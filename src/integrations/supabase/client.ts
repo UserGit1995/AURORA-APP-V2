@@ -1,67 +1,17 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
-// Credenziali dirette del tuo progetto Supabase
-const DEFAULT_SUPABASE_URL = "https://hkpqvggvqzvpkzeqmtga.supabase.co";
-const DEFAULT_SUPABASE_KEY = "sb_publishable_VsQKGL806R1Jkh9Q70zMLQ_BPiUa4g";
+const SUPABASE_URL = "https://hkpqvggvqzvpkzeqmtga.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhrcHF2Z2d2cXp2cGt6ZXFtdGdhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ2ODc3MjUsImV4cCI6MjEwMDI2MzcyNX0.1Lgr756jgYTo-dKsrlAOQpRkwvyULbV5Dt-xnpPrxss";
 
-function isNewSupabaseApiKey(value: string): boolean {
-  return value.startsWith('sb_publishable_') || value.startsWith('sb_secret_');
-}
-
-function createSupabaseFetch(supabaseKey: string): typeof fetch {
-  return (input, init) => {
-    const headers = new Headers(
-      typeof Request !== 'undefined' && input instanceof Request ? input.headers : undefined,
-    );
-
-    if (init?.headers) {
-      new Headers(init.headers).forEach((value, key) => headers.set(key, value));
-    }
-
-    // New Supabase API keys are opaque strings, not bearer JWTs.
-    if (isNewSupabaseApiKey(supabaseKey) && headers.get('Authorization') === `Bearer ${supabaseKey}`) {
-      headers.delete('Authorization');
-    }
-
-    headers.set('apikey', supabaseKey);
-    return fetch(input, { ...init, headers });
-  };
-}
-
-function createSupabaseClient() {
-  // Supporta tutti i possibili nomi di variabili d'ambiente sia client che server con fallback garantito
-  const SUPABASE_URL = 
-    import.meta.env.VITE_SUPABASE_URL || 
-    import.meta.env.NEXT_PUBLIC_SUPABASE_URL || 
-    process.env.SUPABASE_URL || 
-    DEFAULT_SUPABASE_URL;
-
-  const SUPABASE_KEY = 
-    import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || 
-    import.meta.env.VITE_SUPABASE_ANON_KEY || 
-    import.meta.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 
-    process.env.SUPABASE_PUBLISHABLE_KEY || 
-    process.env.SUPABASE_ANON_KEY || 
-    DEFAULT_SUPABASE_KEY;
-
-  return createClient<Database>(SUPABASE_URL, SUPABASE_KEY, {
-    global: {
-      fetch: createSupabaseFetch(SUPABASE_KEY),
-    },
+export const supabase = createClient<Database>(
+  (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_URL) || SUPABASE_URL,
+  (typeof import.meta !== 'undefined' && (import.meta.env?.VITE_SUPABASE_PUBLISHABLE_KEY || import.meta.env?.VITE_SUPABASE_ANON_KEY)) || SUPABASE_ANON_KEY,
+  {
     auth: {
       storage: typeof window !== 'undefined' ? localStorage : undefined,
       persistSession: true,
       autoRefreshToken: true,
-    }
-  });
-}
-
-let _supabase: ReturnType<typeof createSupabaseClient> | undefined;
-
-export const supabase = new Proxy({} as ReturnType<typeof createSupabaseClient>, {
-  get(_, prop, receiver) {
-    if (!_supabase) _supabase = createSupabaseClient();
-    return Reflect.get(_supabase, prop, receiver);
-  },
-});
+    },
+  }
+);
