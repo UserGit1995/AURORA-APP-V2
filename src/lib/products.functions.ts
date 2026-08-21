@@ -53,6 +53,18 @@ export const listProducts = createServerFn({ method: "GET" })
     return filtered;
   });
 
+export const listCategoryCounts = createServerFn({ method: "GET" }).handler(async () => {
+  const c = publicClient();
+  const { data, error } = await c.from("products").select("category_id").eq("active", true);
+  if (error) throw error;
+  const counts: Record<string, number> = {};
+  for (const row of data ?? []) {
+    if (!row.category_id) continue;
+    counts[row.category_id] = (counts[row.category_id] ?? 0) + 1;
+  }
+  return counts;
+});
+
 export const getProduct = createServerFn({ method: "GET" })
   .inputValidator((i: { id: string }) => z.object({ id: z.string().uuid() }).parse(i))
   .handler(async ({ data }) => {

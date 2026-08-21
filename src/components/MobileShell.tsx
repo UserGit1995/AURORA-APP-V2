@@ -17,30 +17,44 @@ import {
   LogIn,
   LogOut,
   Shield,
+  ShoppingBag,
+  Heart,
 } from "lucide-react";
 import { AuroraLogo } from "./AuroraLogo";
 import { useAuth } from "@/hooks/useAuth";
+import { useCart } from "@/lib/cart-context";
 
-export function MobileShell({ children }: { children: ReactNode }) {
+export function MobileShell({ children, onOpenCart }: { children: ReactNode; onOpenCart: () => void }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const path = useRouterState({ select: (s) => s.location.pathname });
   const { session, isAdmin, signOut } = useAuth();
+  const { count, isPulsing } = useCart();
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      <header className="sticky top-0 z-30 h-14 px-4 flex items-center justify-between bg-background/95 backdrop-blur border-b border-border">
+    <div className="min-h-screen bg-background flex flex-col lg:min-h-0 lg:contents">
+      <header className="lg:hidden sticky top-0 z-30 h-14 px-4 flex items-center justify-between bg-background/95 backdrop-blur border-b border-border">
         <button onClick={() => setMenuOpen(true)} aria-label="Menu" className="text-foreground">
           <Menu size={22} />
         </button>
         <AuroraLogo size="md" />
-        <button aria-label="Notifiche" className="text-foreground">
-          <Bell size={20} />
-        </button>
+        <div className="flex items-center gap-3">
+          <button aria-label="Notifiche" className="text-foreground">
+            <Bell size={20} />
+          </button>
+          <button onClick={onOpenCart} aria-label="Carrello" className={`relative text-foreground ${isPulsing ? "text-primary" : ""}`}>
+            <ShoppingBag size={20} />
+            {count > 0 && (
+              <span className="absolute -top-1.5 -right-1.5 bg-primary text-primary-foreground text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                {count}
+              </span>
+            )}
+          </button>
+        </div>
       </header>
 
-      <main className="flex-1 pb-20">{children}</main>
+      <main className="flex-1 pb-20 lg:pb-0">{children}</main>
 
-      <nav className="fixed bottom-0 inset-x-0 h-16 bg-card border-t border-border grid grid-cols-5 z-30">
+      <nav className="lg:hidden fixed bottom-0 inset-x-0 h-16 bg-card border-t border-border grid grid-cols-5 z-30">
         <TabItem to="/home" icon={<HomeIcon size={20} />} label="Home" active={path === "/home"} />
         <TabItem to="/categorie" icon={<LayoutGrid size={20} />} label="Categorie" active={path.startsWith("/categorie")} />
         <TabItem to="/cerca" icon={<Search size={20} />} label="Cerca" active={path === "/cerca"} />
@@ -61,6 +75,7 @@ export function MobileShell({ children }: { children: ReactNode }) {
             <MenuLink to="/categorie" icon={<LayoutGrid size={18} />} onClose={() => setMenuOpen(false)}>Categorie</MenuLink>
             <MenuLink to="/offerte" icon={<Tag size={18} />} onClose={() => setMenuOpen(false)}>Offerte</MenuLink>
             <MenuLink to="/novita" icon={<Sparkles size={18} />} onClose={() => setMenuOpen(false)}>Novità</MenuLink>
+            <MenuLink to="/preferiti" icon={<Heart size={18} />} onClose={() => setMenuOpen(false)}>Preferiti</MenuLink>
             <MenuLink to="/i-miei-ordini" icon={<ClipboardList size={18} />} onClose={() => setMenuOpen(false)}>I miei ordini</MenuLink>
             <MenuLink to="/consegne" icon={<Info size={18} />} onClose={() => setMenuOpen(false)}>Informazioni consegne</MenuLink>
             <MenuLink to="/contatti" icon={<Phone size={18} />} onClose={() => setMenuOpen(false)}>Contatti</MenuLink>
