@@ -19,6 +19,7 @@ import {
   Shield,
   ShoppingBag,
   Heart,
+  Scale,
 } from "lucide-react";
 import { AuroraLogo } from "./AuroraLogo";
 import { useAuth } from "@/hooks/useAuth";
@@ -76,6 +77,7 @@ export function MobileShell({ children, onOpenCart }: { children: ReactNode; onO
             <MenuLink to="/offerte" icon={<Tag size={18} />} onClose={() => setMenuOpen(false)}>Offerte</MenuLink>
             <MenuLink to="/novita" icon={<Sparkles size={18} />} onClose={() => setMenuOpen(false)}>Novità</MenuLink>
             <MenuLink to="/preferiti" icon={<Heart size={18} />} onClose={() => setMenuOpen(false)}>Preferiti</MenuLink>
+            <MenuLink to="/confronta" icon={<Scale size={18} />} onClose={() => setMenuOpen(false)}>Confronta</MenuLink>
             <MenuLink to="/i-miei-ordini" icon={<ClipboardList size={18} />} onClose={() => setMenuOpen(false)}>I miei ordini</MenuLink>
             <MenuLink to="/consegne" icon={<Info size={18} />} onClose={() => setMenuOpen(false)}>Informazioni consegne</MenuLink>
             <MenuLink to="/contatti" icon={<Phone size={18} />} onClose={() => setMenuOpen(false)}>Contatti</MenuLink>

@@ -1,7 +1,8 @@
-import { Heart, Plus, Check, Package, Lock } from "lucide-react";
+import { Heart, Plus, Check, Package, Lock, Scale } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { useCart } from "@/lib/cart-context";
 import { useFavorites } from "@/lib/favorites-context";
+import { useCompare } from "@/lib/compare-context";
 import { useAuth } from "@/hooks/useAuth";
 
 export interface ProductRow {
@@ -17,9 +18,11 @@ export interface ProductRow {
 export function ProductCard({ product }: { product: ProductRow }) {
   const { addItem, addedProductId } = useCart();
   const { isFavorite, toggleFavorite } = useFavorites();
+  const { isCompared, toggleCompare } = useCompare();
   const { session } = useAuth();
 
   const isFav = isFavorite(product.id);
+  const isInCompare = isCompared(product.id);
   const isJustAdded = addedProductId === product.id;
   const hasReservedPrice = !!product.discount_price && product.discount_price < product.price;
   // Il prezzo riservato/scontato è visibile e applicato solo dopo il login.
@@ -53,19 +56,34 @@ export function ProductCard({ product }: { product: ProductRow }) {
           )}
         </div>
 
-        <button
-          onClick={(e) => {
-            e.preventDefault();
-            toggleFavorite(product.id);
-          }}
-          className={`p-1.5 rounded-full backdrop-blur-sm transition-colors shrink-0 ${
-            isFav ? "text-rose-400 bg-rose-500/10" : "text-slate-400 hover:text-white bg-[#0a1528]/80 hover:bg-[#112344]"
-          }`}
-          aria-label="Aggiungi ai preferiti"
-          title={isFav ? "Rimuovi dai preferiti" : "Aggiungi ai preferiti"}
-        >
-          <Heart className={`w-3.5 h-3.5 ${isFav ? "fill-rose-400 text-rose-400" : ""}`} />
-        </button>
+        <div className="flex items-center gap-1 shrink-0">
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              toggleCompare(product.id);
+            }}
+            className={`p-1.5 rounded-full backdrop-blur-sm transition-colors ${
+              isInCompare ? "text-amber-300 bg-amber-500/10" : "text-slate-400 hover:text-white bg-[#0a1528]/80 hover:bg-[#112344]"
+            }`}
+            aria-label="Confronta"
+            title={isInCompare ? "Rimuovi dal confronto" : "Aggiungi al confronto"}
+          >
+            <Scale className="w-3.5 h-3.5" />
+          </button>
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              toggleFavorite(product.id);
+            }}
+            className={`p-1.5 rounded-full backdrop-blur-sm transition-colors ${
+              isFav ? "text-rose-400 bg-rose-500/10" : "text-slate-400 hover:text-white bg-[#0a1528]/80 hover:bg-[#112344]"
+            }`}
+            aria-label="Aggiungi ai preferiti"
+            title={isFav ? "Rimuovi dai preferiti" : "Aggiungi ai preferiti"}
+          >
+            <Heart className={`w-3.5 h-3.5 ${isFav ? "fill-rose-400 text-rose-400" : ""}`} />
+          </button>
+        </div>
       </div>
 
       <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-gradient-to-b from-[#060e1d] to-[#0a1529] flex items-center justify-center p-2 my-1">

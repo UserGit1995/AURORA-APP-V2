@@ -1,13 +1,23 @@
 import { useState } from "react";
-import { useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { Search, Bell, ShoppingBag, X } from "lucide-react";
 import { useCart } from "@/lib/cart-context";
+import { useAuth } from "@/hooks/useAuth";
 
 export function Header({ onOpenCart }: { onOpenCart: () => void }) {
   const navigate = useNavigate();
   const { count, isPulsing } = useCart();
+  const { session } = useAuth();
   const [q, setQ] = useState("");
   const [notifOpen, setNotifOpen] = useState(false);
+
+  const displayName = session?.user?.email?.split("@")[0] || "Ospite";
+  const initials = displayName
+    .split(" ")
+    .map((w: string) => w[0])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
 
   return (
     <header className="hidden lg:flex sticky top-0 z-30 w-full bg-background/90 backdrop-blur-md border-b border-border px-8 py-3.5 items-center justify-between gap-4">
@@ -71,15 +81,20 @@ export function Header({ onOpenCart }: { onOpenCart: () => void }) {
           )}
         </button>
 
-        <div className="flex items-center gap-2.5 pl-1.5 pr-2 py-1 rounded-full border border-transparent">
-          <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-xs">
-            AD
+        <Link
+          to={session ? "/i-miei-ordini" : "/auth"}
+          className="flex items-center gap-2.5 pl-1.5 pr-3 py-1 rounded-full border border-transparent hover:bg-card transition-colors"
+        >
+          <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-xs shrink-0">
+            {initials}
           </div>
-          <div className="hidden xl:block">
-            <p className="text-foreground text-xs font-bold leading-none">Aurora Distributi</p>
-            <p className="text-muted-foreground text-[11px] leading-tight mt-0.5">Distributore</p>
+          <div className="hidden xl:block min-w-0">
+            <p className="text-foreground text-xs font-bold leading-none truncate">{displayName}</p>
+            <p className="text-muted-foreground text-[11px] leading-tight mt-0.5">
+              {session ? "Il mio account" : "Accedi"}
+            </p>
           </div>
-        </div>
+        </Link>
       </div>
     </header>
   );

@@ -4,6 +4,7 @@ import { Header } from "./Header";
 import { MobileShell } from "./MobileShell";
 import { CartDrawer } from "./CartDrawer";
 import { OrderForm } from "./OrderForm";
+import { CompareFloatingBar } from "./CompareFloatingBar";
 import { CartProvider } from "@/lib/cart-context";
 import { FavoritesProvider } from "@/lib/favorites-context";
 import { CompareProvider } from "@/lib/compare-context";
@@ -32,6 +33,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             }}
           />
           <OrderForm open={orderOpen} onClose={() => setOrderOpen(false)} />
+          <CompareFloatingBar />
         </CompareProvider>
       </FavoritesProvider>
     </CartProvider>

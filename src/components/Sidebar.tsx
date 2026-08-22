@@ -6,6 +6,7 @@ import {
   Tag,
   Sparkles,
   ClipboardList,
+  Scale,
   Info,
   MapPin,
   FileText,
@@ -46,6 +47,9 @@ export function Sidebar() {
         </SidebarLink>
         <SidebarLink to="/preferiti" icon={<Heart size={18} />} active={path === "/preferiti"}>
           Preferiti
+        </SidebarLink>
+        <SidebarLink to="/confronta" icon={<Scale size={18} />} active={path === "/confronta"}>
+          Confronta
         </SidebarLink>
         <SidebarLink to="/i-miei-ordini" icon={<ClipboardList size={18} />} active={path === "/i-miei-ordini"}>
           I miei ordini
