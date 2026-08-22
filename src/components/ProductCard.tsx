@@ -1,7 +1,8 @@
-import { Heart, Plus, Check, Package } from "lucide-react";
+import { Heart, Plus, Check, Package, Lock } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { useCart } from "@/lib/cart-context";
 import { useFavorites } from "@/lib/favorites-context";
+import { useAuth } from "@/hooks/useAuth";
 
 export interface ProductRow {
   id: string;
@@ -16,13 +17,17 @@ export interface ProductRow {
 export function ProductCard({ product }: { product: ProductRow }) {
   const { addItem, addedProductId } = useCart();
   const { isFavorite, toggleFavorite } = useFavorites();
+  const { session } = useAuth();
 
   const isFav = isFavorite(product.id);
   const isJustAdded = addedProductId === product.id;
-  const price = product.discount_price ?? product.price;
-  const discountPercent = product.discount_price
-    ? Math.round((1 - Number(product.discount_price) / Number(product.price)) * 100)
-    : null;
+  const hasReservedPrice = !!product.discount_price && product.discount_price < product.price;
+  // Il prezzo riservato/scontato è visibile e applicato solo dopo il login.
+  const price = session && hasReservedPrice ? product.discount_price! : product.price;
+  const discountPercent =
+    session && hasReservedPrice
+      ? Math.round((1 - Number(product.discount_price) / Number(product.price)) * 100)
+      : null;
 
   return (
     <Link
@@ -35,6 +40,10 @@ export function ProductCard({ product }: { product: ProductRow }) {
           {discountPercent ? (
             <span className="text-[10px] font-bold bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded-md border border-amber-500/30">
               -{discountPercent}%
+            </span>
+          ) : !session && hasReservedPrice ? (
+            <span className="inline-flex items-center gap-1 text-[9px] font-bold bg-sky-500/15 text-sky-300 border border-sky-500/30 px-1.5 py-0.5 rounded-md">
+              <Lock size={9} /> Prezzo riservato
             </span>
           ) : null}
           {!product.in_stock && (

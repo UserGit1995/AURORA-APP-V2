@@ -11,6 +11,7 @@ const items = [
   { to: "/admin/ordini", icon: ShoppingBag, label: "Ordini" },
   { to: "/admin/clienti", icon: Users, label: "Clienti" },
   { to: "/admin/utenti", icon: Shield, label: "Utenti Admin" },
+  { to: "/admin/impostazioni", icon: Settings, label: "Impostazioni" },
 ];
 
 export function AdminShell({ children }: { children: ReactNode }) {

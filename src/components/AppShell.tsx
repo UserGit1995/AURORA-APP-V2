@@ -3,23 +3,36 @@ import { Sidebar } from "./Sidebar";
 import { Header } from "./Header";
 import { MobileShell } from "./MobileShell";
 import { CartDrawer } from "./CartDrawer";
+import { OrderForm } from "./OrderForm";
 import { CartProvider } from "@/lib/cart-context";
 import { FavoritesProvider } from "@/lib/favorites-context";
+import { CompareProvider } from "@/lib/compare-context";
 
 export function AppShell({ children }: { children: ReactNode }) {
   const [cartOpen, setCartOpen] = useState(false);
+  const [orderOpen, setOrderOpen] = useState(false);
 
   return (
     <CartProvider>
       <FavoritesProvider>
-        <div className="lg:flex lg:min-h-screen bg-background">
-          <Sidebar />
-          <div className="flex-1 min-w-0 flex flex-col">
-            <Header onOpenCart={() => setCartOpen(true)} />
-            <MobileShell onOpenCart={() => setCartOpen(true)}>{children}</MobileShell>
+        <CompareProvider>
+          <div className="lg:flex lg:min-h-screen bg-background">
+            <Sidebar />
+            <div className="flex-1 min-w-0 flex flex-col">
+              <Header onOpenCart={() => setCartOpen(true)} />
+              <MobileShell onOpenCart={() => setCartOpen(true)}>{children}</MobileShell>
+            </div>
           </div>
-        </div>
-        <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
+          <CartDrawer
+            open={cartOpen}
+            onClose={() => setCartOpen(false)}
+            onOrder={() => {
+              setCartOpen(false);
+              setOrderOpen(true);
+            }}
+          />
+          <OrderForm open={orderOpen} onClose={() => setOrderOpen(false)} />
+        </CompareProvider>
       </FavoritesProvider>
     </CartProvider>
   );

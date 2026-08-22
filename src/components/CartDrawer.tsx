@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { X, Minus, Plus, Trash2, ShoppingBag, Package } from "lucide-react";
 import { useCart } from "@/lib/cart-context";
 
-export function CartDrawer({ open, onClose }: { open: boolean; onClose: () => void }) {
+export function CartDrawer({ open, onClose, onOrder }: { open: boolean; onClose: () => void; onOrder: () => void }) {
   const { items, total, setQty, removeItem } = useCart();
 
   if (!open) return null;
@@ -90,15 +90,14 @@ export function CartDrawer({ open, onClose }: { open: boolean; onClose: () => vo
                 <span className="text-muted-foreground">Totale (+IVA)</span>
                 <span className="font-bold text-foreground text-base">€ {total.toFixed(2)}</span>
               </div>
-              <Link
-                to="/contatti"
-                onClick={onClose}
-                className="flex items-center justify-center h-11 rounded-full bg-primary text-primary-foreground text-sm font-semibold hover:bg-sky-600 transition-colors"
+              <button
+                onClick={onOrder}
+                className="w-full flex items-center justify-center h-11 rounded-full bg-primary text-primary-foreground text-sm font-semibold hover:bg-sky-600 transition-colors"
               >
                 Procedi con l'ordine
-              </Link>
+              </button>
               <p className="text-[11px] text-muted-foreground text-center">
-                L'invio ordine automatico dal carrello arriva nel prossimo blocco: per ora ti mettiamo in contatto diretto.
+                Nessun pagamento online: invii la richiesta, ti ricontattiamo per confermare.
               </p>
             </div>
           </>
