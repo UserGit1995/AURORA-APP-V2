@@ -50,6 +50,7 @@ function AdminProdotti() {
 
   const [form, setForm] = useState<ProductFormState | null>(null);
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const refresh = () => qc.invalidateQueries({ queryKey: ["admin-products"] });
@@ -77,6 +78,7 @@ function AdminProdotti() {
     e.preventDefault();
     if (!form) return;
     setSaving(true);
+    setError(null);
     try {
       await adminSaveProduct({
         data: {
@@ -98,6 +100,8 @@ function AdminProdotti() {
       });
       setForm(null);
       refresh();
+    } catch (err: any) {
+      setError(err?.message ?? "Impossibile salvare il prodotto. Controlla i campi e riprova.");
     } finally {
       setSaving(false);
     }
@@ -216,6 +220,7 @@ function AdminProdotti() {
                 <Checkbox label="In offerta" checked={form.is_on_offer} onChange={(v) => setForm({ ...form, is_on_offer: v })} />
                 <Checkbox label="Attivo (visibile nel sito)" checked={form.active} onChange={(v) => setForm({ ...form, active: v })} />
               </div>
+              {error && <p className="text-xs text-destructive bg-destructive/10 border border-destructive/25 rounded-lg p-2">{error}</p>}
               <button
                 type="submit"
                 disabled={saving}

@@ -20,18 +20,27 @@ function AdminSottocategorie() {
   const { data, isLoading } = useQuery({ queryKey: ["admin-subcategories"], queryFn: () => adminListSubcategories() });
   const { data: categories } = useQuery({ queryKey: ["admin-categories-lite"], queryFn: () => adminListCategories() });
   const [form, setForm] = useState<FormState | null>(null);
+  const [slugTouched, setSlugTouched] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const refresh = () => qc.invalidateQueries({ queryKey: ["admin-subcategories"] });
 
-  const openEdit = (s: any) =>
+  const openEdit = (s: any) => {
+    setSlugTouched(true);
     setForm({ id: s.id, category_id: s.category_id, name: s.name, slug: s.slug, sort_order: String(s.sort_order ?? 0), active: s.active });
+  };
+  const openNew = () => {
+    setSlugTouched(false);
+    setForm(emptyForm);
+  };
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form || !form.category_id) return;
     setSaving(true);
+    setError(null);
     try {
       await adminSaveSubcategory({
         data: {
@@ -45,6 +54,8 @@ function AdminSottocategorie() {
       });
       setForm(null);
       refresh();
+    } catch (err: any) {
+      setError(err?.message ?? "Impossibile salvare la sottocategoria. Controlla i campi e riprova.");
     } finally {
       setSaving(false);
     }
@@ -65,7 +76,7 @@ function AdminSottocategorie() {
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-sm font-bold text-foreground">Sottocategorie</h2>
         <button
-          onClick={() => setForm(emptyForm)}
+          onClick={openNew}
           className="inline-flex items-center gap-1.5 h-9 px-4 rounded-lg bg-primary text-primary-foreground text-xs font-semibold"
         >
           <Plus size={14} /> Nuova sottocategoria
@@ -115,13 +126,21 @@ function AdminSottocategorie() {
                 <input
                   required
                   value={form.name}
-                  onChange={(e) => setForm({ ...form, name: e.target.value, slug: form.slug || slugify(e.target.value) })}
+                  onChange={(e) => setForm({ ...form, name: e.target.value, slug: slugTouched ? form.slug : slugify(e.target.value) })}
                   className="input-field"
                 />
               </label>
               <label className="block">
                 <span className="text-[11px] font-semibold text-muted-foreground block mb-1">Slug (URL)</span>
-                <input required value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} className="input-field" />
+                <input
+                  required
+                  value={form.slug}
+                  onChange={(e) => {
+                    setSlugTouched(true);
+                    setForm({ ...form, slug: e.target.value });
+                  }}
+                  className="input-field"
+                />
               </label>
               <label className="block">
                 <span className="text-[11px] font-semibold text-muted-foreground block mb-1">Ordine</span>
@@ -131,6 +150,7 @@ function AdminSottocategorie() {
                 <input type="checkbox" checked={form.active} onChange={(e) => setForm({ ...form, active: e.target.checked })} className="accent-primary" />
                 Attiva (visibile nel sito)
               </label>
+              {error && <p className="text-xs text-destructive bg-destructive/10 border border-destructive/25 rounded-lg p-2">{error}</p>}
               <button
                 type="submit"
                 disabled={saving}

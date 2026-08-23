@@ -20,18 +20,27 @@ function AdminCategorie() {
   const qc = useQueryClient();
   const { data, isLoading } = useQuery({ queryKey: ["admin-categories"], queryFn: () => adminListCategories() });
   const [form, setForm] = useState<FormState | null>(null);
+  const [slugTouched, setSlugTouched] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const refresh = () => qc.invalidateQueries({ queryKey: ["admin-categories"] });
 
-  const openEdit = (c: any) =>
+  const openEdit = (c: any) => {
+    setSlugTouched(true);
     setForm({ id: c.id, name: c.name, slug: c.slug, image_url: c.image_url ?? "", sort_order: String(c.sort_order ?? 0), active: c.active });
+  };
+  const openNew = () => {
+    setSlugTouched(false);
+    setForm(emptyForm);
+  };
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form) return;
     setSaving(true);
+    setError(null);
     try {
       await adminSaveCategory({
         data: {
@@ -45,6 +54,8 @@ function AdminCategorie() {
       });
       setForm(null);
       refresh();
+    } catch (err: any) {
+      setError(err?.message ?? "Impossibile salvare la categoria. Controlla i campi e riprova.");
     } finally {
       setSaving(false);
     }
@@ -65,7 +76,7 @@ function AdminCategorie() {
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-sm font-bold text-foreground">Categorie</h2>
         <button
-          onClick={() => setForm(emptyForm)}
+          onClick={openNew}
           className="inline-flex items-center gap-1.5 h-9 px-4 rounded-lg bg-primary text-primary-foreground text-xs font-semibold"
         >
           <Plus size={14} /> Nuova categoria
@@ -114,13 +125,21 @@ function AdminCategorie() {
                 <input
                   required
                   value={form.name}
-                  onChange={(e) => setForm({ ...form, name: e.target.value, slug: form.slug || slugify(e.target.value) })}
+                  onChange={(e) => setForm({ ...form, name: e.target.value, slug: slugTouched ? form.slug : slugify(e.target.value) })}
                   className="input-field"
                 />
               </label>
               <label className="block">
                 <span className="text-[11px] font-semibold text-muted-foreground block mb-1">Slug (URL)</span>
-                <input required value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} className="input-field" />
+                <input
+                  required
+                  value={form.slug}
+                  onChange={(e) => {
+                    setSlugTouched(true);
+                    setForm({ ...form, slug: e.target.value });
+                  }}
+                  className="input-field"
+                />
               </label>
               <ImageUploadField label="Immagine categoria" value={form.image_url} onChange={(v) => setForm({ ...form, image_url: v })} />
               <label className="block">
@@ -131,6 +150,7 @@ function AdminCategorie() {
                 <input type="checkbox" checked={form.active} onChange={(e) => setForm({ ...form, active: e.target.checked })} className="accent-primary" />
                 Attiva (visibile nel sito)
               </label>
+              {error && <p className="text-xs text-destructive bg-destructive/10 border border-destructive/25 rounded-lg p-2">{error}</p>}
               <button
                 type="submit"
                 disabled={saving}
