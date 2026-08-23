@@ -21,17 +21,22 @@ import {
   Heart,
   Scale,
   Zap,
+  Flame,
 } from "lucide-react";
 import { AuroraLogo } from "./AuroraLogo";
 import { Footer } from "./Footer";
 import { useAuth } from "@/hooks/useAuth";
 import { useCart } from "@/lib/cart-context";
+import { useFavorites } from "@/lib/favorites-context";
+import { useCompare } from "@/lib/compare-context";
 
 export function MobileShell({ children, onOpenCart, onOpenTemplates }: { children: ReactNode; onOpenCart: () => void; onOpenTemplates: () => void }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const path = useRouterState({ select: (s) => s.location.pathname });
   const { session, isAdmin, signOut } = useAuth();
   const { count, isPulsing } = useCart();
+  const { favorites } = useFavorites();
+  const { comparedIds } = useCompare();
 
   return (
     <div className="min-h-screen bg-background flex flex-col lg:min-h-0 lg:contents">
@@ -87,8 +92,9 @@ export function MobileShell({ children, onOpenCart, onOpenTemplates }: { childre
             <MenuLink to="/categorie" icon={<LayoutGrid size={18} />} onClose={() => setMenuOpen(false)}>Categorie</MenuLink>
             <MenuLink to="/offerte" icon={<Tag size={18} />} onClose={() => setMenuOpen(false)}>Offerte</MenuLink>
             <MenuLink to="/novita" icon={<Sparkles size={18} />} onClose={() => setMenuOpen(false)}>Novità</MenuLink>
-            <MenuLink to="/preferiti" icon={<Heart size={18} />} onClose={() => setMenuOpen(false)}>Preferiti</MenuLink>
-            <MenuLink to="/confronta" icon={<Scale size={18} />} onClose={() => setMenuOpen(false)}>Confronta</MenuLink>
+            <MenuLink to="/piu-venduti" icon={<Flame size={18} />} onClose={() => setMenuOpen(false)}>I più venduti</MenuLink>
+            <MenuLink to="/preferiti" icon={<Heart size={18} />} onClose={() => setMenuOpen(false)} badge={favorites.length}>Preferiti</MenuLink>
+            <MenuLink to="/confronta" icon={<Scale size={18} />} onClose={() => setMenuOpen(false)} badge={comparedIds.length} badgeColor="bg-amber-500/20 text-amber-300">Confronta</MenuLink>
             <MenuLink to="/i-miei-ordini" icon={<ClipboardList size={18} />} onClose={() => setMenuOpen(false)}>I miei ordini</MenuLink>
             <MenuLink to="/consegne" icon={<Info size={18} />} onClose={() => setMenuOpen(false)}>Informazioni consegne</MenuLink>
             <MenuLink to="/contatti" icon={<Phone size={18} />} onClose={() => setMenuOpen(false)}>Contatti</MenuLink>
@@ -130,7 +136,7 @@ function TabItem({ to, icon, label, active }: { to: string; icon: ReactNode; lab
   );
 }
 
-function MenuLink({ to, icon, children, onClose }: { to: string; icon: ReactNode; children: ReactNode; onClose: () => void }) {
+function MenuLink({ to, icon, children, onClose, badge, badgeColor }: { to: string; icon: ReactNode; children: ReactNode; onClose: () => void; badge?: number; badgeColor?: string }) {
   const path = useRouterState({ select: (s) => s.location.pathname });
   const active = path === to;
   return (
@@ -140,7 +146,10 @@ function MenuLink({ to, icon, children, onClose }: { to: string; icon: ReactNode
       className={`flex items-center gap-3 px-3 py-3 rounded-lg ${active ? "bg-sidebar-primary text-sidebar-primary-foreground" : "text-sidebar-foreground hover:bg-sidebar-accent"}`}
     >
       {icon}
-      <span className="text-sm">{children}</span>
+      <span className="text-sm flex-1">{children}</span>
+      {!!badge && (
+        <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${badgeColor ?? "bg-primary/20 text-primary"}`}>{badge}</span>
+      )}
     </Link>
   );
 }

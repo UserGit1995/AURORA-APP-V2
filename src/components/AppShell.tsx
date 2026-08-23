@@ -22,7 +22,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         <FavoritesProvider>
           <CompareProvider>
             <div className="lg:flex lg:min-h-screen bg-background">
-              <Sidebar />
+              <Sidebar onOpenTemplates={() => setTemplatesOpen(true)} />
               <div className="flex-1 min-w-0 flex flex-col">
                 <Header onOpenCart={() => setCartOpen(true)} onOpenTemplates={() => setTemplatesOpen(true)} />
                 <MobileShell onOpenCart={() => setCartOpen(true)} onOpenTemplates={() => setTemplatesOpen(true)}>

@@ -65,6 +65,31 @@ export const listCategoryCounts = createServerFn({ method: "GET" }).handler(asyn
   return counts;
 });
 
+export const listBestsellers = createServerFn({ method: "GET" }).handler(async () => {
+  const c = publicClient();
+  const { data: itemRows, error: iErr } = await c.from("order_items").select("product_id, quantity");
+  if (iErr) throw iErr;
+  const totals: Record<string, number> = {};
+  for (const row of itemRows ?? []) {
+    if (!row.product_id) continue;
+    totals[row.product_id] = (totals[row.product_id] ?? 0) + row.quantity;
+  }
+  const topIds = Object.entries(totals)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 24)
+    .map(([id]) => id);
+  if (topIds.length === 0) return [];
+  const { data: products, error: pErr } = await c
+    .from("products")
+    .select("*, categories(name, slug)")
+    .in("id", topIds)
+    .eq("active", true);
+  if (pErr) throw pErr;
+  // Riordina secondo la classifica reale (la query "in" non garantisce l'ordine)
+  const order = new Map(topIds.map((id, i) => [id, i]));
+  return (products ?? []).sort((a: any, b: any) => (order.get(a.id) ?? 0) - (order.get(b.id) ?? 0));
+});
+
 export const getProduct = createServerFn({ method: "GET" })
   .inputValidator((i: { id: string }) => z.object({ id: z.string().uuid() }).parse(i))
   .handler(async ({ data }) => {
