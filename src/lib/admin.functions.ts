@@ -63,6 +63,7 @@ const productSchema = z.object({
   name: z.string().min(2).max(200),
   description: z.string().max(2000).optional().nullable(),
   category_id: z.string().uuid().optional().nullable(),
+  subcategory_id: z.string().uuid().optional().nullable(),
   price: z.number().min(0),
   discount_price: z.number().min(0).optional().nullable(),
   image_url: z.string().url().optional().nullable(),
@@ -138,6 +139,51 @@ export const adminDeleteCategory = createServerFn({ method: "POST" })
   .handler(async ({ context, data }) => {
     await ensureAdmin(context);
     const { error } = await context.supabase.from("categories").delete().eq("id", data.id);
+    if (error) throw error;
+    return { ok: true };
+  });
+
+export const adminListSubcategories = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await ensureAdmin(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data } = await supabaseAdmin
+      .from("subcategories")
+      .select("*, categories(name)")
+      .order("sort_order");
+    return data ?? [];
+  });
+
+export const adminSaveSubcategory = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i: unknown) => z.object({
+    id: z.string().uuid().optional(),
+    category_id: z.string().uuid(),
+    name: z.string().min(2).max(120),
+    slug: z.string().min(2).max(120).regex(/^[a-z0-9-]+$/),
+    sort_order: z.number().int().optional(),
+    active: z.boolean().optional(),
+  }).parse(i))
+  .handler(async ({ context, data }) => {
+    await ensureAdmin(context);
+    if (data.id) {
+      const { id, ...rest } = data;
+      const { error } = await context.supabase.from("subcategories").update(rest).eq("id", id);
+      if (error) throw error;
+    } else {
+      const { error } = await context.supabase.from("subcategories").insert(data as any);
+      if (error) throw error;
+    }
+    return { ok: true };
+  });
+
+export const adminDeleteSubcategory = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i: unknown) => z.object({ id: z.string().uuid() }).parse(i))
+  .handler(async ({ context, data }) => {
+    await ensureAdmin(context);
+    const { error } = await context.supabase.from("subcategories").delete().eq("id", data.id);
     if (error) throw error;
     return { ok: true };
   });

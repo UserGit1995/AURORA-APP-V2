@@ -25,10 +25,22 @@ export const listCategories = createServerFn({ method: "GET" }).handler(async ()
   return data ?? [];
 });
 
+export const listSubcategories = createServerFn({ method: "GET" })
+  .inputValidator((i: { categorySlug?: string } = {}) => z.object({ categorySlug: z.string().optional() }).parse(i))
+  .handler(async ({ data }) => {
+    const c = publicClient();
+    let query = c.from("subcategories").select("*, categories!inner(slug)").eq("active", true);
+    if (data.categorySlug) query = query.eq("categories.slug", data.categorySlug);
+    const { data: rows, error } = await query.order("sort_order");
+    if (error) throw error;
+    return rows ?? [];
+  });
+
 export const listProducts = createServerFn({ method: "GET" })
-  .inputValidator((i: { categorySlug?: string; featured?: boolean; onOffer?: boolean; isNew?: boolean; q?: string } = {}) =>
+  .inputValidator((i: { categorySlug?: string; subcategorySlug?: string; featured?: boolean; onOffer?: boolean; isNew?: boolean; q?: string } = {}) =>
     z.object({
       categorySlug: z.string().optional(),
+      subcategorySlug: z.string().optional(),
       featured: z.boolean().optional(),
       onOffer: z.boolean().optional(),
       isNew: z.boolean().optional(),
@@ -38,7 +50,7 @@ export const listProducts = createServerFn({ method: "GET" })
     const c = publicClient();
     let query = c
       .from("products")
-      .select("*, categories(slug, name)")
+      .select("*, categories(slug, name), subcategories(slug, name)")
       .eq("active", true);
     if (data.featured) query = query.eq("is_featured", true);
     if (data.onOffer) query = query.eq("is_on_offer", true);
@@ -49,6 +61,9 @@ export const listProducts = createServerFn({ method: "GET" })
     let filtered = rows ?? [];
     if (data.categorySlug) {
       filtered = filtered.filter((p: any) => p.categories?.slug === data.categorySlug);
+    }
+    if (data.subcategorySlug) {
+      filtered = filtered.filter((p: any) => p.subcategories?.slug === data.subcategorySlug);
     }
     return filtered;
   });

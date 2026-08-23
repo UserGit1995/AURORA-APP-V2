@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { listProducts } from "@/lib/products.functions";
+import { useState } from "react";
+import { listProducts, listSubcategories } from "@/lib/products.functions";
 import { ProductGrid } from "@/components/ProductCard";
 
 export const Route = createFileRoute("/_app/categorie/$slug")({
@@ -9,14 +10,33 @@ export const Route = createFileRoute("/_app/categorie/$slug")({
 
 function CategoryPage() {
   const { slug } = Route.useParams();
+  const [activeSub, setActiveSub] = useState<string | null>(null);
+
+  const { data: subcategories } = useQuery({
+    queryKey: ["subcats", slug],
+    queryFn: () => listSubcategories({ data: { categorySlug: slug } }),
+  });
+
   const { data, isLoading } = useQuery({
-    queryKey: ["prods", slug],
-    queryFn: () => listProducts({ data: { categorySlug: slug } }),
+    queryKey: ["prods", slug, activeSub],
+    queryFn: () => listProducts({ data: { categorySlug: slug, subcategorySlug: activeSub ?? undefined } }),
   });
 
   return (
     <div className="px-4 sm:px-6 lg:px-8 pt-4 lg:pt-6 pb-4 max-w-[1400px] mx-auto">
       <h1 className="text-xl font-heading font-bold text-foreground mb-4 capitalize">{slug.replace(/-/g, " ")}</h1>
+
+      {subcategories && subcategories.length > 0 && (
+        <div className="flex gap-2 overflow-x-auto pb-1 mb-4 -mx-1 px-1">
+          <SubTab active={activeSub === null} onClick={() => setActiveSub(null)}>Tutti</SubTab>
+          {subcategories.map((s: any) => (
+            <SubTab key={s.id} active={activeSub === s.slug} onClick={() => setActiveSub(s.slug)}>
+              {s.name}
+            </SubTab>
+          ))}
+        </div>
+      )}
+
       {isLoading ? (
         <SkeletonGrid />
       ) : data && data.length > 0 ? (
@@ -25,6 +45,21 @@ function CategoryPage() {
         <EmptyHint />
       )}
     </div>
+  );
+}
+
+function SubTab({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-semibold border transition-colors shrink-0 ${
+        active
+          ? "bg-primary text-primary-foreground border-primary"
+          : "bg-card text-muted-foreground border-border hover:border-primary/40 hover:text-foreground"
+      }`}
+    >
+      {children}
+    </button>
   );
 }
 

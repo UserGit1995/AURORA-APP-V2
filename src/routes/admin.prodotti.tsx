@@ -1,9 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { adminListProducts, adminSaveProduct, adminDeleteProduct } from "@/lib/admin.functions";
-import { adminListCategories } from "@/lib/admin.functions";
+import { adminListProducts, adminSaveProduct, adminDeleteProduct, adminListCategories, adminListSubcategories } from "@/lib/admin.functions";
 import { Plus, Pencil, Trash2, X, Loader2, Package } from "lucide-react";
+import { ImageUploadField } from "@/components/ImageUploadField";
 
 export const Route = createFileRoute("/admin/prodotti")({
   component: AdminProdotti,
@@ -14,6 +14,7 @@ type ProductFormState = {
   name: string;
   description: string;
   category_id: string;
+  subcategory_id: string;
   price: string;
   discount_price: string;
   image_url: string;
@@ -29,6 +30,7 @@ const emptyForm: ProductFormState = {
   name: "",
   description: "",
   category_id: "",
+  subcategory_id: "",
   price: "",
   discount_price: "",
   image_url: "",
@@ -44,6 +46,7 @@ function AdminProdotti() {
   const qc = useQueryClient();
   const { data, isLoading } = useQuery({ queryKey: ["admin-products"], queryFn: () => adminListProducts() });
   const { data: categories } = useQuery({ queryKey: ["admin-categories-lite"], queryFn: () => adminListCategories() });
+  const { data: subcategories } = useQuery({ queryKey: ["admin-subcategories-lite"], queryFn: () => adminListSubcategories() });
 
   const [form, setForm] = useState<ProductFormState | null>(null);
   const [saving, setSaving] = useState(false);
@@ -58,6 +61,7 @@ function AdminProdotti() {
       name: p.name,
       description: p.description ?? "",
       category_id: p.category_id ?? "",
+      subcategory_id: p.subcategory_id ?? "",
       price: String(p.price),
       discount_price: p.discount_price != null ? String(p.discount_price) : "",
       image_url: p.image_url ?? "",
@@ -80,6 +84,7 @@ function AdminProdotti() {
           name: form.name,
           description: form.description || null,
           category_id: form.category_id || null,
+          subcategory_id: form.subcategory_id || null,
           price: Number(form.price),
           discount_price: form.discount_price ? Number(form.discount_price) : null,
           image_url: form.image_url || null,
@@ -108,6 +113,8 @@ function AdminProdotti() {
     }
   };
 
+  const availableSubcategories = (subcategories ?? []).filter((s: any) => s.category_id === form?.category_id);
+
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
@@ -132,7 +139,8 @@ function AdminProdotti() {
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-foreground truncate">{p.name}</p>
                 <p className="text-xs text-muted-foreground truncate">
-                  {p.categories?.name ?? "—"} · € {Number(p.price).toFixed(2)}
+                  {p.categories?.name ?? "—"}
+                  {p.subcategories?.name ? ` › ${p.subcategories.name}` : ""} · € {Number(p.price).toFixed(2)}
                   {p.discount_price ? ` (riservato € ${Number(p.discount_price).toFixed(2)})` : ""}
                   {!p.active ? " · disattivato" : ""}
                 </p>
@@ -164,24 +172,42 @@ function AdminProdotti() {
             <div className="p-5 space-y-3">
               <TextField label="Nome" value={form.name} onChange={(v) => setForm({ ...form, name: v })} required />
               <TextArea label="Descrizione" value={form.description} onChange={(v) => setForm({ ...form, description: v })} />
-              <label className="block">
-                <span className="text-[11px] font-semibold text-muted-foreground block mb-1">Categoria</span>
-                <select
-                  value={form.category_id}
-                  onChange={(e) => setForm({ ...form, category_id: e.target.value })}
-                  className="input-field"
-                >
-                  <option value="">— Nessuna —</option>
-                  {(categories ?? []).map((c: any) => (
-                    <option key={c.id} value={c.id}>{c.name}</option>
-                  ))}
-                </select>
-              </label>
+
+              <div className="grid grid-cols-2 gap-3">
+                <label className="block">
+                  <span className="text-[11px] font-semibold text-muted-foreground block mb-1">Categoria</span>
+                  <select
+                    value={form.category_id}
+                    onChange={(e) => setForm({ ...form, category_id: e.target.value, subcategory_id: "" })}
+                    className="input-field"
+                  >
+                    <option value="">— Nessuna —</option>
+                    {(categories ?? []).map((c: any) => (
+                      <option key={c.id} value={c.id}>{c.name}</option>
+                    ))}
+                  </select>
+                </label>
+                <label className="block">
+                  <span className="text-[11px] font-semibold text-muted-foreground block mb-1">Sottocategoria</span>
+                  <select
+                    value={form.subcategory_id}
+                    onChange={(e) => setForm({ ...form, subcategory_id: e.target.value })}
+                    disabled={!form.category_id}
+                    className="input-field disabled:opacity-50"
+                  >
+                    <option value="">— Nessuna —</option>
+                    {availableSubcategories.map((s: any) => (
+                      <option key={s.id} value={s.id}>{s.name}</option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+
               <div className="grid grid-cols-2 gap-3">
                 <TextField label="Prezzo (€)" type="number" step="0.01" value={form.price} onChange={(v) => setForm({ ...form, price: v })} required />
                 <TextField label="Prezzo riservato (€, opzionale)" type="number" step="0.01" value={form.discount_price} onChange={(v) => setForm({ ...form, discount_price: v })} />
               </div>
-              <TextField label="URL immagine" value={form.image_url} onChange={(v) => setForm({ ...form, image_url: v })} />
+              <ImageUploadField label="Immagine prodotto" value={form.image_url} onChange={(v) => setForm({ ...form, image_url: v })} />
               <TextField label="Codice / SKU" value={form.sku} onChange={(v) => setForm({ ...form, sku: v })} />
               <div className="grid grid-cols-2 gap-2 pt-1">
                 <Checkbox label="Disponibile" checked={form.in_stock} onChange={(v) => setForm({ ...form, in_stock: v })} />

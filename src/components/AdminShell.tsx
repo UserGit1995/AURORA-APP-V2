@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { LayoutDashboard, Package, Tag, ShoppingBag, Users, Mail, Truck, Shield, LogOut, Settings, BarChart3, FolderTree } from "lucide-react";
+import { LayoutDashboard, Package, Tag, ShoppingBag, Users, Mail, Truck, Shield, LogOut, Settings, BarChart3, FolderTree, Layers } from "lucide-react";
 import { AuroraLogo } from "./AuroraLogo";
 import { useAuth } from "@/hooks/useAuth";
 import type { ReactNode } from "react";
@@ -8,6 +8,7 @@ const items = [
   { to: "/admin", icon: LayoutDashboard, label: "Dashboard" },
   { to: "/admin/prodotti", icon: Package, label: "Prodotti" },
   { to: "/admin/categorie", icon: FolderTree, label: "Categorie" },
+  { to: "/admin/sottocategorie", icon: Layers, label: "Sottocategorie" },
   { to: "/admin/ordini", icon: ShoppingBag, label: "Ordini" },
   { to: "/admin/clienti", icon: Users, label: "Clienti" },
   { to: "/admin/utenti", icon: Shield, label: "Utenti Admin" },
