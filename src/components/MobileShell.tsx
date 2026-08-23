@@ -33,7 +33,7 @@ export function MobileShell({ children, onOpenCart }: { children: ReactNode; onO
 
   return (
     <div className="min-h-screen bg-background flex flex-col lg:min-h-0 lg:contents">
-      <header className="lg:hidden sticky top-0 z-30 h-14 px-4 flex items-center justify-between bg-background/95 backdrop-blur border-b border-border">
+      <header className="lg:hidden sticky top-0 z-30 h-16 px-4 flex items-center justify-between bg-background/95 backdrop-blur border-b border-border">
         <button onClick={() => setMenuOpen(true)} aria-label="Menu" className="text-foreground">
           <Menu size={22} />
         </button>
@@ -67,7 +67,7 @@ export function MobileShell({ children, onOpenCart }: { children: ReactNode; onO
         <div className="fixed inset-0 z-50 flex">
           <aside className="w-[82%] max-w-sm bg-sidebar h-full overflow-y-auto p-5 flex flex-col gap-1 animate-in slide-in-from-left duration-200">
             <div className="flex items-center justify-between mb-6">
-              <AuroraLogo size="md" />
+              <AuroraLogo size="lg" />
               <button onClick={() => setMenuOpen(false)} className="text-sidebar-foreground">
                 <X size={22} />
               </button>

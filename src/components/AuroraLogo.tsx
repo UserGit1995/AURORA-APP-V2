@@ -6,9 +6,9 @@ interface AuroraLogoProps {
 }
 
 const heights = {
-  sm: "h-7",
-  md: "h-9",
-  lg: "h-14",
+  sm: "h-8",
+  md: "h-11",
+  lg: "h-16",
 };
 
 export function AuroraLogo({ size = "md", className = "" }: AuroraLogoProps) {

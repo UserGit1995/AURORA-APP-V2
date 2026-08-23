@@ -26,10 +26,7 @@ export function Sidebar() {
   return (
     <aside className="hidden lg:flex flex-col w-64 shrink-0 h-screen sticky top-0 bg-sidebar border-r border-sidebar-border overflow-y-auto">
       <div className="px-5 py-6">
-        <AuroraLogo size="md" />
-        <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground mt-1">
-          Forniture Professionali
-        </p>
+        <AuroraLogo size="lg" />
       </div>
 
       <nav className="flex-1 px-3 space-y-1">
