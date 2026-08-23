@@ -1,12 +1,12 @@
-// Questo file inizializza Supabase in modo standard
+// File di inizializzazione Supabase
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
-// =========================================================================
-// VALORI DI FALLBACK (Usati se le variabili d'ambiente mancano)
-// =========================================================================
+// URL del tuo progetto Supabase
 const FALLBACK_URL = "https://hkpqvggvqzvpkzeqmtga.supabase.co";
-const FALLBACK_KEY = "sb_publishable_VsQKGL806R1Jkh9Q70zMLQ_BPiUa4g";
+
+// La tua chiave anonima (public) JWT corretta
+const FALLBACK_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhrcHF2Z2d2cXp2cGt6ZXFtdGdhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ2ODc3MjUsImV4cCI6MjEwMDI2MzcyNX0.1Lgr756jgYTo-dKsrlAOQpRkwvyULbV5Dt-xnpPrxss";
 
 function createSupabaseClient() {
   const SUPABASE_URL = 
@@ -20,7 +20,6 @@ function createSupabaseClient() {
     process.env.SUPABASE_ANON_KEY || 
     FALLBACK_KEY;
 
-  // Inizializzazione standard SENZA la modifica degli header (che causava l'errore)
   return createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
     auth: {
       storage: typeof window !== 'undefined' ? window.localStorage : undefined,
