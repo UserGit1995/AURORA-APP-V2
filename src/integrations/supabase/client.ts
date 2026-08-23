@@ -2,8 +2,11 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
-const FALLBACK_URL = "https://hkpqvggvqzvpkzeqmtga.supabase.co";
-const FALLBACK_KEY = "sb_publishable_VsQKGL806R1Jkh9Q70zMLQ_BPiUa4g";
+// =========================================================================
+// SOSTITUISCI QUESTI DUE VALORI CON QUELLI REALI DEL TUO PROGETTO SUPABASE:
+// =========================================================================
+const FALLBACK_URL = "https://hkpqvggvqzvpkzeqmtga.supabase.co"; 
+const FALLBACK_KEY = "sb_publishable_VsQKGL8O6R1Jkh9Q70zMLQ_BPiUa2Vc"; 
 
 function isNewSupabaseApiKey(value: string): boolean {
   return value.startsWith('sb_publishable_') || value.startsWith('sb_secret_');
