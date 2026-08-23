@@ -36,3 +36,24 @@ export const adminSetSetting = createServerFn({ method: "POST" })
 
 // Chiave usata per l'indirizzo email a cui notificare i nuovi ordini.
 export const ORDER_NOTIFICATION_EMAIL_KEY = "order_notification_email";
+
+// Chiavi pubbliche (telefono/email/indirizzo/orari mostrati su Contatti e Footer).
+export const PUBLIC_SETTINGS_KEYS = [
+  "contact_phone",
+  "contact_email",
+  "contact_address",
+  "contact_hours",
+] as const;
+
+export const getPublicSettings = createServerFn({ method: "GET" }).handler(async () => {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { data, error } = await supabaseAdmin
+    .from("settings")
+    .select("key, value")
+    .in("key", PUBLIC_SETTINGS_KEYS as unknown as string[]);
+  if (error) throw error;
+  const map: Record<string, string | null> = {};
+  for (const k of PUBLIC_SETTINGS_KEYS) map[k] = null;
+  for (const row of data ?? []) map[row.key] = row.value;
+  return map;
+});

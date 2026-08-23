@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Search, Bell, ShoppingBag, X } from "lucide-react";
+import { Search, Bell, ShoppingBag, X, Zap } from "lucide-react";
 import { useCart } from "@/lib/cart-context";
 import { useAuth } from "@/hooks/useAuth";
 
-export function Header({ onOpenCart }: { onOpenCart: () => void }) {
+export function Header({ onOpenCart, onOpenTemplates }: { onOpenCart: () => void; onOpenTemplates: () => void }) {
   const navigate = useNavigate();
   const { count, isPulsing } = useCart();
   const { session } = useAuth();
@@ -51,6 +51,15 @@ export function Header({ onOpenCart }: { onOpenCart: () => void }) {
       </form>
 
       <div className="flex items-center gap-3">
+        <button
+          onClick={onOpenTemplates}
+          title="Riordino rapido: riusa un modello salvato in un click"
+          className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-bold text-xs shadow-md shadow-sky-950/50 hover:scale-[1.02] active:scale-[0.98] transition-all"
+        >
+          <Zap size={13} className="fill-white" />
+          <span className="hidden md:inline">Riordino Rapido</span>
+        </button>
+
         <div className="relative">
           <button
             onClick={() => setNotifOpen((v) => !v)}

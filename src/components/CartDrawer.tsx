@@ -1,8 +1,8 @@
 import { Link } from "@tanstack/react-router";
-import { X, Minus, Plus, Trash2, ShoppingBag, Package } from "lucide-react";
+import { X, Minus, Plus, Trash2, ShoppingBag, Package, BookmarkPlus } from "lucide-react";
 import { useCart } from "@/lib/cart-context";
 
-export function CartDrawer({ open, onClose, onOrder }: { open: boolean; onClose: () => void; onOrder: () => void }) {
+export function CartDrawer({ open, onClose, onOrder, onSaveTemplate }: { open: boolean; onClose: () => void; onOrder: () => void; onSaveTemplate: () => void }) {
   const { items, total, setQty, removeItem } = useCart();
 
   if (!open) return null;
@@ -16,9 +16,16 @@ export function CartDrawer({ open, onClose, onOrder }: { open: boolean; onClose:
             <ShoppingBag size={18} className="text-primary" />
             <h2 className="font-heading font-bold text-foreground">Il tuo carrello</h2>
           </div>
-          <button onClick={onClose} aria-label="Chiudi" className="text-muted-foreground hover:text-foreground">
-            <X size={20} />
-          </button>
+          <div className="flex items-center gap-3">
+            {items.length > 0 && (
+              <button onClick={onSaveTemplate} aria-label="Salva come modello" title="Salva come modello" className="text-muted-foreground hover:text-primary">
+                <BookmarkPlus size={18} />
+              </button>
+            )}
+            <button onClick={onClose} aria-label="Chiudi" className="text-muted-foreground hover:text-foreground">
+              <X size={20} />
+            </button>
+          </div>
         </div>
 
         {items.length === 0 ? (

@@ -20,12 +20,14 @@ import {
   ShoppingBag,
   Heart,
   Scale,
+  Zap,
 } from "lucide-react";
 import { AuroraLogo } from "./AuroraLogo";
+import { Footer } from "./Footer";
 import { useAuth } from "@/hooks/useAuth";
 import { useCart } from "@/lib/cart-context";
 
-export function MobileShell({ children, onOpenCart }: { children: ReactNode; onOpenCart: () => void }) {
+export function MobileShell({ children, onOpenCart, onOpenTemplates }: { children: ReactNode; onOpenCart: () => void; onOpenTemplates: () => void }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const path = useRouterState({ select: (s) => s.location.pathname });
   const { session, isAdmin, signOut } = useAuth();
@@ -53,7 +55,10 @@ export function MobileShell({ children, onOpenCart }: { children: ReactNode; onO
         </div>
       </header>
 
-      <main className="flex-1 pb-20 lg:pb-0">{children}</main>
+      <main className="flex-1 pb-20 lg:pb-0">
+        {children}
+        <Footer />
+      </main>
 
       <nav className="lg:hidden fixed bottom-0 inset-x-0 h-16 bg-card border-t border-border grid grid-cols-5 z-30">
         <TabItem to="/home" icon={<HomeIcon size={20} />} label="Home" active={path === "/home"} />
@@ -72,6 +77,12 @@ export function MobileShell({ children, onOpenCart }: { children: ReactNode; onO
                 <X size={22} />
               </button>
             </div>
+            <button
+              onClick={() => { setMenuOpen(false); onOpenTemplates(); }}
+              className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-white bg-gradient-to-r from-sky-500 to-indigo-600 mb-1"
+            >
+              <Zap size={18} className="fill-white" /> Riordino Rapido
+            </button>
             <MenuLink to="/home" icon={<HomeIcon size={18} />} onClose={() => setMenuOpen(false)}>Home</MenuLink>
             <MenuLink to="/categorie" icon={<LayoutGrid size={18} />} onClose={() => setMenuOpen(false)}>Categorie</MenuLink>
             <MenuLink to="/offerte" icon={<Tag size={18} />} onClose={() => setMenuOpen(false)}>Offerte</MenuLink>

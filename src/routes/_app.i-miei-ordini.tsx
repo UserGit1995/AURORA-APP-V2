@@ -1,25 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import { listMyOrders } from "@/lib/orders.functions";
 import { useAuth } from "@/hooks/useAuth";
-import { ClipboardList, Package } from "lucide-react";
+import { ClipboardList, Package, MessageCircleQuestion } from "lucide-react";
+import { OrderTrackingTimeline } from "@/components/OrderTrackingTimeline";
+import { OrderInquiryModal } from "@/components/OrderInquiryModal";
 
 export const Route = createFileRoute("/_app/i-miei-ordini")({
   component: IMieiOrdini,
 });
-
-const statusLabel: Record<string, string> = {
-  nuovo: "Nuovo",
-  in_lavorazione: "In lavorazione",
-  evaso: "Evaso",
-  annullato: "Annullato",
-};
-const statusColor: Record<string, string> = {
-  nuovo: "bg-sky-500/15 text-sky-300 border-sky-500/30",
-  in_lavorazione: "bg-amber-500/15 text-amber-300 border-amber-500/30",
-  evaso: "bg-emerald-500/15 text-emerald-300 border-emerald-500/30",
-  annullato: "bg-rose-500/15 text-rose-300 border-rose-500/30",
-};
 
 function IMieiOrdini() {
   const { session, loading } = useAuth();
@@ -28,6 +18,7 @@ function IMieiOrdini() {
     queryFn: () => listMyOrders(),
     enabled: !!session,
   });
+  const [inquiryOrder, setInquiryOrder] = useState<any | null>(null);
 
   if (!loading && !session) {
     return (
@@ -50,26 +41,37 @@ function IMieiOrdini() {
       {isLoading ? (
         <div className="space-y-3">
           {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="h-20 rounded-2xl bg-card animate-pulse" />
+            <div key={i} className="h-32 rounded-2xl bg-card animate-pulse" />
           ))}
         </div>
       ) : data && data.length > 0 ? (
         <div className="space-y-3">
           {data.map((o: any) => (
             <div key={o.id} className="bg-card border border-border rounded-2xl p-4">
-              <div className="flex items-center justify-between mb-1.5">
+              <div className="flex items-center justify-between mb-3">
                 <span className="font-bold text-sm text-foreground">{o.order_number}</span>
-                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${statusColor[o.status] ?? ""}`}>
-                  {statusLabel[o.status] ?? o.status}
+                <span className="text-xs text-muted-foreground">
+                  {new Date(o.created_at).toLocaleDateString("it-IT", { day: "numeric", month: "long", year: "numeric" })}
                 </span>
               </div>
-              <p className="text-xs text-muted-foreground mb-2">
-                {new Date(o.created_at).toLocaleDateString("it-IT", { day: "numeric", month: "long", year: "numeric" })}
-              </p>
-              <p className="text-xs text-muted-foreground">
+
+              <div className="mb-3">
+                <OrderTrackingTimeline status={o.status} />
+              </div>
+
+              <p className="text-xs text-muted-foreground border-t border-border pt-3">
                 {(o.order_items ?? []).map((it: any) => `${it.quantity}× ${it.product_name}`).join(", ")}
               </p>
-              <p className="text-sm font-bold text-foreground mt-2">€ {Number(o.total).toFixed(2)}</p>
+
+              <div className="flex items-center justify-between mt-2">
+                <p className="text-sm font-bold text-foreground">€ {Number(o.total).toFixed(2)}</p>
+                <button
+                  onClick={() => setInquiryOrder(o)}
+                  className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-primary hover:text-sky-300"
+                >
+                  <MessageCircleQuestion size={13} /> Richiedi informazioni
+                </button>
+              </div>
             </div>
           ))}
         </div>
@@ -79,6 +81,8 @@ function IMieiOrdini() {
           <p className="text-sm text-muted-foreground">Non hai ancora effettuato ordini.</p>
         </div>
       )}
+
+      <OrderInquiryModal order={inquiryOrder} open={!!inquiryOrder} onClose={() => setInquiryOrder(null)} />
     </div>
   );
 }
