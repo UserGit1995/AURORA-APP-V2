@@ -6,7 +6,7 @@ import type { Database } from './types';
 // SOSTITUISCI QUESTI DUE VALORI CON QUELLI REALI DEL TUO PROGETTO SUPABASE:
 // =========================================================================
 const FALLBACK_URL = "https://hkpqvggvqzvpkzeqmtga.supabase.co"; 
-const FALLBACK_KEY = "sb_publishable_VsQKGL8O6R1Jkh9Q70zMLQ_BPiUa2Vc"; 
+const FALLBACK_KEY = "l31eWxpbGFfrZukSJXAT7ZB7766wdhepq+J+X9hygY6XLGlJfhRVW0+y0yw5o8wl2mhH2PEX6EJUNDKUUwgiBw=="; 
 
 function isNewSupabaseApiKey(value: string): boolean {
   return value.startsWith('sb_publishable_') || value.startsWith('sb_secret_');
