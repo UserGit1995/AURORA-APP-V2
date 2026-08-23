@@ -112,7 +112,7 @@ export function Header({ onOpenCart, onOpenTemplates }: { onOpenCart: () => void
         </button>
 
         <Link
-          to={session ? "/i-miei-ordini" : "/auth"}
+          to={session ? "/account" : "/auth"}
           className="flex items-center gap-2.5 pl-1.5 pr-3 py-1 rounded-full border border-transparent hover:bg-card transition-colors"
         >
           <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-xs shrink-0">

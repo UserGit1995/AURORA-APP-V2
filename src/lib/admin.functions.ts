@@ -49,6 +49,25 @@ export const adminUpdateOrderStatus = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+export const adminUpdateOrderDetails = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i: unknown) => z.object({
+    id: z.string().uuid(),
+    customer_name: z.string().trim().min(2).max(120),
+    customer_email: z.string().trim().email().max(255),
+    customer_phone: z.string().trim().min(5).max(30),
+    customer_address: z.string().trim().min(3).max(300),
+    customer_province: z.string().trim().min(2).max(60),
+    notes: z.string().trim().max(1000).optional().nullable(),
+  }).parse(i))
+  .handler(async ({ context, data }) => {
+    await ensureAdmin(context);
+    const { id, ...rest } = data;
+    const { error } = await context.supabase.from("orders").update(rest).eq("id", id);
+    if (error) throw error;
+    return { ok: true };
+  });
+
 export const adminListProducts = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {

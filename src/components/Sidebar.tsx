@@ -17,6 +17,7 @@ import {
   Shield,
   Heart,
   RotateCw,
+  User,
 } from "lucide-react";
 import { AuroraLogo } from "./AuroraLogo";
 import { useAuth } from "@/hooks/useAuth";
@@ -87,6 +88,11 @@ export function Sidebar({ onOpenTemplates }: { onOpenTemplates: () => void }) {
       </nav>
 
       <div className="px-3 py-4 border-t border-sidebar-border space-y-2">
+        {session && (
+          <SidebarLink to="/account" icon={<User size={18} />} active={path === "/account"}>
+            Il mio profilo
+          </SidebarLink>
+        )}
         {isAdmin && (
           <SidebarLink to="/admin" icon={<Shield size={18} />} active={path.startsWith("/admin")}>
             Pannello admin

@@ -1,12 +1,18 @@
-import { useState } from "react";
-import { X, Loader2, CheckCircle2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { X, Loader2, CheckCircle2, AlertTriangle, Truck } from "lucide-react";
 import { useCart } from "@/lib/cart-context";
 import { useAuth } from "@/hooks/useAuth";
 import { submitOrderAuthenticated, submitOrderGuest } from "@/lib/orders.functions";
+import { getMyProfile } from "@/lib/profile.functions";
+import { getPublicSettings } from "@/lib/settings.functions";
 
 export function OrderForm({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { items, total, clear } = useCart();
   const { session, user } = useAuth();
+  const { data: profile } = useQuery({ queryKey: ["my-profile"], queryFn: () => getMyProfile(), enabled: open && !!session });
+  const { data: settings } = useQuery({ queryKey: ["public-settings"], queryFn: () => getPublicSettings(), enabled: open });
+
   const [form, setForm] = useState({
     customerName: "",
     customerEmail: user?.email ?? "",
@@ -19,6 +25,25 @@ export function OrderForm({ open, onClose }: { open: boolean; onClose: () => voi
   const [orderNumber, setOrderNumber] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (profile) {
+      setForm((f) => ({
+        ...f,
+        customerName: f.customerName || profile.full_name || profile.company || "",
+        customerPhone: f.customerPhone || profile.phone || "",
+        customerAddress: f.customerAddress || [profile.address, profile.postal_code, profile.city].filter(Boolean).join(", "),
+        customerProvince: f.customerProvince || profile.province || "",
+      }));
+    }
+  }, [profile]);
+
+  const minOrder = Number(settings?.min_order_amount || 0);
+  const freeShippingAt = settings?.free_shipping_threshold ? Number(settings.free_shipping_threshold) : null;
+  const shippingCost = Number(settings?.standard_shipping_cost || 0);
+  const belowMinimum = minOrder > 0 && total < minOrder;
+  const appliedShipping = freeShippingAt !== null && total >= freeShippingAt ? 0 : shippingCost;
+  const grandTotal = total + appliedShipping;
+
   if (!open) return null;
 
   const update = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
@@ -26,6 +51,7 @@ export function OrderForm({ open, onClose }: { open: boolean; onClose: () => voi
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (belowMinimum) return;
     setStatus("sending");
     setErrorMsg(null);
     try {
@@ -100,16 +126,39 @@ export function OrderForm({ open, onClose }: { open: boolean; onClose: () => voi
               <textarea value={form.notes} onChange={update("notes")} rows={2} className="input-field resize-none" />
             </Field>
 
-            <div className="flex items-center justify-between text-sm pt-2 border-t border-border">
-              <span className="text-muted-foreground">Totale (+IVA)</span>
-              <span className="font-bold text-foreground text-base">€ {total.toFixed(2)}</span>
+            <div className="pt-2 border-t border-border space-y-1.5">
+              <div className="flex items-center justify-between text-xs text-muted-foreground">
+                <span>Subtotale prodotti</span>
+                <span>€ {total.toFixed(2)}</span>
+              </div>
+              {shippingCost > 0 || freeShippingAt !== null ? (
+                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                  <span className="flex items-center gap-1"><Truck size={12} /> Spedizione</span>
+                  <span>{appliedShipping === 0 ? "Gratuita" : `€ ${appliedShipping.toFixed(2)}`}</span>
+                </div>
+              ) : null}
+              <div className="flex items-center justify-between text-sm pt-1">
+                <span className="text-muted-foreground">Totale (+IVA)</span>
+                <span className="font-bold text-foreground text-base">€ {grandTotal.toFixed(2)}</span>
+              </div>
+              {freeShippingAt !== null && appliedShipping > 0 && (
+                <p className="text-[11px] text-muted-foreground">
+                  Spedizione gratuita da € {freeShippingAt.toFixed(2)} (mancano € {(freeShippingAt - total).toFixed(2)})
+                </p>
+              )}
             </div>
+
+            {belowMinimum && (
+              <p className="flex items-center gap-1.5 text-xs text-amber-300 bg-amber-500/10 border border-amber-500/25 rounded-lg p-2.5">
+                <AlertTriangle size={14} className="shrink-0" /> Ordine minimo € {minOrder.toFixed(2)}: aggiungi altri € {(minOrder - total).toFixed(2)} di prodotti.
+              </p>
+            )}
 
             {errorMsg && <p className="text-xs text-destructive">{errorMsg}</p>}
 
             <button
               type="submit"
-              disabled={status === "sending"}
+              disabled={status === "sending" || belowMinimum}
               className="w-full h-11 rounded-full bg-primary text-primary-foreground text-sm font-semibold flex items-center justify-center gap-2 disabled:opacity-60"
             >
               {status === "sending" ? <Loader2 size={16} className="animate-spin" /> : null}

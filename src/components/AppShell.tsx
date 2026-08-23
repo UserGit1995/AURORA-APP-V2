@@ -6,6 +6,7 @@ import { CartDrawer } from "./CartDrawer";
 import { OrderForm } from "./OrderForm";
 import { CompareFloatingBar } from "./CompareFloatingBar";
 import { OrderTemplateModal } from "./OrderTemplateModal";
+import { AnnouncementBanner } from "./AnnouncementBanner";
 import { ToastProvider } from "./ToastContainer";
 import { CartProvider } from "@/lib/cart-context";
 import { FavoritesProvider } from "@/lib/favorites-context";
@@ -21,6 +22,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <CartProvider>
         <FavoritesProvider>
           <CompareProvider>
+            <AnnouncementBanner />
             <div className="lg:flex lg:min-h-screen bg-background">
               <Sidebar onOpenTemplates={() => setTemplatesOpen(true)} />
               <div className="flex-1 min-w-0 flex flex-col">

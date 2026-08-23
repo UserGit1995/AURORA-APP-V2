@@ -37,12 +37,21 @@ export const adminSetSetting = createServerFn({ method: "POST" })
 // Chiave usata per l'indirizzo email a cui notificare i nuovi ordini.
 export const ORDER_NOTIFICATION_EMAIL_KEY = "order_notification_email";
 
-// Chiavi pubbliche (telefono/email/indirizzo/orari mostrati su Contatti e Footer).
+// Chiavi pubbliche (telefono/email/indirizzo/orari mostrati su Contatti e Footer,
+// dati aziendali, condizioni di spedizione, banner annunci).
 export const PUBLIC_SETTINGS_KEYS = [
   "contact_phone",
   "contact_email",
   "contact_address",
   "contact_hours",
+  "company_name",
+  "company_vat",
+  "company_sdi",
+  "min_order_amount",
+  "free_shipping_threshold",
+  "standard_shipping_cost",
+  "announcement_banner_text",
+  "announcement_banner_enabled",
 ] as const;
 
 export const getPublicSettings = createServerFn({ method: "GET" }).handler(async () => {
