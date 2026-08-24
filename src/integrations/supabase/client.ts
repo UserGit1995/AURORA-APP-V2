@@ -2,11 +2,24 @@ import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
 const SUPABASE_URL = "https://hkpqvggvqzvpkzeqmtga.supabase.co";
+const PUBLISHABLE_KEY = "sb_publishable_VsQKGL806R1Jkh9Q70zMLQ_BPiUa4g";
 
-// Chiave ANON PUBLIC (non service_role)
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhrcHF2Z2d2cXp2cGt6ZXFtdGdhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ2ODc3MjUsImV4cCI6MjEwMDI2MzcyNX0.1Lgr756jgYTo-dKsrlAOQpRkwvyULbV5Dt-xnpPrxss";
+export const supabase = createClient<Database>(SUPABASE_URL, PUBLISHABLE_KEY, {
+  global: {
+    fetch: (input, init) => {
+      const headers = new Headers(init?.headers);
+      
+      // Imposta la chiave su tutti i tipi di chiamata (REST, Storage, Auth)
+      headers.set('apikey', PUBLISHABLE_KEY);
+      
+      // Rimuove Authorization se presente come Bearer con la publishable key per evitare conflitti HTTP
+      if (headers.get('Authorization')?.includes('sb_publishable_')) {
+        headers.delete('Authorization');
+      }
 
-export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      return fetch(input, { ...init, headers });
+    },
+  },
   auth: {
     storage: typeof window !== 'undefined' ? window.localStorage : undefined,
     persistSession: true,
