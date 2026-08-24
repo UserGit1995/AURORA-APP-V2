@@ -1,15 +1,11 @@
-import Database from 'better-sqlite3';
+import { createClient } from '@supabase/supabase-js';
 
-// Inizializza il database SQLite
-const db = new Database('sqlite.db');
+const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_ANON_KEY || process.env.SUPABASE_PUBLISHABLE_KEY || process.env.VITE_SUPABASE_ANON_KEY;
 
-// Crea la tabella delle categorie se non esiste
-db.exec(`
-  CREATE TABLE IF NOT EXISTS categories (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL UNIQUE,
-    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
-  )
-`);
+if (!supabaseUrl || !supabaseKey) {
+  throw new Error('Configurazione Supabase mancante nelle Environment Variables.');
+}
 
-export default db;
+export const supabase = createClient(supabaseUrl, supabaseKey);
+export default supabase;
