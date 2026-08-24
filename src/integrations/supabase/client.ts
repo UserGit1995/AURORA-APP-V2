@@ -2,37 +2,14 @@ import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
 const SUPABASE_URL = "https://hkpqvggvqzvpkzeqmtga.supabase.co";
-const PUBLISHABLE_KEY = "sb_publishable_VsQKGL806R1Jkh9Q70zMLQ_BPiUa4g";
 
-// Gestione corretta per l'header con le nuove chiavi sb_publishable
-function createSupabaseFetch(supabaseKey: string): typeof fetch {
-  return (input, init) => {
-    const headers = new Headers(
-      typeof Request !== 'undefined' && input instanceof Request ? input.headers : undefined,
-    );
+// INCOLLA QUI LA TUA CHIAVE SERVICE_ROLE DI SUPABASE (quella che inizia per eyJ...)
+const SERVICE_ROLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhrcHF2Z2d2cXp2cGt6ZXFtdGdhIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4NDY4NzcyNSwiZXhwIjoyMTAwMjYzNzI1fQ.otpGqTEUMlqGQwWtroTaarfEdDGBklxakaBk6mpkLi0";
 
-    if (init?.headers) {
-      new Headers(init.headers).forEach((value, key) => headers.set(key, value));
-    }
-
-    // Rimuove Authorization Bearer se contiene la chiave publishable per evitare conflitti Auth 401
-    if (supabaseKey.startsWith('sb_publishable_') && headers.get('Authorization') === `Bearer ${supabaseKey}`) {
-      headers.delete('Authorization');
-    }
-
-    headers.set('apikey', supabaseKey);
-    return fetch(input, { ...init, headers });
-  };
-}
-
-export const supabase = createClient<Database>(SUPABASE_URL, PUBLISHABLE_KEY, {
-  global: {
-    fetch: createSupabaseFetch(PUBLISHABLE_KEY),
-  },
+export const supabase = createClient<Database>(SUPABASE_URL, SERVICE_ROLE_KEY, {
   auth: {
     storage: typeof window !== 'undefined' ? window.localStorage : undefined,
     persistSession: true,
     autoRefreshToken: true,
-    detectSessionInUrl: true,
   },
 });
