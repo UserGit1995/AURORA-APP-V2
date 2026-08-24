@@ -1,7 +1,7 @@
 import { createServerFn } from '@tanstack/start';
+import { db } from '../db';
 
 export const getSettings = createServerFn({ method: 'GET' }).handler(async () => {
-  const { db } = await import('../db');
   const { data, error } = await db
     .from('settings')
     .select('*');
@@ -13,7 +13,6 @@ export const getSettings = createServerFn({ method: 'GET' }).handler(async () =>
 export const updateSettings = createServerFn({ method: 'POST' })
   .validator((settings: any) => settings)
   .handler(async ({ data }) => {
-    const { db } = await import('../db');
     const { data: updated, error } = await db
       .from('settings')
       .upsert(data)
