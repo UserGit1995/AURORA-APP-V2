@@ -1,11 +1,14 @@
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_ANON_KEY || process.env.SUPABASE_PUBLISHABLE_KEY || process.env.VITE_SUPABASE_ANON_KEY;
+const supabaseKey =
+  process.env.SUPABASE_ANON_KEY ||
+  process.env.SUPABASE_PUBLISHABLE_KEY ||
+  process.env.VITE_SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseKey) {
-  throw new Error('Configurazione Supabase mancante nelle Environment Variables.');
+  throw new Error('Configurazione Supabase mancante nelle Environment Variables su Vercel.');
 }
 
-export const myFunc = createServerFn().validator(supabaseUrl, supabaseKey);
-export default supabase;
+export const db = createClient(supabaseUrl, supabaseKey);
+export default db;
