@@ -1,5 +1,5 @@
 import { createServerFn } from '@tanstack/start';
-import db from '../db';
+import db from '../db.server';
 
 export const getOrders = createServerFn({ method: 'GET' }).handler(async () => {
   const { data, error } = await db
