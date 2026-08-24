@@ -1,5 +1,5 @@
 import { createServerFn } from '@tanstack/start';
-import db from '../db';
+import db from '../db.server';
 
 export const getProfile = createServerFn({ method: 'GET' })
   .validator((userId: unknown) => String(userId))
