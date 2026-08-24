@@ -1,7 +1,7 @@
 import { createServerFn } from '@tanstack/start';
+import { db } from '../db';
 
 export const getCategories = createServerFn({ method: 'GET' }).handler(async () => {
-  const { db } = await import('../db');
   const { data, error } = await db
     .from('categories')
     .select('*')
@@ -19,7 +19,6 @@ export const addCategory = createServerFn({ method: 'POST' })
     return name.trim();
   })
   .handler(async ({ data: name }) => {
-    const { db } = await import('../db');
     const { data, error } = await db
       .from('categories')
       .insert([{ name }])
