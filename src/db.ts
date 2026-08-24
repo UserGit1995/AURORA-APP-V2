@@ -7,5 +7,5 @@ if (!supabaseUrl || !supabaseKey) {
   throw new Error('Configurazione Supabase mancante nelle Environment Variables.');
 }
 
-export const supabase = createClient(supabaseUrl, supabaseKey);
+export const myFunc = createServerFn().validator(supabaseUrl, supabaseKey);
 export default supabase;
