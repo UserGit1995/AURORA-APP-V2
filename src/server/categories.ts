@@ -1,13 +1,18 @@
 import { createServerFn } from '@tanstack/start';
-import db from '../db';
+import supabase from '../db';
 
-// Funzione per recuperare tutte le categorie
+// Recupera tutte le categorie
 export const getCategories = createServerFn({ method: 'GET' }).handler(async () => {
-  const stmt = db.prepare('SELECT * FROM categories ORDER BY id DESC');
-  return stmt.all();
+  const { data, error } = await supabase
+    .from('categories')
+    .select('*')
+    .order('id', { ascending: false });
+
+  if (error) throw new Error(error.message);
+  return data;
 });
 
-// Funzione per salvare una nuova categoria
+// Aggiunge una nuova categoria
 export const addCategory = createServerFn({ method: 'POST' })
   .validator((name: unknown) => {
     if (typeof name !== 'string' || !name.trim()) {
@@ -16,14 +21,18 @@ export const addCategory = createServerFn({ method: 'POST' })
     return name.trim();
   })
   .handler(async ({ data: name }) => {
-    try {
-      const stmt = db.prepare('INSERT INTO categories (name) VALUES (?)');
-      const info = stmt.run(name);
-      return { success: true, id: info.lastInsertRowid };
-    } catch (error: any) {
-      if (error.code === 'SQLITE_CONSTRAINT_UNIQUE') {
+    const { data, error } = await supabase
+      .from('categories')
+      .insert([{ name }])
+      .select();
+
+    if (error) {
+      // 23505 è il codice Postgres per violazione di vincolo UNIQUE
+      if (error.code === '23505') {
         throw new Error('Questa categoria esiste già.');
       }
-      throw new Error('Errore durante il salvataggio.');
+      throw new Error(error.message || 'Errore durante il salvataggio.');
     }
+
+    return { success: true, category: data[0] };
   });
