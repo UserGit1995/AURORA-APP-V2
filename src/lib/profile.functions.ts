@@ -1,34 +1,29 @@
-import { createServerFn } from "@tanstack/react-start";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { z } from "zod";
+import { createServerFn } from '@tanstack/start';
+import db from '../db';
 
-const profileSchema = z.object({
-  full_name: z.string().trim().max(150).optional().nullable(),
-  company: z.string().trim().max(150).optional().nullable(),
-  phone: z.string().trim().max(30).optional().nullable(),
-  piva: z.string().trim().max(20).optional().nullable(),
-  sdi: z.string().trim().max(10).optional().nullable(),
-  pec: z.string().trim().email().max(255).optional().nullable().or(z.literal("")),
-  address: z.string().trim().max(300).optional().nullable(),
-  city: z.string().trim().max(100).optional().nullable(),
-  postal_code: z.string().trim().max(10).optional().nullable(),
-  province: z.string().trim().max(60).optional().nullable(),
-});
+export const getProfile = createServerFn({ method: 'GET' })
+  .validator((userId: unknown) => String(userId))
+  .handler(async ({ data: userId }) => {
+    const { data, error } = await db
+      .from('profiles')
+      .select('*')
+      .eq('id', userId)
+      .single();
 
-export const getMyProfile = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
-    const { data, error } = await context.supabase.from("profiles").select("*").eq("id", context.userId).maybeSingle();
-    if (error) throw error;
+    if (error) throw new Error(error.message);
     return data;
   });
 
-export const updateMyProfile = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((i: unknown) => profileSchema.parse(i))
-  .handler(async ({ context, data }) => {
-    const clean = { ...data, pec: data.pec || null };
-    const { error } = await context.supabase.from("profiles").update(clean).eq("id", context.userId);
-    if (error) throw error;
-    return { ok: true };
+export const updateProfile = createServerFn({ method: 'POST' })
+  .validator((payload: { userId: string; [key: string]: any }) => payload)
+  .handler(async ({ data }) => {
+    const { userId, ...profileData } = data;
+    const { data: updated, error } = await db
+      .from('profiles')
+      .update(profileData)
+      .eq('id', userId)
+      .select();
+
+    if (error) throw new Error(error.message);
+    return { success: true, profile: updated[0] };
   });
