@@ -15,10 +15,12 @@ import {
   Calendar,
   Layers,
   ArrowUpRight,
-  LogIn
+  LogIn,
+  LogOut
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { PurchaseVelocityChart } from './PurchaseVelocityChart';
+import { useAdmin } from '../context/AdminContext';
 
 interface UserProfileModalProps {
   isOpen: boolean;
@@ -27,9 +29,21 @@ interface UserProfileModalProps {
 }
 
 export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onClose, onOpenLogin }) => {
+  const { currentUser, logout } = useAdmin();
   const [activeProfileTab, setActiveProfileTab] = useState<'velocity' | 'company' | 'credit'>('velocity');
 
   if (!isOpen) return null;
+
+  const displayUser = currentUser || {
+    id: 'guest',
+    name: 'Ospite / Visitatore',
+    company: 'Nessuna azienda associata',
+    email: 'Non autenticato',
+    piva: '-',
+    sdi: '-',
+    role: 'user',
+    avatarInitials: 'OS',
+  };
 
   return (
     <div 
@@ -44,17 +58,17 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
         <div className="p-4 sm:p-5 border-b border-[#122340] bg-[#071329] flex flex-wrap items-center justify-between gap-3 shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#0284c7] to-[#0369a1] text-white flex items-center justify-center font-bold text-lg shadow-lg shadow-sky-950/60 border border-sky-400/30 shrink-0">
-              AD
+              {displayUser.avatarInitials || displayUser.name.substring(0, 2).toUpperCase()}
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="text-base sm:text-lg font-bold text-white">Aurora Distributi S.r.l.</h3>
+                <h3 className="text-base sm:text-lg font-bold text-white">{displayUser.company}</h3>
                 <span className="px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-300 text-[10.5px] font-semibold border border-sky-500/30 flex items-center gap-1">
-                  <CheckCircle2 className="w-3 h-3 text-sky-400" /> B2B Certificato
+                  <CheckCircle2 className="w-3 h-3 text-sky-400" /> {displayUser.role === 'superadmin' ? 'Amministrazione' : 'Cliente B2B Certificato'}
                 </span>
               </div>
               <p className="text-xs text-slate-400 font-mono mt-0.5">
-                P.IVA: <span className="text-slate-200">IT09876543210</span> • Cod. SDI: <span className="text-sky-300">AUR789K</span>
+                Utente: <span className="text-slate-200 font-sans font-bold">{displayUser.name}</span> • P.IVA: <span className="text-slate-200">{displayUser.piva}</span> • Email: <span className="text-sky-300">{displayUser.email}</span>
               </p>
             </div>
           </div>
@@ -261,6 +275,19 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
             Account B2B ID: <strong className="text-slate-400 font-mono">AUR-CLI-94812</strong>
           </span>
           <div className="flex items-center gap-2">
+            {currentUser && (
+              <button
+                type="button"
+                onClick={() => {
+                  logout();
+                  onClose();
+                }}
+                className="px-3 py-2 rounded-xl bg-rose-950/40 hover:bg-rose-900/60 border border-rose-500/40 text-rose-300 text-xs font-semibold transition-colors flex items-center gap-1.5"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+                <span>Disconnetti</span>
+              </button>
+            )}
             {onOpenLogin && (
               <button
                 type="button"
@@ -271,12 +298,12 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
                 className="px-3.5 py-2 rounded-xl bg-[#0b1b36] hover:bg-[#0e244d] border border-sky-500/30 text-sky-300 text-xs font-semibold transition-colors flex items-center gap-1.5"
               >
                 <LogIn className="w-3.5 h-3.5" />
-                <span>Cambia Account / Login</span>
+                <span>{currentUser ? 'Cambia Account' : 'Accedi'}</span>
               </button>
             )}
             <button
               onClick={onClose}
-              className="px-5 py-2 rounded-xl bg-[#0284c7] hover:bg-[#0369a1] text-white text-xs font-bold transition-colors shadow-sm"
+              className="px-5 py-2 rounded-xl bg-[#0284c7] hover:bg-[#0369a1] text-white text-xs font-bold transition-colors shadow-sm cursor-pointer"
             >
               Chiudi Scheda Profilo
             </button>

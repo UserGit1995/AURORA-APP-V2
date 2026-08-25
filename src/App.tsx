@@ -36,7 +36,8 @@ export default function App() {
     categoriesList, 
     ordersList, 
     updateProduct, 
-    isAdmin 
+    isAdmin,
+    loginAsUser,
   } = useAdmin();
 
   const [activeTab, setActiveTab] = useState<NavTab>('home');
@@ -557,11 +558,15 @@ export default function App() {
         isOpen={isLoginOpen}
         onClose={() => setIsLoginOpen(false)}
         onLoginSuccess={(userData) => {
+          loginAsUser(userData);
+          const isNoemi = userData.email.toLowerCase() === 'noemi@aurora.app';
           setNotifications((prev) => [
             {
               id: `notif-auth-${Date.now()}`,
-              title: `Accesso B2B Effettuato`,
-              message: `Benvenuto ${userData.name} (${userData.company}). Listino riservato e fido commerciale attivi.`,
+              title: isNoemi ? 'Accesso Amministratore (Noemi)' : 'Accesso B2B Effettuato',
+              message: isNoemi
+                ? 'Benvenuta Noemi! Tutte le funzioni di amministrazione, prezzi e catalogo sono ora sbloccate.'
+                : `Benvenuto ${userData.name} (${userData.company}). Listino riservato e fido commerciale attivi.`,
               time: 'Adesso',
               read: false,
               type: 'system',

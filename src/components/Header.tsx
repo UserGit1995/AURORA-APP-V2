@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, Bell, ShoppingBag, Menu, X, QrCode, Mic, MicOff, AlertCircle, RotateCw, LogIn } from 'lucide-react';
+import { Search, Bell, ShoppingBag, Menu, X, QrCode, Mic, MicOff, AlertCircle, RotateCw, LogIn, ShieldAlert, LogOut } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useLanguage } from '../context/LanguageContext';
+import { useAdmin } from '../context/AdminContext';
 import { AuroraLogo } from './AuroraLogo';
 
 interface HeaderProps {
@@ -36,6 +37,7 @@ export const Header: React.FC<HeaderProps> = ({
   isCartPulsing = false,
 }) => {
   const { t, language } = useLanguage();
+  const { isAdmin, currentUser, logout } = useAdmin();
   const [isListening, setIsListening] = useState(false);
   const [speechError, setSpeechError] = useState<string | null>(null);
   const [interimText, setInterimText] = useState<string>('');
@@ -419,35 +421,60 @@ export const Header: React.FC<HeaderProps> = ({
           </motion.button>
         </div>
 
-        {/* SuperAdmin Master Control Button */}
-        <button
-          id="header-admin-control-btn"
-          onClick={onOpenAdminPanel}
-          className="relative inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs shadow-md shadow-amber-950/60 hover:scale-[1.03] active:scale-[0.98] transition-all cursor-pointer border border-amber-300/40"
-          title="Pannello SuperAdmin: Modifica catalogo, prezzi, ordini e impostazioni senza limiti"
-        >
-          <span className="text-sm">⚡</span>
-          <span className="hidden md:inline uppercase tracking-wider font-extrabold text-[11px]">SuperAdmin</span>
-        </button>
+        {/* SuperAdmin Master Control Button - STRICTLY ONLY FOR NOEMI / ADMIN */}
+        {isAdmin && (
+          <button
+            id="header-admin-control-btn"
+            onClick={onOpenAdminPanel}
+            className="relative inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs shadow-md shadow-amber-950/60 hover:scale-[1.03] active:scale-[0.98] transition-all cursor-pointer border border-amber-300/40"
+            title="Pannello SuperAdmin: Modifica catalogo, prezzi, ordini e impostazioni senza limiti"
+          >
+            <span className="text-sm">⚡</span>
+            <span className="hidden md:inline uppercase tracking-wider font-extrabold text-[11px]">
+              Admin {currentUser?.name || 'Noemi'}
+            </span>
+          </button>
+        )}
 
-        {/* Profile Info */}
-        <button
-          id="header-profile-button"
-          onClick={onOpenProfile}
-          className="flex items-center gap-2.5 pl-1.5 pr-2 py-1 rounded-full hover:bg-[#0a1424] border border-transparent hover:border-[#152744] transition-colors text-left"
-        >
-          <div className="w-8 h-8 rounded-full bg-[#0284c7] text-white flex items-center justify-center font-bold text-xs shadow-xs tracking-tight">
-            AD
+        {/* Profile Info / Login Trigger */}
+        {currentUser ? (
+          <div className="flex items-center gap-1.5">
+            <button
+              id="header-profile-button"
+              onClick={onOpenProfile}
+              className="flex items-center gap-2.5 pl-1.5 pr-2 py-1 rounded-full hover:bg-[#0a1424] border border-transparent hover:border-[#152744] transition-colors text-left"
+            >
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#0284c7] to-[#0369a1] text-white flex items-center justify-center font-bold text-xs shadow-xs tracking-tight">
+                {currentUser.avatarInitials || currentUser.name.substring(0, 2).toUpperCase()}
+              </div>
+              <div className="hidden sm:block">
+                <p className="text-white text-xs font-bold leading-none truncate max-w-[110px]">
+                  {currentUser.name}
+                </p>
+                <p className="text-slate-400 text-[10px] leading-tight mt-0.5">
+                  {currentUser.role === 'superadmin' ? 'SuperAdmin' : 'Cliente B2B'}
+                </p>
+              </div>
+            </button>
+            <button
+              id="header-logout-button"
+              onClick={logout}
+              className="p-2 rounded-full hover:bg-rose-500/15 text-slate-400 hover:text-rose-400 transition-colors"
+              title="Disconnetti"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
           </div>
-          <div className="hidden sm:block">
-            <p className="text-white text-xs font-bold leading-none">
-              Aurora Distributi
-            </p>
-            <p className="text-slate-400 text-[11px] leading-tight mt-0.5">
-              Distributore
-            </p>
-          </div>
-        </button>
+        ) : (
+          <button
+            id="header-login-btn"
+            onClick={onOpenLogin}
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#0d1f3b] hover:bg-[#132c52] text-sky-300 hover:text-white border border-sky-500/30 text-xs font-bold transition-all shadow-sm"
+          >
+            <LogIn className="w-3.5 h-3.5" />
+            <span>{t('auth.login', 'Accedi')}</span>
+          </button>
+        )}
       </div>
     </header>
   );

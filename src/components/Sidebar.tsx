@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { AuroraLogo } from './AuroraLogo';
 import { useLanguage } from '../context/LanguageContext';
+import { useAdmin } from '../context/AdminContext';
 
 export type NavTab = 'home' | 'categorie' | 'offerte' | 'novita' | 'piu-venduti' | 'ordini' | 'preferiti' | 'confronta';
 
@@ -45,6 +46,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onCloseMobile
 }) => {
   const { t } = useLanguage();
+  const { isAdmin } = useAdmin();
 
   const navItems: { id: NavTab; label: string; icon: React.ReactNode; badge?: number; badgeColor?: string }[] = [
     { id: 'home', label: t('nav.home', 'Home'), icon: <Home className="w-[18px] h-[18px]" /> },
@@ -140,7 +142,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
           {/* Quick Reorder, B2B Portal Login & Bottom Help Card */}
           <div className="pt-6 space-y-2.5 mt-auto">
-            {onOpenAdminPanel && (
+            {isAdmin && onOpenAdminPanel && (
               <button
                 id="sidebar-superadmin-control-btn"
                 type="button"
@@ -154,7 +156,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   <span className="text-amber-400 font-black">⚡</span>
                   <span className="uppercase tracking-wider font-extrabold text-[11px]">Pannello SuperAdmin</span>
                 </div>
-                <span className="text-[10px] text-amber-950 font-bold bg-amber-400 px-1.5 py-0.5 rounded">ROOT</span>
+                <span className="text-[10px] text-amber-950 font-bold bg-amber-400 px-1.5 py-0.5 rounded">ADMIN</span>
               </button>
             )}
 

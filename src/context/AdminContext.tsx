@@ -51,15 +51,15 @@ interface AdminContextType {
 }
 
 const DEFAULT_ADMIN: UserProfile = {
-  id: 'admin-01',
-  name: 'Simone Aricò',
-  email: 'simonearico10@gmail.com',
-  company: 'Aurora S.r.l. - Direzione Generale',
+  id: 'admin-noemi',
+  name: 'Noemi',
+  email: 'noemi@aurora.app',
+  company: 'Aurora Distribuzione S.r.l. - Amministrazione',
   piva: 'IT09876543210',
   sdi: 'AUR789K',
-  pec: 'aurora.direzione@pec.it',
+  pec: 'aurora.amministrazione@pec.it',
   role: 'superadmin',
-  avatarInitials: 'SA',
+  avatarInitials: 'NO',
   phone: '+39 02 9876543',
   address: 'Via dell\'Industria 45',
   city: 'Milano',
@@ -81,7 +81,7 @@ const DEFAULT_ADMIN: UserProfile = {
 const DEFAULT_SETTINGS: SystemSettings = {
   companyName: 'AURORA Distribuzione S.r.l.',
   brandTitle: 'AURORA - Igiene & Benessere Professionale',
-  contactEmail: 'info@auroradistribuzione.it',
+  contactEmail: 'noemi@aurora.app',
   contactPhone: '+39 02 9876543',
   vatNumber: 'IT09876543210',
   sdiCode: 'AUR789K',
@@ -99,14 +99,17 @@ const DEFAULT_SETTINGS: SystemSettings = {
 const AdminContext = createContext<AdminContextType | undefined>(undefined);
 
 export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Load saved state or defaults from localStorage
+  // Load saved state from localStorage or start as null (not logged in)
   const [currentUser, setCurrentUser] = useState<UserProfile | null>(() => {
     try {
       const saved = localStorage.getItem('aurora_auth_user');
-      if (saved) return JSON.parse(saved);
-      return DEFAULT_ADMIN; // Default logged in as SuperAdmin to give complete unrestricted power
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        return parsed;
+      }
+      return null;
     } catch {
-      return DEFAULT_ADMIN;
+      return null;
     }
   });
 
@@ -238,36 +241,59 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   const loginAsUser = (userData: UserProfile) => {
-    setCurrentUser(userData);
+    // Check if the logging-in email belongs to Admin Noemi (noemi@aurora.app)
+    const isNoemiAdmin = userData.email.trim().toLowerCase() === 'noemi@aurora.app';
+
+    if (isNoemiAdmin) {
+      const adminUser: UserProfile = {
+        ...DEFAULT_ADMIN,
+        name: userData.name || 'Noemi',
+        email: 'noemi@aurora.app',
+        company: userData.company || 'Aurora Distribuzione S.r.l.',
+        role: 'superadmin',
+        avatarInitials: 'NO',
+        permissions: {
+          canEditCatalog: true,
+          canEditPrices: true,
+          canEditStock: true,
+          canEditOrders: true,
+          canEditUsers: true,
+          canEditCompanyInfo: true,
+          canDeleteRecords: true,
+          canOverrideDiscounts: true,
+        }
+      };
+      setCurrentUser(adminUser);
+    } else {
+      // Standard regular client / user
+      const regularUser: UserProfile = {
+        ...userData,
+        role: 'user',
+        permissions: {
+          canEditCatalog: false,
+          canEditPrices: false,
+          canEditStock: false,
+          canEditOrders: false,
+          canEditUsers: false,
+          canEditCompanyInfo: false,
+          canDeleteRecords: false,
+          canOverrideDiscounts: false,
+        }
+      };
+      setCurrentUser(regularUser);
+    }
   };
 
   const logout = () => {
-    // Switch to standard guest or keep standard profile
-    setCurrentUser({
-      id: 'cust-b2b',
-      name: 'Cliente B2B',
-      email: 'cliente@auroradistribuzione.it',
-      company: 'Azienda Cliente S.r.l.',
-      piva: 'IT01234567890',
-      role: 'user',
-      permissions: {
-        canEditCatalog: false,
-        canEditPrices: false,
-        canEditStock: false,
-        canEditOrders: false,
-        canEditUsers: false,
-        canEditCompanyInfo: false,
-        canDeleteRecords: false,
-        canOverrideDiscounts: false,
-      }
-    });
+    setCurrentUser(null);
+    try {
+      localStorage.removeItem('aurora_auth_user');
+    } catch {}
   };
 
   const toggleAdminMode = () => {
     if (isAdmin) {
       logout();
-    } else {
-      loginAsAdmin();
     }
   };
 

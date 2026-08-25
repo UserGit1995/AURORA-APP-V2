@@ -6,22 +6,22 @@ import {
   Building2,
   CheckCircle2,
   ShieldCheck,
-  ArrowRight,
-  Sparkles,
-  KeyRound,
+  User,
   Eye,
   EyeOff,
   UserCheck,
-  Zap,
+  UserPlus,
+  ShieldAlert,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { AuroraLogo } from './AuroraLogo';
 import { useLanguage } from '../context/LanguageContext';
+import { UserProfile } from '../types';
 
 interface LoginModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onLoginSuccess?: (user: { name: string; company: string; email: string; piva: string }) => void;
+  onLoginSuccess?: (user: UserProfile) => void;
 }
 
 export const LoginModal: React.FC<LoginModalProps> = ({
@@ -33,12 +33,19 @@ export const LoginModal: React.FC<LoginModalProps> = ({
   const isIt = language === 'it';
 
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
-  const [emailOrPiva, setEmailOrPiva] = useState('simonearico10@gmail.com');
-  const [password, setPassword] = useState('••••••••••••');
+  
+  // Form fields
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
+  const [company, setCompany] = useState('');
+  const [piva, setPiva] = useState('');
+  
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [loginSuccess, setLoginSuccess] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
 
   if (!isOpen) return null;
 
@@ -46,42 +53,78 @@ export const LoginModal: React.FC<LoginModalProps> = ({
     e.preventDefault();
     setIsLoading(true);
 
+    const cleanEmail = email.trim().toLowerCase();
+    const isNoemiAdmin = cleanEmail === 'noemi@aurora.app';
+
     setTimeout(() => {
       setIsLoading(false);
       setLoginSuccess(true);
 
+      let authenticatedUser: UserProfile;
+
+      if (isNoemiAdmin) {
+        setSuccessMessage('Accesso Amministratore autorizzato. Benvenuta Noemi!');
+        authenticatedUser = {
+          id: 'admin-noemi',
+          name: 'Noemi',
+          email: 'noemi@aurora.app',
+          company: 'Aurora Distribuzione S.r.l. - Amministrazione',
+          piva: 'IT09876543210',
+          sdi: 'AUR789K',
+          pec: 'aurora.amministrazione@pec.it',
+          role: 'superadmin',
+          avatarInitials: 'NO',
+          phone: '+39 02 9876543',
+          address: "Via dell'Industria 45",
+          city: 'Milano',
+          postalCode: '20145',
+          province: 'MI',
+          country: 'Italia',
+          permissions: {
+            canEditCatalog: true,
+            canEditPrices: true,
+            canEditStock: true,
+            canEditOrders: true,
+            canEditUsers: true,
+            canEditCompanyInfo: true,
+            canDeleteRecords: true,
+            canOverrideDiscounts: true,
+          }
+        };
+      } else {
+        setSuccessMessage(
+          authMode === 'login' 
+            ? 'Accesso B2B effettuato con successo!' 
+            : 'Registrazione completata! Account B2B attivato.'
+        );
+        authenticatedUser = {
+          id: `user-${Date.now()}`,
+          name: name.trim() || (cleanEmail.split('@')[0] ? cleanEmail.split('@')[0] : 'Cliente B2B'),
+          email: cleanEmail,
+          company: company.trim() || 'Azienda Cliente',
+          piva: piva.trim() || 'IT00000000000',
+          role: 'user',
+          avatarInitials: (name.trim() || 'CL').substring(0, 2).toUpperCase(),
+          permissions: {
+            canEditCatalog: false,
+            canEditPrices: false,
+            canEditStock: false,
+            canEditOrders: false,
+            canEditUsers: false,
+            canEditCompanyInfo: false,
+            canDeleteRecords: false,
+            canOverrideDiscounts: false,
+          }
+        };
+      }
+
       setTimeout(() => {
         if (onLoginSuccess) {
-          onLoginSuccess({
-            name: 'Simone Aricò',
-            company: 'Aurora Distributi S.r.l.',
-            email: 'simonearico10@gmail.com',
-            piva: 'IT09876543210',
-          });
+          onLoginSuccess(authenticatedUser);
         }
         setLoginSuccess(false);
         onClose();
       }, 1000);
-    }, 800);
-  };
-
-  const handleQuickDemoLogin = (type: 'b2b' | 'gestionale') => {
-    setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-      setLoginSuccess(true);
-      setTimeout(() => {
-        if (onLoginSuccess) {
-          onLoginSuccess({
-            name: type === 'b2b' ? 'Simone Aricò' : 'Operatore Logistica',
-            company: 'Aurora Distributi S.r.l.',
-            email: type === 'b2b' ? 'simonearico10@gmail.com' : 'magazzino@auroradistribuzione.it',
-            piva: 'IT09876543210',
-          });
-        }
-        setLoginSuccess(false);
-        onClose();
-      }, 900);
     }, 600);
   };
 
@@ -121,79 +164,150 @@ export const LoginModal: React.FC<LoginModalProps> = ({
             <AuroraLogo size="login" showSubtitle={true} />
           </div>
 
-          <p className="text-xs text-slate-400 max-w-xs mt-2">
-            {isIt
-              ? 'Portale B2B Ufficiale • Accesso Fornitori e Rifornimento Merci'
-              : 'Official B2B Portal • Supplier Access & Supply Replenishment'}
-          </p>
+          {/* Mode Switcher Tabs */}
+          <div className="grid grid-cols-2 p-1 bg-[#09152b] border border-[#14284b] rounded-xl w-full max-w-xs mt-3">
+            <button
+              type="button"
+              id="tab-login-btn"
+              onClick={() => {
+                setAuthMode('login');
+                setLoginSuccess(false);
+              }}
+              className={`py-1.5 text-xs font-bold rounded-lg transition-all ${
+                authMode === 'login'
+                  ? 'bg-sky-500 text-white shadow-sm'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              {isIt ? 'Accedi' : 'Sign In'}
+            </button>
+            <button
+              type="button"
+              id="tab-register-btn"
+              onClick={() => {
+                setAuthMode('register');
+                setLoginSuccess(false);
+              }}
+              className={`py-1.5 text-xs font-bold rounded-lg transition-all ${
+                authMode === 'register'
+                  ? 'bg-sky-500 text-white shadow-sm'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              {isIt ? 'Registrati' : 'Register'}
+            </button>
+          </div>
         </div>
 
         {/* Auth Body */}
         <div className="p-6">
-          {/* Quick Demo Access Bar */}
-          <div className="mb-5 p-3 rounded-2xl bg-[#091730] border border-sky-500/30 flex items-center justify-between gap-2">
-            <div className="flex items-center gap-2 text-xs">
-              <Zap className="w-4 h-4 text-sky-400 shrink-0" />
-              <span className="text-slate-300 font-semibold">
-                {isIt ? 'Accesso Rapido Demo:' : 'Quick Demo Access:'}
-              </span>
+          {/* Quick info about Admin account */}
+          <div className="mb-4 p-2.5 rounded-xl bg-sky-950/40 border border-sky-500/25 flex items-start gap-2.5 text-[11px] text-sky-200">
+            <ShieldCheck className="w-4 h-4 text-sky-400 shrink-0 mt-0.5" />
+            <div>
+              {authMode === 'login' ? (
+                <p>
+                  Accesso per clienti B2B e Amministrazione. L'account <strong>noemi@aurora.app</strong> sblocca le funzioni da Amministratore.
+                </p>
+              ) : (
+                <p>
+                  Compila i dati aziendali per registrarti come nuovo cliente B2B e accedere al listino riservato.
+                </p>
+              )}
             </div>
-            <button
-              type="button"
-              id="demo-login-btn"
-              onClick={() => handleQuickDemoLogin('b2b')}
-              className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-bold text-xs shadow-md shadow-sky-950/60 transition-transform active:scale-95 flex items-center gap-1"
-            >
-              <span>1-Click Login</span>
-              <ArrowRight className="w-3 h-3" />
-            </button>
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-3.5">
             {loginSuccess && (
               <div className="p-3.5 rounded-2xl bg-emerald-950/80 border border-emerald-500/50 text-emerald-200 text-xs flex items-center gap-2 shadow-lg">
                 <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span className="font-bold">
-                  {isIt ? 'Autenticazione riuscita! Accesso in corso...' : 'Authentication successful! Logging in...'}
-                </span>
+                <span className="font-bold">{successMessage}</span>
               </div>
             )}
 
+            {authMode === 'register' && (
+              <>
+                <div>
+                  <label className="block text-xs font-bold text-slate-300 mb-1">
+                    {isIt ? 'Nome e Cognome Referente' : 'Contact Full Name'}
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+                      <User className="w-4 h-4" />
+                    </div>
+                    <input
+                      type="text"
+                      id="register-name-input"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      required
+                      placeholder="Mario Rossi"
+                      className="w-full bg-[#050c18] border border-[#132542] rounded-xl pl-10 pr-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-500"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-300 mb-1">
+                    {isIt ? 'Ragione Sociale / Azienda' : 'Company Name'}
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+                      <Building2 className="w-4 h-4" />
+                    </div>
+                    <input
+                      type="text"
+                      id="register-company-input"
+                      value={company}
+                      onChange={(e) => setCompany(e.target.value)}
+                      required
+                      placeholder="Rossi Forniture S.r.l."
+                      className="w-full bg-[#050c18] border border-[#132542] rounded-xl pl-10 pr-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-500"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-300 mb-1">
+                    {isIt ? 'Partita IVA' : 'VAT Number'}
+                  </label>
+                  <input
+                    type="text"
+                    id="register-piva-input"
+                    value={piva}
+                    onChange={(e) => setPiva(e.target.value)}
+                    required
+                    placeholder="IT12345678901"
+                    className="w-full bg-[#050c18] border border-[#132542] rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-500 font-mono"
+                  />
+                </div>
+              </>
+            )}
+
             <div>
-              <label className="block text-xs font-bold text-slate-300 mb-1.5 flex items-center justify-between">
-                <span>{isIt ? 'Partita IVA o Email B2B' : 'VAT / Tax ID or B2B Email'}</span>
-                <span className="text-[10px] text-sky-400 font-normal">{isIt ? 'Verificato SDI' : 'SDI Verified'}</span>
+              <label className="block text-xs font-bold text-slate-300 mb-1">
+                <span>{isIt ? 'Email' : 'Email Address'}</span>
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
                   <Mail className="w-4 h-4" />
                 </div>
                 <input
-                  type="text"
+                  type="email"
                   id="login-email-input"
-                  value={emailOrPiva}
-                  onChange={(e) => setEmailOrPiva(e.target.value)}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   required
-                  placeholder="simonearico10@gmail.com"
+                  placeholder={authMode === 'login' ? 'es. noemi@aurora.app o cliente@email.it' : 'tuamail@azienda.it'}
                   className="w-full bg-[#050c18] border border-[#132542] rounded-xl pl-10 pr-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-500 font-mono"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-300 mb-1.5 flex items-center justify-between">
-                <span>{isIt ? 'Password / PIN Terminale' : 'Password / Terminal PIN'}</span>
-                <a
-                  href="#forgot-password"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    alert(isIt ? 'Link di recupero inviato a simonearico10@gmail.com' : 'Recovery link sent.');
-                  }}
-                  className="text-[10px] text-sky-400 hover:underline"
-                >
-                  {isIt ? 'Recupera password' : 'Forgot password?'}
-                </a>
+              <label className="block text-xs font-bold text-slate-300 mb-1">
+                <span>{isIt ? 'Password' : 'Password'}</span>
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
@@ -205,6 +319,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
+                  placeholder="••••••••••••"
                   className="w-full bg-[#050c18] border border-[#132542] rounded-xl pl-10 pr-10 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-500 font-mono"
                 />
                 <button
@@ -217,7 +332,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
               </div>
             </div>
 
-            {/* Remember Me & Terminal Device Info */}
+            {/* Remember Me */}
             <div className="flex items-center justify-between text-xs text-slate-400 pt-1">
               <label className="flex items-center gap-2 cursor-pointer select-none">
                 <input
@@ -226,10 +341,10 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                   onChange={(e) => setRememberMe(e.target.checked)}
                   className="w-4 h-4 rounded border-slate-700 bg-[#050c18] text-sky-500 focus:ring-0"
                 />
-                <span>{isIt ? 'Ricorda su questo terminale' : 'Remember this terminal'}</span>
+                <span>{isIt ? 'Ricorda terminale' : 'Remember me'}</span>
               </label>
               <span className="text-[10px] font-mono text-emerald-400 flex items-center gap-1">
-                <ShieldCheck className="w-3.5 h-3.5" /> TLS 256-bit
+                <ShieldCheck className="w-3.5 h-3.5" /> SSL 256-bit
               </span>
             </div>
 
@@ -238,14 +353,19 @@ export const LoginModal: React.FC<LoginModalProps> = ({
               type="submit"
               id="login-submit-btn"
               disabled={isLoading}
-              className="w-full bg-[#0284c7] hover:bg-[#0369a1] active:bg-[#075985] text-white font-bold py-3 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow-lg shadow-sky-950/60 transition-all hover:scale-[1.01] mt-2"
+              className="w-full bg-[#0284c7] hover:bg-[#0369a1] active:bg-[#075985] text-white font-bold py-3 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow-lg shadow-sky-950/60 transition-all hover:scale-[1.01] mt-2 cursor-pointer"
             >
               {isLoading ? (
                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              ) : (
+              ) : authMode === 'login' ? (
                 <>
                   <UserCheck className="w-4 h-4" />
                   <span>{isIt ? 'Accedi al Listino Riservato' : 'Sign in to B2B Catalog'}</span>
+                </>
+              ) : (
+                <>
+                  <UserPlus className="w-4 h-4" />
+                  <span>{isIt ? 'Completa Registrazione' : 'Complete Registration'}</span>
                 </>
               )}
             </button>
@@ -253,7 +373,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
         </div>
 
         {/* Footer info */}
-        <div className="p-4 bg-[#040a14] border-t border-[#0e1d35] text-center text-[11px] text-slate-500">
+        <div className="p-3.5 bg-[#040a14] border-t border-[#0e1d35] text-center text-[11px] text-slate-500">
           AURORA Distribuzione • {isIt ? 'Soluzioni Professionali per Pulizia e Sanificazione' : 'Professional Hygiene Solutions'}
         </div>
       </motion.div>
