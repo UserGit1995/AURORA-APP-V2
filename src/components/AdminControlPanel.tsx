@@ -21,6 +21,7 @@ import {
 import { useAdmin } from '../context/AdminContext';
 import { ProductEditModal } from './ProductEditModal';
 import { OrderEditModal } from './OrderEditModal';
+import { ProductImageUploader } from './ProductImageUploader';
 import { Product, Order, Category } from '../types';
 
 interface AdminControlPanelProps {
@@ -63,9 +64,11 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
   // Category Edit State
   const [newCatName, setNewCatName] = useState('');
   const [newCatDesc, setNewCatDesc] = useState('');
+  const [newCatImage, setNewCatImage] = useState('/logo-login.png');
   const [editingCategoryId, setEditingCategoryId] = useState<string | null>(null);
   const [editCategoryName, setEditCategoryName] = useState('');
   const [editCategoryDesc, setEditCategoryDesc] = useState('');
+  const [editCategoryImage, setEditCategoryImage] = useState('');
 
   // Settings State Form
   const [settingsForm, setSettingsForm] = useState(systemSettings);
@@ -100,10 +103,11 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
       description: newCatDesc.trim() || 'Forniture e detergenti professionali',
       count: '0 prodotti',
       countNumber: 0,
-      image: '/logo-login.png',
+      image: newCatImage || '/logo-login.png',
     });
     setNewCatName('');
     setNewCatDesc('');
+    setNewCatImage('/logo-login.png');
   };
 
   const handleSaveCategory = (catId: string) => {
@@ -113,6 +117,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
       ...existing,
       name: editCategoryName || existing.name,
       description: editCategoryDesc || existing.description,
+      image: editCategoryImage || existing.image || '/logo-login.png',
     });
     setEditingCategoryId(null);
   };
@@ -462,18 +467,22 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
                         onChange={(e) => setEditCategoryDesc(e.target.value)}
                         className="w-full bg-[#0c1c38] border border-slate-700 rounded-lg px-2 py-1 text-white text-xs"
                       />
-                      <div className="flex gap-2">
+                      <ProductImageUploader
+                        currentImage={editCategoryImage || cat.image || '/logo-login.png'}
+                        onImageChange={(img) => setEditCategoryImage(img)}
+                      />
+                      <div className="flex gap-2 pt-1">
                         <button
                           type="button"
                           onClick={() => handleSaveCategory(cat.id)}
-                          className="px-3 py-1 bg-amber-500 text-slate-950 font-bold rounded-lg text-xs"
+                          className="px-3 py-1 bg-amber-500 text-slate-950 font-bold rounded-lg text-xs cursor-pointer"
                         >
                           Salva
                         </button>
                         <button
                           type="button"
                           onClick={() => setEditingCategoryId(null)}
-                          className="px-3 py-1 bg-slate-800 text-slate-300 rounded-lg text-xs"
+                          className="px-3 py-1 bg-slate-800 text-slate-300 rounded-lg text-xs cursor-pointer"
                         >
                           Annulla
                         </button>
@@ -481,9 +490,16 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
                     </div>
                   ) : (
                     <div className="flex items-center justify-between gap-2">
-                      <div>
-                        <h4 className="font-bold text-white text-sm">{cat.name}</h4>
-                        <p className="text-[11px] text-slate-400">{cat.description}</p>
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <img
+                          src={cat.image || '/logo-login.png'}
+                          alt={cat.name}
+                          className="w-9 h-9 rounded-lg object-contain bg-white/5 border border-slate-700 shrink-0"
+                        />
+                        <div className="min-w-0">
+                          <h4 className="font-bold text-white text-sm truncate">{cat.name}</h4>
+                          <p className="text-[11px] text-slate-400 truncate">{cat.description}</p>
+                        </div>
                       </div>
                       <div className="flex items-center gap-1.5 shrink-0">
                         <button
@@ -492,8 +508,9 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
                             setEditingCategoryId(cat.id);
                             setEditCategoryName(cat.name);
                             setEditCategoryDesc(cat.description || '');
+                            setEditCategoryImage(cat.image || '/logo-login.png');
                           }}
-                          className="p-1.5 rounded-lg bg-slate-800 text-slate-300 hover:text-white"
+                          className="p-1.5 rounded-lg bg-slate-800 text-slate-300 hover:text-white cursor-pointer"
                           title="Modifica"
                         >
                           <Edit3 className="w-3.5 h-3.5" />
@@ -505,7 +522,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
                               deleteCategory(cat.id);
                             }
                           }}
-                          className="p-1.5 rounded-lg bg-rose-500/10 text-rose-400 hover:bg-rose-500/20"
+                          className="p-1.5 rounded-lg bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 cursor-pointer"
                           title="Elimina"
                         >
                           <Trash2 className="w-3.5 h-3.5" />

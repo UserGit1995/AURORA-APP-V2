@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { Product, Category } from '../types';
 import { useAdmin } from '../context/AdminContext';
+import { ProductImageUploader } from './ProductImageUploader';
 
 interface ProductEditModalProps {
   isOpen: boolean;
@@ -352,21 +353,15 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
             />
           </div>
 
-          {/* Image URL or Image Selector */}
-          <div>
-            <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">
-              URL Immagine o Percorso Asset
-            </label>
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={formData.image || ''}
-                onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-                className="flex-1 bg-[#09152b] border border-slate-700 rounded-xl px-3.5 py-2 text-white font-mono text-xs outline-none"
-                placeholder="/logo-login.png o URL esterno"
-              />
-            </div>
-          </div>
+          {/* Image Uploader Component (PC Upload, URL, Presets) */}
+          <ProductImageUploader
+            currentImage={formData.image || ''}
+            onImageChange={(newImage) => setFormData({ ...formData, image: newImage })}
+            presetImages={categories.map((c) => ({
+              label: c.name,
+              url: c.image || '/logo-login.png',
+            }))}
+          />
 
           {/* Flags & Toggles */}
           <div className="flex flex-wrap gap-4 pt-2 border-t border-slate-800">
