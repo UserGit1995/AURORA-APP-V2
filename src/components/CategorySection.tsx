@@ -1,61 +1,84 @@
-import { Folder, ArrowRight, Package } from "lucide-react";
-import { Link } from "@tanstack/react-router";
+import React from 'react';
+import { Folder, ArrowRight } from 'lucide-react';
+import { Category } from '../types';
+import { useLanguage } from '../context/LanguageContext';
 
-interface CategoryRow {
-  id: string;
-  slug: string;
-  name: string;
-  image_url: string | null;
+interface CategorySectionProps {
+  categories: Category[];
+  selectedCategoryId: string | null;
+  onSelectCategory: (categoryId: string) => void;
+  onViewAll: () => void;
 }
 
-export function CategorySection({ categories, counts }: { categories: CategoryRow[]; counts: Record<string, number> }) {
+export const CategorySection: React.FC<CategorySectionProps> = ({
+  categories,
+  selectedCategoryId,
+  onSelectCategory,
+  onViewAll,
+}) => {
+  const { t } = useLanguage();
+
   return (
     <section className="w-full mt-7">
+      {/* Section Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2.5">
           <div className="p-1.5 rounded-lg bg-sky-500/15 text-sky-400">
             <Folder className="w-4 h-4" />
           </div>
-          <h2 className="text-white text-base sm:text-lg font-bold tracking-tight">Categorie principali</h2>
+          <h2 className="text-white text-base sm:text-lg font-bold tracking-tight">
+            {t('categories.sectionTitle', 'Categorie principali')}
+          </h2>
         </div>
-        <Link
-          to="/categorie"
+        <button
+          id="view-all-categories-btn"
+          onClick={onViewAll}
           className="text-xs sm:text-sm font-semibold text-sky-400 hover:text-sky-300 transition-colors flex items-center gap-1 group"
         >
-          <span>Vedi tutte</span>
+          <span>{t('categories.viewAll', 'Vedi tutte')}</span>
           <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
-        </Link>
+        </button>
       </div>
 
+      {/* Categories Grid (7 items matching the screenshot) */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3">
         {categories.slice(0, 7).map((cat) => {
-          const count = counts[cat.id] ?? 0;
+          const isSelected = selectedCategoryId === cat.id;
+          const translatedName = t(`cat.${cat.id}`, cat.name);
+          const countDisplay = `${cat.countNumber || 100} ${t('categories.productsCount', 'prodotti')}`;
+
           return (
-            <Link
+            <div
               key={cat.id}
-              to="/categorie/$slug"
-              params={{ slug: cat.slug }}
-              className="group cursor-pointer rounded-2xl p-2.5 text-center transition-all duration-200 bg-[#081326] hover:bg-[#0c1c36] border border-[#142646] hover:border-[#1e3966] hover:-translate-y-0.5"
+              id={`cat-card-${cat.id}`}
+              onClick={() => onSelectCategory(cat.id)}
+              className={`group cursor-pointer rounded-2xl p-2.5 text-center transition-all duration-200 ${
+                isSelected
+                  ? 'bg-[#0f244a] border-2 border-sky-400 shadow-lg shadow-sky-950/40 translate-y-[-2px]'
+                  : 'bg-[#081326] hover:bg-[#0c1c36] border border-[#142646] hover:border-[#1e3966] hover:translate-y-[-2px]'
+              }`}
             >
-              <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-[#050c18] mb-2.5 flex items-center justify-center">
-                {cat.image_url ? (
-                  <img
-                    src={cat.image_url}
-                    alt={cat.name}
-                    className="w-full h-full object-cover object-center transition-transform duration-300 group-hover:scale-105"
-                  />
-                ) : (
-                  <Package className="w-6 h-6 text-primary" />
-                )}
+              {/* Image Frame */}
+              <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-[#050c18] mb-2.5">
+                <img
+                  src={cat.image}
+                  alt={translatedName}
+                  referrerPolicy="no-referrer"
+                  className="w-full h-full object-cover object-center transition-transform duration-300 group-hover:scale-105"
+                />
               </div>
-              <h3 className="text-white text-xs sm:text-sm font-bold truncate leading-tight">{cat.name}</h3>
+
+              {/* Title & Count */}
+              <h3 className="text-white text-xs sm:text-sm font-bold truncate leading-tight group-hover:text-sky-300 transition-colors">
+                {translatedName}
+              </h3>
               <p className="text-slate-400 text-[11px] mt-0.5 truncate">
-                {count} {count === 1 ? "prodotto" : "prodotti"}
+                {countDisplay}
               </p>
-            </Link>
+            </div>
           );
         })}
       </div>
     </section>
   );
-}
+};

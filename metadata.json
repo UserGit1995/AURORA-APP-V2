@@ -1,0 +1,6 @@
+{
+  "name": "Aurora Distribuzione",
+  "description": "Piattaforma e-commerce B2B per la distribuzione di prodotti per l'igiene, pulizia e benessere con tracciamento ordini, confronto prodotti e analisi predittiva del riordino con Gemini AI.",
+  "requestFramePermissions": ["camera", "microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
