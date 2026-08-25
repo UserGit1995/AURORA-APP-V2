@@ -4,9 +4,10 @@ export interface StoredAccount {
   id: string;
   name: string;
   email: string;
-  passwordHash: string; // stored for demo verification
-  company: string;
-  piva: string;
+  passwordHash: string;
+  customerType: 'privato' | 'attivita';
+  company?: string;
+  piva?: string;
   role: 'superadmin' | 'user';
   createdAt: string;
   avatarInitials: string;
@@ -20,70 +21,17 @@ export interface StoredAccount {
 
 const STORAGE_ACCOUNTS_KEY = 'aurora_registered_accounts';
 
-// Default Admin Account: Noemi
-export const ADMIN_NOEMI_EMAIL = 'noemi@aurora.app';
-
-export const DEFAULT_ADMIN_ACCOUNT: StoredAccount = {
-  id: 'admin-noemi',
-  name: 'Noemi',
-  email: ADMIN_NOEMI_EMAIL,
-  passwordHash: 'admin123', // standard admin password or aurora2026
-  company: 'Aurora Distribuzione S.r.l. - Amministrazione',
-  piva: 'IT09876543210',
-  role: 'superadmin',
-  createdAt: '2026-01-01T00:00:00.000Z',
-  avatarInitials: 'NO',
-  phone: '+39 02 9876543',
-  address: "Via dell'Industria 45",
-  city: 'Milano',
-  postalCode: '20145',
-  province: 'MI',
-};
-
-// Initial Demo Client Account
-const INITIAL_DEMO_CLIENT: StoredAccount = {
-  id: 'client-rossi',
-  name: 'Mario Rossi',
-  email: 'cliente@rossiforniture.it',
-  passwordHash: 'cliente123',
-  company: 'Rossi Forniture S.r.l.',
-  piva: 'IT12345678901',
-  role: 'user',
-  createdAt: '2026-01-15T10:00:00.000Z',
-  avatarInitials: 'MR',
-  phone: '+39 06 1234567',
-  address: 'Via Roma 12',
-  city: 'Roma',
-  postalCode: '00100',
-  province: 'RM',
-};
-
 // Retrieve registered accounts from localStorage
 export function getRegisteredAccounts(): StoredAccount[] {
   try {
     const raw = localStorage.getItem(STORAGE_ACCOUNTS_KEY);
     if (raw) {
-      const parsed: StoredAccount[] = JSON.parse(raw);
-      // Ensure Admin Noemi is always present and updated
-      const hasAdmin = parsed.some(
-        (a) => a.email.toLowerCase() === ADMIN_NOEMI_EMAIL.toLowerCase()
-      );
-      if (!hasAdmin) {
-        parsed.unshift(DEFAULT_ADMIN_ACCOUNT);
-        localStorage.setItem(STORAGE_ACCOUNTS_KEY, JSON.stringify(parsed));
-      }
-      return parsed;
+      return JSON.parse(raw);
     }
   } catch (e) {
     console.warn('Error reading accounts from storage', e);
   }
-
-  // Initial seeding with Admin Noemi and a sample B2B client
-  const defaultAccounts = [DEFAULT_ADMIN_ACCOUNT, INITIAL_DEMO_CLIENT];
-  try {
-    localStorage.setItem(STORAGE_ACCOUNTS_KEY, JSON.stringify(defaultAccounts));
-  } catch {}
-  return defaultAccounts;
+  return [];
 }
 
 // Convert StoredAccount to public UserProfile
@@ -93,16 +41,17 @@ export function toUserProfile(account: StoredAccount): UserProfile {
     id: account.id,
     name: account.name,
     email: account.email,
-    company: account.company,
-    piva: account.piva,
+    customerType: account.customerType || (account.company ? 'attivita' : 'privato'),
+    company: account.company || (account.customerType === 'privato' ? 'Cliente Privato (Casalinghi)' : 'Attività'),
+    piva: account.piva || '',
     role: account.role,
     avatarInitials: account.avatarInitials,
-    phone: account.phone || '+39 02 0000000',
+    phone: account.phone || '',
     address: account.address || '',
     city: account.city || '',
     postalCode: account.postalCode || '',
     province: account.province || '',
-    country: 'Italia',
+    country: account.country || 'Italia',
     permissions: {
       canEditCatalog: isSuper,
       canEditPrices: isSuper,
@@ -116,7 +65,7 @@ export function toUserProfile(account: StoredAccount): UserProfile {
   };
 }
 
-// Authenticate user
+// Authenticate user with strict verification against registered accounts or admin credentials
 export function authenticateUser(
   emailInput: string,
   passwordInput: string
@@ -125,12 +74,56 @@ export function authenticateUser(
   const cleanPass = passwordInput.trim();
 
   if (!cleanEmail) {
-    return { success: false, error: 'Inserisci un indirizzo email valido.' };
+    return { success: false, error: 'Inserisci il tuo indirizzo email.' };
   }
   if (!cleanPass) {
-    return { success: false, error: 'Inserisci la password.' };
+    return { success: false, error: 'Inserisci la tua password.' };
   }
 
+  // 1. Check if it is the dedicated SuperAdmin Noemi
+  const isNoemiAdminEmail = cleanEmail === 'noemi@aurora.app';
+  if (isNoemiAdminEmail) {
+    const accounts = getRegisteredAccounts();
+    const savedAdmin = accounts.find((a) => a.email.toLowerCase() === 'noemi@aurora.app');
+
+    const isValidAdminPass =
+      (savedAdmin && savedAdmin.passwordHash === cleanPass) ||
+      cleanPass === 'admin123' ||
+      cleanPass === 'aurora2026' ||
+      cleanPass === 'noemi2026';
+
+    if (!isValidAdminPass) {
+      return {
+        success: false,
+        error: 'Password di amministrazione non corretta.',
+      };
+    }
+
+    const adminUser: UserProfile = {
+      id: 'admin-noemi',
+      name: savedAdmin ? savedAdmin.name : 'Noemi',
+      email: 'noemi@aurora.app',
+      customerType: 'attivita',
+      company: savedAdmin?.company || 'Aurora Distribuzione S.r.l. - Amministrazione',
+      piva: savedAdmin?.piva || 'IT09876543210',
+      role: 'superadmin',
+      avatarInitials: 'NO',
+      permissions: {
+        canEditCatalog: true,
+        canEditPrices: true,
+        canEditStock: true,
+        canEditOrders: true,
+        canEditUsers: true,
+        canEditCompanyInfo: true,
+        canDeleteRecords: true,
+        canOverrideDiscounts: true,
+      },
+    };
+
+    return { success: true, user: adminUser };
+  }
+
+  // 2. For regular users: strictly look up registered accounts in storage
   const accounts = getRegisteredAccounts();
   const found = accounts.find((a) => a.email.toLowerCase() === cleanEmail);
 
@@ -138,22 +131,14 @@ export function authenticateUser(
     return {
       success: false,
       error:
-        'Nessun account trovato per questa email. Clicca sulla scheda "Registrati" per creare il tuo account aziendale B2B.',
+        'Account non trovato. Se non sei ancora registrato, clicca sulla scheda "Registrati" per creare il tuo account.',
     };
   }
 
-  // Validate password (support admin default pass, or exact match)
-  const isMasterPass =
-    found.role === 'superadmin' &&
-    (cleanPass === 'admin123' ||
-      cleanPass === 'aurora2026' ||
-      cleanPass === 'noemi2026' ||
-      cleanPass === found.passwordHash);
-
-  if (!isMasterPass && found.passwordHash !== cleanPass) {
+  if (found.passwordHash !== cleanPass) {
     return {
       success: false,
-      error: 'Password errata. Riprova con le credenziali corrette.',
+      error: 'Password errata. Controlla e riprova.',
     };
   }
 
@@ -163,34 +148,52 @@ export function authenticateUser(
   };
 }
 
-// Register a new B2B client
+// Register a new user (supports both Private Household customer and Business/Supplier customer)
 export function registerNewUser(data: {
+  customerType: 'privato' | 'attivita';
   name: string;
-  company: string;
-  piva: string;
   email: string;
   password: string;
+  company?: string;
+  piva?: string;
+  phone?: string;
+  city?: string;
 }): { success: boolean; user?: UserProfile; error?: string } {
   const cleanEmail = data.email.trim().toLowerCase();
   const cleanName = data.name.trim();
-  const cleanCompany = data.company.trim();
-  const cleanPiva = data.piva.trim().toUpperCase();
   const cleanPass = data.password.trim();
+  const customerType = data.customerType || 'privato';
 
   if (!cleanName || cleanName.length < 2) {
-    return { success: false, error: 'Inserisci il nome e cognome del referente aziendale.' };
+    return {
+      success: false,
+      error: customerType === 'privato' ? 'Inserisci il tuo Nome e Cognome.' : 'Inserisci il nome del referente aziendale.',
+    };
   }
-  if (!cleanCompany || cleanCompany.length < 2) {
-    return { success: false, error: 'Inserisci la Ragione Sociale / Nome Azienda.' };
-  }
-  if (!cleanPiva || cleanPiva.length < 5) {
-    return { success: false, error: 'Inserisci una Partita IVA valida.' };
-  }
+
   if (!cleanEmail || !cleanEmail.includes('@')) {
     return { success: false, error: 'Inserisci un indirizzo email valido.' };
   }
+
   if (!cleanPass || cleanPass.length < 4) {
-    return { success: false, error: 'La password deve contenere almeno 4 caratteri.' };
+    return { success: false, error: 'La password deve avere almeno 4 caratteri.' };
+  }
+
+  let cleanCompany = '';
+  let cleanPiva = '';
+
+  if (customerType === 'attivita') {
+    cleanCompany = (data.company || '').trim();
+    cleanPiva = (data.piva || '').trim().toUpperCase();
+
+    if (!cleanCompany || cleanCompany.length < 2) {
+      return { success: false, error: 'Inserisci la Ragione Sociale / Nome dell\'attività.' };
+    }
+    if (!cleanPiva || cleanPiva.length < 5) {
+      return { success: false, error: 'Inserisci una Partita IVA o Codice Fiscale valido.' };
+    }
+  } else {
+    cleanCompany = 'Cliente Privato (Famiglia / Casalinghi)';
   }
 
   const accounts = getRegisteredAccounts();
@@ -199,23 +202,26 @@ export function registerNewUser(data: {
   if (alreadyExists) {
     return {
       success: false,
-      error: 'Questa email è già registrata nel sistema. Clicca su "Accedi" per effettuare il login.',
+      error: 'Questa email è già registrata. Clicca su "Accedi" per entrare.',
     };
   }
 
-  // Prevent unauthorized registration attempting to claim admin email
-  const isNoemiEmail = cleanEmail === ADMIN_NOEMI_EMAIL.toLowerCase();
+  // Only noemi@aurora.app gets admin privileges; all others are strictly standard users
+  const isNoemi = cleanEmail === 'noemi@aurora.app';
 
   const newAccount: StoredAccount = {
-    id: `cli-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+    id: `usr_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
     name: cleanName,
+    customerType,
     company: cleanCompany,
     piva: cleanPiva,
     email: cleanEmail,
     passwordHash: cleanPass,
-    role: isNoemiEmail ? 'superadmin' : 'user', // only Noemi gets superadmin
+    role: isNoemi ? 'superadmin' : 'user',
     createdAt: new Date().toISOString(),
     avatarInitials: cleanName.substring(0, 2).toUpperCase(),
+    phone: data.phone?.trim() || '',
+    city: data.city?.trim() || '',
     country: 'Italia',
   };
 
@@ -223,7 +229,7 @@ export function registerNewUser(data: {
   try {
     localStorage.setItem(STORAGE_ACCOUNTS_KEY, JSON.stringify(updatedAccounts));
   } catch (e) {
-    console.error('Failed to save user account', e);
+    console.error('Failed to save account', e);
   }
 
   return {

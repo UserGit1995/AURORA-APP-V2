@@ -161,8 +161,9 @@ export interface UserProfile {
   id: string;
   name: string;
   email: string;
-  company: string;
-  piva: string;
+  company?: string;
+  piva?: string;
+  customerType?: 'privato' | 'attivita';
   sdi?: string;
   pec?: string;
   role: UserRole;

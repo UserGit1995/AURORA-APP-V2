@@ -5,24 +5,24 @@ import {
   Mail,
   Building2,
   CheckCircle2,
-  ShieldCheck,
   User,
   Eye,
   EyeOff,
   UserCheck,
   UserPlus,
   AlertTriangle,
-  Crown,
-  KeyRound,
+  Sparkles,
+  ShoppingBag,
+  Briefcase,
+  Phone,
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion } from 'motion/react';
 import { AuroraLogo } from './AuroraLogo';
 import { useLanguage } from '../context/LanguageContext';
 import { UserProfile } from '../types';
 import {
   authenticateUser,
   registerNewUser,
-  ADMIN_NOEMI_EMAIL,
 } from '../services/authService';
 
 interface LoginModalProps {
@@ -40,11 +40,13 @@ export const LoginModal: React.FC<LoginModalProps> = ({
   const isIt = language === 'it';
 
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
+  const [customerType, setCustomerType] = useState<'privato' | 'attivita'>('privato');
 
-  // Form fields
+  // Neutral form fields
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
   const [company, setCompany] = useState('');
   const [piva, setPiva] = useState('');
 
@@ -59,20 +61,6 @@ export const LoginModal: React.FC<LoginModalProps> = ({
   const resetFormState = () => {
     setErrorMessage(null);
     setSuccessMessage(null);
-  };
-
-  const handleQuickFillAdmin = () => {
-    setAuthMode('login');
-    setEmail(ADMIN_NOEMI_EMAIL);
-    setPassword('admin123');
-    resetFormState();
-  };
-
-  const handleQuickFillDemoClient = () => {
-    setAuthMode('login');
-    setEmail('cliente@rossiforniture.it');
-    setPassword('cliente123');
-    resetFormState();
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -90,11 +78,11 @@ export const LoginModal: React.FC<LoginModalProps> = ({
           return;
         }
 
-        const isNoemi = authResult.user.email.toLowerCase() === ADMIN_NOEMI_EMAIL.toLowerCase();
+        const isSuperAdmin = authResult.user.role === 'superadmin';
         setSuccessMessage(
-          isNoemi
-            ? 'Accesso SuperAdmin autorizzato con successo. Benvenuta Noemi!'
-            : `Benvenuto ${authResult.user.name}! Accesso al listino B2B completato.`
+          isSuperAdmin
+            ? `Accesso Amministratore autorizzato. Benvenuta ${authResult.user.name}!`
+            : `Benvenuto ${authResult.user.name}! Accesso effettuato con successo.`
         );
 
         setTimeout(() => {
@@ -102,13 +90,15 @@ export const LoginModal: React.FC<LoginModalProps> = ({
             onLoginSuccess(authResult.user!);
           }
           onClose();
-        }, 800);
+        }, 750);
       } else {
         // Registration mode
         const regResult = registerNewUser({
+          customerType,
           name,
-          company,
-          piva,
+          company: customerType === 'attivita' ? company : undefined,
+          piva: customerType === 'attivita' ? piva : undefined,
+          phone,
           email,
           password,
         });
@@ -119,16 +109,20 @@ export const LoginModal: React.FC<LoginModalProps> = ({
           return;
         }
 
-        setSuccessMessage('Registrazione aziendale B2B completata con successo! Account attivato.');
+        setSuccessMessage(
+          customerType === 'privato'
+            ? `Registrazione completata! Benvenuto in AURORA Casalinghi.`
+            : `Registrazione aziendale B2B completata con successo!`
+        );
 
         setTimeout(() => {
           if (onLoginSuccess) {
             onLoginSuccess(regResult.user!);
           }
           onClose();
-        }, 900);
+        }, 850);
       }
-    }, 450);
+    }, 400);
   };
 
   return (
@@ -205,22 +199,57 @@ export const LoginModal: React.FC<LoginModalProps> = ({
         {/* Auth Body */}
         <div className="p-5 sm:p-6">
           {/* Informative Guidance Banner */}
-          {authMode === 'login' ? (
-            <div className="mb-4 p-2.5 rounded-xl bg-sky-950/40 border border-sky-500/20 text-[11px] text-sky-200 flex items-start gap-2">
-              <ShieldCheck className="w-4 h-4 text-sky-400 shrink-0 mt-0.5" />
-              <div className="leading-tight">
-                <span>Accesso riservato per </span>
-                <strong className="text-amber-300">Amministratore (Noemi)</strong>
-                <span> e </span>
-                <strong className="text-white">Clienti B2B registrati</strong>.
+          {authMode === 'register' ? (
+            <div className="mb-4 space-y-2">
+              <p className="text-xs font-bold text-slate-300">
+                Seleziona la tipologia di account:
+              </p>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  id="select-type-privato-btn"
+                  onClick={() => {
+                    setCustomerType('privato');
+                    resetFormState();
+                  }}
+                  className={`p-2.5 rounded-xl border flex flex-col items-center text-center gap-1.5 transition-all cursor-pointer ${
+                    customerType === 'privato'
+                      ? 'bg-sky-950/70 border-sky-500 text-white shadow-md shadow-sky-950/50 ring-1 ring-sky-400/40'
+                      : 'bg-[#08152c] border-[#142848] text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  <ShoppingBag className={`w-4 h-4 ${customerType === 'privato' ? 'text-sky-400' : 'text-slate-400'}`} />
+                  <div>
+                    <div className="text-xs font-bold">Cliente Privato</div>
+                    <div className="text-[10px] text-slate-400 leading-tight">Uso casa e famiglia</div>
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  id="select-type-attivita-btn"
+                  onClick={() => {
+                    setCustomerType('attivita');
+                    resetFormState();
+                  }}
+                  className={`p-2.5 rounded-xl border flex flex-col items-center text-center gap-1.5 transition-all cursor-pointer ${
+                    customerType === 'attivita'
+                      ? 'bg-sky-950/70 border-sky-500 text-white shadow-md shadow-sky-950/50 ring-1 ring-sky-400/40'
+                      : 'bg-[#08152c] border-[#142848] text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  <Briefcase className={`w-4 h-4 ${customerType === 'attivita' ? 'text-sky-400' : 'text-slate-400'}`} />
+                  <div>
+                    <div className="text-xs font-bold">Attività / Fornitore</div>
+                    <div className="text-[10px] text-slate-400 leading-tight">P.IVA / B2B all'ingrosso</div>
+                  </div>
+                </button>
               </div>
             </div>
           ) : (
-            <div className="mb-4 p-2.5 rounded-xl bg-sky-950/40 border border-sky-500/20 text-[11px] text-sky-200 flex items-start gap-2">
-              <UserPlus className="w-4 h-4 text-sky-400 shrink-0 mt-0.5" />
-              <div className="leading-tight">
-                Registra la tua attività per accedere al listino all'ingrosso e alle condizioni commerciali dedicate.
-              </div>
+            <div className="mb-4 p-2.5 rounded-xl bg-sky-950/30 border border-sky-500/20 text-[11px] text-slate-300 flex items-center gap-2">
+              <Sparkles className="w-3.5 h-3.5 text-sky-400 shrink-0" />
+              <span>Inserisci le tue credenziali per accedere al tuo account.</span>
             </div>
           )}
 
@@ -246,7 +275,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
               <>
                 <div>
                   <label className="block text-xs font-bold text-slate-300 mb-1">
-                    {isIt ? 'Nome e Cognome Referente *' : 'Full Name *'}
+                    {customerType === 'privato' ? 'Nome e Cognome *' : 'Nome e Cognome Referente *'}
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
@@ -258,52 +287,75 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       required
-                      placeholder="es. Mario Rossi"
+                      placeholder={customerType === 'privato' ? 'es. Mario Rossi' : 'es. Mario Rossi (Referente Acquisti)'}
                       className="w-full bg-[#050c18] border border-[#132542] rounded-xl pl-10 pr-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-500"
                     />
                   </div>
                 </div>
 
+                {customerType === 'attivita' && (
+                  <>
+                    <div>
+                      <label className="block text-xs font-bold text-slate-300 mb-1">
+                        Ragione Sociale / Nome Attività *
+                      </label>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+                          <Building2 className="w-4 h-4" />
+                        </div>
+                        <input
+                          type="text"
+                          id="register-company-input"
+                          value={company}
+                          onChange={(e) => setCompany(e.target.value)}
+                          required
+                          placeholder="es. Rossi Forniture S.r.l. o Negozio Casalinghi"
+                          className="w-full bg-[#050c18] border border-[#132542] rounded-xl pl-10 pr-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-500"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-slate-300 mb-1">
+                        Partita IVA / Codice Fiscale Azienda *
+                      </label>
+                      <input
+                        type="text"
+                        id="register-piva-input"
+                        value={piva}
+                        onChange={(e) => setPiva(e.target.value)}
+                        required
+                        placeholder="IT01234567890"
+                        className="w-full bg-[#050c18] border border-[#132542] rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-500 font-mono uppercase"
+                      />
+                    </div>
+                  </>
+                )}
+
                 <div>
                   <label className="block text-xs font-bold text-slate-300 mb-1">
-                    {isIt ? 'Ragione Sociale / Azienda *' : 'Company Name *'}
+                    Recapito Telefonico <span className="text-slate-500 font-normal">(Opzionale per spedizioni)</span>
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
-                      <Building2 className="w-4 h-4" />
+                      <Phone className="w-4 h-4" />
                     </div>
                     <input
-                      type="text"
-                      id="register-company-input"
-                      value={company}
-                      onChange={(e) => setCompany(e.target.value)}
-                      required
-                      placeholder="es. Rossi Forniture S.r.l."
-                      className="w-full bg-[#050c18] border border-[#132542] rounded-xl pl-10 pr-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-500"
+                      type="tel"
+                      id="register-phone-input"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      placeholder="+39 333 1234567"
+                      className="w-full bg-[#050c18] border border-[#132542] rounded-xl pl-10 pr-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-500 font-mono"
                     />
                   </div>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">
-                    {isIt ? 'Partita IVA *' : 'VAT Number *'}
-                  </label>
-                  <input
-                    type="text"
-                    id="register-piva-input"
-                    value={piva}
-                    onChange={(e) => setPiva(e.target.value)}
-                    required
-                    placeholder="IT01234567890"
-                    className="w-full bg-[#050c18] border border-[#132542] rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-500 font-mono uppercase"
-                  />
                 </div>
               </>
             )}
 
             <div>
               <label className="block text-xs font-bold text-slate-300 mb-1">
-                <span>{isIt ? 'Email *' : 'Email Address *'}</span>
+                <span>{isIt ? 'Indirizzo Email *' : 'Email Address *'}</span>
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
@@ -315,7 +367,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  placeholder={authMode === 'login' ? 'es. noemi@aurora.app o tua@email.it' : 'email@azienda.it'}
+                  placeholder="nome@dominio.it"
                   className="w-full bg-[#050c18] border border-[#132542] rounded-xl pl-10 pr-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-500 font-mono"
                 />
               </div>
@@ -341,7 +393,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-500 hover:text-slate-300"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-500 hover:text-slate-300 cursor-pointer"
                 >
                   {showPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
                 </button>
@@ -359,9 +411,6 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                 />
                 <span>{isIt ? 'Resta connesso' : 'Stay signed in'}</span>
               </label>
-              <span className="text-[10px] font-mono text-emerald-400 flex items-center gap-1">
-                <ShieldCheck className="w-3.5 h-3.5" /> Protetto SSL
-              </span>
             </div>
 
             {/* Submit Button */}
@@ -376,48 +425,25 @@ export const LoginModal: React.FC<LoginModalProps> = ({
               ) : authMode === 'login' ? (
                 <>
                   <UserCheck className="w-4 h-4" />
-                  <span>{isIt ? 'Verifica Credenziali ed Accedi' : 'Verify and Sign In'}</span>
+                  <span>{isIt ? 'Accedi' : 'Sign In'}</span>
                 </>
               ) : (
                 <>
                   <UserPlus className="w-4 h-4" />
-                  <span>{isIt ? 'Registra e Attiva Account B2B' : 'Complete Registration'}</span>
+                  <span>
+                    {customerType === 'privato'
+                      ? 'Crea Account Privato'
+                      : 'Registra Attività / Fornitore'}
+                  </span>
                 </>
               )}
             </button>
           </form>
-
-          {/* Quick Access Helper Buttons for Testing / Admin */}
-          {authMode === 'login' && (
-            <div className="mt-4 pt-4 border-t border-[#10223d] space-y-2">
-              <p className="text-[10px] text-slate-500 text-center font-medium">
-                Accesso Rapido Preconfigurato:
-              </p>
-              <div className="grid grid-cols-2 gap-2">
-                <button
-                  type="button"
-                  onClick={handleQuickFillAdmin}
-                  className="p-2 rounded-xl bg-amber-950/30 hover:bg-amber-900/40 border border-amber-500/30 text-amber-300 text-[11px] font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
-                >
-                  <Crown className="w-3.5 h-3.5 text-amber-400" />
-                  <span>Admin Noemi</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={handleQuickFillDemoClient}
-                  className="p-2 rounded-xl bg-[#09172f] hover:bg-[#0f244a] border border-sky-500/30 text-sky-300 text-[11px] font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
-                >
-                  <KeyRound className="w-3.5 h-3.5 text-sky-400" />
-                  <span>Cliente B2B Demo</span>
-                </button>
-              </div>
-            </div>
-          )}
         </div>
 
         {/* Footer info */}
         <div className="p-3.5 bg-[#040a14] border-t border-[#0e1d35] text-center text-[11px] text-slate-500">
-          AURORA Distribuzione • Soluzioni Professionali Certificate
+          AURORA Casalinghi & Forniture • Accesso Sicuro
         </div>
       </motion.div>
     </div>

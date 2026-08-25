@@ -16,7 +16,9 @@ import {
   Layers,
   ArrowUpRight,
   LogIn,
-  LogOut
+  LogOut,
+  ShoppingBag,
+  Sparkles
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { PurchaseVelocityChart } from './PurchaseVelocityChart';
@@ -34,15 +36,20 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
 
   if (!isOpen) return null;
 
+  const isGuest = !currentUser;
+  const isPrivate = currentUser?.customerType === 'privato';
+  const isSuperAdmin = currentUser?.role === 'superadmin';
+
   const displayUser = currentUser || {
     id: 'guest',
-    name: 'Ospite / Visitatore',
-    company: 'Nessuna azienda associata',
+    name: 'Visitatore',
+    company: 'Nessun account connesso',
     email: 'Non autenticato',
     piva: '-',
     sdi: '-',
-    role: 'user',
-    avatarInitials: 'OS',
+    customerType: 'privato' as const,
+    role: 'user' as const,
+    avatarInitials: 'VI',
   };
 
   return (
@@ -61,19 +68,64 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
               {displayUser.avatarInitials || displayUser.name.substring(0, 2).toUpperCase()}
             </div>
             <div>
-              <div className="flex items-center gap-2">
-                <h3 className="text-base sm:text-lg font-bold text-white">{displayUser.company}</h3>
+              <div className="flex items-center gap-2 flex-wrap">
+                <h3 className="text-base sm:text-lg font-bold text-white">
+                  {displayUser.name}
+                </h3>
                 <span className="px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-300 text-[10.5px] font-semibold border border-sky-500/30 flex items-center gap-1">
-                  <CheckCircle2 className="w-3 h-3 text-sky-400" /> {displayUser.role === 'superadmin' ? 'Amministrazione' : 'Cliente B2B Certificato'}
+                  <CheckCircle2 className="w-3 h-3 text-sky-400" />
+                  {isSuperAdmin
+                    ? '⚡ Amministratore'
+                    : isPrivate
+                    ? 'Cliente Registrato (Casalinghi & Casa)'
+                    : 'Attività / Fornitore B2B'}
                 </span>
               </div>
               <p className="text-xs text-slate-400 font-mono mt-0.5">
-                Utente: <span className="text-slate-200 font-sans font-bold">{displayUser.name}</span> • P.IVA: <span className="text-slate-200">{displayUser.piva}</span> • Email: <span className="text-sky-300">{displayUser.email}</span>
+                {displayUser.company && (
+                  <>
+                    <span className="text-slate-200 font-sans font-medium">{displayUser.company}</span> •{' '}
+                  </>
+                )}
+                Email: <span className="text-sky-300">{displayUser.email}</span>
+                {displayUser.piva && (
+                  <>
+                    {' '}• P.IVA: <span className="text-slate-300">{displayUser.piva}</span>
+                  </>
+                )}
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
+            {currentUser ? (
+              <button
+                id="profile-logout-btn"
+                type="button"
+                onClick={() => {
+                  logout();
+                  onClose();
+                }}
+                className="px-3 py-1.5 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 border border-rose-500/30 text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+                <span>Esci</span>
+              </button>
+            ) : (
+              <button
+                id="profile-login-btn"
+                type="button"
+                onClick={() => {
+                  onClose();
+                  if (onOpenLogin) onOpenLogin();
+                }}
+                className="px-3 py-1.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-white text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+              >
+                <LogIn className="w-3.5 h-3.5" />
+                <span>Accedi / Registrati</span>
+              </button>
+            )}
+
             <button
               id="close-user-profile-modal-btn"
               onClick={onClose}
@@ -98,9 +150,9 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
             }`}
           >
             <Activity className="w-4 h-4 text-sky-400" />
-            <span>Dashboard Purchase Velocity</span>
+            <span>Panoramica Acquisti & Frequenza</span>
             <span className="px-1.5 py-0.5 text-[10px] rounded-full bg-emerald-500/20 text-emerald-300 font-mono">
-              +21.8% YoY
+              Attivo
             </span>
           </button>
 
@@ -114,12 +166,12 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
                 : 'border-transparent text-slate-400 hover:text-slate-200'
             }`}
           >
-            <Building2 className="w-4 h-4 text-sky-400" />
-            <span>Dati Azienda & Fatturazione</span>
+            {isPrivate ? <User className="w-4 h-4 text-sky-400" /> : <Building2 className="w-4 h-4 text-sky-400" />}
+            <span>{isPrivate ? 'Dati Account & Spedizione' : 'Dati Azienda & Fatturazione'}</span>
           </button>
 
           <button
-            id="tab-credit-conditions"
+            id="tab-credit-terms"
             type="button"
             onClick={() => setActiveProfileTab('credit')}
             className={`flex items-center gap-2 px-4 py-2.5 text-xs sm:text-sm font-bold border-b-2 transition-all whitespace-nowrap ${
@@ -128,20 +180,52 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
                 : 'border-transparent text-slate-400 hover:text-slate-200'
             }`}
           >
-            <Shield className="w-4 h-4 text-emerald-400" />
-            <span>Fido Commerciale & Ri.Ba.</span>
+            <CreditCard className="w-4 h-4 text-sky-400" />
+            <span>Vantaggi & Condizioni</span>
           </button>
         </div>
 
-        {/* Scrollable Modal Content */}
-        <div className="p-4 sm:p-6 overflow-y-auto flex-1 custom-scrollbar">
+        {/* Tab Content Body */}
+        <div className="p-4 sm:p-6 overflow-y-auto space-y-6">
           {activeProfileTab === 'velocity' && (
             <motion.div
               initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.2 }}
+              className="space-y-6"
             >
-              <PurchaseVelocityChart />
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div className="bg-[#071329] border border-[#132546] p-4 rounded-2xl">
+                  <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
+                    Tipologia Profilo
+                  </span>
+                  <div className="text-lg font-bold text-white mt-1 flex items-center gap-2">
+                    {isPrivate ? 'Cliente Privato (Casa)' : isSuperAdmin ? 'Amministrazione' : 'Attività / Fornitore'}
+                  </div>
+                  <span className="text-xs text-sky-400 block mt-0.5">Listino Scontato Applicato</span>
+                </div>
+
+                <div className="bg-[#071329] border border-[#132546] p-4 rounded-2xl">
+                  <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
+                    Stato Account
+                  </span>
+                  <div className="text-lg font-bold text-emerald-400 mt-1">Verificato & Attivo</div>
+                  <span className="text-xs text-slate-400 block mt-0.5">Spedizioni Prioritarie</span>
+                </div>
+
+                <div className="bg-[#071329] border border-[#132546] p-4 rounded-2xl">
+                  <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
+                    Sconto Fedeltà Registrati
+                  </span>
+                  <div className="text-lg font-bold text-sky-300 mt-1">-10% su tutto il catalogo</div>
+                  <span className="text-xs text-slate-400 block mt-0.5">Automatico al carrello</span>
+                </div>
+              </div>
+
+              {/* Purchase Velocity AI Interactive Module */}
+              <div className="bg-[#071329] border border-[#122340] rounded-2xl p-4 sm:p-5">
+                <PurchaseVelocityChart />
+              </div>
             </motion.div>
           )}
 
@@ -150,19 +234,23 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
               initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.2 }}
-              className="space-y-4 text-xs"
+              className="space-y-4"
             >
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="bg-[#09152b] border border-[#142646] p-4 rounded-2xl flex items-start gap-3.5">
                   <div className="p-2 rounded-xl bg-sky-500/20 text-sky-400 shrink-0">
                     <User className="w-5 h-5" />
                   </div>
                   <div>
                     <span className="text-[10px] text-slate-500 uppercase tracking-wider block font-bold">
-                      Referente Commerciale Principale
+                      {isPrivate ? 'Nome e Cognome' : 'Referente Principale'}
                     </span>
-                    <span className="text-sm text-slate-100 font-bold block mt-0.5">Simone Aricò</span>
-                    <span className="text-xs text-slate-400 block mt-0.5">Responsabile Acquisti & Supply Chain</span>
+                    <span className="text-sm text-slate-100 font-bold block mt-0.5">
+                      {displayUser.name}
+                    </span>
+                    <span className="text-xs text-slate-400 block mt-0.5">
+                      {isPrivate ? 'Acquisti Personali e Casalinghi' : 'Responsabile Acquisti & Forniture'}
+                    </span>
                   </div>
                 </div>
 
@@ -172,45 +260,44 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
                   </div>
                   <div>
                     <span className="text-[10px] text-slate-500 uppercase tracking-wider block font-bold">
-                      Email Istituzionale & Ordini
+                      Email di Contatto
                     </span>
                     <span className="text-sm text-slate-100 font-bold font-mono block mt-0.5">
-                      simonearico10@gmail.com
+                      {displayUser.email}
                     </span>
-                    <span className="text-xs text-emerald-400 block mt-0.5">PEC & Fatture SDI Verificate</span>
+                    <span className="text-xs text-emerald-400 block mt-0.5">Verificata per notifiche ordini</span>
                   </div>
                 </div>
 
-                <div className="bg-[#09152b] border border-[#142646] p-4 rounded-2xl flex items-start gap-3.5">
-                  <div className="p-2 rounded-xl bg-sky-500/20 text-sky-400 shrink-0">
-                    <FileText className="w-5 h-5" />
+                {displayUser.piva && (
+                  <div className="bg-[#09152b] border border-[#142646] p-4 rounded-2xl flex items-start gap-3.5">
+                    <div className="p-2 rounded-xl bg-sky-500/20 text-sky-400 shrink-0">
+                      <FileText className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-slate-500 uppercase tracking-wider block font-bold">
+                        Dati Fiscali / P.IVA
+                      </span>
+                      <span className="text-xs text-slate-200 font-bold block mt-0.5">
+                        P.IVA / CF: <strong className="font-mono text-sky-300">{displayUser.piva}</strong>
+                      </span>
+                    </div>
                   </div>
-                  <div>
-                    <span className="text-[10px] text-slate-500 uppercase tracking-wider block font-bold">
-                      Dati Fiscali & SDI
-                    </span>
-                    <span className="text-xs text-slate-200 font-bold block mt-0.5">
-                      Codice Univoco: <strong className="font-mono text-sky-300">AUR789K</strong>
-                    </span>
-                    <span className="text-[11px] text-slate-400 block mt-0.5">
-                      Partita IVA / CF: IT09876543210 • REA MI-2094182
-                    </span>
-                  </div>
-                </div>
+                )}
 
                 <div className="bg-[#09152b] border border-[#142646] p-4 rounded-2xl flex items-start gap-3.5">
                   <div className="p-2 rounded-xl bg-sky-500/20 text-sky-400 shrink-0">
-                    <Building2 className="w-5 h-5" />
+                    {isPrivate ? <ShoppingBag className="w-5 h-5" /> : <Building2 className="w-5 h-5" />}
                   </div>
                   <div>
                     <span className="text-[10px] text-slate-500 uppercase tracking-wider block font-bold">
-                      Sede Legale & Deposito
+                      {isPrivate ? 'Destinazione Principale' : 'Sede Attività'}
                     </span>
                     <span className="text-xs text-slate-200 font-bold block mt-0.5">
-                      Via dell'Industria 45, Palazzina B
+                      {displayUser.address || 'Italia'}
                     </span>
                     <span className="text-[11px] text-slate-400 block mt-0.5">
-                      20145 Milano (MI) • Orario scarico merci 08:00 - 17:30
+                      {displayUser.city || 'Consegna rapida espressa'}
                     </span>
                   </div>
                 </div>
@@ -219,11 +306,10 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
               {/* Delivery Terms */}
               <div className="bg-[#071329] border border-[#142646] p-4 rounded-2xl space-y-2">
                 <h4 className="text-xs font-bold text-slate-200 flex items-center gap-2">
-                  <Shield className="w-4 h-4 text-sky-400" /> Condizioni Fornitura & Accordi Quadro B2B
+                  <Shield className="w-4 h-4 text-sky-400" /> Condizioni Fornitura & Spedizione AURORA
                 </h4>
                 <p className="text-slate-400 text-xs leading-relaxed">
-                  Listino convenzionato con scontistica a volume su pallet completi. Trasporto con sponda idraulica incluso
-                  e preavviso telefonico del corriere GLS Logistics B2B.
+                  Tutti i prodotti di detergenza, carta, igiene persona e casalinghi sono spediti con imballi anti-rottura protetti e tracciamento espresso h24.
                 </p>
               </div>
             </motion.div>
@@ -238,79 +324,48 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
             >
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div className="bg-[#09152b] border border-emerald-500/30 p-4 rounded-2xl">
-                  <span className="text-[10px] text-slate-400 uppercase font-bold block">Fido Accordato</span>
-                  <span className="text-xl font-bold text-emerald-400 font-mono block mt-1">€ 50.000,00</span>
-                  <span className="text-[11px] text-slate-400 block mt-0.5">Disponibile: € 38.450,00</span>
+                  <span className="text-[10px] text-slate-400 uppercase tracking-wider block font-bold">
+                    Sconto Registrato
+                  </span>
+                  <div className="text-xl font-bold text-emerald-400 mt-1">-10% Dedicato</div>
+                  <span className="text-[11px] text-slate-400 block mt-0.5">Attivo su catalogo casalinghi</span>
                 </div>
 
-                <div className="bg-[#09152b] border border-[#142646] p-4 rounded-2xl">
-                  <span className="text-[10px] text-slate-400 uppercase font-bold block">Termini di Pagamento</span>
-                  <span className="text-base font-bold text-white block mt-1">Ri.Ba. 30/60 gg d.f.</span>
-                  <span className="text-[11px] text-sky-400 block mt-0.5">Banca Intesa Sanpaolo</span>
+                <div className="bg-[#09152b] border border-sky-500/30 p-4 rounded-2xl">
+                  <span className="text-[10px] text-slate-400 uppercase tracking-wider block font-bold">
+                    Spedizione Gratuita
+                  </span>
+                  <div className="text-xl font-bold text-sky-300 mt-1">Da € 49,00</div>
+                  <span className="text-[11px] text-slate-400 block mt-0.5">Corriere espresso in tutta Italia</span>
                 </div>
 
-                <div className="bg-[#09152b] border border-[#142646] p-4 rounded-2xl">
-                  <span className="text-[10px] text-slate-400 uppercase font-bold block">Rating Affidabilità</span>
-                  <span className="text-xl font-bold text-sky-300 font-mono block mt-1">AAA (Massima)</span>
-                  <span className="text-[11px] text-emerald-400 block mt-0.5">Zero insoluti registrati</span>
+                <div className="bg-[#09152b] border border-purple-500/30 p-4 rounded-2xl">
+                  <span className="text-[10px] text-slate-400 uppercase tracking-wider block font-bold">
+                    Garanzia Reso
+                  </span>
+                  <div className="text-xl font-bold text-purple-300 mt-1">30 Giorni</div>
+                  <span className="text-[11px] text-slate-400 block mt-0.5">Sostituzione rapida prodotti</span>
                 </div>
-              </div>
-
-              <div className="bg-[#071329] border border-[#142848] rounded-2xl p-4 space-y-3">
-                <h4 className="text-xs font-bold text-slate-200">Coordinate Bancarie d'Appoggio (SEPA / Ri.Ba)</h4>
-                <div className="p-3 rounded-xl bg-[#040b17] border border-[#10203a] font-mono text-xs text-sky-300">
-                  IBAN: IT99 A 03069 09606 100000012345 • BIC/SWIFT: BCITITMM
-                </div>
-                <p className="text-[11px] text-slate-400">
-                  Gli addebiti diretti SDD / Ri.Ba. vengono presentati con valuta fine mese concordata.
-                </p>
               </div>
             </motion.div>
           )}
         </div>
 
         {/* Modal Footer */}
-        <div className="p-4 border-t border-[#122340] bg-[#071124] flex items-center justify-between shrink-0">
-          <span className="text-[11px] text-slate-500">
-            Account B2B ID: <strong className="text-slate-400 font-mono">AUR-CLI-94812</strong>
-          </span>
-          <div className="flex items-center gap-2">
-            {currentUser && (
-              <button
-                type="button"
-                onClick={() => {
-                  logout();
-                  onClose();
-                }}
-                className="px-3 py-2 rounded-xl bg-rose-950/40 hover:bg-rose-900/60 border border-rose-500/40 text-rose-300 text-xs font-semibold transition-colors flex items-center gap-1.5"
-              >
-                <LogOut className="w-3.5 h-3.5" />
-                <span>Disconnetti</span>
-              </button>
-            )}
-            {onOpenLogin && (
-              <button
-                type="button"
-                onClick={() => {
-                  onClose();
-                  onOpenLogin();
-                }}
-                className="px-3.5 py-2 rounded-xl bg-[#0b1b36] hover:bg-[#0e244d] border border-sky-500/30 text-sky-300 text-xs font-semibold transition-colors flex items-center gap-1.5"
-              >
-                <LogIn className="w-3.5 h-3.5" />
-                <span>{currentUser ? 'Cambia Account' : 'Accedi'}</span>
-              </button>
-            )}
-            <button
-              onClick={onClose}
-              className="px-5 py-2 rounded-xl bg-[#0284c7] hover:bg-[#0369a1] text-white text-xs font-bold transition-colors shadow-sm cursor-pointer"
-            >
-              Chiudi Scheda Profilo
-            </button>
+        <div className="p-4 bg-[#050b17] border-t border-[#122340] flex items-center justify-between gap-3 shrink-0">
+          <div className="text-xs text-slate-400 flex items-center gap-2">
+            <Shield className="w-4 h-4 text-sky-400" />
+            <span>AURORA Casalinghi • Piattaforma Ufficiale</span>
           </div>
+          <button
+            id="profile-footer-close-btn"
+            onClick={onClose}
+            className="px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-bold text-xs transition-colors cursor-pointer"
+          >
+            Chiudi
+          </button>
         </div>
       </div>
     </div>
   );
 };
-

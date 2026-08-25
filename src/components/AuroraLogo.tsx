@@ -1,4 +1,5 @@
 import React from 'react';
+import logoLoginAsset from '../assets/logo-login.png';
 
 interface AuroraLogoProps {
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'login';
@@ -23,7 +24,7 @@ export const AuroraLogo: React.FC<AuroraLogoProps> = ({
   return (
     <div className={`inline-flex flex-col items-center select-none ${className}`}>
       <img
-        src="/logo-login.png"
+        src={logoLoginAsset}
         alt="AURORA Logo"
         referrerPolicy="no-referrer"
         className={`${sizeStyles[size]} w-auto max-w-full object-contain filter drop-shadow-[0_2px_12px_rgba(56,189,248,0.35)]`}
@@ -37,5 +38,3 @@ export const AuroraLogo: React.FC<AuroraLogoProps> = ({
     </div>
   );
 };
-
-
