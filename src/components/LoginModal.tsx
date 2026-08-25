@@ -83,7 +83,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
         const isSuperAdmin = authResult.user.role === 'superadmin';
         setSuccessMessage(
           isSuperAdmin
-            ? `Accesso Amministratore autorizzato. Benvenuto ${authResult.user.name}!`
+            ? `Accesso Amministratore autorizzato. Benvenuta ${authResult.user.name}!`
             : `Benvenuto ${authResult.user.name}! Accesso effettuato con successo.`
         );
 

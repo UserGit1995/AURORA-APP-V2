@@ -65,7 +65,7 @@ export function toUserProfile(account: StoredAccount): UserProfile {
   };
 }
 
-// Authenticate user with strict verification against registered accounts
+// Authenticate user with verification against registered accounts and SuperAdmin credentials
 export function authenticateUser(
   emailInput: string,
   passwordInput: string
@@ -80,7 +80,51 @@ export function authenticateUser(
     return { success: false, error: 'Inserisci la tua password.' };
   }
 
-  // Strictly look up registered accounts in storage
+  // 1. Dedicated SuperAdmin authentication for Noemi
+  if (cleanEmail === 'noemi@aurora.app') {
+    const accounts = getRegisteredAccounts();
+    const savedAdmin = accounts.find((a) => a.email.toLowerCase() === 'noemi@aurora.app');
+
+    const isValidAdminPass =
+      cleanPass === 'amministratriceappaurora' ||
+      (savedAdmin && savedAdmin.passwordHash === cleanPass);
+
+    if (!isValidAdminPass) {
+      return {
+        success: false,
+        error: 'Password di amministrazione non corretta.',
+      };
+    }
+
+    const adminUser: UserProfile = {
+      id: 'admin-noemi',
+      name: savedAdmin?.name || 'Noemi',
+      email: 'noemi@aurora.app',
+      customerType: 'attivita',
+      company: savedAdmin?.company || 'AURORA Casalinghi & Distribuzione',
+      piva: savedAdmin?.piva || 'IT09876543210',
+      role: 'superadmin',
+      avatarInitials: 'NO',
+      phone: savedAdmin?.phone || '+39 02 9876543',
+      address: savedAdmin?.address || 'Via dell\'Industria 45',
+      city: savedAdmin?.city || 'Milano',
+      country: 'Italia',
+      permissions: {
+        canEditCatalog: true,
+        canEditPrices: true,
+        canEditStock: true,
+        canEditOrders: true,
+        canEditUsers: true,
+        canEditCompanyInfo: true,
+        canDeleteRecords: true,
+        canOverrideDiscounts: true,
+      },
+    };
+
+    return { success: true, user: adminUser };
+  }
+
+  // 2. Strictly look up registered accounts in storage
   const accounts = getRegisteredAccounts();
   const found = accounts.find((a) => a.email.toLowerCase() === cleanEmail);
 
@@ -164,8 +208,11 @@ export function registerNewUser(data: {
     };
   }
 
-  // Verify optional admin authorization code
-  const isSuperAdminAccount = data.adminCode?.trim() === 'AURORA_ADMIN_2026' || data.adminCode?.trim() === 'admin2026';
+  // Verify admin authorization
+  const isSuperAdminAccount =
+    cleanEmail === 'noemi@aurora.app' ||
+    data.adminCode?.trim() === 'AURORA_ADMIN_2026' ||
+    data.adminCode?.trim() === 'admin2026';
 
   const newAccount: StoredAccount = {
     id: `usr_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
