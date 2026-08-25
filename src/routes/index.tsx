@@ -1,26 +1,26 @@
-import { createFileRoute } from '@tanstack/react-router';
-import { getProducts } from '../lib/products.functions';
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useEffect } from "react";
+import splashScreen from "@/assets/splash-screen.jpg";
 
-export const Route = createFileRoute('/')({
-  loader: () => getProducts(),
-  component: IndexComponent,
+export const Route = createFileRoute("/")({
+  component: Splash,
 });
 
-function IndexComponent() {
-  const products = Route.useLoaderData();
+function Splash() {
+  const navigate = useNavigate();
+  useEffect(() => {
+    const t = setTimeout(() => navigate({ to: "/home" }), 1800);
+    return () => clearTimeout(t);
+  }, [navigate]);
 
   return (
-    <div style={{ padding: '20px', fontFamily: 'sans-serif' }}>
-      <h1>Prodotti</h1>
-      {Array.isArray(products) && products.length > 0 ? (
-        <ul>
-          {products.map((item: any) => (
-            <li key={item.id}>{item.name || JSON.stringify(item)}</li>
-          ))}
-        </ul>
-      ) : (
-        <p>Nessun prodotto trovato.</p>
-      )}
+    <div className="min-h-screen w-full relative overflow-hidden bg-black">
+      <img
+        src={splashScreen}
+        alt="Aurora"
+        className="absolute inset-0 w-full h-full object-cover"
+        draggable={false}
+      />
     </div>
   );
 }
