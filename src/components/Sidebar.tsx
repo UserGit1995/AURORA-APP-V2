@@ -172,9 +172,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
               >
                 <div className="flex items-center gap-2">
                   <LogIn className="w-3.5 h-3.5 text-sky-400" />
-                  <span>{t('nav.login', 'Portale Login B2B')}</span>
+                  <span>{t('nav.login', 'Accedi / Registrati')}</span>
                 </div>
-                <span className="text-[10px] text-sky-400 font-mono bg-sky-500/15 px-1.5 py-0.5 rounded">SDI</span>
+                <span className="text-[10px] text-sky-400 font-mono bg-sky-500/15 px-1.5 py-0.5 rounded">ACCOUNT</span>
               </button>
             )}
 

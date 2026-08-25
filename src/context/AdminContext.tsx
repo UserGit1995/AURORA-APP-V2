@@ -51,15 +51,15 @@ interface AdminContextType {
 }
 
 const DEFAULT_ADMIN: UserProfile = {
-  id: 'admin-noemi',
-  name: 'Noemi',
-  email: 'noemi@aurora.app',
-  company: 'Aurora Distribuzione S.r.l. - Amministrazione',
+  id: 'admin-master',
+  name: 'Amministratore',
+  email: 'admin@aurora.app',
+  company: 'AURORA Distribuzione S.r.l.',
   piva: 'IT09876543210',
   sdi: 'AUR789K',
-  pec: 'aurora.amministrazione@pec.it',
+  pec: 'amministrazione@pec.aurora.it',
   role: 'superadmin',
-  avatarInitials: 'NO',
+  avatarInitials: 'AD',
   phone: '+39 02 9876543',
   address: 'Via dell\'Industria 45',
   city: 'Milano',
@@ -80,8 +80,8 @@ const DEFAULT_ADMIN: UserProfile = {
 
 const DEFAULT_SETTINGS: SystemSettings = {
   companyName: 'AURORA Distribuzione S.r.l.',
-  brandTitle: 'AURORA - Igiene & Benessere Professionale',
-  contactEmail: 'noemi@aurora.app',
+  brandTitle: 'AURORA - Casalinghi & Detergenza',
+  contactEmail: 'info@auroracasalinghi.it',
   contactPhone: '+39 02 9876543',
   vatNumber: 'IT09876543210',
   sdiCode: 'AUR789K',
@@ -92,7 +92,7 @@ const DEFAULT_SETTINGS: SystemSettings = {
   vatRatePercent: 22,
   allowDirectOrderEdit: true,
   allowPriceOverride: true,
-  announcementBannerText: '🔥 Spedizione Gratuita B2B sopra 150€ • Forniture Dirette Certificate',
+  announcementBannerText: '🔥 Spedizione Rapida • Casalinghi e Detergenza per Casa e Attività',
   enableAnnouncementBanner: true,
 };
 
@@ -241,17 +241,12 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   const loginAsUser = (userData: UserProfile) => {
-    // Check if the logging-in email belongs to Admin Noemi (noemi@aurora.app)
-    const isNoemiAdmin = userData.email.trim().toLowerCase() === 'noemi@aurora.app';
+    const isSuper = userData.role === 'superadmin' || userData.role === 'admin';
 
-    if (isNoemiAdmin) {
+    if (isSuper) {
       const adminUser: UserProfile = {
-        ...DEFAULT_ADMIN,
-        name: userData.name || 'Noemi',
-        email: 'noemi@aurora.app',
-        company: userData.company || 'Aurora Distribuzione S.r.l.',
+        ...userData,
         role: 'superadmin',
-        avatarInitials: 'NO',
         permissions: {
           canEditCatalog: true,
           canEditPrices: true,

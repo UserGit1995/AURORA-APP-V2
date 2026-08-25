@@ -559,14 +559,14 @@ export default function App() {
         onClose={() => setIsLoginOpen(false)}
         onLoginSuccess={(userData) => {
           loginAsUser(userData);
-          const isNoemi = userData.email.toLowerCase() === 'noemi@aurora.app';
+          const isSuper = userData.role === 'superadmin' || userData.role === 'admin';
           setNotifications((prev) => [
             {
               id: `notif-auth-${Date.now()}`,
-              title: isNoemi ? 'Accesso Amministratore (Noemi)' : 'Accesso B2B Effettuato',
-              message: isNoemi
-                ? 'Benvenuta Noemi! Tutte le funzioni di amministrazione, prezzi e catalogo sono ora sbloccate.'
-                : `Benvenuto ${userData.name} (${userData.company}). Listino riservato e fido commerciale attivi.`,
+              title: isSuper ? 'Accesso Amministratore Effettuato' : 'Accesso Account Effettuato',
+              message: isSuper
+                ? `Benvenuto ${userData.name}! Tutte le funzioni di amministrazione, prezzi e catalogo sono sbloccate.`
+                : `Benvenuto ${userData.name}! Listino dedicato e promozioni attive.`,
               time: 'Adesso',
               read: false,
               type: 'system',
@@ -598,7 +598,7 @@ export default function App() {
         onSelectProduct={setSelectedProduct}
       />
 
-      {/* SuperAdmin Master Control Panel Modal - STRICTLY FOR ADMIN NOEMI ONLY */}
+      {/* SuperAdmin Master Control Panel Modal - STRICTLY FOR AUTHENTICATED ADMIN ONLY */}
       {isAdmin && (
         <AdminControlPanel
           isOpen={isAdminPanelOpen}

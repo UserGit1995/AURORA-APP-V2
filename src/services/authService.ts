@@ -65,7 +65,7 @@ export function toUserProfile(account: StoredAccount): UserProfile {
   };
 }
 
-// Authenticate user with strict verification against registered accounts or admin credentials
+// Authenticate user with strict verification against registered accounts
 export function authenticateUser(
   emailInput: string,
   passwordInput: string
@@ -80,50 +80,7 @@ export function authenticateUser(
     return { success: false, error: 'Inserisci la tua password.' };
   }
 
-  // 1. Check if it is the dedicated SuperAdmin Noemi
-  const isNoemiAdminEmail = cleanEmail === 'noemi@aurora.app';
-  if (isNoemiAdminEmail) {
-    const accounts = getRegisteredAccounts();
-    const savedAdmin = accounts.find((a) => a.email.toLowerCase() === 'noemi@aurora.app');
-
-    const isValidAdminPass =
-      (savedAdmin && savedAdmin.passwordHash === cleanPass) ||
-      cleanPass === 'admin123' ||
-      cleanPass === 'aurora2026' ||
-      cleanPass === 'noemi2026';
-
-    if (!isValidAdminPass) {
-      return {
-        success: false,
-        error: 'Password di amministrazione non corretta.',
-      };
-    }
-
-    const adminUser: UserProfile = {
-      id: 'admin-noemi',
-      name: savedAdmin ? savedAdmin.name : 'Noemi',
-      email: 'noemi@aurora.app',
-      customerType: 'attivita',
-      company: savedAdmin?.company || 'Aurora Distribuzione S.r.l. - Amministrazione',
-      piva: savedAdmin?.piva || 'IT09876543210',
-      role: 'superadmin',
-      avatarInitials: 'NO',
-      permissions: {
-        canEditCatalog: true,
-        canEditPrices: true,
-        canEditStock: true,
-        canEditOrders: true,
-        canEditUsers: true,
-        canEditCompanyInfo: true,
-        canDeleteRecords: true,
-        canOverrideDiscounts: true,
-      },
-    };
-
-    return { success: true, user: adminUser };
-  }
-
-  // 2. For regular users: strictly look up registered accounts in storage
+  // Strictly look up registered accounts in storage
   const accounts = getRegisteredAccounts();
   const found = accounts.find((a) => a.email.toLowerCase() === cleanEmail);
 
@@ -158,6 +115,7 @@ export function registerNewUser(data: {
   piva?: string;
   phone?: string;
   city?: string;
+  adminCode?: string;
 }): { success: boolean; user?: UserProfile; error?: string } {
   const cleanEmail = data.email.trim().toLowerCase();
   const cleanName = data.name.trim();
@@ -206,8 +164,8 @@ export function registerNewUser(data: {
     };
   }
 
-  // Only noemi@aurora.app gets admin privileges; all others are strictly standard users
-  const isNoemi = cleanEmail === 'noemi@aurora.app';
+  // Verify optional admin authorization code
+  const isSuperAdminAccount = data.adminCode?.trim() === 'AURORA_ADMIN_2026' || data.adminCode?.trim() === 'admin2026';
 
   const newAccount: StoredAccount = {
     id: `usr_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
@@ -217,7 +175,7 @@ export function registerNewUser(data: {
     piva: cleanPiva,
     email: cleanEmail,
     passwordHash: cleanPass,
-    role: isNoemi ? 'superadmin' : 'user',
+    role: isSuperAdminAccount ? 'superadmin' : 'user',
     createdAt: new Date().toISOString(),
     avatarInitials: cleanName.substring(0, 2).toUpperCase(),
     phone: data.phone?.trim() || '',

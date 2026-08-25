@@ -49,6 +49,8 @@ export const LoginModal: React.FC<LoginModalProps> = ({
   const [phone, setPhone] = useState('');
   const [company, setCompany] = useState('');
   const [piva, setPiva] = useState('');
+  const [adminCode, setAdminCode] = useState('');
+  const [showAdminCodeField, setShowAdminCodeField] = useState(false);
 
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
@@ -81,7 +83,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
         const isSuperAdmin = authResult.user.role === 'superadmin';
         setSuccessMessage(
           isSuperAdmin
-            ? `Accesso Amministratore autorizzato. Benvenuta ${authResult.user.name}!`
+            ? `Accesso Amministratore autorizzato. Benvenuto ${authResult.user.name}!`
             : `Benvenuto ${authResult.user.name}! Accesso effettuato con successo.`
         );
 
@@ -101,6 +103,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
           phone,
           email,
           password,
+          adminCode: adminCode.trim() || undefined,
         });
         setIsLoading(false);
 
@@ -109,8 +112,11 @@ export const LoginModal: React.FC<LoginModalProps> = ({
           return;
         }
 
+        const isSuperAdmin = regResult.user.role === 'superadmin';
         setSuccessMessage(
-          customerType === 'privato'
+          isSuperAdmin
+            ? `Registrazione Amministratore completata con successo!`
+            : customerType === 'privato'
             ? `Registrazione completata! Benvenuto in AURORA Casalinghi.`
             : `Registrazione aziendale B2B completata con successo!`
         );
@@ -349,6 +355,32 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                       className="w-full bg-[#050c18] border border-[#132542] rounded-xl pl-10 pr-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-500 font-mono"
                     />
                   </div>
+                </div>
+
+                <div className="pt-1">
+                  {!showAdminCodeField ? (
+                    <button
+                      type="button"
+                      onClick={() => setShowAdminCodeField(true)}
+                      className="text-[11px] text-slate-500 hover:text-amber-400/80 transition-colors flex items-center gap-1 cursor-pointer"
+                    >
+                      <span>🔑 Sei un amministratore? Inserisci codice di sicurezza</span>
+                    </button>
+                  ) : (
+                    <div>
+                      <label className="block text-xs font-bold text-amber-400/90 mb-1">
+                        Codice Sicurezza Amministratore <span className="text-slate-500 font-normal">(Riservato al gestore)</span>
+                      </label>
+                      <input
+                        type="password"
+                        id="register-admin-code-input"
+                        value={adminCode}
+                        onChange={(e) => setAdminCode(e.target.value)}
+                        placeholder="Inserisci passkey admin (opzionale)"
+                        className="w-full bg-[#050c18] border border-amber-500/40 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 font-mono"
+                      />
+                    </div>
+                  )}
                 </div>
               </>
             )}

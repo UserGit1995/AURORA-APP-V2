@@ -421,7 +421,7 @@ export const Header: React.FC<HeaderProps> = ({
           </motion.button>
         </div>
 
-        {/* SuperAdmin Master Control Button - STRICTLY ONLY FOR NOEMI / ADMIN */}
+        {/* SuperAdmin Master Control Button - STRICTLY FOR AUTHENTICATED ADMIN ONLY */}
         {isAdmin && (
           <button
             id="header-admin-control-btn"
@@ -431,7 +431,7 @@ export const Header: React.FC<HeaderProps> = ({
           >
             <span className="text-sm">⚡</span>
             <span className="hidden md:inline uppercase tracking-wider font-extrabold text-[11px]">
-              Admin {currentUser?.name || 'Noemi'}
+              Admin {currentUser?.name ? `(${currentUser.name})` : ''}
             </span>
           </button>
         )}
