@@ -426,7 +426,7 @@ export const Header: React.FC<HeaderProps> = ({
           <button
             id="header-admin-control-btn"
             onClick={onOpenAdminPanel}
-            className="relative inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs shadow-md shadow-amber-950/60 hover:scale-[1.03] active:scale-[0.98] transition-all cursor-pointer border border-amber-300/40"
+            className="relative inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-black text-xs shadow-md shadow-sky-950/60 hover:scale-[1.03] active:scale-[0.98] transition-all cursor-pointer border border-sky-300/40"
             title="Pannello SuperAdmin: Modifica catalogo, prezzi, ordini e impostazioni senza limiti"
           >
             <span className="text-sm">⚡</span>
