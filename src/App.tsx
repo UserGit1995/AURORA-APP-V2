@@ -598,14 +598,16 @@ export default function App() {
         onSelectProduct={setSelectedProduct}
       />
 
-      {/* SuperAdmin Master Control Panel Modal */}
-      <AdminControlPanel
-        isOpen={isAdminPanelOpen}
-        onClose={() => setIsAdminPanelOpen(false)}
-      />
+      {/* SuperAdmin Master Control Panel Modal - STRICTLY FOR ADMIN NOEMI ONLY */}
+      {isAdmin && (
+        <AdminControlPanel
+          isOpen={isAdminPanelOpen}
+          onClose={() => setIsAdminPanelOpen(false)}
+        />
+      )}
 
-      {/* Direct Product Quick Edit Modal (opened from details modal or quick buttons) */}
-      {editingProduct && (
+      {/* Direct Product Quick Edit Modal (Admin only) */}
+      {isAdmin && editingProduct && (
         <ProductEditModal
           isOpen={!!editingProduct}
           product={editingProduct}
