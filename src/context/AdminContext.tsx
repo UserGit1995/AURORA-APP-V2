@@ -154,6 +154,9 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     return persistentStorage.getItemSync<SystemSettings>('aurora_admin_settings', DEFAULT_SETTINGS);
   });
 
+  // Track whether initial asynchronous hydration has completed to avoid overwriting stored data with defaults
+  const [isHydrated, setIsHydrated] = useState<boolean>(false);
+
   // Asynchronously hydrate complete data from IndexedDB on startup (loads base64 images & unlimited products)
   useEffect(() => {
     let isMounted = true;
@@ -176,6 +179,10 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         if (savedSettings) setSystemSettings(savedSettings);
       } catch (err) {
         console.warn('IndexedDB initial hydration notice:', err);
+      } finally {
+        if (isMounted) {
+          setIsHydrated(true);
+        }
       }
     }
 
@@ -185,30 +192,35 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     };
   }, []);
 
-  // Sync state changes permanently to high-capacity storage
+  // Sync state changes permanently to high-capacity storage ONLY AFTER initial hydration
   useEffect(() => {
+    if (!isHydrated) return;
     if (currentUser) {
       persistentStorage.setItem('aurora_auth_user', currentUser);
     } else {
       persistentStorage.removeItem('aurora_auth_user');
     }
-  }, [currentUser]);
+  }, [currentUser, isHydrated]);
 
   useEffect(() => {
+    if (!isHydrated) return;
     persistentStorage.setItem('aurora_admin_products', productsList);
-  }, [productsList]);
+  }, [productsList, isHydrated]);
 
   useEffect(() => {
+    if (!isHydrated) return;
     persistentStorage.setItem('aurora_admin_categories', categoriesList);
-  }, [categoriesList]);
+  }, [categoriesList, isHydrated]);
 
   useEffect(() => {
+    if (!isHydrated) return;
     persistentStorage.setItem('aurora_admin_orders', ordersList);
-  }, [ordersList]);
+  }, [ordersList, isHydrated]);
 
   useEffect(() => {
+    if (!isHydrated) return;
     persistentStorage.setItem('aurora_admin_settings', systemSettings);
-  }, [systemSettings]);
+  }, [systemSettings, isHydrated]);
 
   const isSupabaseConnected = isSupabaseConfigured();
 
