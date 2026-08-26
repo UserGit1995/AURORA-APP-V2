@@ -64,10 +64,26 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
 }) => {
   const { isBusinessCustomer, formatProductPrice } = useAdmin();
   const [activeFilterCategory, setActiveFilterCategory] = useState<string | null>(selectedCategoryId);
+  const [activeFilterSubCategory, setActiveFilterSubCategory] = useState<string | null>(null);
+  const [activeFilterSubSubCategory, setActiveFilterSubSubCategory] = useState<string | null>(null);
   const [isSelectionMode, setIsSelectionMode] = useState<boolean>(false);
   const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
   const [isExportingCsv, setIsExportingCsv] = useState<boolean>(false);
   const [bulkFeedback, setBulkFeedback] = useState<{ type: 'cart' | 'fav' | 'csv'; count: number } | null>(null);
+
+  React.useEffect(() => {
+    setActiveFilterCategory(selectedCategoryId);
+    setActiveFilterSubCategory(null);
+    setActiveFilterSubSubCategory(null);
+  }, [selectedCategoryId]);
+
+  const currentSelectedCategory = useMemo(() => {
+    return categories.find((c) => c.id === activeFilterCategory);
+  }, [categories, activeFilterCategory]);
+
+  const currentSelectedSubCategory = useMemo(() => {
+    return currentSelectedCategory?.subCategories?.find((s) => s.id === activeFilterSubCategory);
+  }, [currentSelectedCategory, activeFilterSubCategory]);
 
   const getHeaderInfo = () => {
     switch (viewType) {
@@ -107,21 +123,37 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
       if (viewType === 'offerte' && !product.isOffer && !product.discountPercent) {
         return false;
       }
-      // Category filter
+      // Category filter (Level 1)
       if (activeFilterCategory && product.categoryId !== activeFilterCategory) {
         return false;
+      }
+      // SubCategory filter (Level 2)
+      if (activeFilterSubCategory) {
+        if (product.subCategoryId && product.subCategoryId !== activeFilterSubCategory) {
+          return false;
+        }
+      }
+      // SubSubCategory filter (Level 3)
+      if (activeFilterSubSubCategory) {
+        if (product.subSubCategoryId && product.subSubCategoryId !== activeFilterSubSubCategory) {
+          return false;
+        }
       }
       // Search query
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
         const matchName = product.name.toLowerCase().includes(q);
         const matchCategory = product.category.toLowerCase().includes(q);
+        const matchSubCategory = product.subCategoryName?.toLowerCase().includes(q);
+        const matchSubSubCategory = product.subSubCategoryName?.toLowerCase().includes(q);
         const matchCode = product.code.toLowerCase().includes(q);
-        if (!matchName && !matchCategory && !matchCode) return false;
+        if (!matchName && !matchCategory && !matchSubCategory && !matchSubSubCategory && !matchCode) {
+          return false;
+        }
       }
       return true;
     });
-  }, [products, viewType, activeFilterCategory, searchQuery]);
+  }, [products, viewType, activeFilterCategory, activeFilterSubCategory, activeFilterSubSubCategory, searchQuery]);
 
   const selectedProducts = useMemo(() => {
     return products.filter((p) => selectedProductIds.includes(p.id));
@@ -412,42 +444,159 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
         )}
       </AnimatePresence>
 
-      {/* Category Pills Filter Bar */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-3 mb-5 scrollbar-none">
-        <button
-          onClick={() => {
-            setActiveFilterCategory(null);
-            onSelectCategory(null);
-          }}
-          className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
-            !activeFilterCategory
-              ? 'bg-[#0284c7] text-white shadow-md shadow-sky-950/50'
-              : 'bg-[#09152b] text-slate-400 hover:text-white border border-[#132746]'
-          }`}
-        >
-          Tutte le Categorie ({products.length})
-        </button>
+      {/* 3-Level Category Filter Bars */}
+      <div className="space-y-2.5 mb-5">
+        {/* Level 1: Main Category Pills */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+          <button
+            onClick={() => {
+              setActiveFilterCategory(null);
+              setActiveFilterSubCategory(null);
+              setActiveFilterSubSubCategory(null);
+              onSelectCategory(null);
+            }}
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
+              !activeFilterCategory
+                ? 'bg-[#0284c7] text-white shadow-md shadow-sky-950/50'
+                : 'bg-[#09152b] text-slate-400 hover:text-white border border-[#132746]'
+            }`}
+          >
+            Tutte le Categorie ({products.length})
+          </button>
 
-        {categories.map((cat) => {
-          const isSelected = activeFilterCategory === cat.id;
-          return (
+          {categories.map((cat) => {
+            const isSelected = activeFilterCategory === cat.id;
+            return (
+              <button
+                key={cat.id}
+                onClick={() => {
+                  const next = isSelected ? null : cat.id;
+                  setActiveFilterCategory(next);
+                  setActiveFilterSubCategory(null);
+                  setActiveFilterSubSubCategory(null);
+                  onSelectCategory(next);
+                }}
+                className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
+                  isSelected
+                    ? 'bg-[#0284c7] text-white shadow-md shadow-sky-950/50'
+                    : 'bg-[#09152b] text-slate-400 hover:text-white border border-[#132746]'
+                }`}
+              >
+                {cat.image && (
+                  <img
+                    src={cat.image}
+                    alt=""
+                    className="w-4 h-4 rounded object-cover"
+                    referrerPolicy="no-referrer"
+                  />
+                )}
+                <span>{cat.name}</span>
+                <span className="text-[10px] opacity-75">({cat.countNumber || 0})</span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Level 2: Subcategory Pills (Appears when a Level 1 Category with subcategories is active) */}
+        {currentSelectedCategory && currentSelectedCategory.subCategories && currentSelectedCategory.subCategories.length > 0 && (
+          <div className="flex items-center gap-2 overflow-x-auto p-2 bg-[#061226] border border-sky-950/80 rounded-xl scrollbar-none">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-sky-400 pl-1 shrink-0 flex items-center gap-1">
+              <Layers className="w-3 h-3" />
+              <span>Sottocategorie:</span>
+            </span>
+
             <button
-              key={cat.id}
               onClick={() => {
-                const next = isSelected ? null : cat.id;
-                setActiveFilterCategory(next);
-                onSelectCategory(next);
+                setActiveFilterSubCategory(null);
+                setActiveFilterSubSubCategory(null);
               }}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
-                isSelected
-                  ? 'bg-[#0284c7] text-white shadow-md shadow-sky-950/50'
-                  : 'bg-[#09152b] text-slate-400 hover:text-white border border-[#132746]'
+              className={`px-2.5 py-1 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${
+                !activeFilterSubCategory
+                  ? 'bg-sky-500/20 text-sky-200 border border-sky-500/40 font-bold'
+                  : 'text-slate-400 hover:text-white bg-slate-900/50'
               }`}
             >
-              {cat.name} ({cat.countNumber})
+              Tutte
             </button>
-          );
-        })}
+
+            {currentSelectedCategory.subCategories.map((sub) => {
+              const isSubSelected = activeFilterSubCategory === sub.id;
+              return (
+                <button
+                  key={sub.id}
+                  onClick={() => {
+                    const next = isSubSelected ? null : sub.id;
+                    setActiveFilterSubCategory(next);
+                    setActiveFilterSubSubCategory(null);
+                  }}
+                  className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs whitespace-nowrap transition-all ${
+                    isSubSelected
+                      ? 'bg-sky-500/20 text-sky-200 border border-sky-500/40 font-bold shadow-xs'
+                      : 'text-slate-400 hover:text-white bg-slate-900/50 hover:bg-slate-800'
+                  }`}
+                >
+                  {sub.image && (
+                    <img
+                      src={sub.image}
+                      alt=""
+                      className="w-3.5 h-3.5 rounded object-cover"
+                      referrerPolicy="no-referrer"
+                    />
+                  )}
+                  <span>{sub.name}</span>
+                </button>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Level 3: Micro-category Pills (Appears when a Level 2 Subcategory with micro-categories is active) */}
+        {currentSelectedSubCategory && currentSelectedSubCategory.subSubCategories && currentSelectedSubCategory.subSubCategories.length > 0 && (
+          <div className="flex items-center gap-2 overflow-x-auto p-2 bg-[#051722] border border-emerald-950/80 rounded-xl scrollbar-none">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-400 pl-1 shrink-0 flex items-center gap-1">
+              <Tag className="w-3 h-3" />
+              <span>Micro-categorie:</span>
+            </span>
+
+            <button
+              onClick={() => setActiveFilterSubSubCategory(null)}
+              className={`px-2.5 py-1 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${
+                !activeFilterSubSubCategory
+                  ? 'bg-emerald-500/20 text-emerald-200 border border-emerald-500/40 font-bold'
+                  : 'text-slate-400 hover:text-white bg-slate-900/50'
+              }`}
+            >
+              Tutte
+            </button>
+
+            {currentSelectedSubCategory.subSubCategories.map((micro) => {
+              const isMicroSelected = activeFilterSubSubCategory === micro.id;
+              return (
+                <button
+                  key={micro.id}
+                  onClick={() => {
+                    setActiveFilterSubSubCategory(isMicroSelected ? null : micro.id);
+                  }}
+                  className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs whitespace-nowrap transition-all ${
+                    isMicroSelected
+                      ? 'bg-emerald-500/20 text-emerald-200 border border-emerald-500/40 font-bold shadow-xs'
+                      : 'text-slate-400 hover:text-white bg-slate-900/50 hover:bg-slate-800'
+                  }`}
+                >
+                  {micro.image && (
+                    <img
+                      src={micro.image}
+                      alt=""
+                      className="w-3.5 h-3.5 rounded object-cover"
+                      referrerPolicy="no-referrer"
+                    />
+                  )}
+                  <span>{micro.name}</span>
+                </button>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* Products Grid */}

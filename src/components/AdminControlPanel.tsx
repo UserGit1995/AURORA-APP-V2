@@ -22,6 +22,7 @@ import { useAdmin } from '../context/AdminContext';
 import { ProductEditModal } from './ProductEditModal';
 import { OrderEditModal } from './OrderEditModal';
 import { ProductImageUploader } from './ProductImageUploader';
+import { CategoryHierarchyManager } from './CategoryHierarchyManager';
 import { Product, Order, Category } from '../types';
 
 interface AdminControlPanelProps {
@@ -61,15 +62,6 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
   const [editingOrder, setEditingOrder] = useState<Order | null>(null);
   const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
 
-  // Category Edit State
-  const [newCatName, setNewCatName] = useState('');
-  const [newCatDesc, setNewCatDesc] = useState('');
-  const [newCatImage, setNewCatImage] = useState('/logo-login.png');
-  const [editingCategoryId, setEditingCategoryId] = useState<string | null>(null);
-  const [editCategoryName, setEditCategoryName] = useState('');
-  const [editCategoryDesc, setEditCategoryDesc] = useState('');
-  const [editCategoryImage, setEditCategoryImage] = useState('');
-
   // Settings State Form
   const [settingsForm, setSettingsForm] = useState(systemSettings);
   const [settingsSaved, setSettingsSaved] = useState(false);
@@ -93,33 +85,6 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
   const handleOpenEditOrder = (ord: Order) => {
     setEditingOrder(ord);
     setIsOrderModalOpen(true);
-  };
-
-  const handleAddCategory = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newCatName.trim()) return;
-    addCategory({
-      name: newCatName.trim(),
-      description: newCatDesc.trim() || 'Forniture e detergenti professionali',
-      count: '0 prodotti',
-      countNumber: 0,
-      image: newCatImage || '/logo-login.png',
-    });
-    setNewCatName('');
-    setNewCatDesc('');
-    setNewCatImage('/logo-login.png');
-  };
-
-  const handleSaveCategory = (catId: string) => {
-    const existing = categoriesList.find((c) => c.id === catId);
-    if (!existing) return;
-    updateCategory({
-      ...existing,
-      name: editCategoryName || existing.name,
-      description: editCategoryDesc || existing.description,
-      image: editCategoryImage || existing.image || '/logo-login.png',
-    });
-    setEditingCategoryId(null);
   };
 
   const handleSaveSettings = (e: React.FormEvent) => {
@@ -412,127 +377,10 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
           </div>
         )}
 
-        {/* Tab 3: Categories CRUD */}
+        {/* Tab 3: Categories & Subcategories Hierarchical CRUD */}
         {activeTab === 'categories' && (
-          <div className="p-4 sm:p-6 overflow-y-auto flex-1 space-y-5 text-left">
-            {/* Create Category Form */}
-            <form onSubmit={handleAddCategory} className="bg-[#08152b] p-4 rounded-2xl border border-slate-800 space-y-3">
-              <h3 className="text-xs font-bold text-amber-400 uppercase tracking-wider">
-                Aggiungi Nuova Categoria Merceologica
-              </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <input
-                  type="text"
-                  required
-                  placeholder="Nome Categoria (es. Disinfezione Ospedaliera)"
-                  value={newCatName}
-                  onChange={(e) => setNewCatName(e.target.value)}
-                  className="bg-[#0c1c38] border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white outline-none"
-                />
-                <input
-                  type="text"
-                  placeholder="Descrizione breve"
-                  value={newCatDesc}
-                  onChange={(e) => setNewCatDesc(e.target.value)}
-                  className="bg-[#0c1c38] border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white outline-none"
-                />
-              </div>
-              <button
-                type="submit"
-                className="px-4 py-2 bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs rounded-xl flex items-center gap-1.5"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                Crea Categoria
-              </button>
-            </form>
-
-            {/* Categories List */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {categoriesList.map((cat) => (
-                <div
-                  key={cat.id}
-                  className="p-3.5 rounded-2xl bg-[#071329] border border-slate-800 space-y-2 text-xs"
-                >
-                  {editingCategoryId === cat.id ? (
-                    <div className="space-y-2">
-                      <input
-                        type="text"
-                        value={editCategoryName}
-                        onChange={(e) => setEditCategoryName(e.target.value)}
-                        className="w-full bg-[#0c1c38] border border-amber-400 rounded-lg px-2 py-1 text-white text-xs"
-                      />
-                      <input
-                        type="text"
-                        value={editCategoryDesc}
-                        onChange={(e) => setEditCategoryDesc(e.target.value)}
-                        className="w-full bg-[#0c1c38] border border-slate-700 rounded-lg px-2 py-1 text-white text-xs"
-                      />
-                      <ProductImageUploader
-                        currentImage={editCategoryImage || cat.image || '/logo-login.png'}
-                        onImageChange={(img) => setEditCategoryImage(img)}
-                      />
-                      <div className="flex gap-2 pt-1">
-                        <button
-                          type="button"
-                          onClick={() => handleSaveCategory(cat.id)}
-                          className="px-3 py-1 bg-amber-500 text-slate-950 font-bold rounded-lg text-xs cursor-pointer"
-                        >
-                          Salva
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setEditingCategoryId(null)}
-                          className="px-3 py-1 bg-slate-800 text-slate-300 rounded-lg text-xs cursor-pointer"
-                        >
-                          Annulla
-                        </button>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <img
-                          src={cat.image || '/logo-login.png'}
-                          alt={cat.name}
-                          className="w-9 h-9 rounded-lg object-contain bg-white/5 border border-slate-700 shrink-0"
-                        />
-                        <div className="min-w-0">
-                          <h4 className="font-bold text-white text-sm truncate">{cat.name}</h4>
-                          <p className="text-[11px] text-slate-400 truncate">{cat.description}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-1.5 shrink-0">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setEditingCategoryId(cat.id);
-                            setEditCategoryName(cat.name);
-                            setEditCategoryDesc(cat.description || '');
-                            setEditCategoryImage(cat.image || '/logo-login.png');
-                          }}
-                          className="p-1.5 rounded-lg bg-slate-800 text-slate-300 hover:text-white cursor-pointer"
-                          title="Modifica"
-                        >
-                          <Edit3 className="w-3.5 h-3.5" />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            if (confirm(`Eliminare categoria ${cat.name}?`)) {
-                              deleteCategory(cat.id);
-                            }
-                          }}
-                          className="p-1.5 rounded-lg bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 cursor-pointer"
-                          title="Elimina"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
+          <div className="p-4 sm:p-6 overflow-y-auto flex-1 text-left">
+            <CategoryHierarchyManager />
           </div>
         )}
 

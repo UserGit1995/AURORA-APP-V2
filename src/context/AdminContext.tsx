@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { UserProfile, SystemSettings, Product, Order, Category } from '../types';
+import { UserProfile, SystemSettings, Product, Order, Category, SubCategory, SubSubCategory } from '../types';
 import { PRODUCTS, CATEGORIES, INITIAL_ORDERS } from '../data/catalog';
 import { 
   isSupabaseConfigured, 
@@ -56,6 +56,22 @@ interface AdminContextType {
   updateCategory: (updated: Category) => void;
   addCategory: (newCat: Omit<Category, 'id'>) => Category;
   deleteCategory: (categoryId: string) => void;
+
+  // Subcategory (Level 2) CRUD
+  addSubCategory: (categoryId: string, newSubCat: Omit<SubCategory, 'id' | 'categoryId'>) => SubCategory;
+  updateSubCategory: (categoryId: string, updatedSubCat: SubCategory) => void;
+  deleteSubCategory: (categoryId: string, subCategoryId: string) => void;
+
+  // Sub-subcategory (Level 3) CRUD
+  addSubSubCategory: (categoryId: string, subCategoryId: string, newSubSubCat: Omit<SubSubCategory, 'id' | 'categoryId' | 'subCategoryId'>) => SubSubCategory;
+  updateSubSubCategory: (categoryId: string, subCategoryId: string, updatedSubSubCat: SubSubCategory) => void;
+  deleteSubSubCategory: (categoryId: string, subCategoryId: string, subSubCatId: string) => void;
+
+  // Update Image from PC for any level
+  updateCategoryImageFromPc: (
+    target: { level: 'category' | 'subcategory' | 'subsubcategory'; categoryId: string; subCategoryId?: string; subSubCategoryId?: string },
+    imageDataUri: string
+  ) => void;
   
   // Order Management
   updateOrder: (updated: Order) => void;
@@ -334,7 +350,10 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   // Category CRUD
   const updateCategory = (updated: Category) => {
-    setCategoriesList((prev) => prev.map((c) => (c.id === updated.id ? updated : c)));
+    setCategoriesList((prev) => {
+      const next = prev.map((c) => (c.id === updated.id ? updated : c));
+      return next;
+    });
     syncSupabaseCategory(updated);
   };
 
@@ -343,6 +362,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const fullCategory: Category = {
       ...newCat,
       id,
+      subCategories: newCat.subCategories || [],
     };
     setCategoriesList((prev) => [...prev, fullCategory]);
     syncSupabaseCategory(fullCategory);
@@ -351,6 +371,196 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const deleteCategory = (categoryId: string) => {
     setCategoriesList((prev) => prev.filter((c) => c.id !== categoryId));
+  };
+
+  // Subcategory (Level 2) CRUD
+  const addSubCategory = (categoryId: string, newSubCat: Omit<SubCategory, 'id' | 'categoryId'>): SubCategory => {
+    const id = newSubCat.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') || `sub_${Date.now()}`;
+    const fullSubCat: SubCategory = {
+      ...newSubCat,
+      id,
+      categoryId,
+      subSubCategories: newSubCat.subSubCategories || [],
+    };
+
+    setCategoriesList((prev) =>
+      prev.map((cat) => {
+        if (cat.id === categoryId) {
+          const updatedCat = {
+            ...cat,
+            subCategories: [...(cat.subCategories || []), fullSubCat],
+          };
+          syncSupabaseCategory(updatedCat);
+          return updatedCat;
+        }
+        return cat;
+      })
+    );
+
+    return fullSubCat;
+  };
+
+  const updateSubCategory = (categoryId: string, updatedSubCat: SubCategory) => {
+    setCategoriesList((prev) =>
+      prev.map((cat) => {
+        if (cat.id === categoryId) {
+          const updatedCat = {
+            ...cat,
+            subCategories: (cat.subCategories || []).map((sub) => (sub.id === updatedSubCat.id ? updatedSubCat : sub)),
+          };
+          syncSupabaseCategory(updatedCat);
+          return updatedCat;
+        }
+        return cat;
+      })
+    );
+  };
+
+  const deleteSubCategory = (categoryId: string, subCategoryId: string) => {
+    setCategoriesList((prev) =>
+      prev.map((cat) => {
+        if (cat.id === categoryId) {
+          const updatedCat = {
+            ...cat,
+            subCategories: (cat.subCategories || []).filter((sub) => sub.id !== subCategoryId),
+          };
+          syncSupabaseCategory(updatedCat);
+          return updatedCat;
+        }
+        return cat;
+      })
+    );
+  };
+
+  // Sub-subcategory (Level 3) CRUD
+  const addSubSubCategory = (
+    categoryId: string,
+    subCategoryId: string,
+    newSubSubCat: Omit<SubSubCategory, 'id' | 'categoryId' | 'subCategoryId'>
+  ): SubSubCategory => {
+    const id = newSubSubCat.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') || `micro_${Date.now()}`;
+    const fullSubSubCat: SubSubCategory = {
+      ...newSubSubCat,
+      id,
+      categoryId,
+      subCategoryId,
+    };
+
+    setCategoriesList((prev) =>
+      prev.map((cat) => {
+        if (cat.id === categoryId) {
+          const updatedCat = {
+            ...cat,
+            subCategories: (cat.subCategories || []).map((sub) => {
+              if (sub.id === subCategoryId) {
+                return {
+                  ...sub,
+                  subSubCategories: [...(sub.subSubCategories || []), fullSubSubCat],
+                };
+              }
+              return sub;
+            }),
+          };
+          syncSupabaseCategory(updatedCat);
+          return updatedCat;
+        }
+        return cat;
+      })
+    );
+
+    return fullSubSubCat;
+  };
+
+  const updateSubSubCategory = (categoryId: string, subCategoryId: string, updatedSubSubCat: SubSubCategory) => {
+    setCategoriesList((prev) =>
+      prev.map((cat) => {
+        if (cat.id === categoryId) {
+          const updatedCat = {
+            ...cat,
+            subCategories: (cat.subCategories || []).map((sub) => {
+              if (sub.id === subCategoryId) {
+                return {
+                  ...sub,
+                  subSubCategories: (sub.subSubCategories || []).map((micro) =>
+                    micro.id === updatedSubSubCat.id ? updatedSubSubCat : micro
+                  ),
+                };
+              }
+              return sub;
+            }),
+          };
+          syncSupabaseCategory(updatedCat);
+          return updatedCat;
+        }
+        return cat;
+      })
+    );
+  };
+
+  const deleteSubSubCategory = (categoryId: string, subCategoryId: string, subSubCatId: string) => {
+    setCategoriesList((prev) =>
+      prev.map((cat) => {
+        if (cat.id === categoryId) {
+          const updatedCat = {
+            ...cat,
+            subCategories: (cat.subCategories || []).map((sub) => {
+              if (sub.id === subCategoryId) {
+                return {
+                  ...sub,
+                  subSubCategories: (sub.subSubCategories || []).filter((micro) => micro.id !== subSubCatId),
+                };
+              }
+              return sub;
+            }),
+          };
+          syncSupabaseCategory(updatedCat);
+          return updatedCat;
+        }
+        return cat;
+      })
+    );
+  };
+
+  // Upload/Set Image from PC for Category, SubCategory, or SubSubCategory
+  const updateCategoryImageFromPc = (
+    target: { level: 'category' | 'subcategory' | 'subsubcategory'; categoryId: string; subCategoryId?: string; subSubCategoryId?: string },
+    imageDataUri: string
+  ) => {
+    setCategoriesList((prev) =>
+      prev.map((cat) => {
+        if (cat.id !== target.categoryId) return cat;
+
+        let updatedCat: Category;
+        if (target.level === 'category') {
+          updatedCat = { ...cat, image: imageDataUri };
+        } else if (target.level === 'subcategory' && target.subCategoryId) {
+          updatedCat = {
+            ...cat,
+            subCategories: (cat.subCategories || []).map((sub) =>
+              sub.id === target.subCategoryId ? { ...sub, image: imageDataUri } : sub
+            ),
+          };
+        } else if (target.level === 'subsubcategory' && target.subCategoryId && target.subSubCategoryId) {
+          updatedCat = {
+            ...cat,
+            subCategories: (cat.subCategories || []).map((sub) => {
+              if (sub.id !== target.subCategoryId) return sub;
+              return {
+                ...sub,
+                subSubCategories: (sub.subSubCategories || []).map((micro) =>
+                  micro.id === target.subSubCategoryId ? { ...micro, image: imageDataUri } : micro
+                ),
+              };
+            }),
+          };
+        } else {
+          return cat;
+        }
+
+        syncSupabaseCategory(updatedCat);
+        return updatedCat;
+      })
+    );
   };
 
   // Order CRUD
@@ -453,6 +663,13 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         updateCategory,
         addCategory,
         deleteCategory,
+        addSubCategory,
+        updateSubCategory,
+        deleteSubCategory,
+        addSubSubCategory,
+        updateSubSubCategory,
+        deleteSubSubCategory,
+        updateCategoryImageFromPc,
         updateOrder,
         deleteOrder,
         createOrder,

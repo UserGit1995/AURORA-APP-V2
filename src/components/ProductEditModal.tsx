@@ -96,10 +96,43 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
 
   const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedCat = categories.find((c) => c.id === e.target.value);
+    const firstSub = selectedCat?.subCategories?.[0];
+    const firstMicro = firstSub?.subSubCategories?.[0];
+
     setFormData((prev) => ({
       ...prev,
       categoryId: e.target.value,
       category: selectedCat?.name || prev.category || 'Igiene Casa',
+      subCategoryId: firstSub?.id || '',
+      subCategoryName: firstSub?.name || '',
+      subSubCategoryId: firstMicro?.id || '',
+      subSubCategoryName: firstMicro?.name || '',
+    }));
+  };
+
+  const handleSubCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const currentCat = categories.find((c) => c.id === formData.categoryId);
+    const selectedSub = currentCat?.subCategories?.find((s) => s.id === e.target.value);
+    const firstMicro = selectedSub?.subSubCategories?.[0];
+
+    setFormData((prev) => ({
+      ...prev,
+      subCategoryId: e.target.value,
+      subCategoryName: selectedSub?.name || '',
+      subSubCategoryId: firstMicro?.id || '',
+      subSubCategoryName: firstMicro?.name || '',
+    }));
+  };
+
+  const handleSubSubCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const currentCat = categories.find((c) => c.id === formData.categoryId);
+    const currentSub = currentCat?.subCategories?.find((s) => s.id === formData.subCategoryId);
+    const selectedMicro = currentSub?.subSubCategories?.find((m) => m.id === e.target.value);
+
+    setFormData((prev) => ({
+      ...prev,
+      subSubCategoryId: e.target.value,
+      subSubCategoryName: selectedMicro?.name || '',
     }));
   };
 
@@ -220,24 +253,77 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
               />
             </div>
 
-            <div>
-              <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">
-                Categoria
-              </label>
-              <select
-                value={formData.categoryId || ''}
-                onChange={handleCategoryChange}
-                className="w-full bg-[#09152b] border border-slate-700 focus:border-amber-400 rounded-xl px-3.5 py-2.5 text-white text-sm outline-none transition-all"
-              >
-                {categories.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.name}
-                  </option>
-                ))}
-              </select>
+            {/* 3-Level Category Hierarchy Selection */}
+            <div className="sm:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-3 bg-[#08152b]/80 p-3.5 rounded-2xl border border-slate-800">
+              <div>
+                <label className="block text-[11px] font-bold text-amber-400 uppercase tracking-wider mb-1">
+                  1. Categoria Principale *
+                </label>
+                <select
+                  value={formData.categoryId || ''}
+                  onChange={handleCategoryChange}
+                  className="w-full bg-[#0c1c38] border border-slate-700 focus:border-amber-400 rounded-xl px-3 py-2 text-white text-xs outline-none transition-all"
+                >
+                  {categories.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold text-sky-400 uppercase tracking-wider mb-1">
+                  2. Sottocategoria
+                </label>
+                {(() => {
+                  const currentCat = categories.find((c) => c.id === formData.categoryId);
+                  const subCats = currentCat?.subCategories || [];
+                  return (
+                    <select
+                      value={formData.subCategoryId || ''}
+                      onChange={handleSubCategoryChange}
+                      className="w-full bg-[#0c1c38] border border-slate-700 focus:border-sky-400 rounded-xl px-3 py-2 text-white text-xs outline-none transition-all"
+                    >
+                      <option value="">-- Nessuna / Generale --</option>
+                      {subCats.map((s) => (
+                        <option key={s.id} value={s.id}>
+                          {s.name}
+                        </option>
+                      ))}
+                    </select>
+                  );
+                })()}
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold text-emerald-400 uppercase tracking-wider mb-1">
+                  3. Sotto-sottocategoria
+                </label>
+                {(() => {
+                  const currentCat = categories.find((c) => c.id === formData.categoryId);
+                  const currentSub = currentCat?.subCategories?.find((s) => s.id === formData.subCategoryId);
+                  const microCats = currentSub?.subSubCategories || [];
+                  return (
+                    <select
+                      value={formData.subSubCategoryId || ''}
+                      onChange={handleSubSubCategoryChange}
+                      disabled={!formData.subCategoryId || microCats.length === 0}
+                      className="w-full bg-[#0c1c38] border border-slate-700 focus:border-emerald-400 rounded-xl px-3 py-2 text-white text-xs outline-none transition-all disabled:opacity-40"
+                    >
+                      <option value="">-- Nessuna / Generale --</option>
+                      {microCats.map((m) => (
+                        <option key={m.id} value={m.id}>
+                          {m.name}
+                        </option>
+                      ))}
+                    </select>
+                  );
+                })()}
+              </div>
             </div>
 
-            <div>
+            <div className="sm:col-span-2">
               <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">
                 Codice Articolo / SKU
               </label>

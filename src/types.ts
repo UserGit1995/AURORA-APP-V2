@@ -1,3 +1,23 @@
+export interface SubSubCategory {
+  id: string;
+  name: string;
+  subCategoryId: string;
+  categoryId: string;
+  image?: string;
+  description?: string;
+  countNumber?: number;
+}
+
+export interface SubCategory {
+  id: string;
+  name: string;
+  categoryId: string;
+  image?: string;
+  description?: string;
+  countNumber?: number;
+  subSubCategories?: SubSubCategory[];
+}
+
 export interface Category {
   id: string;
   name: string;
@@ -5,6 +25,7 @@ export interface Category {
   countNumber: number;
   image: string;
   description?: string;
+  subCategories?: SubCategory[];
 }
 
 export interface Product {
@@ -12,6 +33,10 @@ export interface Product {
   name: string;
   category: string;
   categoryId: string;
+  subCategoryId?: string;
+  subCategoryName?: string;
+  subSubCategoryId?: string;
+  subSubCategoryName?: string;
   image: string;
   price: number;
   unit: string;
