@@ -25,6 +25,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Category, Product } from '../types';
 import { NavTab } from './Sidebar';
 import { exportProductsToCsv } from '../utils/catalogCsvExporter';
+import { useAdmin } from '../context/AdminContext';
 
 interface CatalogViewProps {
   viewType: NavTab;
@@ -61,6 +62,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
   searchQuery,
   onOpenRestockAnalysis,
 }) => {
+  const { isBusinessCustomer, formatProductPrice } = useAdmin();
   const [activeFilterCategory, setActiveFilterCategory] = useState<string | null>(selectedCategoryId);
   const [isSelectionMode, setIsSelectionMode] = useState<boolean>(false);
   const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
@@ -309,7 +311,14 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
               <div className="flex items-center gap-2 flex-wrap">
                 <span className="text-xs text-slate-300 font-medium mr-1 hidden sm:inline">
                   <strong className="text-sky-300">{selectedProductIds.length}</strong> selezionati
-                  {selectedProductIds.length > 0 && ` (€ ${totalSelectedPrice.toFixed(2)} +IVA)`}
+                  {selectedProductIds.length > 0 && (
+                    <span className="text-slate-300 ml-1">
+                      (€ {isBusinessCustomer ? (totalSelectedPrice * 1.22).toFixed(2) : totalSelectedPrice.toFixed(2)}{' '}
+                      <span className={isBusinessCustomer ? "text-sky-400" : "text-emerald-400"}>
+                        {isBusinessCustomer ? 'con IVA' : 'senza IVA'}
+                      </span>)
+                    </span>
+                  )}
                 </span>
 
                 {/* Export Selected to CSV */}
@@ -607,8 +616,17 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
 
                   <div className="flex items-center justify-between mt-2.5 pt-1.5 border-t border-[#122340]">
                     <div>
-                      <span className="text-white text-xs font-bold">€{product.price.toFixed(2)}</span>
-                      <span className="text-slate-400 text-[10px] ml-1">+IVA</span>
+                      {isBusinessCustomer ? (
+                        <div className="flex items-baseline gap-1">
+                          <span className="text-white text-xs font-bold">€{(product.price * 1.22).toFixed(2)}</span>
+                          <span className="text-sky-400 text-[9.5px] font-medium bg-sky-500/15 px-1 py-0.5 rounded border border-sky-500/25">con IVA</span>
+                        </div>
+                      ) : (
+                        <div className="flex items-baseline gap-1">
+                          <span className="text-white text-xs font-bold">€{product.price.toFixed(2)}</span>
+                          <span className="text-emerald-400 text-[9.5px] font-medium bg-emerald-500/15 px-1 py-0.5 rounded border border-emerald-500/25">senza IVA</span>
+                        </div>
+                      )}
                     </div>
                     <button
                       id={`catalog-add-cart-btn-${product.id}`}
@@ -644,7 +662,13 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                   <span>{selectedProductIds.length} {selectedProductIds.length === 1 ? 'prodotto selezionato' : 'prodotti selezionati'}</span>
                 </div>
                 <div className="text-[11px] text-sky-300 font-mono">
-                  Totale: <strong>€ {totalSelectedPrice.toFixed(2)}</strong> <span className="text-slate-400 font-normal">+IVA</span>
+                  Totale:{' '}
+                  <strong>
+                    € {isBusinessCustomer ? (totalSelectedPrice * 1.22).toFixed(2) : totalSelectedPrice.toFixed(2)}
+                  </strong>{' '}
+                  <span className={`font-semibold ${isBusinessCustomer ? 'text-sky-400' : 'text-emerald-400'}`}>
+                    {isBusinessCustomer ? '(con IVA 22%)' : '(senza IVA)'}
+                  </span>
                 </div>
               </div>
             </div>

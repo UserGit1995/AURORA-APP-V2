@@ -26,6 +26,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Product, Order, CustomerType, DeliveryOption } from '../types';
 import { PRODUCTS } from '../data/catalog';
 import { generateOrderReceiptPdf } from '../utils/orderPdfGenerator';
+import { useAdmin } from '../context/AdminContext';
 
 interface QuickReorderModalProps {
   isOpen: boolean;
@@ -48,6 +49,8 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
   onOrderCreated,
   onSelectProduct
 }) => {
+  const { currentUser, isBusinessCustomer } = useAdmin();
+
   // Tabs: 'frequent' (Frequenti & Consumabili) | 'history' (Da Ordini Passati) | 'sku' (Inserimento Rapido Codice)
   const [activeTab, setActiveTab] = useState<'frequent' | 'history' | 'sku'>('frequent');
 
@@ -57,13 +60,18 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
     { id: '2', product: PRODUCTS[2], quantity: 2 }, // Sgrassatore
   ]);
 
-  // Recipient / Shipping Info
-  const [customerType, setCustomerType] = useState<CustomerType>('azienda');
+  // Recipient / Shipping Info: Default to user profile type
+  const [customerType, setCustomerType] = useState<CustomerType>(() => {
+    if (currentUser?.customerType === 'attivita' || currentUser?.role === 'superadmin') {
+      return 'azienda';
+    }
+    return 'privato';
+  });
   const [deliveryOption, setDeliveryOption] = useState<DeliveryOption>('corriere');
-  const [companyOrName, setCompanyOrName] = useState('AURORA Retail & Facility Service S.r.l.');
-  const [contactPerson, setContactPerson] = useState('Simone Aricò');
-  const [email, setEmail] = useState('simonearico10@gmail.com');
-  const [phone, setPhone] = useState('+39 340 1234567');
+  const [companyOrName, setCompanyOrName] = useState(currentUser?.company || currentUser?.name || 'Simone Aricò');
+  const [contactPerson, setContactPerson] = useState(currentUser?.name || 'Simone Aricò');
+  const [email, setEmail] = useState(currentUser?.email || 'simonearico10@gmail.com');
+  const [phone, setPhone] = useState(currentUser?.phone || '+39 340 1234567');
   const [deliveryAddress, setDeliveryAddress] = useState('Via dell\'Industria 45, Palazzina B, 20145 Milano (MI)');
   const [notes, setNotes] = useState('Riordino periodico programmato - scarico colli magazzino.');
 
@@ -84,9 +92,10 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
 
   if (!isOpen) return null;
 
-  // Calculation
+  const isAzienda = customerType === 'azienda';
+  // Calculation: IVA 22% for business, 0% for private
   const subtotal = selectedItems.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
-  const vat = subtotal * 0.22;
+  const vat = isAzienda ? subtotal * 0.22 : 0;
   const total = subtotal + vat;
   const totalColli = selectedItems.reduce((acc, item) => acc + item.quantity, 0);
 
@@ -378,7 +387,15 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
                             <div className="flex items-center gap-2 text-[11px] text-slate-400 mt-0.5">
                               <span>{product.packageQty}</span>
                               <span>•</span>
-                              <span className="text-sky-400 font-bold font-mono">€{product.price.toFixed(2)} +IVA</span>
+                              {isBusinessCustomer ? (
+                                <span className="text-sky-400 font-bold font-mono">
+                                  €{(product.price * 1.22).toFixed(2)} <span className="text-[9.5px] font-normal text-sky-300">con IVA</span>
+                                </span>
+                              ) : (
+                                <span className="text-emerald-400 font-bold font-mono">
+                                  €{product.price.toFixed(2)} <span className="text-[9.5px] font-normal text-emerald-300">senza IVA</span>
+                                </span>
+                              )}
                             </div>
                           </div>
 
@@ -575,7 +592,15 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
                         <div className="min-w-0 flex-1 pr-2">
                           <p className="text-white font-medium truncate">{item.product.name}</p>
                           <p className="text-[10px] text-slate-400">
-                            €{item.product.price.toFixed(2)}/cad • <span className="text-sky-300 font-bold font-mono">€{(item.product.price * item.quantity).toFixed(2)}</span>
+                            {isAzienda ? (
+                              <>
+                                €{(item.product.price * 1.22).toFixed(2)}/cad (IVA inc.) • <span className="text-sky-300 font-bold font-mono">€{((item.product.price * 1.22) * item.quantity).toFixed(2)}</span>
+                              </>
+                            ) : (
+                              <>
+                                €{item.product.price.toFixed(2)}/cad (senza IVA) • <span className="text-emerald-300 font-bold font-mono">€{(item.product.price * item.quantity).toFixed(2)}</span>
+                              </>
+                            )}
                           </p>
                         </div>
                         <div className="flex items-center gap-1">
@@ -684,12 +709,16 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
                     <span className="font-mono text-white">€{subtotal.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-slate-400 text-[11px]">
-                    <span>IVA 22%:</span>
-                    <span className="font-mono text-white">€{vat.toFixed(2)}</span>
+                    <span>{isAzienda ? 'IVA 22% (Attività/Aziende):' : 'IVA (0% - Listino Privati):'}</span>
+                    <span className={`font-mono ${isAzienda ? 'text-white' : 'text-emerald-400'}`}>
+                      {isAzienda ? `€${vat.toFixed(2)}` : '€0.00 (non applicata)'}
+                    </span>
                   </div>
                   <div className="flex justify-between text-sm font-bold text-white pt-1">
-                    <span>Totale Documento:</span>
-                    <span className="text-sky-400 font-mono">€{total.toFixed(2)}</span>
+                    <span>{isAzienda ? 'Totale Documento (con IVA):' : 'Totale Documento (Senza IVA):'}</span>
+                    <span className={`font-mono ${isAzienda ? 'text-sky-400' : 'text-emerald-400'}`}>
+                      €{total.toFixed(2)}
+                    </span>
                   </div>
                 </div>
               </div>

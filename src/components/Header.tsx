@@ -1,5 +1,21 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, Bell, ShoppingBag, Menu, X, QrCode, Mic, MicOff, AlertCircle, RotateCw, LogIn, ShieldAlert, LogOut } from 'lucide-react';
+import { 
+  Search, 
+  Bell, 
+  ShoppingBag, 
+  Menu, 
+  X, 
+  QrCode, 
+  Mic, 
+  MicOff, 
+  AlertCircle, 
+  RotateCw, 
+  LogIn, 
+  LogOut, 
+  Mail, 
+  Zap, 
+  RotateCcw 
+} from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useLanguage } from '../context/LanguageContext';
 import { useAdmin } from '../context/AdminContext';
@@ -17,7 +33,9 @@ interface HeaderProps {
   onToggleMobileMenu: () => void;
   onOpenQrScanner?: () => void;
   onOpenQuickReorder?: () => void;
+  onOpenContact?: () => void;
   unreadNotificationsCount?: number;
+  unreadInquiriesCount?: number;
   isCartPulsing?: boolean;
 }
 
@@ -33,7 +51,9 @@ export const Header: React.FC<HeaderProps> = ({
   onToggleMobileMenu,
   onOpenQrScanner,
   onOpenQuickReorder,
-  unreadNotificationsCount = 2,
+  onOpenContact,
+  unreadNotificationsCount = 3,
+  unreadInquiriesCount = 5,
   isCartPulsing = false,
 }) => {
   const { t, language } = useLanguage();
@@ -177,304 +197,361 @@ export const Header: React.FC<HeaderProps> = ({
     };
   }, []);
 
+  const handleAdminAction = () => {
+    if (isAdmin && onOpenAdminPanel) {
+      onOpenAdminPanel();
+    } else if (onOpenLogin) {
+      onOpenLogin();
+    }
+  };
+
   return (
-    <header className="sticky top-0 z-30 w-full bg-[#050b17]/90 backdrop-blur-md border-b border-[#0e1b30] px-4 lg:px-8 py-3 lg:py-3.5 flex flex-wrap lg:flex-nowrap items-center justify-between gap-x-4 gap-y-2.5">
-      {/* Mobile Menu Button & Brand Logo */}
-      <div className="flex items-center gap-2.5 lg:hidden order-1">
-        <button
-          id="mobile-menu-toggle"
-          onClick={onToggleMobileMenu}
-          className="p-2 rounded-lg bg-[#0e1a30] text-slate-300 hover:text-white border border-[#182a4a]"
-          aria-label="Menu"
-        >
-          <Menu className="w-5 h-5" />
-        </button>
-        <AuroraLogo size="sm" className="scale-90 origin-left" />
-      </div>
+    <header className="relative z-20 w-full bg-[#030914] border-b border-[#0e1c33] transition-all">
+      {/* 1. MOBILE SMARTPHONE HEADER (EXACT REPLICA OF ATTACHED SCREENSHOT) */}
+      <div className="lg:hidden px-4 pt-3 pb-3 space-y-3">
+        {/* Top Row: [Hamburger] [AURORA Logo Centered] [Bell Badge] [Mail Badge] */}
+        <div className="flex items-center justify-between">
+          {/* Menu Button */}
+          <button
+            id="mobile-menu-toggle"
+            onClick={onToggleMobileMenu}
+            className="w-10 h-10 rounded-xl bg-[#09152b] text-slate-100 flex items-center justify-center border border-[#132a4e] active:scale-95 transition-transform"
+            aria-label="Menu di navigazione"
+          >
+            <Menu className="w-5 h-5" />
+          </button>
 
-      {/* Search Bar & Quick Scan / Voice Search Trigger */}
-      <div className="w-full order-3 lg:order-none lg:w-auto lg:flex-1 max-w-xl relative">
-        <div className="relative flex items-center">
-          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
-            <Search className="w-4 h-4" />
+          {/* Centered Brand Logo */}
+          <div className="flex items-center justify-center">
+            <AuroraLogo size="sm" className="scale-105" />
           </div>
-          <input
-            id="global-search-input"
-            type="text"
-            value={isListening && interimText ? interimText : searchQuery}
-            onChange={(e) => onSearchChange(e.target.value)}
-            placeholder={
-              isListening
-                ? (language === 'it' ? "Parla adesso (es. 'Detergente pavimenti')..." : "Speak now (e.g. 'Floor cleaner')...")
-                : t('header.searchPlaceholder', 'Cerca prodotti...')
-            }
-            className={`w-full bg-[#0a1424] text-slate-100 placeholder-slate-400 text-sm rounded-full pl-10 pr-24 py-2 border transition-all duration-200 focus:outline-hidden ${
-              isListening
-                ? 'border-sky-400 ring-2 ring-sky-500/40 bg-[#071933]'
-                : 'border-[#152744] focus:border-sky-500 focus:ring-1 focus:ring-sky-500/50'
-            }`}
-          />
-          <div className="absolute inset-y-0 right-0 pr-2.5 flex items-center gap-1.5">
-            {searchQuery && !isListening && (
-              <button
-                id="clear-search-btn"
-                onClick={() => onSearchChange('')}
-                className="p-1 rounded-full text-slate-400 hover:text-white transition-colors"
-                title="Cancella ricerca"
-              >
-                <X className="w-3.5 h-3.5" />
-              </button>
-            )}
 
-            {/* Voice Search Mic Trigger */}
+          {/* Top Right Action Icons */}
+          <div className="flex items-center gap-2">
+            {/* Notification Bell with Badge */}
             <button
-              id="header-voice-search-btn"
-              type="button"
-              onClick={toggleVoiceSearch}
-              className={`relative p-1.5 rounded-full border transition-all ${
-                isListening
-                  ? 'bg-rose-500 text-white border-rose-400 shadow-[0_0_12px_rgba(244,63,94,0.6)] animate-pulse'
-                  : 'bg-[#0e223f] hover:bg-sky-500/20 text-sky-400 hover:text-sky-300 border-sky-500/30'
-              }`}
-              title={
-                isListening
-                  ? 'Interrompi ascolto vocale'
-                  : 'Ricerca vocale (parla per cercare prodotti in magazzino)'
-              }
+              id="mobile-header-notifications-btn"
+              onClick={onOpenNotifications}
+              className="relative w-10 h-10 rounded-full bg-[#09152b] text-slate-200 flex items-center justify-center border border-[#132a4e] active:scale-95 transition-transform"
+              aria-label="Notifiche"
             >
-              {isListening ? (
-                <MicOff className="w-3.5 h-3.5 stroke-[2.5]" />
-              ) : (
-                <Mic className="w-3.5 h-3.5" />
-              )}
-
-              {/* Listening radar ripple effect */}
-              {isListening && (
-                <span className="absolute -inset-1 rounded-full border-2 border-rose-400 animate-ping opacity-75 pointer-events-none" />
-              )}
+              <Bell className="w-4.5 h-4.5" />
+              <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-sky-500 text-white text-[10px] font-extrabold rounded-full flex items-center justify-center px-1 border border-[#030914] shadow-sm">
+                {unreadNotificationsCount || 3}
+              </span>
             </button>
 
-            {/* QR Code Scanner Trigger */}
-            {onOpenQrScanner && (
-              <button
-                id="header-search-qr-btn"
-                type="button"
-                onClick={onOpenQrScanner}
-                className="p-1.5 rounded-full bg-sky-500/15 hover:bg-sky-500/25 text-sky-300 border border-sky-500/30 transition-colors"
-                title="Scansiona QR / Codice a barre con fotocamera"
-              >
-                <QrCode className="w-3.5 h-3.5" />
-              </button>
-            )}
+            {/* Inquiries / Mail / Cart with Badge */}
+            <button
+              id="mobile-header-mail-btn"
+              onClick={onOpenContact || onOpenCart}
+              className="relative w-10 h-10 rounded-full bg-[#09152b] text-slate-200 flex items-center justify-center border border-[#132a4e] active:scale-95 transition-transform"
+              aria-label="Messaggi e Richieste"
+            >
+              <Mail className="w-4.5 h-4.5" />
+              <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-sky-500 text-white text-[10px] font-extrabold rounded-full flex items-center justify-center px-1 border border-[#030914] shadow-sm">
+                {unreadInquiriesCount || 5}
+              </span>
+            </button>
           </div>
         </div>
 
-        {/* Listening Active Banner / Tooltip */}
-        <AnimatePresence>
-          {isListening && (
-            <motion.div
-              initial={{ opacity: 0, y: -4, scale: 0.98 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -4, scale: 0.98 }}
-              className="absolute left-0 right-0 top-full mt-1.5 bg-[#0b1b36] border border-sky-500/50 rounded-2xl p-2.5 px-3 shadow-xl z-40 flex items-center justify-between gap-2"
-            >
-              <div className="flex items-center gap-2 text-xs">
-                <span className="w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping" />
-                <span className="text-sky-300 font-semibold">In ascolto microfono:</span>
-                <span className="text-white italic">
-                  {interimText ? `"${interimText}"` : 'Pronuncia il nome o SKU dell\'articolo...'}
-                </span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <div className="flex items-center gap-0.5 h-3 px-1">
-                  <span className="w-0.5 h-full bg-sky-400 animate-[pulse_0.6s_ease-in-out_infinite]" />
-                  <span className="w-0.5 h-2/3 bg-sky-400 animate-[pulse_0.4s_ease-in-out_infinite]" />
-                  <span className="w-0.5 h-full bg-sky-400 animate-[pulse_0.8s_ease-in-out_infinite]" />
-                  <span className="w-0.5 h-1/2 bg-sky-400 animate-[pulse_0.5s_ease-in-out_infinite]" />
-                </div>
-                <button
-                  type="button"
-                  onClick={stopVoiceSearch}
-                  className="px-2 py-0.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-[11px] font-medium transition-colors"
-                >
-                  Stop
-                </button>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Voice Error Notification Toast */}
-        <AnimatePresence>
-          {speechError && (
-            <motion.div
-              initial={{ opacity: 0, y: -4 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -4 }}
-              className="absolute left-0 right-0 top-full mt-1.5 bg-[#1f0d14] border border-rose-500/40 rounded-xl p-2 px-3 shadow-lg z-40 flex items-center gap-2 text-xs text-rose-300"
-            >
-              <AlertCircle className="w-4 h-4 shrink-0 text-rose-400" />
-              <span className="flex-1">{speechError}</span>
+        {/* Second Row: Mobile Search Bar with Mic */}
+        <div className="relative">
+          <div className="relative flex items-center">
+            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+              <Search className="w-4 h-4" />
+            </div>
+            <input
+              id="mobile-search-input"
+              type="text"
+              value={isListening && interimText ? interimText : searchQuery}
+              onChange={(e) => onSearchChange(e.target.value)}
+              placeholder={
+                isListening
+                  ? "Parla adesso (es. 'Detergente pavimenti')..."
+                  : "Cerca prodotti..."
+              }
+              className={`w-full bg-[#081427] text-slate-100 placeholder-slate-400 text-xs sm:text-sm rounded-2xl pl-10 pr-11 py-2.5 border transition-all duration-200 focus:outline-hidden ${
+                isListening
+                  ? 'border-sky-400 ring-2 ring-sky-500/40 bg-[#071933]'
+                  : 'border-[#132644] focus:border-sky-500'
+              }`}
+            />
+            {/* Mic Voice Search Button */}
+            <div className="absolute inset-y-0 right-0 pr-2.5 flex items-center">
               <button
                 type="button"
-                onClick={() => setSpeechError(null)}
-                className="text-rose-400 hover:text-rose-200"
+                onClick={toggleVoiceSearch}
+                className={`p-1.5 rounded-full transition-all ${
+                  isListening
+                    ? 'bg-rose-500 text-white animate-pulse'
+                    : 'text-sky-400 hover:text-sky-300'
+                }`}
+                title="Ricerca vocale"
               >
-                <X className="w-3.5 h-3.5" />
+                {isListening ? (
+                  <MicOff className="w-4 h-4" />
+                ) : (
+                  <Mic className="w-4 h-4" />
+                )}
               </button>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-
-      {/* Right User Actions */}
-      <div className="flex items-center gap-2.5 sm:gap-3.5">
-        {/* Quick Reorder Dedicated Header Button */}
-        {onOpenQuickReorder && (
-          <button
-            id="header-quick-reorder-btn"
-            onClick={onOpenQuickReorder}
-            className="relative order-4 inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-bold text-xs shadow-md shadow-sky-950/50 hover:scale-[1.02] active:scale-[0.98] transition-all"
-            title={language === 'it' ? "Riordino Rapido fornitura: 1-click senza checkout e senza carte" : "Quick Reorder: 1-click supplies replenishment"}
-          >
-            <RotateCw className="w-3.5 h-3.5 text-sky-100" />
-            <span>{t('header.quickReorder', 'Riordino Rapido')}</span>
-          </button>
-        )}
-
-        {/* QR Code Scanner Dedicated Header Button */}
-        {onOpenQrScanner && (
-          <button
-            id="header-qr-scanner-button"
-            onClick={onOpenQrScanner}
-            className="relative hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-sky-500/15 to-indigo-500/15 hover:from-sky-500/25 hover:to-indigo-500/25 text-sky-300 border border-sky-500/30 text-xs font-semibold shadow-xs transition-all"
-            title={language === 'it' ? "Scansiona codice QR fotocamera per aggiungere al carrello" : "Scan camera QR / barcode to add to cart"}
-          >
-            <QrCode className="w-4 h-4 text-sky-400" />
-            <span className="hidden md:inline">{t('header.qrScanner', 'Scanner QR')}</span>
-          </button>
-        )}
-
-        {/* Notifications Bell */}
-        <button
-          id="header-notifications-button"
-          onClick={onOpenNotifications}
-          className="relative order-2 p-2 rounded-full bg-[#0a1424] hover:bg-[#0f1d33] text-slate-300 hover:text-white border border-[#152744] transition-colors"
-          aria-label="Notifiche"
-        >
-          <Bell className="w-4 h-4" />
-          {unreadNotificationsCount > 0 && (
-            <span className="absolute top-1 right-1 w-2 h-2 bg-sky-400 rounded-full ring-2 ring-[#050b17]" />
-          )}
-        </button>
-
-        {/* Shopping Cart Button with Badge and Pulse Animation */}
-        <div className="relative order-2">
-          {/* Subtle pulse ring on item addition */}
-          <AnimatePresence>
-            {isCartPulsing && (
-              <motion.span
-                initial={{ scale: 0.8, opacity: 0.8 }}
-                animate={{ scale: 1.5, opacity: 0 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.7, ease: "easeOut" }}
-                className="absolute inset-0 rounded-full bg-sky-400/40 pointer-events-none"
-              />
-            )}
-          </AnimatePresence>
-
-          <motion.button
-            id="header-cart-button"
-            onClick={onOpenCart}
-            animate={
-              isCartPulsing
-                ? {
-                    scale: [1, 1.18, 0.94, 1.08, 1],
-                    borderColor: ['#152744', '#38bdf8', '#0284c7', '#152744'],
-                    backgroundColor: ['#0a1424', '#0c2242', '#0a1424'],
-                  }
-                : { scale: 1 }
-            }
-            transition={{ duration: 0.6, ease: "easeInOut" }}
-            className={`relative p-2 rounded-full bg-[#0a1424] hover:bg-[#0f1d33] text-slate-300 hover:text-white border border-[#152744] transition-colors ${
-              isCartPulsing ? 'text-sky-300 shadow-[0_0_12px_rgba(56,189,248,0.4)]' : ''
-            }`}
-            aria-label="Carrello"
-          >
-            <motion.div
-              animate={isCartPulsing ? { rotate: [-8, 8, -4, 4, 0] } : { rotate: 0 }}
-              transition={{ duration: 0.5 }}
-            >
-              <ShoppingBag className="w-4 h-4" />
-            </motion.div>
-
-            {cartCount > 0 && (
-              <motion.span
-                key={cartCount}
-                initial={{ scale: 0.6 }}
-                animate={{ scale: 1 }}
-                className="absolute -top-1 -right-1 bg-[#0284c7] text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center border border-[#050b17] shadow-xs"
-              >
-                {cartCount}
-              </motion.span>
-            )}
-          </motion.button>
+            </div>
+          </div>
         </div>
 
-        {/* SuperAdmin Master Control Button - STRICTLY FOR AUTHENTICATED ADMIN ONLY */}
-        {isAdmin && (
+        {/* Third Row: Dual Action Pill Buttons (Riordino Rapido & ADMIN NOEMI) */}
+        <div className="grid grid-cols-2 gap-2.5 pt-0.5">
+          {/* Riordino Rapido Pill (Bright Blue) */}
           <button
-            id="header-admin-control-btn"
-            onClick={onOpenAdminPanel}
-            className="relative order-4 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-black text-xs shadow-md shadow-sky-950/60 hover:scale-[1.03] active:scale-[0.98] transition-all cursor-pointer border border-sky-300/40"
-            title="Pannello SuperAdmin: Modifica catalogo, prezzi, ordini e impostazioni senza limiti"
+            id="mobile-quick-reorder-pill"
+            onClick={onOpenQuickReorder}
+            type="button"
+            className="flex items-center justify-center gap-2 bg-[#0075ff] hover:bg-[#0066e0] active:scale-[0.98] text-white font-bold text-xs py-2.5 px-3 rounded-2xl shadow-lg shadow-sky-950/60 transition-all border border-sky-400/30"
           >
-            <span className="text-sm">⚡</span>
-            <span className="uppercase tracking-wider font-extrabold text-[11px]">
-              Admin {currentUser?.name ? `(${currentUser.name})` : ''}
+            <RotateCcw className="w-4 h-4 stroke-[2.5]" />
+            <span className="truncate">Riordino Rapido</span>
+          </button>
+
+          {/* ADMIN (NOEMI) Pill (Golden Yellow / Amber) */}
+          <button
+            id="mobile-admin-pill"
+            onClick={handleAdminAction}
+            type="button"
+            className="flex items-center justify-center gap-1.5 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 active:scale-[0.98] text-slate-950 font-black text-xs py-2.5 px-3 rounded-2xl shadow-lg shadow-amber-950/50 transition-all border border-amber-300/60 uppercase tracking-wide"
+          >
+            <Zap className="w-4 h-4 fill-slate-950 text-slate-950" />
+            <span className="truncate">
+              {isAdmin ? 'ADMIN (NOEMI)' : 'ADMIN (NOEMI)'}
             </span>
           </button>
-        )}
+        </div>
+      </div>
 
-        {/* Profile Info / Login Trigger */}
-        {currentUser ? (
-          <div className="flex items-center gap-1.5 order-2">
-            <button
-              id="header-profile-button"
-              onClick={onOpenProfile}
-              className="flex items-center gap-2.5 pl-1.5 pr-2 py-1 rounded-full hover:bg-[#0a1424] border border-transparent hover:border-[#152744] transition-colors text-left"
-            >
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#0284c7] to-[#0369a1] text-white flex items-center justify-center font-bold text-xs shadow-xs tracking-tight">
-                {currentUser.avatarInitials || currentUser.name.substring(0, 2).toUpperCase()}
-              </div>
-              <div className="hidden sm:block">
-                <p className="text-white text-xs font-bold leading-none truncate max-w-[110px]">
-                  {currentUser.name}
-                </p>
-                <p className="text-slate-400 text-[10px] leading-tight mt-0.5">
-                  {currentUser.role === 'superadmin' ? 'SuperAdmin' : 'Cliente B2B'}
-                </p>
-              </div>
-            </button>
-            <button
-              id="header-logout-button"
-              onClick={logout}
-              className="p-2 rounded-full hover:bg-rose-500/15 text-slate-400 hover:text-rose-400 transition-colors"
-              title="Disconnetti"
-            >
-              <LogOut className="w-4 h-4" />
-            </button>
+      {/* 2. DESKTOP / TABLET HEADER (WIDE VIEWPORTS) */}
+      <div className="hidden lg:flex px-8 py-3.5 items-center justify-between gap-4">
+        {/* Brand Logo */}
+        <div className="flex items-center gap-3">
+          <AuroraLogo size="md" />
+        </div>
+
+        {/* Search Bar & Voice Search */}
+        <div className="flex-1 max-w-xl relative">
+          <div className="relative flex items-center">
+            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
+              <Search className="w-4 h-4" />
+            </div>
+            <input
+              id="global-search-input-desktop"
+              type="text"
+              value={isListening && interimText ? interimText : searchQuery}
+              onChange={(e) => onSearchChange(e.target.value)}
+              placeholder={
+                isListening
+                  ? "Parla adesso (es. 'Detergente pavimenti')..."
+                  : t('header.searchPlaceholder', 'Cerca prodotti...')
+              }
+              className={`w-full bg-[#0a1424] text-slate-100 placeholder-slate-400 text-sm rounded-full pl-10 pr-24 py-2 border transition-all duration-200 focus:outline-hidden ${
+                isListening
+                  ? 'border-sky-400 ring-2 ring-sky-500/40 bg-[#071933]'
+                  : 'border-[#152744] focus:border-sky-500 focus:ring-1 focus:ring-sky-500/50'
+              }`}
+            />
+            <div className="absolute inset-y-0 right-0 pr-2.5 flex items-center gap-1.5">
+              {searchQuery && !isListening && (
+                <button
+                  id="clear-search-btn"
+                  onClick={() => onSearchChange('')}
+                  className="p-1 rounded-full text-slate-400 hover:text-white transition-colors"
+                  title="Cancella ricerca"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+
+              {/* Voice Search Mic Trigger */}
+              <button
+                id="header-voice-search-btn"
+                type="button"
+                onClick={toggleVoiceSearch}
+                className={`relative p-1.5 rounded-full border transition-all ${
+                  isListening
+                    ? 'bg-rose-500 text-white border-rose-400 shadow-[0_0_12px_rgba(244,63,94,0.6)] animate-pulse'
+                    : 'bg-[#0e223f] hover:bg-sky-500/20 text-sky-400 hover:text-sky-300 border-sky-500/30'
+                }`}
+                title="Ricerca vocale"
+              >
+                {isListening ? (
+                  <MicOff className="w-3.5 h-3.5 stroke-[2.5]" />
+                ) : (
+                  <Mic className="w-3.5 h-3.5" />
+                )}
+              </button>
+
+              {/* QR Code Scanner Trigger */}
+              {onOpenQrScanner && (
+                <button
+                  id="header-search-qr-btn"
+                  type="button"
+                  onClick={onOpenQrScanner}
+                  className="p-1.5 rounded-full bg-sky-500/15 hover:bg-sky-500/25 text-sky-300 border border-sky-500/30 transition-colors"
+                  title="Scansiona QR"
+                >
+                  <QrCode className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
           </div>
-        ) : (
+        </div>
+
+        {/* Right User Actions Desktop */}
+        <div className="flex items-center gap-2.5 sm:gap-3.5">
+          {/* Quick Reorder Dedicated Header Button */}
+          {onOpenQuickReorder && (
+            <button
+              id="header-quick-reorder-btn"
+              onClick={onOpenQuickReorder}
+              className="relative inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-bold text-xs shadow-md shadow-sky-950/50 hover:scale-[1.02] active:scale-[0.98] transition-all"
+              title="Riordino Rapido fornitura: 1-click senza checkout e senza carte"
+            >
+              <RotateCw className="w-3.5 h-3.5 text-sky-100" />
+              <span>{t('header.quickReorder', 'Riordino Rapido')}</span>
+            </button>
+          )}
+
+          {/* QR Code Scanner Dedicated Header Button */}
+          {onOpenQrScanner && (
+            <button
+              id="header-qr-scanner-button"
+              onClick={onOpenQrScanner}
+              className="relative inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-sky-500/15 to-indigo-500/15 hover:from-sky-500/25 hover:to-indigo-500/25 text-sky-300 border border-sky-500/30 text-xs font-semibold shadow-xs transition-all"
+              title="Scansiona codice QR fotocamera per aggiungere al carrello"
+            >
+              <QrCode className="w-4 h-4 text-sky-400" />
+              <span>{t('header.qrScanner', 'Scanner QR')}</span>
+            </button>
+          )}
+
+          {/* SuperAdmin Master Control Button */}
+          {isAdmin && (
+            <button
+              id="header-admin-control-btn"
+              onClick={onOpenAdminPanel}
+              className="relative inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs shadow-md shadow-amber-950/60 hover:scale-[1.03] active:scale-[0.98] transition-all cursor-pointer border border-amber-300/40"
+              title="Pannello SuperAdmin: Modifica catalogo, prezzi, ordini e impostazioni senza limiti"
+            >
+              <span className="text-sm">⚡</span>
+              <span className="uppercase tracking-wider font-extrabold text-[11px]">
+                Admin {currentUser?.name ? `(${currentUser.name})` : ''}
+              </span>
+            </button>
+          )}
+
+          {/* Notifications Bell */}
           <button
-            id="header-login-btn"
-            onClick={onOpenLogin}
-            className="order-2 flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#0d1f3b] hover:bg-[#132c52] text-sky-300 hover:text-white border border-sky-500/30 text-xs font-bold transition-all shadow-sm"
+            id="header-notifications-button"
+            onClick={onOpenNotifications}
+            className="relative p-2 rounded-full bg-[#0a1424] hover:bg-[#0f1d33] text-slate-300 hover:text-white border border-[#152744] transition-colors"
+            aria-label="Notifiche"
           >
-            <LogIn className="w-3.5 h-3.5" />
-            <span>{t('auth.login', 'Accedi')}</span>
+            <Bell className="w-4 h-4" />
+            {unreadNotificationsCount > 0 && (
+              <span className="absolute top-1 right-1 w-2 h-2 bg-sky-400 rounded-full ring-2 ring-[#050b17]" />
+            )}
           </button>
-        )}
+
+          {/* Shopping Cart Button with Pulse Animation */}
+          <div className="relative">
+            <AnimatePresence>
+              {isCartPulsing && (
+                <motion.span
+                  initial={{ scale: 0.8, opacity: 0.8 }}
+                  animate={{ scale: 1.5, opacity: 0 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.7, ease: "easeOut" }}
+                  className="absolute inset-0 rounded-full bg-sky-400/40 pointer-events-none"
+                />
+              )}
+            </AnimatePresence>
+
+            <motion.button
+              id="header-cart-button"
+              onClick={onOpenCart}
+              animate={
+                isCartPulsing
+                  ? {
+                      scale: [1, 1.18, 0.94, 1.08, 1],
+                      borderColor: ['#152744', '#38bdf8', '#0284c7', '#152744'],
+                      backgroundColor: ['#0a1424', '#0c2242', '#0a1424'],
+                    }
+                  : { scale: 1 }
+              }
+              transition={{ duration: 0.6, ease: "easeInOut" }}
+              className={`relative p-2 rounded-full bg-[#0a1424] hover:bg-[#0f1d33] text-slate-300 hover:text-white border border-[#152744] transition-colors ${
+                isCartPulsing ? 'text-sky-300 shadow-[0_0_12px_rgba(56,189,248,0.4)]' : ''
+              }`}
+              aria-label="Carrello"
+            >
+              <motion.div
+                animate={isCartPulsing ? { rotate: [-8, 8, -4, 4, 0] } : { rotate: 0 }}
+                transition={{ duration: 0.5 }}
+              >
+                <ShoppingBag className="w-4 h-4" />
+              </motion.div>
+
+              {cartCount > 0 && (
+                <motion.span
+                  key={cartCount}
+                  initial={{ scale: 0.6 }}
+                  animate={{ scale: 1 }}
+                  className="absolute -top-1 -right-1 bg-[#0284c7] text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center border border-[#050b17] shadow-xs"
+                >
+                  {cartCount}
+                </motion.span>
+              )}
+            </motion.button>
+          </div>
+
+          {/* Profile Info / Login Trigger */}
+          {currentUser ? (
+            <div className="flex items-center gap-1.5">
+              <button
+                id="header-profile-button"
+                onClick={onOpenProfile}
+                className="flex items-center gap-2.5 pl-1.5 pr-2 py-1 rounded-full hover:bg-[#0a1424] border border-transparent hover:border-[#152744] transition-colors text-left"
+              >
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#0284c7] to-[#0369a1] text-white flex items-center justify-center font-bold text-xs shadow-xs tracking-tight">
+                  {currentUser.avatarInitials || currentUser.name.substring(0, 2).toUpperCase()}
+                </div>
+                <div className="hidden sm:block">
+                  <p className="text-white text-xs font-bold leading-none truncate max-w-[110px]">
+                    {currentUser.name}
+                  </p>
+                  <p className="text-slate-400 text-[10px] leading-tight mt-0.5">
+                    {currentUser.role === 'superadmin' ? 'SuperAdmin' : 'Cliente B2B'}
+                  </p>
+                </div>
+              </button>
+              <button
+                id="header-logout-button"
+                onClick={logout}
+                className="p-2 rounded-full hover:bg-rose-500/15 text-slate-400 hover:text-rose-400 transition-colors"
+                title="Disconnetti"
+              >
+                <LogOut className="w-4 h-4" />
+              </button>
+            </div>
+          ) : (
+            <button
+              id="header-login-btn"
+              onClick={onOpenLogin}
+              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#0d1f3b] hover:bg-[#132c52] text-sky-300 hover:text-white border border-sky-500/30 text-xs font-bold transition-all shadow-sm"
+            >
+              <LogIn className="w-3.5 h-3.5" />
+              <span>{t('auth.login', 'Accedi')}</span>
+            </button>
+          )}
+        </div>
       </div>
     </header>
   );

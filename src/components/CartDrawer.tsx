@@ -35,6 +35,7 @@ import { OrderTemplateModal } from './OrderTemplateModal';
 import { PRESET_ORDER_TEMPLATES } from '../data/orderTemplates';
 import { PRODUCTS } from '../data/catalog';
 import { useLanguage } from '../context/LanguageContext';
+import { useAdmin } from '../context/AdminContext';
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -59,6 +60,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
 }) => {
   const { language, t } = useLanguage();
   const isIt = language === 'it';
+  const { currentUser, isBusinessCustomer } = useAdmin();
 
   // Step in checkout: 'cart' -> 'form' -> 'success'
   const [step, setStep] = useState<'cart' | 'form' | 'success'>('cart');
@@ -69,21 +71,25 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
   const [templateModalMode, setTemplateModalMode] = useState<'save' | 'load'>('load');
   const [templateFeedbackMsg, setTemplateFeedbackMsg] = useState<string | null>(null);
 
-  // Form State
-  const [customerType, setCustomerType] = useState<CustomerType>('azienda');
+  // Form State: Initialize to user's profile type
+  const [customerType, setCustomerType] = useState<CustomerType>(() => {
+    if (currentUser?.customerType === 'attivita' || currentUser?.role === 'superadmin') {
+      return 'azienda';
+    }
+    return 'privato';
+  });
   const [deliveryOption, setDeliveryOption] = useState<DeliveryOption>('corriere');
 
-  
   // Fields
-  const [companyName, setCompanyName] = useState('AURORA Retail & Facility Service S.r.l.');
-  const [vatNumber, setVatNumber] = useState('IT09876543210');
-  const [sdiCode, setSdiCode] = useState('AUR789K');
+  const [companyName, setCompanyName] = useState(currentUser?.company || 'AURORA Retail & Facility Service S.r.l.');
+  const [vatNumber, setVatNumber] = useState(currentUser?.piva || 'IT09876543210');
+  const [sdiCode, setSdiCode] = useState(currentUser?.sdi || 'AUR789K');
   
   // Private / Common Fields
-  const [fullName, setFullName] = useState('Simone Aricò');
+  const [fullName, setFullName] = useState(currentUser?.name || 'Simone Aricò');
   const [fiscalCode, setFiscalCode] = useState('RCISMN85T10F205Z');
-  const [email, setEmail] = useState('simonearico10@gmail.com');
-  const [phone, setPhone] = useState('+39 340 1234567');
+  const [email, setEmail] = useState(currentUser?.email || 'simonearico10@gmail.com');
+  const [phone, setPhone] = useState(currentUser?.phone || '+39 340 1234567');
   
   // Delivery Address
   const [street, setStreet] = useState('Via dell\'Industria 45, Palazzina B');
@@ -97,8 +103,10 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
 
   if (!isOpen) return null;
 
+  const isAzienda = customerType === 'azienda';
   const subtotal = items.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
-  const vat = subtotal * 0.22;
+  // Regola IVA: Utenti normali (privato) = 0 IVA; Aziende/Attività/Fornitori = 22% IVA
+  const vat = isAzienda ? subtotal * 0.22 : 0;
   const total = subtotal + vat;
   const freeShippingThreshold = 250;
   const remainingForFreeShipping = Math.max(0, freeShippingThreshold - subtotal);
@@ -330,6 +338,49 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
 
               {/* Items List / Empty State */}
               <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3">
+                {/* Customer Type Quick Selector in Cart */}
+                {items.length > 0 && (
+                  <div className="bg-[#071326] border border-[#132749] rounded-2xl p-2.5 flex items-center justify-between gap-2 text-xs">
+                    <div className="flex items-center gap-1.5">
+                      {isAzienda ? (
+                        <span className="w-2 h-2 rounded-full bg-sky-400" />
+                      ) : (
+                        <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                      )}
+                      <span className="text-[11px] text-slate-300 font-medium">
+                        Listino:{' '}
+                        <strong className={isAzienda ? "text-sky-300" : "text-emerald-300"}>
+                          {isAzienda ? 'Attività / Fornitore (con IVA 22%)' : 'Cliente Privato (senza IVA)'}
+                        </strong>
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() => setCustomerType('privato')}
+                        className={`px-2 py-1 rounded-lg text-[10px] font-bold transition-all ${
+                          !isAzienda 
+                            ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40' 
+                            : 'text-slate-400 hover:text-slate-200'
+                        }`}
+                      >
+                        Privato
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setCustomerType('azienda')}
+                        className={`px-2 py-1 rounded-lg text-[10px] font-bold transition-all ${
+                          isAzienda 
+                            ? 'bg-sky-500/20 text-sky-300 border border-sky-500/40' 
+                            : 'text-slate-400 hover:text-slate-200'
+                        }`}
+                      >
+                        Azienda
+                      </button>
+                    </div>
+                  </div>
+                )}
+
                 {items.length === 0 ? (
                   <div className="space-y-5">
                     {/* Empty cart banner */}
@@ -439,10 +490,25 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                       <div className="flex-1 min-w-0">
                         <h4 className="text-xs font-bold text-white truncate">{item.product.name}</h4>
                         <p className="text-[11px] text-slate-400">{item.product.packageQty}</p>
-                        <p className="text-xs font-bold text-sky-400 mt-1">
-                          €{(item.product.price * item.quantity).toFixed(2)}
-                          <span className="text-[10px] text-slate-500 font-normal ml-1">(€{item.product.price.toFixed(2)}/cad)</span>
-                        </p>
+                        {isAzienda ? (
+                          <div className="mt-1">
+                            <span className="text-xs font-bold text-sky-400">
+                              €{((item.product.price * 1.22) * item.quantity).toFixed(2)}
+                            </span>
+                            <span className="text-[10px] text-slate-400 ml-1">
+                              (€{(item.product.price * 1.22).toFixed(2)} con IVA)
+                            </span>
+                          </div>
+                        ) : (
+                          <div className="mt-1">
+                            <span className="text-xs font-bold text-emerald-400">
+                              €{(item.product.price * item.quantity).toFixed(2)}
+                            </span>
+                            <span className="text-[10px] text-slate-400 ml-1">
+                              (€{item.product.price.toFixed(2)} senza IVA)
+                            </span>
+                          </div>
+                        )}
                       </div>
 
                       {/* Quantity Modifier */}
@@ -481,18 +547,37 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
               {items.length > 0 && (
                 <div className="p-4 sm:p-5 border-t border-[#122442] bg-[#050c18] space-y-3">
                   <div className="space-y-1.5 text-xs text-slate-300">
-                    <div className="flex justify-between">
-                      <span>Imponibile Netto:</span>
-                      <span className="font-mono text-white font-medium">€{subtotal.toFixed(2)}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>IVA (22%):</span>
-                      <span className="font-mono text-white font-medium">€{vat.toFixed(2)}</span>
-                    </div>
-                    <div className="flex justify-between text-sm font-bold text-white pt-2 border-t border-[#122442]">
-                      <span>Totale Fornitura:</span>
-                      <span className="text-sky-400 font-mono">€{total.toFixed(2)}</span>
-                    </div>
+                    {isAzienda ? (
+                      <>
+                        <div className="flex justify-between">
+                          <span>Imponibile Netto:</span>
+                          <span className="font-mono text-white font-medium">€{subtotal.toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>IVA (22% per Attività/Aziende):</span>
+                          <span className="font-mono text-white font-medium">€{vat.toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between text-sm font-bold text-white pt-2 border-t border-[#122442]">
+                          <span>Totale Fornitura (IVA inclusa):</span>
+                          <span className="text-sky-400 font-mono">€{total.toFixed(2)}</span>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="flex justify-between">
+                          <span>Imponibile:</span>
+                          <span className="font-mono text-white font-medium">€{subtotal.toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-emerald-400">IVA (0% - Listino Utenti Privati):</span>
+                          <span className="font-mono text-emerald-400 font-medium">€0.00 (non applicata)</span>
+                        </div>
+                        <div className="flex justify-between text-sm font-bold text-white pt-2 border-t border-[#122442]">
+                          <span>Totale Ordine (Senza IVA):</span>
+                          <span className="text-emerald-400 font-mono">€{total.toFixed(2)}</span>
+                        </div>
+                      </>
+                    )}
                   </div>
 
                   <div className="flex items-center gap-2">
@@ -827,8 +912,12 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
               {/* Form Footer */}
               <div className="p-4 sm:p-5 border-t border-[#122442] bg-[#050c18] space-y-3">
                 <div className="flex justify-between items-center text-xs">
-                  <span className="text-slate-400">Totale Fornitura (IVA inc.):</span>
-                  <span className="text-base font-bold text-sky-400 font-mono">€{total.toFixed(2)}</span>
+                  <span className="text-slate-400">
+                    {isAzienda ? 'Totale Fornitura (IVA 22% inc.):' : 'Totale Ordine (Senza IVA):'}
+                  </span>
+                  <span className={`text-base font-bold font-mono ${isAzienda ? 'text-sky-400' : 'text-emerald-400'}`}>
+                    €{total.toFixed(2)}
+                  </span>
                 </div>
 
                 <div className="flex gap-2">

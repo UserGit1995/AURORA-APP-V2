@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Product } from '../types';
+import { useAdmin } from '../context/AdminContext';
 
 interface CompareViewProps {
   comparedProducts: Product[];
@@ -45,6 +46,7 @@ export const CompareView: React.FC<CompareViewProps> = ({
   onSelectProduct,
   onBackToHome,
 }) => {
+  const { isBusinessCustomer } = useAdmin();
   const [highlightDifferences, setHighlightDifferences] = useState(false);
   const [isAddPickerOpen, setIsAddPickerOpen] = useState(false);
   const [addedProductId, setAddedProductId] = useState<string | null>(null);
@@ -299,10 +301,10 @@ export const CompareView: React.FC<CompareViewProps> = ({
                             {/* Price */}
                             <div className="mt-2.5 flex items-baseline gap-1.5">
                               <span className="text-lg font-extrabold text-white font-mono">
-                                €{product.price.toFixed(2)}
+                                €{isBusinessCustomer ? (product.price * 1.22).toFixed(2) : product.price.toFixed(2)}
                               </span>
                               <span className="text-[10px] text-slate-400">
-                                +IVA / {product.unit}
+                                {isBusinessCustomer ? '+IVA (22%)' : 'senza IVA'} / {product.unit}
                               </span>
                             </div>
 

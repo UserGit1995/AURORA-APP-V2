@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { RotateCcw, ArrowRight } from 'lucide-react';
 import { Sidebar, NavTab } from './components/Sidebar';
 import { Header } from './components/Header';
 import { HeroBanner } from './components/HeroBanner';
@@ -356,8 +357,10 @@ export default function App() {
           onOpenLogin={() => setIsLoginOpen(true)}
           onOpenAdminPanel={() => setIsAdminPanelOpen(true)}
           onOpenQuickReorder={() => setIsQuickReorderOpen(true)}
+          onOpenContact={() => setIsContactOpen(true)}
           onToggleMobileMenu={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           unreadNotificationsCount={unreadNotificationsCount}
+          unreadInquiriesCount={5}
           isCartPulsing={isCartPulsing}
         />
 
@@ -402,6 +405,33 @@ export default function App() {
                   setSelectedCategoryId(null);
                 }}
               />
+
+              {/* 2.5 Quick Reorder Highlight Banner Card (Mobile only, matches smartphone mockup) */}
+              <div
+                id="home-quick-reorder-banner"
+                onClick={() => setIsQuickReorderOpen(true)}
+                className="md:hidden w-full bg-gradient-to-r from-[#07162e] via-[#091f42] to-[#0a2754] border border-[#132c57] hover:border-sky-500/50 rounded-2xl p-3.5 flex items-center justify-between cursor-pointer transition-all duration-200 shadow-xl shadow-sky-950/40 group active:scale-[0.99]"
+              >
+                <div className="flex items-center gap-3.5">
+                  <div className="w-10 h-10 rounded-full bg-sky-500/20 border border-sky-400/40 text-sky-400 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform shadow-md">
+                    <RotateCcw className="w-4.5 h-4.5 stroke-[2.5]" />
+                  </div>
+                  <div>
+                    <h3 className="text-white text-xs sm:text-sm font-bold leading-tight flex items-center gap-1.5">
+                      <span>Riordino Rapido</span>
+                      <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-sky-500/20 text-sky-300 border border-sky-500/30">
+                        1-Click
+                      </span>
+                    </h3>
+                    <p className="text-sky-400 text-[11px] font-semibold mt-0.5">
+                      Forniture veloci • Senza carte • A 30gg
+                    </p>
+                  </div>
+                </div>
+                <div className="w-7 h-7 rounded-full bg-[#0e254d] border border-[#1d407a] text-slate-300 group-hover:text-white group-hover:border-sky-400/60 flex items-center justify-center transition-all">
+                  <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                </div>
+              </div>
 
               {/* 3. Offerte del mese Promo Banner */}
               <PromoBanner

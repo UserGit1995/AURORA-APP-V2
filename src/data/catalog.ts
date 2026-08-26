@@ -24,7 +24,7 @@ export const BANNER_BOTTLES_IMAGE = bannerBottles;
 export const CATEGORIES: Category[] = [
   {
     id: 'igiene-casa',
-    name: 'Igiene Casa',
+    name: 'Pulizia Casa',
     count: '128 prodotti',
     countNumber: 128,
     image: catIgieneCasa,
@@ -32,7 +32,7 @@ export const CATEGORIES: Category[] = [
   },
   {
     id: 'igiene-corpo',
-    name: 'Igiene Corpo',
+    name: 'Cura Persona',
     count: '92 prodotti',
     countNumber: 92,
     image: catIgieneCorpo,
@@ -45,6 +45,14 @@ export const CATEGORIES: Category[] = [
     countNumber: 156,
     image: catDetersivi,
     description: 'Detersivi per lavatrice, polveri concentrate, ammorbidenti e smacchiatori.',
+  },
+  {
+    id: 'profumatori',
+    name: 'Profumazione',
+    count: '37 prodotti',
+    countNumber: 37,
+    image: catProfumatori,
+    description: 'Diffusori a bastoncino, spray essenziali persistenti per ambienti e tessuti.',
   },
   {
     id: 'casa',
@@ -69,14 +77,6 @@ export const CATEGORIES: Category[] = [
     countNumber: 54,
     image: catCarta,
     description: 'Carta igienica maxi rotoli, asciugamani piegati a V/Z, tovaglioli e bobine.',
-  },
-  {
-    id: 'profumatori',
-    name: 'Profumatori',
-    count: '37 prodotti',
-    countNumber: 37,
-    image: catProfumatori,
-    description: 'Diffusori a bastoncino, spray essenziali persistenti per ambienti e tessuti.',
   },
 ];
 

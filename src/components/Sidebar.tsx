@@ -150,13 +150,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   onOpenAdminPanel();
                   if (onCloseMobile) onCloseMobile();
                 }}
-                className="w-full bg-gradient-to-r from-sky-500/20 via-indigo-600/20 to-sky-500/20 hover:from-sky-500/30 hover:to-indigo-600/30 border border-sky-500/50 text-sky-300 hover:text-sky-200 text-xs font-black py-2.5 px-3 rounded-xl transition-all flex items-center justify-between shadow-lg shadow-sky-950/40 cursor-pointer"
+                className="w-full bg-gradient-to-r from-amber-500/20 via-amber-600/20 to-amber-500/20 hover:from-amber-500/30 hover:to-amber-600/30 border border-amber-500/50 text-amber-300 hover:text-amber-200 text-xs font-black py-2.5 px-3 rounded-xl transition-all flex items-center justify-between shadow-lg shadow-amber-950/40 cursor-pointer"
               >
                 <div className="flex items-center gap-2">
-                  <span className="text-sky-400 font-black">⚡</span>
+                  <span className="text-amber-400 font-black">⚡</span>
                   <span className="uppercase tracking-wider font-extrabold text-[11px]">Pannello SuperAdmin</span>
                 </div>
-                <span className="text-[10px] text-sky-950 font-bold bg-sky-400 px-1.5 py-0.5 rounded">ADMIN</span>
+                <span className="text-[10px] text-amber-950 font-bold bg-amber-400 px-1.5 py-0.5 rounded">ADMIN</span>
               </button>
             )}
 

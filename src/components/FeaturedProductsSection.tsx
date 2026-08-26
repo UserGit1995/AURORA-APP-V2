@@ -2,6 +2,7 @@ import React from 'react';
 import { Star, Heart, ArrowRight, Plus, Check, Scale } from 'lucide-react';
 import { Product } from '../types';
 import { useLanguage } from '../context/LanguageContext';
+import { useAdmin } from '../context/AdminContext';
 
 interface FeaturedProductsSectionProps {
   products: Product[];
@@ -27,6 +28,7 @@ export const FeaturedProductsSection: React.FC<FeaturedProductsSectionProps> = (
   addedProductId,
 }) => {
   const { t, language } = useLanguage();
+  const { isBusinessCustomer } = useAdmin();
 
   return (
     <section className="w-full mt-7 mb-12">
@@ -160,12 +162,25 @@ export const FeaturedProductsSection: React.FC<FeaturedProductsSectionProps> = (
                 {/* Price and B2B quick add */}
                 <div className="flex items-center justify-between mt-2.5 pt-1.5 border-t border-[#122340]">
                   <div>
-                    <span className="text-white text-xs font-bold">
-                      €{product.price.toFixed(2)}
-                    </span>
-                    <span className="text-slate-400 text-[10px] ml-1">
-                      +IVA
-                    </span>
+                    {isBusinessCustomer ? (
+                      <div className="flex items-baseline gap-1">
+                        <span className="text-white text-xs font-bold">
+                          €{(product.price * 1.22).toFixed(2)}
+                        </span>
+                        <span className="text-sky-400 text-[9.5px] font-medium bg-sky-500/15 px-1 py-0.5 rounded border border-sky-500/25">
+                          con IVA
+                        </span>
+                      </div>
+                    ) : (
+                      <div className="flex items-baseline gap-1">
+                        <span className="text-white text-xs font-bold">
+                          €{product.price.toFixed(2)}
+                        </span>
+                        <span className="text-emerald-400 text-[9.5px] font-medium bg-emerald-500/15 px-1 py-0.5 rounded border border-emerald-500/25">
+                          senza IVA
+                        </span>
+                      </div>
+                    )}
                   </div>
                   <button
                     id={`add-cart-btn-${product.id}`}

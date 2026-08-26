@@ -13,6 +13,18 @@ import {
   syncSupabaseSettings
 } from '../services/supabase';
 
+export interface PriceCalculation {
+  basePrice: number;
+  displayPrice: number;
+  formattedDisplayPrice: string;
+  vatAmount: number;
+  totalWithVat: number;
+  formattedTotal: string;
+  vatLabel: string;
+  isWithVat: boolean;
+  vatRatePercent: number;
+}
+
 interface AdminContextType {
   currentUser: UserProfile | null;
   isAdmin: boolean;
@@ -23,6 +35,12 @@ interface AdminContextType {
   logout: () => void;
   toggleAdminMode: () => void;
   
+  // VAT & Pricing Rules (Utenti normali = Senza IVA; Fornitori / Attività = Con IVA 22%)
+  isBusinessCustomer: boolean;
+  isPrivateCustomer: boolean;
+  customerVatRate: number;
+  formatProductPrice: (basePrice: number, qty?: number) => PriceCalculation;
+
   // Master Editable Data States
   productsList: Product[];
   categoriesList: Category[];
@@ -367,6 +385,49 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setCurrentUser(DEFAULT_ADMIN);
   };
 
+  // VAT Rules:
+  // - Utenti normali (privati o visitatori): prezzo SENZA IVA (IVA 0%, nessuna maggiorazione)
+  // - Fornitori / Attività (aziende, B2B, negozianti): prezzo CON IVA (IVA 22% applicata)
+  const isBusinessCustomer = currentUser?.customerType === 'attivita' || currentUser?.role === 'superadmin';
+  const isPrivateCustomer = !isBusinessCustomer;
+  const customerVatRate = isBusinessCustomer ? 0.22 : 0;
+
+  const formatProductPrice = useCallback(
+    (basePrice: number, qty: number = 1): PriceCalculation => {
+      const quantity = Math.max(1, qty);
+      const netTotal = basePrice * quantity;
+      
+      if (isBusinessCustomer) {
+        const vatAmount = netTotal * 0.22;
+        const totalWithVat = netTotal + vatAmount;
+        return {
+          basePrice,
+          displayPrice: basePrice * 1.22,
+          formattedDisplayPrice: `€ ${(basePrice * 1.22).toFixed(2)}`,
+          vatAmount,
+          totalWithVat,
+          formattedTotal: `€ ${totalWithVat.toFixed(2)}`,
+          vatLabel: 'con IVA (22%)',
+          isWithVat: true,
+          vatRatePercent: 22,
+        };
+      }
+
+      return {
+        basePrice,
+        displayPrice: basePrice,
+        formattedDisplayPrice: `€ ${basePrice.toFixed(2)}`,
+        vatAmount: 0,
+        totalWithVat: netTotal,
+        formattedTotal: `€ ${netTotal.toFixed(2)}`,
+        vatLabel: 'senza IVA',
+        isWithVat: false,
+        vatRatePercent: 0,
+      };
+    },
+    [isBusinessCustomer]
+  );
+
   return (
     <AdminContext.Provider
       value={{
@@ -374,6 +435,10 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         isAdmin,
         isSuperAdmin,
         isSupabaseConnected,
+        isBusinessCustomer,
+        isPrivateCustomer,
+        customerVatRate,
+        formatProductPrice,
         loginAsAdmin,
         loginAsUser,
         logout,

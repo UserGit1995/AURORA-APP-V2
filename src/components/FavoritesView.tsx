@@ -1,6 +1,7 @@
 import React from 'react';
 import { Heart, Plus, ArrowLeft, Sparkles, PackageSearch, Bookmark, Scale } from 'lucide-react';
 import { Product } from '../types';
+import { useAdmin } from '../context/AdminContext';
 
 interface FavoritesViewProps {
   favoriteProducts: Product[];
@@ -21,6 +22,8 @@ export const FavoritesView: React.FC<FavoritesViewProps> = ({
   onAddToCart,
   onBackToHome,
 }) => {
+  const { isBusinessCustomer } = useAdmin();
+
   return (
     <div className="w-full animate-in fade-in duration-200">
       <div className="flex items-center justify-between mb-6">
@@ -180,7 +183,19 @@ export const FavoritesView: React.FC<FavoritesViewProps> = ({
                   </div>
 
                   <div className="flex items-center justify-between mt-2.5 pt-1.5 border-t border-[#122340]">
-                    <span className="text-white text-xs font-bold">€{product.price.toFixed(2)}</span>
+                    <div>
+                      {isBusinessCustomer ? (
+                        <div className="flex items-baseline gap-1">
+                          <span className="text-white text-xs font-bold">€{(product.price * 1.22).toFixed(2)}</span>
+                          <span className="text-sky-400 text-[9.5px] font-medium bg-sky-500/15 px-1 py-0.5 rounded border border-sky-500/25">con IVA</span>
+                        </div>
+                      ) : (
+                        <div className="flex items-baseline gap-1">
+                          <span className="text-white text-xs font-bold">€{product.price.toFixed(2)}</span>
+                          <span className="text-emerald-400 text-[9.5px] font-medium bg-emerald-500/15 px-1 py-0.5 rounded border border-emerald-500/25">senza IVA</span>
+                        </div>
+                      )}
+                    </div>
                     <button
                       id={`fav-add-cart-btn-${product.id}`}
                       onClick={(e) => onAddToCart(product, e)}

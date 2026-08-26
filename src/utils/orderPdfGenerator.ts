@@ -179,9 +179,10 @@ export const generateOrderReceiptPdf = (order: Order): void => {
   // Calculate position for Financial Totals Summary
   const finalY = (doc as any).lastAutoTable.finalY + 6;
 
-  // Subtotal, VAT, and Final Total Box
-  const subtotal = order.subtotal ?? (order.total / 1.22);
-  const vatAmount = order.vatAmount ?? (order.total - subtotal);
+  // Subtotal, VAT, and Final Total Box based on customer type
+  const isBusinessOrder = isCompany || order.shippingAddress?.customerType === 'azienda';
+  const subtotal = order.subtotal ?? (isBusinessOrder ? (order.total / 1.22) : order.total);
+  const vatAmount = order.vatAmount ?? (isBusinessOrder ? (order.total - subtotal) : 0);
   const shippingCost = order.shippingCost ?? 0;
 
   // Notes on the left
@@ -197,8 +198,13 @@ export const generateOrderReceiptPdf = (order: Order): void => {
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(7.5);
   doc.setTextColor(100, 116, 139);
-  doc.text('• Documento proforma valido ai fini commerciali B2B.', 18, finalY + 10);
-  doc.text('• Fattura elettronica SDI trasmessa tramite canale accreditato.', 18, finalY + 15);
+  if (isBusinessOrder) {
+    doc.text('• Documento per ordine B2B con fatturazione elettronica.', 18, finalY + 10);
+    doc.text('• Fattura elettronica SDI trasmessa tramite canale accreditato.', 18, finalY + 15);
+  } else {
+    doc.text('• Ricevuta ordine cliente privato (senza applicazione IVA).', 18, finalY + 10);
+    doc.text('• Valido ai fini di riepilogo acquisto e garanzia.', 18, finalY + 15);
+  }
   doc.text('• Merce resa franco destino con imballaggio standard.', 18, finalY + 20);
   doc.text('• Assistenza ordini & reclami: ordini@auroradistribuzione.it', 18, finalY + 25);
 
@@ -221,12 +227,18 @@ export const generateOrderReceiptPdf = (order: Order): void => {
   doc.setFont('helvetica', 'normal');
   doc.text('Spese di Spedizione:', summaryX + 4, finalY + 12);
   doc.setFont('courier', 'normal');
-  doc.text(shippingCost === 0 ? 'Gratuite (B2B)' : `€ ${shippingCost.toFixed(2)}`, summaryX + summaryWidth - 4, finalY + 12, { align: 'right' });
+  doc.text(shippingCost === 0 ? 'Gratuite' : `€ ${shippingCost.toFixed(2)}`, summaryX + summaryWidth - 4, finalY + 12, { align: 'right' });
 
   doc.setFont('helvetica', 'normal');
-  doc.text('IVA Ordinaria (22%):', summaryX + 4, finalY + 18);
-  doc.setFont('courier', 'normal');
-  doc.text(`€ ${vatAmount.toFixed(2)}`, summaryX + summaryWidth - 4, finalY + 18, { align: 'right' });
+  if (isBusinessOrder) {
+    doc.text('IVA Ordinaria (22%):', summaryX + 4, finalY + 18);
+    doc.setFont('courier', 'normal');
+    doc.text(`€ ${vatAmount.toFixed(2)}`, summaryX + summaryWidth - 4, finalY + 18, { align: 'right' });
+  } else {
+    doc.text('IVA (Listino Privati):', summaryX + 4, finalY + 18);
+    doc.setFont('courier', 'normal');
+    doc.text('€ 0.00 (Esente)', summaryX + summaryWidth - 4, finalY + 18, { align: 'right' });
+  }
 
   // Total Bar Highlight
   doc.setFillColor(...darkNavy);
@@ -235,7 +247,7 @@ export const generateOrderReceiptPdf = (order: Order): void => {
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(9);
   doc.setTextColor(255, 255, 255);
-  doc.text('TOTALE DOVUTO:', summaryX + 5, finalY + 28);
+  doc.text(isBusinessOrder ? 'TOTALE DOVUTO:' : 'TOTALE ORDINE:', summaryX + 5, finalY + 28);
 
   doc.setFont('courier', 'bold');
   doc.setFontSize(10.5);

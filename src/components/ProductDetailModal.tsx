@@ -17,6 +17,7 @@ import {
 import { Product } from '../types';
 import { ProductTrendSparkline } from './ProductTrendSparkline';
 import { ProductUsageGuidelines } from './ProductUsageGuidelines';
+import { useAdmin } from '../context/AdminContext';
 
 interface ProductDetailModalProps {
   product: Product | null;
@@ -41,6 +42,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
   onOpenRestockAnalysis,
   onEditProduct,
 }) => {
+  const { isBusinessCustomer } = useAdmin();
   const [activeTab, setActiveTab] = useState<'overview' | 'usage'>('overview');
   const [quantity, setQuantity] = useState(1);
   const [addedAnimation, setAddedAnimation] = useState(false);
@@ -53,8 +55,10 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
     setTimeout(() => setAddedAnimation(false), 1500);
   };
 
-  const totalPrice = (product.price * quantity).toFixed(2);
-  const totalWithVat = (product.price * quantity * 1.22).toFixed(2);
+  const rawSubtotal = product.price * quantity;
+  const totalPrice = rawSubtotal.toFixed(2);
+  const totalWithVat = (rawSubtotal * 1.22).toFixed(2);
+  const displayFinalPrice = isBusinessCustomer ? totalWithVat : totalPrice;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/75 backdrop-blur-xs animate-in fade-in duration-200 overflow-y-auto">
@@ -244,11 +248,22 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
               <div className="mt-5 pt-4 border-t border-[#132646]">
                 <div className="flex items-baseline justify-between mb-3">
                   <div>
-                    <span className="text-2xl font-extrabold text-white">€{totalPrice}</span>
-                    <span className="text-xs text-slate-400 ml-1.5">+ IVA (€{totalWithVat} inc.)</span>
+                    <span className="text-2xl font-extrabold text-white">€{displayFinalPrice}</span>
+                    {isBusinessCustomer ? (
+                      <span className="text-xs text-sky-400 ml-2 font-medium bg-sky-500/15 px-2 py-0.5 rounded border border-sky-500/25">
+                        con IVA 22% (Netto €{totalPrice})
+                      </span>
+                    ) : (
+                      <span className="text-xs text-emerald-400 ml-2 font-medium bg-emerald-500/15 px-2 py-0.5 rounded border border-emerald-500/25">
+                        senza IVA (Prezzo Utente)
+                      </span>
+                    )}
                   </div>
                   <span className="text-xs text-slate-400">
-                    €{product.price.toFixed(2)} / {product.unit}
+                    €{isBusinessCustomer ? (product.price * 1.22).toFixed(2) : product.price.toFixed(2)} / {product.unit}
+                    <span className="text-[10px] ml-1 text-slate-500">
+                      {isBusinessCustomer ? '(IVA inc.)' : '(senza IVA)'}
+                    </span>
                   </span>
                 </div>
 

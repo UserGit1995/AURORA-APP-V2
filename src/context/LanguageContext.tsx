@@ -54,17 +54,17 @@ const translations: Record<Language, Record<string, string>> = {
 
     // Categories
     'categories.sectionTitle': 'Categorie principali',
-    'categories.viewAll': 'Vedi tutti',
+    'categories.viewAll': 'Vedi tutte',
     'categories.productsCount': 'prodotti',
 
     // Category Names
-    'cat.igiene-casa': 'Igiene Casa',
-    'cat.igiene-corpo': 'Igiene Corpo',
+    'cat.igiene-casa': 'Pulizia Casa',
+    'cat.igiene-corpo': 'Cura Persona',
     'cat.detersivi': 'Detersivi',
+    'cat.profumatori': 'Profumazione',
     'cat.casa': 'Casa',
     'cat.accessori-pulizia': 'Accessori Pulizia',
     'cat.carta-monouso': 'Carta e Monouso',
-    'cat.profumatori': 'Profumatori',
 
     // Promo Banner
     'promo.badge': 'PROMOZIONE B2B',
