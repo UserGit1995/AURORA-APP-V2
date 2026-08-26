@@ -128,16 +128,12 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
         return false;
       }
       // SubCategory filter (Level 2)
-      if (activeFilterSubCategory) {
-        if (product.subCategoryId && product.subCategoryId !== activeFilterSubCategory) {
-          return false;
-        }
+      if (activeFilterSubCategory && product.subCategoryId !== activeFilterSubCategory) {
+        return false;
       }
       // SubSubCategory filter (Level 3)
-      if (activeFilterSubSubCategory) {
-        if (product.subSubCategoryId && product.subSubCategoryId !== activeFilterSubSubCategory) {
-          return false;
-        }
+      if (activeFilterSubSubCategory && product.subSubCategoryId !== activeFilterSubSubCategory) {
+        return false;
       }
       // Search query
       if (searchQuery.trim()) {
@@ -601,18 +597,29 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
 
       {/* Products Grid */}
       {filteredProducts.length === 0 ? (
-        <div className="bg-[#081326] border border-[#142646] rounded-2xl p-12 text-center">
-          <p className="text-sm font-semibold text-white">Nessun prodotto trovato</p>
-          <p className="text-xs text-slate-400 mt-1">Prova a cambiare i filtri di ricerca o la categoria selezionata.</p>
-          <button
-            onClick={() => {
-              setActiveFilterCategory(null);
-              onSelectCategory(null);
-            }}
-            className="mt-4 bg-[#0284c7] hover:bg-[#0369a1] text-white text-xs font-semibold px-4 py-2 rounded-xl"
-          >
-            Azzera Filtri
-          </button>
+        <div className="bg-[#081326] border border-[#142646] rounded-2xl p-10 text-center space-y-3">
+          <div className="w-12 h-12 rounded-2xl bg-sky-500/10 border border-sky-500/30 text-sky-400 mx-auto flex items-center justify-center">
+            <Layers className="w-6 h-6" />
+          </div>
+          <p className="text-sm font-bold text-white">Nessun articolo trovato per questo filtro</p>
+          <p className="text-xs text-slate-400 max-w-md mx-auto">
+            {activeFilterSubCategory
+              ? 'Non ci sono ancora articoli assegnati a questa specifica sottocategoria.'
+              : 'Prova a cambiare i filtri di ricerca o selezionare un\'altra categoria.'}
+          </p>
+          <div className="flex items-center justify-center gap-3 pt-2">
+            <button
+              onClick={() => {
+                setActiveFilterCategory(null);
+                setActiveFilterSubCategory(null);
+                setActiveFilterSubSubCategory(null);
+                onSelectCategory(null);
+              }}
+              className="bg-[#0284c7] hover:bg-[#0369a1] text-white text-xs font-semibold px-4 py-2 rounded-xl transition-colors cursor-pointer"
+            >
+              Mostra Tutti i Prodotti
+            </button>
+          </div>
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3.5">
@@ -755,7 +762,9 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                     {product.name}
                   </h3>
                   <div className="flex items-center justify-between gap-1 mt-0.5">
-                    <p className="text-slate-400 text-[11px] truncate">{product.category}</p>
+                    <p className="text-slate-400 text-[11px] truncate">
+                      {product.subCategoryName ? `${product.category} › ${product.subCategoryName}` : product.category}
+                    </p>
                     {isLowStock && (
                       <span className="text-rose-400 text-[10px] font-medium shrink-0">
                         Solo {product.stock} colli

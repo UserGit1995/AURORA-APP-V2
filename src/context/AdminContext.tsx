@@ -12,6 +12,7 @@ import {
   syncSupabaseOrder,
   syncSupabaseSettings
 } from '../services/supabase';
+import { persistentStorage } from '../services/storage';
 
 export interface PriceCalculation {
   basePrice: number;
@@ -133,103 +134,80 @@ const DEFAULT_SETTINGS: SystemSettings = {
 const AdminContext = createContext<AdminContextType | undefined>(undefined);
 
 export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Load saved state from localStorage or start as null (not logged in)
   const [currentUser, setCurrentUser] = useState<UserProfile | null>(() => {
-    try {
-      const saved = localStorage.getItem('aurora_auth_user');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        return parsed;
-      }
-      return null;
-    } catch {
-      return null;
-    }
+    return persistentStorage.getItemSync<UserProfile | null>('aurora_auth_user', null);
   });
 
   const [productsList, setProductsList] = useState<Product[]>(() => {
-    try {
-      const saved = localStorage.getItem('aurora_admin_products');
-      if (saved) return JSON.parse(saved);
-      return PRODUCTS;
-    } catch {
-      return PRODUCTS;
-    }
+    return persistentStorage.getItemSync<Product[]>('aurora_admin_products', PRODUCTS);
   });
 
   const [categoriesList, setCategoriesList] = useState<Category[]>(() => {
-    try {
-      const saved = localStorage.getItem('aurora_admin_categories');
-      if (saved) return JSON.parse(saved);
-      return CATEGORIES;
-    } catch {
-      return CATEGORIES;
-    }
+    return persistentStorage.getItemSync<Category[]>('aurora_admin_categories', CATEGORIES);
   });
 
   const [ordersList, setOrdersList] = useState<Order[]>(() => {
-    try {
-      const saved = localStorage.getItem('aurora_admin_orders');
-      if (saved) return JSON.parse(saved);
-      return INITIAL_ORDERS;
-    } catch {
-      return INITIAL_ORDERS;
-    }
+    return persistentStorage.getItemSync<Order[]>('aurora_admin_orders', INITIAL_ORDERS);
   });
 
   const [systemSettings, setSystemSettings] = useState<SystemSettings>(() => {
-    try {
-      const saved = localStorage.getItem('aurora_admin_settings');
-      if (saved) return JSON.parse(saved);
-      return DEFAULT_SETTINGS;
-    } catch {
-      return DEFAULT_SETTINGS;
-    }
+    return persistentStorage.getItemSync<SystemSettings>('aurora_admin_settings', DEFAULT_SETTINGS);
   });
 
-  // Sync state to localStorage
+  // Asynchronously hydrate complete data from IndexedDB on startup (loads base64 images & unlimited products)
   useEffect(() => {
-    try {
-      if (currentUser) {
-        localStorage.setItem('aurora_auth_user', JSON.stringify(currentUser));
-      } else {
-        localStorage.removeItem('aurora_auth_user');
+    let isMounted = true;
+    async function hydrateFromIndexedDB() {
+      try {
+        const [savedUser, savedProds, savedCats, savedOrds, savedSettings] = await Promise.all([
+          persistentStorage.getItem<UserProfile | null>('aurora_auth_user', null),
+          persistentStorage.getItem<Product[] | null>('aurora_admin_products', null),
+          persistentStorage.getItem<Category[] | null>('aurora_admin_categories', null),
+          persistentStorage.getItem<Order[] | null>('aurora_admin_orders', null),
+          persistentStorage.getItem<SystemSettings | null>('aurora_admin_settings', null),
+        ]);
+
+        if (!isMounted) return;
+
+        if (savedUser) setCurrentUser(savedUser);
+        if (savedProds && savedProds.length > 0) setProductsList(savedProds);
+        if (savedCats && savedCats.length > 0) setCategoriesList(savedCats);
+        if (savedOrds && savedOrds.length > 0) setOrdersList(savedOrds);
+        if (savedSettings) setSystemSettings(savedSettings);
+      } catch (err) {
+        console.warn('IndexedDB initial hydration notice:', err);
       }
-    } catch (e) {
-      console.warn('Storage sync failed', e);
+    }
+
+    hydrateFromIndexedDB();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  // Sync state changes permanently to high-capacity storage
+  useEffect(() => {
+    if (currentUser) {
+      persistentStorage.setItem('aurora_auth_user', currentUser);
+    } else {
+      persistentStorage.removeItem('aurora_auth_user');
     }
   }, [currentUser]);
 
   useEffect(() => {
-    try {
-      localStorage.setItem('aurora_admin_products', JSON.stringify(productsList));
-    } catch (e) {
-      console.warn('Product sync failed', e);
-    }
+    persistentStorage.setItem('aurora_admin_products', productsList);
   }, [productsList]);
 
   useEffect(() => {
-    try {
-      localStorage.setItem('aurora_admin_categories', JSON.stringify(categoriesList));
-    } catch (e) {
-      console.warn('Category sync failed', e);
-    }
+    persistentStorage.setItem('aurora_admin_categories', categoriesList);
   }, [categoriesList]);
 
   useEffect(() => {
-    try {
-      localStorage.setItem('aurora_admin_orders', JSON.stringify(ordersList));
-    } catch (e) {
-      console.warn('Order sync failed', e);
-    }
+    persistentStorage.setItem('aurora_admin_orders', ordersList);
   }, [ordersList]);
 
   useEffect(() => {
-    try {
-      localStorage.setItem('aurora_admin_settings', JSON.stringify(systemSettings));
-    } catch (e) {
-      console.warn('Settings sync failed', e);
-    }
+    persistentStorage.setItem('aurora_admin_settings', systemSettings);
   }, [systemSettings]);
 
   const isSupabaseConnected = isSupabaseConfigured();

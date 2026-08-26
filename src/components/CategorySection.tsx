@@ -100,12 +100,12 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
         ))}
       </div>
 
-      {/* 2. DESKTOP & TABLET VIEW (Full 7 Categories Grid with Product Counts) */}
-      <div className="hidden md:grid md:grid-cols-4 lg:grid-cols-7 gap-3">
-        {categories.slice(0, 7).map((cat) => {
+      {/* 2. DESKTOP & TABLET VIEW (Full Categories Grid with Product Counts) */}
+      <div className="hidden md:grid md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7 gap-3">
+        {categories.map((cat) => {
           const isSelected = selectedCategoryId === cat.id;
           const translatedName = t(`cat.${cat.id}`, cat.name);
-          const countDisplay = `${cat.countNumber || 100} ${t('categories.productsCount', 'prodotti')}`;
+          const countDisplay = `${cat.countNumber || 0} ${t('categories.productsCount', 'prodotti')}`;
 
           return (
             <div
@@ -121,7 +121,7 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
               {/* Image Frame */}
               <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-[#050c18] mb-2.5">
                 <img
-                  src={cat.image}
+                  src={cat.image || '/logo-login.png'}
                   alt={translatedName}
                   referrerPolicy="no-referrer"
                   className="w-full h-full object-cover object-center transition-transform duration-300 group-hover:scale-105"

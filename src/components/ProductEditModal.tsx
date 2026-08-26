@@ -96,31 +96,28 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
 
   const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedCat = categories.find((c) => c.id === e.target.value);
-    const firstSub = selectedCat?.subCategories?.[0];
-    const firstMicro = firstSub?.subSubCategories?.[0];
 
     setFormData((prev) => ({
       ...prev,
       categoryId: e.target.value,
       category: selectedCat?.name || prev.category || 'Igiene Casa',
-      subCategoryId: firstSub?.id || '',
-      subCategoryName: firstSub?.name || '',
-      subSubCategoryId: firstMicro?.id || '',
-      subSubCategoryName: firstMicro?.name || '',
+      subCategoryId: '',
+      subCategoryName: '',
+      subSubCategoryId: '',
+      subSubCategoryName: '',
     }));
   };
 
   const handleSubCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const currentCat = categories.find((c) => c.id === formData.categoryId);
     const selectedSub = currentCat?.subCategories?.find((s) => s.id === e.target.value);
-    const firstMicro = selectedSub?.subSubCategories?.[0];
 
     setFormData((prev) => ({
       ...prev,
       subCategoryId: e.target.value,
       subCategoryName: selectedSub?.name || '',
-      subSubCategoryId: firstMicro?.id || '',
-      subSubCategoryName: firstMicro?.name || '',
+      subSubCategoryId: '',
+      subSubCategoryName: '',
     }));
   };
 
