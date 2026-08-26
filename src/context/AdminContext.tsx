@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { UserProfile, SystemSettings, Product, Order, Category, SubCategory, SubSubCategory } from '../types';
+import { UserProfile, SystemSettings, Product, Order, Category } from '../types';
 import { PRODUCTS, CATEGORIES, INITIAL_ORDERS } from '../data/catalog';
 import { 
   isSupabaseConfigured, 
@@ -9,22 +9,11 @@ import {
   syncSupabaseProduct,
   deleteSupabaseProduct,
   syncSupabaseCategory,
+  deleteSupabaseCategory,
   syncSupabaseOrder,
-  syncSupabaseSettings
+  syncSupabaseSettings,
+  newDbId
 } from '../services/supabase';
-import { persistentStorage } from '../services/storage';
-
-export interface PriceCalculation {
-  basePrice: number;
-  displayPrice: number;
-  formattedDisplayPrice: string;
-  vatAmount: number;
-  totalWithVat: number;
-  formattedTotal: string;
-  vatLabel: string;
-  isWithVat: boolean;
-  vatRatePercent: number;
-}
 
 interface AdminContextType {
   currentUser: UserProfile | null;
@@ -36,12 +25,6 @@ interface AdminContextType {
   logout: () => void;
   toggleAdminMode: () => void;
   
-  // VAT & Pricing Rules (Utenti normali = Senza IVA; Fornitori / Attività = Con IVA 22%)
-  isBusinessCustomer: boolean;
-  isPrivateCustomer: boolean;
-  customerVatRate: number;
-  formatProductPrice: (basePrice: number, qty?: number) => PriceCalculation;
-
   // Master Editable Data States
   productsList: Product[];
   categoriesList: Category[];
@@ -57,22 +40,6 @@ interface AdminContextType {
   updateCategory: (updated: Category) => void;
   addCategory: (newCat: Omit<Category, 'id'>) => Category;
   deleteCategory: (categoryId: string) => void;
-
-  // Subcategory (Level 2) CRUD
-  addSubCategory: (categoryId: string, newSubCat: Omit<SubCategory, 'id' | 'categoryId'>) => SubCategory;
-  updateSubCategory: (categoryId: string, updatedSubCat: SubCategory) => void;
-  deleteSubCategory: (categoryId: string, subCategoryId: string) => void;
-
-  // Sub-subcategory (Level 3) CRUD
-  addSubSubCategory: (categoryId: string, subCategoryId: string, newSubSubCat: Omit<SubSubCategory, 'id' | 'categoryId' | 'subCategoryId'>) => SubSubCategory;
-  updateSubSubCategory: (categoryId: string, subCategoryId: string, updatedSubSubCat: SubSubCategory) => void;
-  deleteSubSubCategory: (categoryId: string, subCategoryId: string, subSubCatId: string) => void;
-
-  // Update Image from PC for any level
-  updateCategoryImageFromPc: (
-    target: { level: 'category' | 'subcategory' | 'subsubcategory'; categoryId: string; subCategoryId?: string; subSubCategoryId?: string },
-    imageDataUri: string
-  ) => void;
   
   // Order Management
   updateOrder: (updated: Order) => void;
@@ -134,93 +101,104 @@ const DEFAULT_SETTINGS: SystemSettings = {
 const AdminContext = createContext<AdminContextType | undefined>(undefined);
 
 export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  // Load saved state from localStorage or start as null (not logged in)
   const [currentUser, setCurrentUser] = useState<UserProfile | null>(() => {
-    return persistentStorage.getItemSync<UserProfile | null>('aurora_auth_user', null);
+    try {
+      const saved = localStorage.getItem('aurora_auth_user');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        return parsed;
+      }
+      return null;
+    } catch {
+      return null;
+    }
   });
 
   const [productsList, setProductsList] = useState<Product[]>(() => {
-    return persistentStorage.getItemSync<Product[]>('aurora_admin_products', PRODUCTS);
+    try {
+      const saved = localStorage.getItem('aurora_admin_products');
+      if (saved) return JSON.parse(saved);
+      return PRODUCTS;
+    } catch {
+      return PRODUCTS;
+    }
   });
 
   const [categoriesList, setCategoriesList] = useState<Category[]>(() => {
-    return persistentStorage.getItemSync<Category[]>('aurora_admin_categories', CATEGORIES);
+    try {
+      const saved = localStorage.getItem('aurora_admin_categories');
+      if (saved) return JSON.parse(saved);
+      return CATEGORIES;
+    } catch {
+      return CATEGORIES;
+    }
   });
 
   const [ordersList, setOrdersList] = useState<Order[]>(() => {
-    return persistentStorage.getItemSync<Order[]>('aurora_admin_orders', INITIAL_ORDERS);
+    try {
+      const saved = localStorage.getItem('aurora_admin_orders');
+      if (saved) return JSON.parse(saved);
+      return INITIAL_ORDERS;
+    } catch {
+      return INITIAL_ORDERS;
+    }
   });
 
   const [systemSettings, setSystemSettings] = useState<SystemSettings>(() => {
-    return persistentStorage.getItemSync<SystemSettings>('aurora_admin_settings', DEFAULT_SETTINGS);
+    try {
+      const saved = localStorage.getItem('aurora_admin_settings');
+      if (saved) return JSON.parse(saved);
+      return DEFAULT_SETTINGS;
+    } catch {
+      return DEFAULT_SETTINGS;
+    }
   });
 
-  // Track whether initial asynchronous hydration has completed to avoid overwriting stored data with defaults
-  const [isHydrated, setIsHydrated] = useState<boolean>(false);
-
-  // Asynchronously hydrate complete data from IndexedDB on startup (loads base64 images & unlimited products)
+  // Sync state to localStorage
   useEffect(() => {
-    let isMounted = true;
-    async function hydrateFromIndexedDB() {
-      try {
-        const [savedUser, savedProds, savedCats, savedOrds, savedSettings] = await Promise.all([
-          persistentStorage.getItem<UserProfile | null>('aurora_auth_user', null),
-          persistentStorage.getItem<Product[] | null>('aurora_admin_products', null),
-          persistentStorage.getItem<Category[] | null>('aurora_admin_categories', null),
-          persistentStorage.getItem<Order[] | null>('aurora_admin_orders', null),
-          persistentStorage.getItem<SystemSettings | null>('aurora_admin_settings', null),
-        ]);
-
-        if (!isMounted) return;
-
-        if (savedUser) setCurrentUser(savedUser);
-        if (savedProds && savedProds.length > 0) setProductsList(savedProds);
-        if (savedCats && savedCats.length > 0) setCategoriesList(savedCats);
-        if (savedOrds && savedOrds.length > 0) setOrdersList(savedOrds);
-        if (savedSettings) setSystemSettings(savedSettings);
-      } catch (err) {
-        console.warn('IndexedDB initial hydration notice:', err);
-      } finally {
-        if (isMounted) {
-          setIsHydrated(true);
-        }
+    try {
+      if (currentUser) {
+        localStorage.setItem('aurora_auth_user', JSON.stringify(currentUser));
+      } else {
+        localStorage.removeItem('aurora_auth_user');
       }
+    } catch (e) {
+      console.warn('Storage sync failed', e);
     }
+  }, [currentUser]);
 
-    hydrateFromIndexedDB();
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
-  // Sync state changes permanently to high-capacity storage ONLY AFTER initial hydration
   useEffect(() => {
-    if (!isHydrated) return;
-    if (currentUser) {
-      persistentStorage.setItem('aurora_auth_user', currentUser);
-    } else {
-      persistentStorage.removeItem('aurora_auth_user');
+    try {
+      localStorage.setItem('aurora_admin_products', JSON.stringify(productsList));
+    } catch (e) {
+      console.warn('Product sync failed', e);
     }
-  }, [currentUser, isHydrated]);
+  }, [productsList]);
 
   useEffect(() => {
-    if (!isHydrated) return;
-    persistentStorage.setItem('aurora_admin_products', productsList);
-  }, [productsList, isHydrated]);
+    try {
+      localStorage.setItem('aurora_admin_categories', JSON.stringify(categoriesList));
+    } catch (e) {
+      console.warn('Category sync failed', e);
+    }
+  }, [categoriesList]);
 
   useEffect(() => {
-    if (!isHydrated) return;
-    persistentStorage.setItem('aurora_admin_categories', categoriesList);
-  }, [categoriesList, isHydrated]);
+    try {
+      localStorage.setItem('aurora_admin_orders', JSON.stringify(ordersList));
+    } catch (e) {
+      console.warn('Order sync failed', e);
+    }
+  }, [ordersList]);
 
   useEffect(() => {
-    if (!isHydrated) return;
-    persistentStorage.setItem('aurora_admin_orders', ordersList);
-  }, [ordersList, isHydrated]);
-
-  useEffect(() => {
-    if (!isHydrated) return;
-    persistentStorage.setItem('aurora_admin_settings', systemSettings);
-  }, [systemSettings, isHydrated]);
+    try {
+      localStorage.setItem('aurora_admin_settings', JSON.stringify(systemSettings));
+    } catch (e) {
+      console.warn('Settings sync failed', e);
+    }
+  }, [systemSettings]);
 
   const isSupabaseConnected = isSupabaseConfigured();
 
@@ -323,7 +301,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   const addProduct = (newProd: Omit<Product, 'id'>): Product => {
-    const id = `p_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`;
+    const id = newDbId();
     const fullProduct: Product = {
       ...newProd,
       id,
@@ -340,19 +318,15 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   // Category CRUD
   const updateCategory = (updated: Category) => {
-    setCategoriesList((prev) => {
-      const next = prev.map((c) => (c.id === updated.id ? updated : c));
-      return next;
-    });
+    setCategoriesList((prev) => prev.map((c) => (c.id === updated.id ? updated : c)));
     syncSupabaseCategory(updated);
   };
 
   const addCategory = (newCat: Omit<Category, 'id'>): Category => {
-    const id = newCat.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') || `cat_${Date.now()}`;
+    const id = newDbId();
     const fullCategory: Category = {
       ...newCat,
       id,
-      subCategories: newCat.subCategories || [],
     };
     setCategoriesList((prev) => [...prev, fullCategory]);
     syncSupabaseCategory(fullCategory);
@@ -361,196 +335,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const deleteCategory = (categoryId: string) => {
     setCategoriesList((prev) => prev.filter((c) => c.id !== categoryId));
-  };
-
-  // Subcategory (Level 2) CRUD
-  const addSubCategory = (categoryId: string, newSubCat: Omit<SubCategory, 'id' | 'categoryId'>): SubCategory => {
-    const id = newSubCat.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') || `sub_${Date.now()}`;
-    const fullSubCat: SubCategory = {
-      ...newSubCat,
-      id,
-      categoryId,
-      subSubCategories: newSubCat.subSubCategories || [],
-    };
-
-    setCategoriesList((prev) =>
-      prev.map((cat) => {
-        if (cat.id === categoryId) {
-          const updatedCat = {
-            ...cat,
-            subCategories: [...(cat.subCategories || []), fullSubCat],
-          };
-          syncSupabaseCategory(updatedCat);
-          return updatedCat;
-        }
-        return cat;
-      })
-    );
-
-    return fullSubCat;
-  };
-
-  const updateSubCategory = (categoryId: string, updatedSubCat: SubCategory) => {
-    setCategoriesList((prev) =>
-      prev.map((cat) => {
-        if (cat.id === categoryId) {
-          const updatedCat = {
-            ...cat,
-            subCategories: (cat.subCategories || []).map((sub) => (sub.id === updatedSubCat.id ? updatedSubCat : sub)),
-          };
-          syncSupabaseCategory(updatedCat);
-          return updatedCat;
-        }
-        return cat;
-      })
-    );
-  };
-
-  const deleteSubCategory = (categoryId: string, subCategoryId: string) => {
-    setCategoriesList((prev) =>
-      prev.map((cat) => {
-        if (cat.id === categoryId) {
-          const updatedCat = {
-            ...cat,
-            subCategories: (cat.subCategories || []).filter((sub) => sub.id !== subCategoryId),
-          };
-          syncSupabaseCategory(updatedCat);
-          return updatedCat;
-        }
-        return cat;
-      })
-    );
-  };
-
-  // Sub-subcategory (Level 3) CRUD
-  const addSubSubCategory = (
-    categoryId: string,
-    subCategoryId: string,
-    newSubSubCat: Omit<SubSubCategory, 'id' | 'categoryId' | 'subCategoryId'>
-  ): SubSubCategory => {
-    const id = newSubSubCat.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') || `micro_${Date.now()}`;
-    const fullSubSubCat: SubSubCategory = {
-      ...newSubSubCat,
-      id,
-      categoryId,
-      subCategoryId,
-    };
-
-    setCategoriesList((prev) =>
-      prev.map((cat) => {
-        if (cat.id === categoryId) {
-          const updatedCat = {
-            ...cat,
-            subCategories: (cat.subCategories || []).map((sub) => {
-              if (sub.id === subCategoryId) {
-                return {
-                  ...sub,
-                  subSubCategories: [...(sub.subSubCategories || []), fullSubSubCat],
-                };
-              }
-              return sub;
-            }),
-          };
-          syncSupabaseCategory(updatedCat);
-          return updatedCat;
-        }
-        return cat;
-      })
-    );
-
-    return fullSubSubCat;
-  };
-
-  const updateSubSubCategory = (categoryId: string, subCategoryId: string, updatedSubSubCat: SubSubCategory) => {
-    setCategoriesList((prev) =>
-      prev.map((cat) => {
-        if (cat.id === categoryId) {
-          const updatedCat = {
-            ...cat,
-            subCategories: (cat.subCategories || []).map((sub) => {
-              if (sub.id === subCategoryId) {
-                return {
-                  ...sub,
-                  subSubCategories: (sub.subSubCategories || []).map((micro) =>
-                    micro.id === updatedSubSubCat.id ? updatedSubSubCat : micro
-                  ),
-                };
-              }
-              return sub;
-            }),
-          };
-          syncSupabaseCategory(updatedCat);
-          return updatedCat;
-        }
-        return cat;
-      })
-    );
-  };
-
-  const deleteSubSubCategory = (categoryId: string, subCategoryId: string, subSubCatId: string) => {
-    setCategoriesList((prev) =>
-      prev.map((cat) => {
-        if (cat.id === categoryId) {
-          const updatedCat = {
-            ...cat,
-            subCategories: (cat.subCategories || []).map((sub) => {
-              if (sub.id === subCategoryId) {
-                return {
-                  ...sub,
-                  subSubCategories: (sub.subSubCategories || []).filter((micro) => micro.id !== subSubCatId),
-                };
-              }
-              return sub;
-            }),
-          };
-          syncSupabaseCategory(updatedCat);
-          return updatedCat;
-        }
-        return cat;
-      })
-    );
-  };
-
-  // Upload/Set Image from PC for Category, SubCategory, or SubSubCategory
-  const updateCategoryImageFromPc = (
-    target: { level: 'category' | 'subcategory' | 'subsubcategory'; categoryId: string; subCategoryId?: string; subSubCategoryId?: string },
-    imageDataUri: string
-  ) => {
-    setCategoriesList((prev) =>
-      prev.map((cat) => {
-        if (cat.id !== target.categoryId) return cat;
-
-        let updatedCat: Category;
-        if (target.level === 'category') {
-          updatedCat = { ...cat, image: imageDataUri };
-        } else if (target.level === 'subcategory' && target.subCategoryId) {
-          updatedCat = {
-            ...cat,
-            subCategories: (cat.subCategories || []).map((sub) =>
-              sub.id === target.subCategoryId ? { ...sub, image: imageDataUri } : sub
-            ),
-          };
-        } else if (target.level === 'subsubcategory' && target.subCategoryId && target.subSubCategoryId) {
-          updatedCat = {
-            ...cat,
-            subCategories: (cat.subCategories || []).map((sub) => {
-              if (sub.id !== target.subCategoryId) return sub;
-              return {
-                ...sub,
-                subSubCategories: (sub.subSubCategories || []).map((micro) =>
-                  micro.id === target.subSubCategoryId ? { ...micro, image: imageDataUri } : micro
-                ),
-              };
-            }),
-          };
-        } else {
-          return cat;
-        }
-
-        syncSupabaseCategory(updatedCat);
-        return updatedCat;
-      })
-    );
+    deleteSupabaseCategory(categoryId);
   };
 
   // Order CRUD
@@ -585,49 +370,6 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setCurrentUser(DEFAULT_ADMIN);
   };
 
-  // VAT Rules:
-  // - Utenti normali (privati o visitatori): prezzo SENZA IVA (IVA 0%, nessuna maggiorazione)
-  // - Fornitori / Attività (aziende, B2B, negozianti): prezzo CON IVA (IVA 22% applicata)
-  const isBusinessCustomer = currentUser?.customerType === 'attivita' || currentUser?.role === 'superadmin';
-  const isPrivateCustomer = !isBusinessCustomer;
-  const customerVatRate = isBusinessCustomer ? 0.22 : 0;
-
-  const formatProductPrice = useCallback(
-    (basePrice: number, qty: number = 1): PriceCalculation => {
-      const quantity = Math.max(1, qty);
-      const netTotal = basePrice * quantity;
-      
-      if (isBusinessCustomer) {
-        const vatAmount = netTotal * 0.22;
-        const totalWithVat = netTotal + vatAmount;
-        return {
-          basePrice,
-          displayPrice: basePrice * 1.22,
-          formattedDisplayPrice: `€ ${(basePrice * 1.22).toFixed(2)}`,
-          vatAmount,
-          totalWithVat,
-          formattedTotal: `€ ${totalWithVat.toFixed(2)}`,
-          vatLabel: 'con IVA (22%)',
-          isWithVat: true,
-          vatRatePercent: 22,
-        };
-      }
-
-      return {
-        basePrice,
-        displayPrice: basePrice,
-        formattedDisplayPrice: `€ ${basePrice.toFixed(2)}`,
-        vatAmount: 0,
-        totalWithVat: netTotal,
-        formattedTotal: `€ ${netTotal.toFixed(2)}`,
-        vatLabel: 'senza IVA',
-        isWithVat: false,
-        vatRatePercent: 0,
-      };
-    },
-    [isBusinessCustomer]
-  );
-
   return (
     <AdminContext.Provider
       value={{
@@ -635,10 +377,6 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         isAdmin,
         isSuperAdmin,
         isSupabaseConnected,
-        isBusinessCustomer,
-        isPrivateCustomer,
-        customerVatRate,
-        formatProductPrice,
         loginAsAdmin,
         loginAsUser,
         logout,
@@ -653,13 +391,6 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         updateCategory,
         addCategory,
         deleteCategory,
-        addSubCategory,
-        updateSubCategory,
-        deleteSubCategory,
-        addSubSubCategory,
-        updateSubSubCategory,
-        deleteSubSubCategory,
-        updateCategoryImageFromPc,
         updateOrder,
         deleteOrder,
         createOrder,
