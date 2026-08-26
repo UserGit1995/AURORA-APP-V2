@@ -178,9 +178,9 @@ export const Header: React.FC<HeaderProps> = ({
   }, []);
 
   return (
-    <header className="sticky top-0 z-30 w-full bg-[#050b17]/90 backdrop-blur-md border-b border-[#0e1b30] px-4 lg:px-8 py-3.5 flex items-center justify-between gap-4">
+    <header className="sticky top-0 z-30 w-full bg-[#050b17]/90 backdrop-blur-md border-b border-[#0e1b30] px-4 lg:px-8 py-3 lg:py-3.5 flex flex-wrap lg:flex-nowrap items-center justify-between gap-x-4 gap-y-2.5">
       {/* Mobile Menu Button & Brand Logo */}
-      <div className="flex items-center gap-2.5 lg:hidden">
+      <div className="flex items-center gap-2.5 lg:hidden order-1">
         <button
           id="mobile-menu-toggle"
           onClick={onToggleMobileMenu}
@@ -193,7 +193,7 @@ export const Header: React.FC<HeaderProps> = ({
       </div>
 
       {/* Search Bar & Quick Scan / Voice Search Trigger */}
-      <div className="flex-1 max-w-xl relative">
+      <div className="w-full order-3 lg:order-none lg:w-auto lg:flex-1 max-w-xl relative">
         <div className="relative flex items-center">
           <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
             <Search className="w-4 h-4" />
@@ -334,11 +334,11 @@ export const Header: React.FC<HeaderProps> = ({
           <button
             id="header-quick-reorder-btn"
             onClick={onOpenQuickReorder}
-            className="relative hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-bold text-xs shadow-md shadow-sky-950/50 hover:scale-[1.02] active:scale-[0.98] transition-all"
+            className="relative order-4 inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-bold text-xs shadow-md shadow-sky-950/50 hover:scale-[1.02] active:scale-[0.98] transition-all"
             title={language === 'it' ? "Riordino Rapido fornitura: 1-click senza checkout e senza carte" : "Quick Reorder: 1-click supplies replenishment"}
           >
             <RotateCw className="w-3.5 h-3.5 text-sky-100" />
-            <span className="hidden md:inline">{t('header.quickReorder', 'Riordino Rapido')}</span>
+            <span>{t('header.quickReorder', 'Riordino Rapido')}</span>
           </button>
         )}
 
@@ -359,7 +359,7 @@ export const Header: React.FC<HeaderProps> = ({
         <button
           id="header-notifications-button"
           onClick={onOpenNotifications}
-          className="relative p-2 rounded-full bg-[#0a1424] hover:bg-[#0f1d33] text-slate-300 hover:text-white border border-[#152744] transition-colors"
+          className="relative order-2 p-2 rounded-full bg-[#0a1424] hover:bg-[#0f1d33] text-slate-300 hover:text-white border border-[#152744] transition-colors"
           aria-label="Notifiche"
         >
           <Bell className="w-4 h-4" />
@@ -369,7 +369,7 @@ export const Header: React.FC<HeaderProps> = ({
         </button>
 
         {/* Shopping Cart Button with Badge and Pulse Animation */}
-        <div className="relative">
+        <div className="relative order-2">
           {/* Subtle pulse ring on item addition */}
           <AnimatePresence>
             {isCartPulsing && (
@@ -426,11 +426,11 @@ export const Header: React.FC<HeaderProps> = ({
           <button
             id="header-admin-control-btn"
             onClick={onOpenAdminPanel}
-            className="relative inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-black text-xs shadow-md shadow-sky-950/60 hover:scale-[1.03] active:scale-[0.98] transition-all cursor-pointer border border-sky-300/40"
+            className="relative order-4 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-black text-xs shadow-md shadow-sky-950/60 hover:scale-[1.03] active:scale-[0.98] transition-all cursor-pointer border border-sky-300/40"
             title="Pannello SuperAdmin: Modifica catalogo, prezzi, ordini e impostazioni senza limiti"
           >
             <span className="text-sm">⚡</span>
-            <span className="hidden md:inline uppercase tracking-wider font-extrabold text-[11px]">
+            <span className="uppercase tracking-wider font-extrabold text-[11px]">
               Admin {currentUser?.name ? `(${currentUser.name})` : ''}
             </span>
           </button>
@@ -438,7 +438,7 @@ export const Header: React.FC<HeaderProps> = ({
 
         {/* Profile Info / Login Trigger */}
         {currentUser ? (
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1.5 order-2">
             <button
               id="header-profile-button"
               onClick={onOpenProfile}
@@ -469,7 +469,7 @@ export const Header: React.FC<HeaderProps> = ({
           <button
             id="header-login-btn"
             onClick={onOpenLogin}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#0d1f3b] hover:bg-[#132c52] text-sky-300 hover:text-white border border-sky-500/30 text-xs font-bold transition-all shadow-sm"
+            className="order-2 flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#0d1f3b] hover:bg-[#132c52] text-sky-300 hover:text-white border border-sky-500/30 text-xs font-bold transition-all shadow-sm"
           >
             <LogIn className="w-3.5 h-3.5" />
             <span>{t('auth.login', 'Accedi')}</span>
