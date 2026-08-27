@@ -1,5 +1,6 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { Product, Order, Category, SystemSettings } from '../types';
+import { CATEGORIES as LOCAL_CATEGORIES } from '../data/catalog';
 
 // Valore di riserva noto e corretto per questo progetto: l'URL e la chiave "anon"
 // non sono segreti (sono pensati per essere pubblici nel browser), quindi qui
@@ -106,12 +107,18 @@ function categoryToRow(c: Category) {
 }
 
 function rowToCategory(row: any, countNumber = 0): Category {
+  // Se la categoria nel database non ha ancora un'immagine caricata (es. è
+  // stata creata dalla query di importazione iniziale), usiamo l'immagine
+  // locale della categoria di esempio con lo stesso nome, così non sparisce.
+  const localFallback = LOCAL_CATEGORIES.find(
+    (lc) => lc.name.trim().toLowerCase() === (row.name || '').trim().toLowerCase()
+  );
   return {
     id: row.id,
     name: row.name,
     count: `${countNumber} prodott${countNumber === 1 ? 'o' : 'i'}`,
     countNumber,
-    image: row.image_url || '',
+    image: row.image_url || localFallback?.image || '',
     description: row.description || '',
   };
 }
