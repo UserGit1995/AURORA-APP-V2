@@ -1,10 +1,10 @@
 import { UserProfile } from '../types';
+import { getSupabase } from './supabase';
 
 export interface StoredAccount {
   id: string;
   name: string;
   email: string;
-  passwordHash: string;
   customerType: 'privato' | 'attivita';
   company?: string;
   piva?: string;
@@ -21,136 +21,113 @@ export interface StoredAccount {
 
 const STORAGE_ACCOUNTS_KEY = 'aurora_registered_accounts';
 
-// Retrieve registered accounts from localStorage
+// Recupera i profili "arricchiti" (azienda, P.IVA, ecc.) salvati localmente.
+// L'identità e la password vere restano SEMPRE su Supabase Auth: qui teniamo
+// solo i dati extra che l'app mostra nell'interfaccia.
 export function getRegisteredAccounts(): StoredAccount[] {
   try {
     const raw = localStorage.getItem(STORAGE_ACCOUNTS_KEY);
-    if (raw) {
-      return JSON.parse(raw);
-    }
+    if (raw) return JSON.parse(raw);
   } catch (e) {
     console.warn('Error reading accounts from storage', e);
   }
   return [];
 }
 
-// Convert StoredAccount to public UserProfile
-export function toUserProfile(account: StoredAccount): UserProfile {
-  const isSuper = account.role === 'superadmin';
+function saveAccount(account: StoredAccount) {
+  const accounts = getRegisteredAccounts().filter((a) => a.id !== account.id);
+  accounts.push(account);
+  try {
+    localStorage.setItem(STORAGE_ACCOUNTS_KEY, JSON.stringify(accounts));
+  } catch (e) {
+    console.error('Failed to save account profile', e);
+  }
+}
+
+async function isRealAdmin(userId: string): Promise<boolean> {
+  const sb = getSupabase();
+  if (!sb) return false;
+  try {
+    const { data, error } = await sb
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', userId)
+      .eq('role', 'admin')
+      .maybeSingle();
+    if (error) return false;
+    return !!data;
+  } catch {
+    return false;
+  }
+}
+
+function buildProfile(userId: string, email: string, isAdmin: boolean, extra?: Partial<StoredAccount>): UserProfile {
+  const stored = getRegisteredAccounts().find((a) => a.id === userId);
+  const name = extra?.name || stored?.name || email.split('@')[0];
   return {
-    id: account.id,
-    name: account.name,
-    email: account.email,
-    customerType: account.customerType || (account.company ? 'attivita' : 'privato'),
-    company: account.company || (account.customerType === 'privato' ? 'Cliente Privato (Casalinghi)' : 'Attività'),
-    piva: account.piva || '',
-    role: account.role,
-    avatarInitials: account.avatarInitials,
-    phone: account.phone || '',
-    address: account.address || '',
-    city: account.city || '',
-    postalCode: account.postalCode || '',
-    province: account.province || '',
-    country: account.country || 'Italia',
+    id: userId,
+    name,
+    email,
+    customerType: extra?.customerType || stored?.customerType || 'privato',
+    company: extra?.company || stored?.company || (isAdmin ? 'AURORA Casalinghi & Distribuzione' : 'Cliente Privato (Casalinghi)'),
+    piva: extra?.piva || stored?.piva || '',
+    role: isAdmin ? 'superadmin' : 'user',
+    avatarInitials: name.substring(0, 2).toUpperCase(),
+    phone: extra?.phone || stored?.phone || '',
+    address: stored?.address || '',
+    city: extra?.city || stored?.city || '',
+    postalCode: stored?.postalCode || '',
+    province: stored?.province || '',
+    country: stored?.country || 'Italia',
     permissions: {
-      canEditCatalog: isSuper,
-      canEditPrices: isSuper,
-      canEditStock: isSuper,
-      canEditOrders: isSuper,
-      canEditUsers: isSuper,
-      canEditCompanyInfo: isSuper,
-      canDeleteRecords: isSuper,
-      canOverrideDiscounts: isSuper,
+      canEditCatalog: isAdmin,
+      canEditPrices: isAdmin,
+      canEditStock: isAdmin,
+      canEditOrders: isAdmin,
+      canEditUsers: isAdmin,
+      canEditCompanyInfo: isAdmin,
+      canDeleteRecords: isAdmin,
+      canOverrideDiscounts: isAdmin,
     },
   };
 }
 
-// Authenticate user with verification against registered accounts and SuperAdmin credentials
-export function authenticateUser(
+/**
+ * Login vero: stabilisce una sessione reale su Supabase (necessaria perché il
+ * database accetti i salvataggi). Prima l'app non lo faceva mai: sembrava
+ * "loggato" ma era solo un'etichetta locale, e ogni scrittura veniva rifiutata.
+ */
+export async function authenticateUser(
   emailInput: string,
   passwordInput: string
-): { success: boolean; user?: UserProfile; error?: string } {
+): Promise<{ success: boolean; user?: UserProfile; error?: string }> {
   const cleanEmail = emailInput.trim().toLowerCase();
   const cleanPass = passwordInput.trim();
 
-  if (!cleanEmail) {
-    return { success: false, error: 'Inserisci il tuo indirizzo email.' };
-  }
-  if (!cleanPass) {
-    return { success: false, error: 'Inserisci la tua password.' };
-  }
+  if (!cleanEmail) return { success: false, error: 'Inserisci il tuo indirizzo email.' };
+  if (!cleanPass) return { success: false, error: 'Inserisci la tua password.' };
 
-  // 1. Dedicated SuperAdmin authentication for Noemi
-  if (cleanEmail === 'noemi@aurora.app') {
-    const accounts = getRegisteredAccounts();
-    const savedAdmin = accounts.find((a) => a.email.toLowerCase() === 'noemi@aurora.app');
-
-    const isValidAdminPass =
-      cleanPass === 'amministratriceappaurora' ||
-      (savedAdmin && savedAdmin.passwordHash === cleanPass);
-
-    if (!isValidAdminPass) {
-      return {
-        success: false,
-        error: 'Password di amministrazione non corretta.',
-      };
-    }
-
-    const adminUser: UserProfile = {
-      id: 'admin-noemi',
-      name: savedAdmin?.name || 'Noemi',
-      email: 'noemi@aurora.app',
-      customerType: 'attivita',
-      company: savedAdmin?.company || 'AURORA Casalinghi & Distribuzione',
-      piva: savedAdmin?.piva || 'IT09876543210',
-      role: 'superadmin',
-      avatarInitials: 'NO',
-      phone: savedAdmin?.phone || '+39 02 9876543',
-      address: savedAdmin?.address || 'Via dell\'Industria 45',
-      city: savedAdmin?.city || 'Milano',
-      country: 'Italia',
-      permissions: {
-        canEditCatalog: true,
-        canEditPrices: true,
-        canEditStock: true,
-        canEditOrders: true,
-        canEditUsers: true,
-        canEditCompanyInfo: true,
-        canDeleteRecords: true,
-        canOverrideDiscounts: true,
-      },
-    };
-
-    return { success: true, user: adminUser };
+  const sb = getSupabase();
+  if (!sb) {
+    return { success: false, error: 'Connessione al database non disponibile. Riprova tra poco.' };
   }
 
-  // 2. Strictly look up registered accounts in storage
-  const accounts = getRegisteredAccounts();
-  const found = accounts.find((a) => a.email.toLowerCase() === cleanEmail);
-
-  if (!found) {
-    return {
-      success: false,
-      error:
-        'Account non trovato. Se non sei ancora registrato, clicca sulla scheda "Registrati" per creare il tuo account.',
-    };
+  const { data, error } = await sb.auth.signInWithPassword({ email: cleanEmail, password: cleanPass });
+  if (error || !data.user) {
+    return { success: false, error: 'Email o password non corrette.' };
   }
 
-  if (found.passwordHash !== cleanPass) {
-    return {
-      success: false,
-      error: 'Password errata. Controlla e riprova.',
-    };
-  }
-
-  return {
-    success: true,
-    user: toUserProfile(found),
-  };
+  const admin = await isRealAdmin(data.user.id);
+  return { success: true, user: buildProfile(data.user.id, cleanEmail, admin) };
 }
 
-// Register a new user (supports both Private Household customer and Business/Supplier customer)
-export function registerNewUser(data: {
+/**
+ * Registrazione vera: crea un account reale su Supabase Auth. Il ruolo admin
+ * NON si può più assegnare da un "codice segreto" nel codice del browser
+ * (chiunque avrebbe potuto leggerlo e auto-promuoversi admin) — va assegnato
+ * una volta sola dal pannello Supabase, vedi le istruzioni che ti ho scritto.
+ */
+export async function registerNewUser(data: {
   customerType: 'privato' | 'attivita';
   name: string;
   email: string;
@@ -159,37 +136,29 @@ export function registerNewUser(data: {
   piva?: string;
   phone?: string;
   city?: string;
-  adminCode?: string;
-}): { success: boolean; user?: UserProfile; error?: string } {
+}): Promise<{ success: boolean; user?: UserProfile; error?: string }> {
   const cleanEmail = data.email.trim().toLowerCase();
   const cleanName = data.name.trim();
   const cleanPass = data.password.trim();
   const customerType = data.customerType || 'privato';
 
   if (!cleanName || cleanName.length < 2) {
-    return {
-      success: false,
-      error: customerType === 'privato' ? 'Inserisci il tuo Nome e Cognome.' : 'Inserisci il nome del referente aziendale.',
-    };
+    return { success: false, error: customerType === 'privato' ? 'Inserisci il tuo Nome e Cognome.' : 'Inserisci il nome del referente aziendale.' };
   }
-
   if (!cleanEmail || !cleanEmail.includes('@')) {
     return { success: false, error: 'Inserisci un indirizzo email valido.' };
   }
-
-  if (!cleanPass || cleanPass.length < 4) {
-    return { success: false, error: 'La password deve avere almeno 4 caratteri.' };
+  if (!cleanPass || cleanPass.length < 6) {
+    return { success: false, error: 'La password deve avere almeno 6 caratteri.' };
   }
 
   let cleanCompany = '';
   let cleanPiva = '';
-
   if (customerType === 'attivita') {
     cleanCompany = (data.company || '').trim();
     cleanPiva = (data.piva || '').trim().toUpperCase();
-
     if (!cleanCompany || cleanCompany.length < 2) {
-      return { success: false, error: 'Inserisci la Ragione Sociale / Nome dell\'attività.' };
+      return { success: false, error: "Inserisci la Ragione Sociale / Nome dell'attività." };
     }
     if (!cleanPiva || cleanPiva.length < 5) {
       return { success: false, error: 'Inserisci una Partita IVA o Codice Fiscale valido.' };
@@ -198,47 +167,53 @@ export function registerNewUser(data: {
     cleanCompany = 'Cliente Privato (Famiglia / Casalinghi)';
   }
 
-  const accounts = getRegisteredAccounts();
-  const alreadyExists = accounts.some((a) => a.email.toLowerCase() === cleanEmail);
-
-  if (alreadyExists) {
-    return {
-      success: false,
-      error: 'Questa email è già registrata. Clicca su "Accedi" per entrare.',
-    };
+  const sb = getSupabase();
+  if (!sb) {
+    return { success: false, error: 'Connessione al database non disponibile. Riprova tra poco.' };
   }
 
-  // Verify admin authorization
-  const isSuperAdminAccount =
-    cleanEmail === 'noemi@aurora.app' ||
-    data.adminCode?.trim() === 'AURORA_ADMIN_2026' ||
-    data.adminCode?.trim() === 'admin2026';
+  const { data: signUpData, error } = await sb.auth.signUp({ email: cleanEmail, password: cleanPass });
+  if (error) {
+    if (error.message.toLowerCase().includes('already') || error.message.toLowerCase().includes('registered')) {
+      return { success: false, error: 'Questa email è già registrata. Clicca su "Accedi" per entrare.' };
+    }
+    return { success: false, error: error.message };
+  }
+  if (!signUpData.user) {
+    return { success: false, error: 'Registrazione non riuscita. Riprova.' };
+  }
 
-  const newAccount: StoredAccount = {
-    id: `usr_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
+  const account: StoredAccount = {
+    id: signUpData.user.id,
     name: cleanName,
     customerType,
     company: cleanCompany,
     piva: cleanPiva,
     email: cleanEmail,
-    passwordHash: cleanPass,
-    role: isSuperAdminAccount ? 'superadmin' : 'user',
+    role: 'user',
     createdAt: new Date().toISOString(),
     avatarInitials: cleanName.substring(0, 2).toUpperCase(),
     phone: data.phone?.trim() || '',
     city: data.city?.trim() || '',
     country: 'Italia',
   };
+  saveAccount(account);
 
-  const updatedAccounts = [...accounts, newAccount];
-  try {
-    localStorage.setItem(STORAGE_ACCOUNTS_KEY, JSON.stringify(updatedAccounts));
-  } catch (e) {
-    console.error('Failed to save account', e);
-  }
+  return { success: true, user: buildProfile(signUpData.user.id, cleanEmail, false, account) };
+}
 
-  return {
-    success: true,
-    user: toUserProfile(newAccount),
-  };
+/** Recupera l'utente già loggato (sessione persistita) al riavvio dell'app. */
+export async function getCurrentSessionUser(): Promise<UserProfile | null> {
+  const sb = getSupabase();
+  if (!sb) return null;
+  const { data } = await sb.auth.getSession();
+  const user = data.session?.user;
+  if (!user || !user.email) return null;
+  const admin = await isRealAdmin(user.id);
+  return buildProfile(user.id, user.email, admin);
+}
+
+export async function signOutUser(): Promise<void> {
+  const sb = getSupabase();
+  if (sb) await sb.auth.signOut();
 }

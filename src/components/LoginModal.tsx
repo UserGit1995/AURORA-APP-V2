@@ -65,70 +65,64 @@ export const LoginModal: React.FC<LoginModalProps> = ({
     setSuccessMessage(null);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     resetFormState();
     setIsLoading(true);
 
-    setTimeout(() => {
-      if (authMode === 'login') {
-        const authResult = authenticateUser(email, password);
-        setIsLoading(false);
+    if (authMode === 'login') {
+      const authResult = await authenticateUser(email, password);
+      setIsLoading(false);
 
-        if (!authResult.success || !authResult.user) {
-          setErrorMessage(authResult.error || 'Credenziali di accesso non valide.');
-          return;
-        }
-
-        const isSuperAdmin = authResult.user.role === 'superadmin';
-        setSuccessMessage(
-          isSuperAdmin
-            ? `Accesso Amministratore autorizzato. Benvenuta ${authResult.user.name}!`
-            : `Benvenuto ${authResult.user.name}! Accesso effettuato con successo.`
-        );
-
-        setTimeout(() => {
-          if (onLoginSuccess) {
-            onLoginSuccess(authResult.user!);
-          }
-          onClose();
-        }, 750);
-      } else {
-        // Registration mode
-        const regResult = registerNewUser({
-          customerType,
-          name,
-          company: customerType === 'attivita' ? company : undefined,
-          piva: customerType === 'attivita' ? piva : undefined,
-          phone,
-          email,
-          password,
-          adminCode: adminCode.trim() || undefined,
-        });
-        setIsLoading(false);
-
-        if (!regResult.success || !regResult.user) {
-          setErrorMessage(regResult.error || 'Errore durante la registrazione.');
-          return;
-        }
-
-        const isSuperAdmin = regResult.user.role === 'superadmin';
-        setSuccessMessage(
-          isSuperAdmin
-            ? `Registrazione Amministratore completata con successo!`
-            : customerType === 'privato'
-            ? `Registrazione completata! Benvenuto in AURORA Casalinghi.`
-            : `Registrazione aziendale B2B completata con successo!`
-        );
-
-        setTimeout(() => {
-          if (onLoginSuccess) {
-            onLoginSuccess(regResult.user!);
-          }
-          onClose();
-        }, 850);
+      if (!authResult.success || !authResult.user) {
+        setErrorMessage(authResult.error || 'Credenziali di accesso non valide.');
+        return;
       }
-    }, 400);
+
+      const isSuperAdmin = authResult.user.role === 'superadmin';
+      setSuccessMessage(
+        isSuperAdmin
+          ? `Accesso Amministratore autorizzato. Benvenuta ${authResult.user.name}!`
+          : `Benvenuto ${authResult.user.name}! Accesso effettuato con successo.`
+      );
+
+      setTimeout(() => {
+        if (onLoginSuccess) {
+          onLoginSuccess(authResult.user!);
+        }
+        onClose();
+      }, 750);
+    } else {
+      // Registration mode
+      const regResult = await registerNewUser({
+        customerType,
+        name,
+        company: customerType === 'attivita' ? company : undefined,
+        piva: customerType === 'attivita' ? piva : undefined,
+        phone,
+        email,
+        password,
+      });
+      setIsLoading(false);
+
+      if (!regResult.success || !regResult.user) {
+        setErrorMessage(regResult.error || 'Errore durante la registrazione.');
+        return;
+      }
+
+      setSuccessMessage(
+        customerType === 'privato'
+          ? `Registrazione completata! Benvenuto in AURORA Casalinghi.`
+          : `Registrazione aziendale B2B completata con successo!`
+      );
+
+      setTimeout(() => {
+        if (onLoginSuccess) {
+          onLoginSuccess(regResult.user!);
+        }
+        onClose();
+      }, 850);
+    }
   };
 
   return (
