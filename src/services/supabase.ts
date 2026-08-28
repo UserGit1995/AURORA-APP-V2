@@ -1,5 +1,5 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { Product, Order, Category, SystemSettings } from '../types';
+import { Product, Order, Category, SystemSettings, Subcategory } from '../types';
 import { CATEGORIES as LOCAL_CATEGORIES } from '../data/catalog';
 
 // Valore di riserva noto e corretto per questo progetto: l'URL e la chiave "anon"
@@ -48,6 +48,7 @@ function productToRow(p: Product) {
     name: p.name,
     description: p.description ?? null,
     category_id: p.categoryId || null,
+    subcategory_id: p.subcategoryId || null,
     price: p.price,
     discount_price: p.discountPercent ? +(p.price * (1 - p.discountPercent / 100)).toFixed(2) : null,
     image_url: p.image || null,
@@ -75,6 +76,7 @@ function rowToProduct(row: any, categoryName?: string): Product {
     name: row.name,
     category: categoryName || '',
     categoryId: row.category_id || '',
+    subcategoryId: row.subcategory_id || null,
     image: row.image_url || '',
     price: Number(row.price),
     unit: extra.unit || 'pz',
@@ -297,6 +299,87 @@ export async function deleteSupabaseCategory(categoryId: string): Promise<boolea
 /**
  * Sync system settings to Supabase
  */
+// ---------------------------------------------------------------------------
+// Sottocategorie (e sotto-sottocategorie tramite parentSubcategoryId)
+// ---------------------------------------------------------------------------
+
+function subcategoryToRow(s: Subcategory) {
+  const slug = (s.slug || s.name)
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '');
+  return {
+    id: s.id,
+    category_id: s.categoryId,
+    parent_subcategory_id: s.parentSubcategoryId || null,
+    name: s.name,
+    slug,
+    sort_order: s.sortOrder ?? 0,
+    active: s.active ?? true,
+  };
+}
+
+function rowToSubcategory(row: any): Subcategory {
+  return {
+    id: row.id,
+    categoryId: row.category_id,
+    parentSubcategoryId: row.parent_subcategory_id || null,
+    name: row.name,
+    slug: row.slug,
+    sortOrder: row.sort_order ?? 0,
+    active: !!row.active,
+  };
+}
+
+export async function fetchSupabaseSubcategories(): Promise<Subcategory[] | null> {
+  const sb = getSupabase();
+  if (!sb) return null;
+  try {
+    const { data, error } = await sb.from('subcategories').select('*').eq('active', true).order('sort_order');
+    if (error) {
+      console.warn('Supabase fetch subcategories notice:', error.message);
+      return null;
+    }
+    return (data ?? []).map(rowToSubcategory);
+  } catch (e) {
+    console.warn('Supabase subcategories fetch failed:', e);
+    return null;
+  }
+}
+
+export async function syncSupabaseSubcategory(sub: Subcategory): Promise<boolean> {
+  const sb = getSupabase();
+  if (!sb) return false;
+  try {
+    const { error } = await sb.from('subcategories').upsert(subcategoryToRow(sub));
+    if (error) {
+      console.error('Supabase sync subcategory FAILED:', error.message, error);
+      return false;
+    }
+    return true;
+  } catch (e) {
+    console.error('Supabase sync subcategory error:', e);
+    return false;
+  }
+}
+
+export async function deleteSupabaseSubcategory(id: string): Promise<boolean> {
+  const sb = getSupabase();
+  if (!sb) return false;
+  try {
+    const { error } = await sb.from('subcategories').delete().eq('id', id);
+    if (error) {
+      console.error('Supabase delete subcategory FAILED:', error.message);
+      return false;
+    }
+    return true;
+  } catch (e) {
+    console.error('Supabase delete subcategory error:', e);
+    return false;
+  }
+}
+
 export async function syncSupabaseSettings(settings: SystemSettings): Promise<boolean> {
   const sb = getSupabase();
   if (!sb) return false;

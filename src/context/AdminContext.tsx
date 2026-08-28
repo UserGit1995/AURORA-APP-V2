@@ -1,15 +1,18 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { UserProfile, SystemSettings, Product, Order, Category } from '../types';
+import { UserProfile, SystemSettings, Product, Order, Category, Subcategory } from '../types';
 import { PRODUCTS, CATEGORIES, INITIAL_ORDERS } from '../data/catalog';
 import { 
   isSupabaseConfigured, 
   fetchSupabaseProducts, 
   fetchSupabaseCategories, 
   fetchSupabaseOrders,
+  fetchSupabaseSubcategories,
   syncSupabaseProduct,
   deleteSupabaseProduct,
   syncSupabaseCategory,
   deleteSupabaseCategory,
+  syncSupabaseSubcategory,
+  deleteSupabaseSubcategory,
   syncSupabaseOrder,
   syncSupabaseSettings,
   newDbId
@@ -28,6 +31,10 @@ interface AdminContextType {
   // Master Editable Data States
   productsList: Product[];
   categoriesList: Category[];
+  subcategoriesList: Subcategory[];
+  addSubcategory: (s: Omit<Subcategory, 'id'>) => Subcategory;
+  updateSubcategory: (s: Subcategory) => void;
+  deleteSubcategory: (id: string) => void;
   ordersList: Order[];
   systemSettings: SystemSettings;
   
@@ -135,6 +142,16 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   });
 
+  const [subcategoriesList, setSubcategoriesList] = useState<Subcategory[]>(() => {
+    try {
+      const saved = localStorage.getItem('aurora_admin_subcategories');
+      if (saved) return JSON.parse(saved);
+      return [];
+    } catch {
+      return [];
+    }
+  });
+
   const [ordersList, setOrdersList] = useState<Order[]>(() => {
     try {
       const saved = localStorage.getItem('aurora_admin_orders');
@@ -186,6 +203,14 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   useEffect(() => {
     try {
+      localStorage.setItem('aurora_admin_subcategories', JSON.stringify(subcategoriesList));
+    } catch (e) {
+      console.warn('Subcategory sync failed', e);
+    }
+  }, [subcategoriesList]);
+
+  useEffect(() => {
+    try {
       localStorage.setItem('aurora_admin_orders', JSON.stringify(ordersList));
     } catch (e) {
       console.warn('Order sync failed', e);
@@ -206,9 +231,10 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const refreshFromCloud = useCallback(async () => {
     if (!isSupabaseConfigured()) return;
     try {
-      const [cloudProducts, cloudCategories, cloudOrders] = await Promise.all([
+      const [cloudProducts, cloudCategories, cloudSubcategories, cloudOrders] = await Promise.all([
         fetchSupabaseProducts(),
         fetchSupabaseCategories(),
+        fetchSupabaseSubcategories(),
         fetchSupabaseOrders(),
       ]);
 
@@ -217,6 +243,9 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       }
       if (cloudCategories && cloudCategories.length > 0) {
         setCategoriesList(cloudCategories);
+      }
+      if (cloudSubcategories) {
+        setSubcategoriesList(cloudSubcategories);
       }
       if (cloudOrders && cloudOrders.length > 0) {
         setOrdersList(cloudOrders);
@@ -338,6 +367,26 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     deleteSupabaseCategory(categoryId);
   };
 
+  // Subcategory CRUD (parentSubcategoryId presente = sotto-sottocategoria)
+  const addSubcategory = (newSub: Omit<Subcategory, 'id'>): Subcategory => {
+    const full: Subcategory = { ...newSub, id: newDbId() };
+    setSubcategoriesList((prev) => [...prev, full]);
+    syncSupabaseSubcategory(full);
+    return full;
+  };
+
+  const updateSubcategory = (updated: Subcategory) => {
+    setSubcategoriesList((prev) => prev.map((s) => (s.id === updated.id ? updated : s)));
+    syncSupabaseSubcategory(updated);
+  };
+
+  const deleteSubcategory = (id: string) => {
+    // Elimina anche eventuali sotto-sottocategorie figlie (in locale; il
+    // database lo fa già da solo grazie a ON DELETE CASCADE)
+    setSubcategoriesList((prev) => prev.filter((s) => s.id !== id && s.parentSubcategoryId !== id));
+    deleteSupabaseSubcategory(id);
+  };
+
   // Order CRUD
   const updateOrder = (updated: Order) => {
     setOrdersList((prev) => prev.map((o) => (o.id === updated.id ? updated : o)));
@@ -383,6 +432,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         toggleAdminMode,
         productsList,
         categoriesList,
+        subcategoriesList,
         ordersList,
         systemSettings,
         updateProduct,
@@ -391,6 +441,9 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         updateCategory,
         addCategory,
         deleteCategory,
+        addSubcategory,
+        updateSubcategory,
+        deleteSubcategory,
         updateOrder,
         deleteOrder,
         createOrder,
