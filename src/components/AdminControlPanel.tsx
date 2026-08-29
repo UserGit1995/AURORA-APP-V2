@@ -23,6 +23,7 @@ import { ProductEditModal } from './ProductEditModal';
 import { OrderEditModal } from './OrderEditModal';
 import { ProductImageUploader } from './ProductImageUploader';
 import { SubcategoryManager } from './SubcategoryManager';
+import { ImageImportTool } from './ImageImportTool';
 import { Product, Order, Category } from '../types';
 
 interface AdminControlPanelProps {
@@ -55,7 +56,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
 
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const [activeTab, setActiveTab] = useState<'products' | 'orders' | 'categories' | 'subcategories' | 'settings' | 'user'>('products');
+  const [activeTab, setActiveTab] = useState<'products' | 'orders' | 'categories' | 'subcategories' | 'images' | 'settings' | 'user'>('products');
   
   // Modals inside admin
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
@@ -253,6 +254,19 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
           >
             <Tag className="w-4 h-4 text-amber-400" />
             <span>Sottocategorie ({subcategoriesList.length})</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab('images')}
+            className={`flex items-center gap-2 px-4 py-2.5 text-xs sm:text-sm font-bold border-b-2 transition-all whitespace-nowrap ${
+              activeTab === 'images'
+                ? 'border-amber-400 text-amber-300 bg-amber-500/10 rounded-t-xl'
+                : 'border-transparent text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            <Tag className="w-4 h-4 text-amber-400" />
+            <span>Importa Immagini</span>
           </button>
 
           <button
@@ -553,6 +567,9 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
 
         {/* Tab: Sottocategorie */}
         {activeTab === 'subcategories' && <SubcategoryManager />}
+
+        {/* Tab: Importa Immagini */}
+        {activeTab === 'images' && <ImageImportTool />}
 
         {/* Tab 4: System B2B Settings */}
         {activeTab === 'settings' && (
