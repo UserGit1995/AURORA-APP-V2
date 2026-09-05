@@ -1,24 +1,21 @@
 import React, { useState, useMemo } from 'react';
-import { 
-  X, 
-  ShieldCheck, 
-  Sparkles, 
-  Sliders, 
-  Package, 
-  Tag, 
-  Building2, 
-  FileText, 
-  Plus, 
-  Edit3, 
-  Trash2, 
-  RotateCcw, 
-  Check, 
+import {
+  X,
+  Cloud,
+  CloudOff,
+  Package,
+  ListOrdered,
+  FolderTree,
+  Image as ImageIcon,
+  SlidersHorizontal,
+  Plus,
+  Edit3,
+  Trash2,
+  RotateCcw,
+  Check,
   Save,
-  Users,
-  Settings,
-  DollarSign,
   Search,
-  XCircle
+  XCircle,
 } from 'lucide-react';
 import { useAdmin } from '../context/AdminContext';
 import { ProductEditModal } from './ProductEditModal';
@@ -26,20 +23,33 @@ import { OrderEditModal } from './OrderEditModal';
 import { ProductImageUploader } from './ProductImageUploader';
 import { SubcategoryManager } from './SubcategoryManager';
 import { ImageImportTool } from './ImageImportTool';
-import { Product, Order, Category } from '../types';
+import { Product, Order } from '../types';
 
 interface AdminControlPanelProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
-  isOpen,
-  onClose,
-}) => {
+// Stessa struttura/logica di sempre: qui cambia solo l'aspetto — via gradienti,
+// scritte tutte maiuscole e badge finti, dentro una gerarchia visiva più semplice
+// da leggere: un solo colore d'accento (indigo), colori di stato usati solo dove
+// hanno un vero significato (stock basso, ordine spedito, ecc.).
+const TAB_BUTTON = (active: boolean) =>
+  `flex items-center gap-2 px-4 py-2.5 text-sm font-semibold border-b-2 transition-colors whitespace-nowrap ${
+    active ? 'border-indigo-400 text-white' : 'border-transparent text-slate-400 hover:text-slate-200'
+  }`;
+
+const PANEL_CARD = 'bg-[#111826] border border-[#232b3a] rounded-2xl';
+const INPUT = 'bg-[#0b111c] border border-[#232b3a] rounded-lg px-3.5 py-2 text-white text-sm outline-none focus:border-indigo-400/60 transition-colors';
+const LABEL = 'block text-xs font-medium text-slate-400 mb-1';
+const BTN_PRIMARY = 'px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm rounded-lg flex items-center gap-1.5 transition-colors cursor-pointer';
+const BTN_SECONDARY = 'px-3 py-1.5 rounded-lg bg-[#1a2230] hover:bg-[#212b3c] text-slate-300 text-sm font-medium border border-[#2a3444] transition-colors flex items-center gap-1.5';
+const ICON_BTN = 'p-1.5 rounded-lg bg-[#1a2230] text-slate-400 hover:text-white transition-colors';
+const ICON_BTN_DANGER = 'p-1.5 rounded-lg bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 transition-colors';
+
+export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({ isOpen, onClose }) => {
   const {
     currentUser,
-    isAdmin,
     isSupabaseConnected,
     productsList,
     categoriesList,
@@ -52,13 +62,10 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
     deleteCategory,
     resetToDefaults,
     refreshFromCloud,
-    loginAsAdmin,
-    logout,
   } = useAdmin();
 
   const [isRefreshing, setIsRefreshing] = useState(false);
-
-  const [activeTab, setActiveTab] = useState<'products' | 'orders' | 'categories' | 'subcategories' | 'images' | 'settings' | 'user'>('products');
+  const [activeTab, setActiveTab] = useState<'products' | 'orders' | 'categories' | 'subcategories' | 'images' | 'settings'>('products');
   const [productSearch, setProductSearch] = useState('');
 
   // Ricerca articoli nel pannello admin: nome, codice/SKU, categoria, marca/tipologia.
@@ -75,7 +82,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
       );
     });
   }, [productsList, productSearch]);
-  
+
   // Modals inside admin
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
@@ -151,42 +158,38 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/85 backdrop-blur-sm overflow-y-auto">
-      <div 
-        className="relative w-full max-w-5xl bg-[#050b17] border-2 border-amber-500/40 rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[94vh]"
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/70 backdrop-blur-sm overflow-y-auto">
+      <div
+        className="relative w-full max-w-5xl bg-[#0b0f17] border border-[#232b3a] rounded-2xl overflow-hidden shadow-2xl flex flex-col max-h-[94vh]"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Top SuperAdmin Banner */}
-        <div className="p-4 sm:p-5 border-b border-amber-500/30 bg-gradient-to-r from-[#0a152e] via-[#102347] to-[#0a152e] flex flex-wrap items-center justify-between gap-3 shrink-0">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 border border-amber-500/40 flex items-center justify-center font-bold text-xl shadow-lg shadow-amber-950/50 shrink-0">
-              ⚡
+        {/* Header */}
+        <div className="p-4 sm:p-5 border-b border-[#1c2433] flex flex-wrap items-center justify-between gap-3 shrink-0">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-10 h-10 rounded-xl bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 flex items-center justify-center shrink-0">
+              <SlidersHorizontal className="w-5 h-5" />
             </div>
-            <div>
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-[10.5px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold flex items-center gap-1">
-                  <ShieldCheck className="w-3.5 h-3.5 text-amber-400" /> SuperAdmin Unlimited Root
-                </span>
+            <div className="min-w-0">
+              <h2 className="text-base sm:text-lg font-bold text-white leading-tight">
+                Pannello di gestione
+              </h2>
+              <div className="flex items-center gap-2 text-xs text-slate-400 mt-0.5">
+                <span className="truncate">{currentUser?.name} · {currentUser?.role}</span>
+                <span className="text-slate-600">•</span>
                 {isSupabaseConnected ? (
-                  <span className="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> Supabase Cloud Sync Attivo
+                  <span className="flex items-center gap-1 text-emerald-400">
+                    <Cloud className="w-3.5 h-3.5" /> Cloud connesso
                   </span>
                 ) : (
-                  <span className="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/40 font-bold flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-blue-400" /> Storage Mode Locale
+                  <span className="flex items-center gap-1 text-slate-500">
+                    <CloudOff className="w-3.5 h-3.5" /> Modalità locale
                   </span>
                 )}
-                <span className="text-xs text-slate-400 font-mono hidden sm:inline">
-                  Utente: <strong className="text-white">{currentUser?.name}</strong> ({currentUser?.role})
-                </span>
               </div>
-              <h2 className="text-lg sm:text-xl font-black text-white tracking-tight mt-0.5">
-                Pannello di Controllo & Modifica Totale Sistema
-              </h2>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0">
             {isSupabaseConnected && (
               <button
                 type="button"
@@ -196,24 +199,24 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
                   setTimeout(() => setIsRefreshing(false), 500);
                 }}
                 disabled={isRefreshing}
-                className="px-3 py-1.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 text-xs font-semibold border border-emerald-500/40 transition-all flex items-center gap-1"
+                className={BTN_SECONDARY}
                 title="Sincronizza e scarica dati da Supabase"
               >
-                <Sparkles className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin' : ''}`} />
-                <span className="hidden md:inline">{isRefreshing ? 'Sincronizzazione...' : 'Sync Cloud'}</span>
+                <RotateCcw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin' : ''}`} />
+                <span className="hidden md:inline">{isRefreshing ? 'Sincronizzo…' : 'Aggiorna dati'}</span>
               </button>
             )}
             <button
               onClick={resetToDefaults}
-              className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold border border-slate-700 transition-all flex items-center gap-1"
-              title="Ripristina valori originali del database di test"
+              className={BTN_SECONDARY}
+              title="Ripristina i valori originali del database di test"
             >
-              <RotateCcw className="w-3.5 h-3.5" />
-              <span className="hidden md:inline">Reset Dati</span>
+              <span className="hidden md:inline">Ripristina dati di test</span>
+              <span className="md:hidden">Ripristina</span>
             </button>
             <button
               onClick={onClose}
-              className="p-2 rounded-full bg-[#0d1c38] text-slate-400 hover:text-white border border-[#1b345b] transition-colors"
+              className="p-2 rounded-full bg-[#1a2230] text-slate-400 hover:text-white transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
@@ -221,105 +224,44 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
         </div>
 
         {/* Tab Selector Navigation */}
-        <div className="px-4 sm:px-6 pt-3 border-b border-[#122340] bg-[#071122] flex items-center gap-2 overflow-x-auto no-scrollbar shrink-0">
-          <button
-            type="button"
-            onClick={() => setActiveTab('products')}
-            className={`flex items-center gap-2 px-4 py-2.5 text-xs sm:text-sm font-bold border-b-2 transition-all whitespace-nowrap ${
-              activeTab === 'products'
-                ? 'border-amber-400 text-amber-300 bg-amber-500/10 rounded-t-xl'
-                : 'border-transparent text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            <Package className="w-4 h-4 text-amber-400" />
-            <span>Prodotti & Prezzi ({productsList.length})</span>
+        <div className="px-4 sm:px-6 border-b border-[#1c2433] bg-[#0b0f17] flex items-center gap-1 overflow-x-auto no-scrollbar shrink-0">
+          <button type="button" onClick={() => setActiveTab('products')} className={TAB_BUTTON(activeTab === 'products')}>
+            <Package className="w-4 h-4" />
+            <span>Prodotti ({productsList.length})</span>
           </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveTab('orders')}
-            className={`flex items-center gap-2 px-4 py-2.5 text-xs sm:text-sm font-bold border-b-2 transition-all whitespace-nowrap ${
-              activeTab === 'orders'
-                ? 'border-amber-400 text-amber-300 bg-amber-500/10 rounded-t-xl'
-                : 'border-transparent text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            <FileText className="w-4 h-4 text-amber-400" />
-            <span>Ordini & Stati ({ordersList.length})</span>
+          <button type="button" onClick={() => setActiveTab('orders')} className={TAB_BUTTON(activeTab === 'orders')}>
+            <ListOrdered className="w-4 h-4" />
+            <span>Ordini ({ordersList.length})</span>
           </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveTab('categories')}
-            className={`flex items-center gap-2 px-4 py-2.5 text-xs sm:text-sm font-bold border-b-2 transition-all whitespace-nowrap ${
-              activeTab === 'categories'
-                ? 'border-amber-400 text-amber-300 bg-amber-500/10 rounded-t-xl'
-                : 'border-transparent text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            <Tag className="w-4 h-4 text-amber-400" />
-            <span>Categorie Catalogo ({categoriesList.length})</span>
+          <button type="button" onClick={() => setActiveTab('categories')} className={TAB_BUTTON(activeTab === 'categories')}>
+            <FolderTree className="w-4 h-4" />
+            <span>Categorie ({categoriesList.length})</span>
           </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveTab('subcategories')}
-            className={`flex items-center gap-2 px-4 py-2.5 text-xs sm:text-sm font-bold border-b-2 transition-all whitespace-nowrap ${
-              activeTab === 'subcategories'
-                ? 'border-amber-400 text-amber-300 bg-amber-500/10 rounded-t-xl'
-                : 'border-transparent text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            <Tag className="w-4 h-4 text-amber-400" />
+          <button type="button" onClick={() => setActiveTab('subcategories')} className={TAB_BUTTON(activeTab === 'subcategories')}>
+            <FolderTree className="w-4 h-4" />
             <span>Sottocategorie ({subcategoriesList.length})</span>
           </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveTab('images')}
-            className={`flex items-center gap-2 px-4 py-2.5 text-xs sm:text-sm font-bold border-b-2 transition-all whitespace-nowrap ${
-              activeTab === 'images'
-                ? 'border-amber-400 text-amber-300 bg-amber-500/10 rounded-t-xl'
-                : 'border-transparent text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            <Tag className="w-4 h-4 text-amber-400" />
-            <span>Importa Immagini</span>
+          <button type="button" onClick={() => setActiveTab('images')} className={TAB_BUTTON(activeTab === 'images')}>
+            <ImageIcon className="w-4 h-4" />
+            <span>Immagini</span>
           </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveTab('settings')}
-            className={`flex items-center gap-2 px-4 py-2.5 text-xs sm:text-sm font-bold border-b-2 transition-all whitespace-nowrap ${
-              activeTab === 'settings'
-                ? 'border-amber-400 text-amber-300 bg-amber-500/10 rounded-t-xl'
-                : 'border-transparent text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            <Settings className="w-4 h-4 text-amber-400" />
-            <span>Parametri B2B & Spedizioni</span>
+          <button type="button" onClick={() => setActiveTab('settings')} className={TAB_BUTTON(activeTab === 'settings')}>
+            <SlidersHorizontal className="w-4 h-4" />
+            <span>Parametri</span>
           </button>
         </div>
 
-        {/* Tab 1: Products Full Master CRUD */}
+        {/* Tab: Prodotti */}
         {activeTab === 'products' && (
           <div className="p-4 sm:p-6 overflow-y-auto flex-1 space-y-4 text-left">
-            <div className="flex flex-wrap items-center justify-between gap-3 bg-[#08152b] p-4 rounded-2xl border border-slate-800">
+            <div className={`flex flex-wrap items-center justify-between gap-3 ${PANEL_CARD} p-4`}>
               <div>
-                <h3 className="text-sm font-bold text-white uppercase tracking-wider">
-                  Gestione Completa Catalogo Articoli
-                </h3>
-                <p className="text-xs text-slate-400">
-                  Modifica prezzi, giacenze stock, schede tecniche e foto in tempo reale.
-                </p>
+                <h3 className="text-sm font-semibold text-white">Catalogo articoli</h3>
+                <p className="text-xs text-slate-400">Modifica prezzi, giacenze, schede tecniche e foto.</p>
               </div>
-              <button
-                type="button"
-                onClick={handleOpenNewProduct}
-                className="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs uppercase tracking-wider rounded-xl flex items-center gap-1.5 shadow-md shadow-amber-950/40 cursor-pointer"
-              >
+              <button type="button" onClick={handleOpenNewProduct} className={BTN_PRIMARY}>
                 <Plus className="w-4 h-4" />
-                Nuovo Articolo
+                Nuovo articolo
               </button>
             </div>
 
@@ -330,7 +272,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
                 value={productSearch}
                 onChange={(e) => setProductSearch(e.target.value)}
                 placeholder="Cerca per nome, codice/SKU, categoria o marca..."
-                className="w-full pl-10 pr-9 py-2.5 bg-[#08152b] border border-slate-800 focus:border-sky-500/50 rounded-xl text-xs text-white placeholder:text-slate-500 outline-none transition-colors"
+                className={`w-full pl-10 pr-9 py-2.5 ${INPUT}`}
               />
               {productSearch && (
                 <button
@@ -344,139 +286,115 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
               )}
             </div>
             {productSearch && (
-              <p className="text-[11px] text-slate-500 -mt-1">
+              <p className="text-xs text-slate-500 -mt-1">
                 {filteredAdminProducts.length} articol{filteredAdminProducts.length === 1 ? 'o trovato' : 'i trovati'} su {productsList.length}
               </p>
             )}
 
-            <div className="grid grid-cols-1 gap-2.5">
+            <div className="grid grid-cols-1 gap-2">
               {filteredAdminProducts.map((prod) => (
                 <div
                   key={prod.id}
-                  className="flex flex-wrap sm:flex-nowrap items-center justify-between gap-3 p-3.5 rounded-2xl bg-[#071329] border border-slate-800 hover:border-amber-500/30 transition-all text-xs"
+                  className="flex flex-wrap sm:flex-nowrap items-center justify-between gap-3 p-3 rounded-xl bg-[#111826] border border-[#1c2433] hover:border-[#2f3b50] transition-colors text-sm"
                 >
                   <div className="flex items-center gap-3 min-w-0 flex-1">
                     <img
                       src={prod.image || '/logo-login.png'}
                       alt={prod.name}
-                      className="w-12 h-12 rounded-xl object-cover bg-white/5 border border-slate-700 shrink-0"
+                      className="w-11 h-11 rounded-lg object-cover bg-white/5 border border-[#232b3a] shrink-0"
                     />
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
-                        <span className="font-mono text-[10px] text-amber-400 bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/20">
-                          {prod.code}
-                        </span>
-                        <span className="text-[11px] text-slate-400">{prod.category}</span>
+                        <span className="font-mono text-[11px] text-slate-400">{prod.code}</span>
+                        <span className="text-[11px] text-slate-500">{prod.category}</span>
                       </div>
-                      <h4 className="font-bold text-white text-sm truncate mt-0.5">{prod.name}</h4>
-                      <p className="text-[11px] text-slate-400">{prod.unit} • {prod.packageQty}</p>
+                      <h4 className="font-semibold text-white truncate">{prod.name}</h4>
+                      <p className="text-xs text-slate-400">{prod.unit} • {prod.packageQty}</p>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-4 shrink-0">
                     <div className="text-right">
-                      <span className="text-xs text-slate-400 block font-medium">Prezzo Listino</span>
-                      <span className="text-base font-black text-amber-400 font-mono">
-                        € {prod.price.toFixed(2)}
-                      </span>
+                      <span className="text-[11px] text-slate-500 block">Prezzo</span>
+                      <span className="text-sm font-bold text-white font-mono">€ {prod.price.toFixed(2)}</span>
                     </div>
 
                     <div className="text-right">
-                      <span className="text-xs text-slate-400 block font-medium">Giacenza</span>
-                      <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${
+                      <span className="text-[11px] text-slate-500 block">Giacenza</span>
+                      <span className={`text-xs font-semibold px-2 py-0.5 rounded-md ${
                         prod.stock <= (prod.lowStockThreshold || 20)
-                          ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
-                          : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                          ? 'bg-rose-500/15 text-rose-300'
+                          : 'bg-emerald-500/15 text-emerald-300'
                       }`}>
                         {prod.stock} pz
                       </span>
                     </div>
 
-                    <button
-                      type="button"
-                      onClick={() => handleOpenEditProduct(prod)}
-                      className="px-3 py-1.5 bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 border border-sky-500/40 rounded-xl font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer"
-                    >
+                    <button type="button" onClick={() => handleOpenEditProduct(prod)} className={BTN_SECONDARY}>
                       <Edit3 className="w-3.5 h-3.5" />
                       Modifica
                     </button>
                   </div>
                 </div>
               ))}
+              {filteredAdminProducts.length === 0 && (
+                <p className="text-sm text-slate-500 text-center py-8">Nessun articolo trovato per questa ricerca.</p>
+              )}
             </div>
           </div>
         )}
 
-        {/* Tab 2: Orders Full Master CRUD */}
+        {/* Tab: Ordini */}
         {activeTab === 'orders' && (
           <div className="p-4 sm:p-6 overflow-y-auto flex-1 space-y-4 text-left">
-            <div className="bg-[#08152b] p-4 rounded-2xl border border-slate-800">
-              <h3 className="text-sm font-bold text-white uppercase tracking-wider">
-                Gestione Master Ordini & Tracciabilità
-              </h3>
-              <p className="text-xs text-slate-400">
-                Cambia stato di spedizione, assegna corriere/tracking e modifica le quantità degli ordini dei clienti.
-              </p>
+            <div className={`${PANEL_CARD} p-4`}>
+              <h3 className="text-sm font-semibold text-white">Ordini e tracciabilità</h3>
+              <p className="text-xs text-slate-400">Cambia lo stato di spedizione, assegna corriere/tracking e modifica le quantità.</p>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-2">
               {ordersList.map((ord) => (
-                <div
-                  key={ord.id}
-                  className="p-4 rounded-2xl bg-[#071329] border border-slate-800 hover:border-amber-500/30 transition-all text-xs space-y-3"
-                >
-                  <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-2.5">
+                <div key={ord.id} className="p-4 rounded-xl bg-[#111826] border border-[#1c2433] hover:border-[#2f3b50] transition-colors text-sm space-y-3">
+                  <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#1c2433] pb-2.5">
                     <div className="flex items-center gap-2">
-                      <span className="font-mono font-bold text-white text-sm">#{ord.id}</span>
-                      <span className="text-slate-400">• {ord.date}</span>
-                      <span className={`px-2 py-0.5 rounded-full font-bold text-[10.5px] ${
+                      <span className="font-mono font-semibold text-white">#{ord.id}</span>
+                      <span className="text-slate-500">• {ord.date}</span>
+                      <span className={`px-2 py-0.5 rounded-md font-medium text-[11px] ${
                         ord.status === 'Consegnato'
-                          ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                          ? 'bg-emerald-500/15 text-emerald-300'
                           : ord.status === 'Spedito'
-                          ? 'bg-sky-500/20 text-sky-300 border border-sky-500/30'
+                          ? 'bg-sky-500/15 text-sky-300'
                           : ord.status === 'Annullato'
-                          ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
-                          : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                          ? 'bg-rose-500/15 text-rose-300'
+                          : 'bg-amber-500/15 text-amber-300'
                       }`}>
                         {ord.status}
                       </span>
                     </div>
 
                     <div className="flex items-center gap-3">
-                      <span className="text-base font-black text-amber-400 font-mono">
-                        € {ord.total.toFixed(2)}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => handleOpenEditOrder(ord)}
-                        className="px-3 py-1.5 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 rounded-xl font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer"
-                      >
+                      <span className="text-sm font-bold text-white font-mono">€ {ord.total.toFixed(2)}</span>
+                      <button type="button" onClick={() => handleOpenEditOrder(ord)} className={BTN_SECONDARY}>
                         <Edit3 className="w-3.5 h-3.5" />
-                        Modifica Ordine
+                        Modifica
                       </button>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-slate-300 text-[11px]">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-slate-300 text-xs">
                     <div>
-                      <span className="text-slate-500 block">Destinatario:</span>
-                      <p className="font-semibold text-white">
-                        {ord.shippingAddress?.companyName || ord.shippingAddress?.recipient || 'Cliente B2B'}
-                      </p>
+                      <span className="text-slate-500 block">Destinatario</span>
+                      <p className="font-medium text-white">{ord.shippingAddress?.companyName || ord.shippingAddress?.recipient || 'Cliente B2B'}</p>
                       <p className="text-slate-400 truncate">{ord.shippingAddress?.street}, {ord.shippingAddress?.city}</p>
                     </div>
-
                     <div>
-                      <span className="text-slate-500 block">Logistica & Tracking:</span>
-                      <p className="font-semibold text-sky-300">{ord.courier || 'Da assegnare'}</p>
+                      <span className="text-slate-500 block">Logistica</span>
+                      <p className="font-medium text-sky-300">{ord.courier || 'Da assegnare'}</p>
                       <p className="font-mono text-slate-400">{ord.trackingNumber || 'Nessun tracking'}</p>
                     </div>
-
                     <div>
-                      <span className="text-slate-500 block">Articoli ({ord.itemsCount} pz):</span>
-                      <p className="truncate text-slate-300">
-                        {ord.items.map((i) => `${i.qty}x ${i.productName}`).join(', ')}
-                      </p>
+                      <span className="text-slate-500 block">Articoli ({ord.itemsCount} pz)</span>
+                      <p className="truncate text-slate-300">{ord.items.map((i) => `${i.qty}x ${i.productName}`).join(', ')}</p>
                     </div>
                   </div>
                 </div>
@@ -485,78 +403,60 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
           </div>
         )}
 
-        {/* Tab 3: Categories CRUD */}
+        {/* Tab: Categorie */}
         {activeTab === 'categories' && (
           <div className="p-4 sm:p-6 overflow-y-auto flex-1 space-y-5 text-left">
-            {/* Create Category Form */}
-            <form onSubmit={handleAddCategory} className="bg-[#08152b] p-4 rounded-2xl border border-slate-800 space-y-3">
-              <h3 className="text-xs font-bold text-amber-400 uppercase tracking-wider">
-                Aggiungi Nuova Categoria Merceologica
-              </h3>
+            <form onSubmit={handleAddCategory} className={`${PANEL_CARD} p-4 space-y-3`}>
+              <h3 className="text-sm font-semibold text-white">Nuova categoria</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <input
                   type="text"
                   required
-                  placeholder="Nome Categoria (es. Disinfezione Ospedaliera)"
+                  placeholder="Nome categoria (es. Disinfezione ospedaliera)"
                   value={newCatName}
                   onChange={(e) => setNewCatName(e.target.value)}
-                  className="bg-[#0c1c38] border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white outline-none"
+                  className={INPUT}
                 />
                 <input
                   type="text"
                   placeholder="Descrizione breve"
                   value={newCatDesc}
                   onChange={(e) => setNewCatDesc(e.target.value)}
-                  className="bg-[#0c1c38] border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white outline-none"
+                  className={INPUT}
                 />
               </div>
-              <button
-                type="submit"
-                className="px-4 py-2 bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs rounded-xl flex items-center gap-1.5"
-              >
+              <button type="submit" className={BTN_PRIMARY}>
                 <Plus className="w-3.5 h-3.5" />
-                Crea Categoria
+                Crea categoria
               </button>
             </form>
 
-            {/* Categories List */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {categoriesList.map((cat) => (
-                <div
-                  key={cat.id}
-                  className="p-3.5 rounded-2xl bg-[#071329] border border-slate-800 space-y-2 text-xs"
-                >
+                <div key={cat.id} className="p-3.5 rounded-xl bg-[#111826] border border-[#1c2433] space-y-2 text-sm">
                   {editingCategoryId === cat.id ? (
                     <div className="space-y-2">
                       <input
                         type="text"
                         value={editCategoryName}
                         onChange={(e) => setEditCategoryName(e.target.value)}
-                        className="w-full bg-[#0c1c38] border border-amber-400 rounded-lg px-2 py-1 text-white text-xs"
+                        className={`w-full ${INPUT} border-indigo-400/60`}
                       />
                       <input
                         type="text"
                         value={editCategoryDesc}
                         onChange={(e) => setEditCategoryDesc(e.target.value)}
-                        className="w-full bg-[#0c1c38] border border-slate-700 rounded-lg px-2 py-1 text-white text-xs"
+                        className={`w-full ${INPUT}`}
                       />
                       <ProductImageUploader
                         currentImage={editCategoryImage || cat.image || '/logo-login.png'}
                         onImageChange={(img) => setEditCategoryImage(img)}
                       />
                       <div className="flex gap-2 pt-1">
-                        <button
-                          type="button"
-                          onClick={() => handleSaveCategory(cat.id)}
-                          className="px-3 py-1 bg-amber-500 text-slate-950 font-bold rounded-lg text-xs cursor-pointer"
-                        >
+                        <button type="button" onClick={() => handleSaveCategory(cat.id)} className={`${BTN_PRIMARY} py-1.5 text-xs`}>
                           Salva
                         </button>
-                        <button
-                          type="button"
-                          onClick={() => setEditingCategoryId(null)}
-                          className="px-3 py-1 bg-slate-800 text-slate-300 rounded-lg text-xs cursor-pointer"
-                        >
+                        <button type="button" onClick={() => setEditingCategoryId(null)} className={`${BTN_SECONDARY} py-1.5 text-xs`}>
                           Annulla
                         </button>
                       </div>
@@ -567,11 +467,11 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
                         <img
                           src={cat.image || '/logo-login.png'}
                           alt={cat.name}
-                          className="w-9 h-9 rounded-lg object-contain bg-white/5 border border-slate-700 shrink-0"
+                          className="w-9 h-9 rounded-lg object-contain bg-white/5 border border-[#232b3a] shrink-0"
                         />
                         <div className="min-w-0">
-                          <h4 className="font-bold text-white text-sm truncate">{cat.name}</h4>
-                          <p className="text-[11px] text-slate-400 truncate">{cat.description}</p>
+                          <h4 className="font-semibold text-white truncate">{cat.name}</h4>
+                          <p className="text-xs text-slate-400 truncate">{cat.description}</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-1.5 shrink-0">
@@ -583,7 +483,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
                             setEditCategoryDesc(cat.description || '');
                             setEditCategoryImage(cat.image || '/logo-login.png');
                           }}
-                          className="p-1.5 rounded-lg bg-slate-800 text-slate-300 hover:text-white cursor-pointer"
+                          className={ICON_BTN}
                           title="Modifica"
                         >
                           <Edit3 className="w-3.5 h-3.5" />
@@ -591,11 +491,9 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
                         <button
                           type="button"
                           onClick={() => {
-                            if (confirm(`Eliminare categoria ${cat.name}?`)) {
-                              deleteCategory(cat.id);
-                            }
+                            if (confirm(`Eliminare la categoria "${cat.name}"?`)) deleteCategory(cat.id);
                           }}
-                          className="p-1.5 rounded-lg bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 cursor-pointer"
+                          className={ICON_BTN_DANGER}
                           title="Elimina"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
@@ -619,101 +517,79 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
           />
         )}
 
-        {/* Tab: Importa Immagini */}
+        {/* Tab: Importa immagini */}
         {activeTab === 'images' && <ImageImportTool />}
 
-        {/* Tab 4: System B2B Settings */}
+        {/* Tab: Parametri */}
         {activeTab === 'settings' && (
           <form onSubmit={handleSaveSettings} className="p-4 sm:p-6 overflow-y-auto flex-1 space-y-5 text-left text-sm">
-            <div className="bg-[#08152b] p-4 rounded-2xl border border-slate-800 space-y-4">
-              <h3 className="text-xs font-bold text-amber-400 uppercase tracking-wider">
-                Parametri Aziendali e Soglie Commerciali
-              </h3>
+            <div className={`${PANEL_CARD} p-4 space-y-4`}>
+              <h3 className="text-sm font-semibold text-white">Parametri aziendali e soglie commerciali</h3>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 uppercase mb-1">
-                    Ragione Sociale Azienda
-                  </label>
+                  <label className={LABEL}>Ragione sociale azienda</label>
                   <input
                     type="text"
                     value={settingsForm.companyName}
                     onChange={(e) => setSettingsForm({ ...settingsForm, companyName: e.target.value })}
-                    className="w-full bg-[#0c1c38] border border-slate-700 rounded-xl px-3.5 py-2 text-white text-xs outline-none"
+                    className={`w-full ${INPUT}`}
                   />
                 </div>
-
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 uppercase mb-1">
-                    Email di Contatto / Ordini
-                  </label>
+                  <label className={LABEL}>Email di contatto / ordini</label>
                   <input
                     type="email"
                     value={settingsForm.contactEmail}
                     onChange={(e) => setSettingsForm({ ...settingsForm, contactEmail: e.target.value })}
-                    className="w-full bg-[#0c1c38] border border-slate-700 rounded-xl px-3.5 py-2 text-white text-xs outline-none"
+                    className={`w-full ${INPUT}`}
                   />
                 </div>
-
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 uppercase mb-1">
-                    Partita IVA
-                  </label>
+                  <label className={LABEL}>Partita IVA</label>
                   <input
                     type="text"
                     value={settingsForm.vatNumber}
                     onChange={(e) => setSettingsForm({ ...settingsForm, vatNumber: e.target.value })}
-                    className="w-full bg-[#0c1c38] border border-slate-700 rounded-xl px-3.5 py-2 text-white font-mono text-xs outline-none"
+                    className={`w-full ${INPUT} font-mono`}
                   />
                 </div>
-
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 uppercase mb-1">
-                    Codice Univoco SDI
-                  </label>
+                  <label className={LABEL}>Codice univoco SDI</label>
                   <input
                     type="text"
                     value={settingsForm.sdiCode}
                     onChange={(e) => setSettingsForm({ ...settingsForm, sdiCode: e.target.value })}
-                    className="w-full bg-[#0c1c38] border border-slate-700 rounded-xl px-3.5 py-2 text-white font-mono text-xs outline-none"
+                    className={`w-full ${INPUT} font-mono`}
                   />
                 </div>
-
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 uppercase mb-1">
-                    Soglia Spedizione Gratuita (€)
-                  </label>
+                  <label className={LABEL}>Soglia spedizione gratuita (€)</label>
                   <input
                     type="number"
                     step="1"
                     value={settingsForm.freeShippingThresholdEur}
                     onChange={(e) => setSettingsForm({ ...settingsForm, freeShippingThresholdEur: parseFloat(e.target.value) || 0 })}
-                    className="w-full bg-[#0c1c38] border border-slate-700 rounded-xl px-3.5 py-2 text-white text-xs outline-none"
+                    className={`w-full ${INPUT}`}
                   />
                 </div>
-
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 uppercase mb-1">
-                    Costo Spedizione Standard (€)
-                  </label>
+                  <label className={LABEL}>Costo spedizione standard (€)</label>
                   <input
                     type="number"
                     step="0.10"
                     value={settingsForm.standardShippingEur}
                     onChange={(e) => setSettingsForm({ ...settingsForm, standardShippingEur: parseFloat(e.target.value) || 0 })}
-                    className="w-full bg-[#0c1c38] border border-slate-700 rounded-xl px-3.5 py-2 text-white text-xs outline-none"
+                    className={`w-full ${INPUT}`}
                   />
                 </div>
-
                 <div className="sm:col-span-2">
-                  <label className="block text-xs font-bold text-slate-300 uppercase mb-1">
-                    Testo Banner Annunci in Evidenza
-                  </label>
+                  <label className={LABEL}>Testo banner annunci in evidenza</label>
                   <input
                     type="text"
                     value={settingsForm.announcementBannerText}
                     onChange={(e) => setSettingsForm({ ...settingsForm, announcementBannerText: e.target.value })}
-                    className="w-full bg-[#0c1c38] border border-slate-700 rounded-xl px-3.5 py-2 text-white text-xs outline-none"
+                    className={`w-full ${INPUT}`}
                   />
                 </div>
               </div>
@@ -721,16 +597,13 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
 
             <div className="flex items-center justify-end gap-3">
               {settingsSaved && (
-                <span className="text-emerald-400 text-xs font-bold flex items-center gap-1">
-                  <Check className="w-4 h-4" /> Impostazioni aggiornate!
+                <span className="text-emerald-400 text-sm font-medium flex items-center gap-1">
+                  <Check className="w-4 h-4" /> Impostazioni aggiornate
                 </span>
               )}
-              <button
-                type="submit"
-                className="px-6 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs uppercase tracking-wider rounded-xl flex items-center gap-2 shadow-lg shadow-amber-950/40 cursor-pointer"
-              >
+              <button type="submit" className={BTN_PRIMARY}>
                 <Save className="w-4 h-4" />
-                Salva Parametri
+                Salva parametri
               </button>
             </div>
           </form>

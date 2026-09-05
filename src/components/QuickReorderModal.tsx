@@ -389,11 +389,11 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
                               <span>•</span>
                               {isBusinessCustomer ? (
                                 <span className="text-sky-400 font-bold font-mono">
-                                  €{(product.price * 1.22).toFixed(2)} <span className="text-[9.5px] font-normal text-sky-300">con IVA</span>
+                                  €{(product.price * 1.22).toFixed(2)}
                                 </span>
                               ) : (
                                 <span className="text-emerald-400 font-bold font-mono">
-                                  €{product.price.toFixed(2)} <span className="text-[9.5px] font-normal text-emerald-300">senza IVA</span>
+                                  €{product.price.toFixed(2)}
                                 </span>
                               )}
                             </div>
