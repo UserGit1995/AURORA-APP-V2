@@ -5,6 +5,9 @@ export interface Category {
   countNumber: number;
   image: string;
   description?: string;
+  // Albero marca->tipologia montato da buildCategoryTree() in services/supabase.ts,
+  // usato dai filtri "Sottocategorie"/"Micro-categorie" di CatalogView.tsx.
+  subCategories?: (Subcategory & { subSubCategories?: Subcategory[] })[];
 }
 
 export interface Subcategory {
@@ -15,6 +18,7 @@ export interface Subcategory {
   slug: string;
   sortOrder: number;
   active: boolean;
+  image?: string;
 }
 
 export interface Product {
@@ -23,6 +27,12 @@ export interface Product {
   category: string;
   categoryId: string;
   subcategoryId?: string | null;
+  // Derivati da subcategoryId da enrichProductsWithSubcategoryTree() (services/supabase.ts):
+  // subCategoryId = marca, subSubCategoryId = tipologia. Usati dai filtri di CatalogView.tsx.
+  subCategoryId?: string | null;
+  subCategoryName?: string;
+  subSubCategoryId?: string | null;
+  subSubCategoryName?: string;
   image: string;
   price: number;
   unit: string;

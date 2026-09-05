@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { 
   X, 
   ShieldCheck, 
@@ -16,7 +16,9 @@ import {
   Save,
   Users,
   Settings,
-  DollarSign
+  DollarSign,
+  Search,
+  XCircle
 } from 'lucide-react';
 import { useAdmin } from '../context/AdminContext';
 import { ProductEditModal } from './ProductEditModal';
@@ -57,6 +59,22 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const [activeTab, setActiveTab] = useState<'products' | 'orders' | 'categories' | 'subcategories' | 'images' | 'settings' | 'user'>('products');
+  const [productSearch, setProductSearch] = useState('');
+
+  // Ricerca articoli nel pannello admin: nome, codice/SKU, categoria, marca/tipologia.
+  const filteredAdminProducts = useMemo(() => {
+    const q = productSearch.trim().toLowerCase();
+    if (!q) return productsList;
+    return productsList.filter((p) => {
+      return (
+        p.name?.toLowerCase().includes(q) ||
+        p.code?.toLowerCase().includes(q) ||
+        p.category?.toLowerCase().includes(q) ||
+        p.subCategoryName?.toLowerCase().includes(q) ||
+        p.subSubCategoryName?.toLowerCase().includes(q)
+      );
+    });
+  }, [productsList, productSearch]);
   
   // Modals inside admin
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
@@ -305,8 +323,34 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
               </button>
             </div>
 
+            <div className="relative">
+              <Search className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <input
+                type="text"
+                value={productSearch}
+                onChange={(e) => setProductSearch(e.target.value)}
+                placeholder="Cerca per nome, codice/SKU, categoria o marca..."
+                className="w-full pl-10 pr-9 py-2.5 bg-[#08152b] border border-slate-800 focus:border-sky-500/50 rounded-xl text-xs text-white placeholder:text-slate-500 outline-none transition-colors"
+              />
+              {productSearch && (
+                <button
+                  type="button"
+                  onClick={() => setProductSearch('')}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white"
+                  aria-label="Cancella ricerca"
+                >
+                  <XCircle className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+            {productSearch && (
+              <p className="text-[11px] text-slate-500 -mt-1">
+                {filteredAdminProducts.length} articol{filteredAdminProducts.length === 1 ? 'o trovato' : 'i trovati'} su {productsList.length}
+              </p>
+            )}
+
             <div className="grid grid-cols-1 gap-2.5">
-              {productsList.map((prod) => (
+              {filteredAdminProducts.map((prod) => (
                 <div
                   key={prod.id}
                   className="flex flex-wrap sm:flex-nowrap items-center justify-between gap-3 p-3.5 rounded-2xl bg-[#071329] border border-slate-800 hover:border-amber-500/30 transition-all text-xs"

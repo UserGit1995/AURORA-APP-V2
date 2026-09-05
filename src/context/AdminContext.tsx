@@ -7,6 +7,8 @@ import {
   fetchSupabaseCategories, 
   fetchSupabaseOrders,
   fetchSupabaseSubcategories,
+  buildCategoryTree,
+  enrichProductsWithSubcategoryTree,
   syncSupabaseProduct,
   deleteSupabaseProduct,
   syncSupabaseCategory,
@@ -238,11 +240,17 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         fetchSupabaseOrders(),
       ]);
 
-      if (cloudProducts && cloudProducts.length > 0) {
-        setProductsList(cloudProducts);
-      }
+      // Le sottocategorie sono organizzate su 2 livelli (marca -> tipologia).
+      // Montiamo l'albero su categorie e prodotti QUI, una sola volta dopo
+      // che entrambe le liste sono arrivate dal cloud, così CatalogView.tsx
+      // trova sempre marche/tipologie e prodotti correttamente collegati.
+      const subs = cloudSubcategories ?? [];
+
       if (cloudCategories && cloudCategories.length > 0) {
-        setCategoriesList(cloudCategories);
+        setCategoriesList(subs.length > 0 ? buildCategoryTree(cloudCategories, subs) : cloudCategories);
+      }
+      if (cloudProducts && cloudProducts.length > 0) {
+        setProductsList(subs.length > 0 ? enrichProductsWithSubcategoryTree(cloudProducts, subs) : cloudProducts);
       }
       if (cloudSubcategories) {
         setSubcategoriesList(cloudSubcategories);
@@ -258,6 +266,17 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   useEffect(() => {
     refreshFromCloud();
   }, [refreshFromCloud]);
+
+  // Se le sottocategorie cambiano (caricamento cloud, o modifica da admin:
+  // nuova marca/tipologia, rinomina, cancellazione...), ricostruiamo subito
+  // l'albero su categorie e prodotti, così i filtri del catalogo restano
+  // sempre coerenti senza bisogno di un refresh manuale della pagina.
+  useEffect(() => {
+    if (subcategoriesList.length === 0) return;
+    setCategoriesList((prev) => buildCategoryTree(prev, subcategoriesList));
+    setProductsList((prev) => enrichProductsWithSubcategoryTree(prev, subcategoriesList));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [subcategoriesList]);
 
   const isAdmin = currentUser?.role === 'admin' || currentUser?.role === 'superadmin';
   const isSuperAdmin = currentUser?.role === 'superadmin';
@@ -324,17 +343,25 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   // Product CRUD
+  // Quando un prodotto viene salvato dall'admin cambiando la sua sottocategoria
+  // (subcategoryId), ricalcoliamo subito subCategoryId/subSubCategoryId dallo
+  // stesso albero marca->tipologia, così il prodotto risulta subito filtrabile
+  // nel catalogo senza dover aspettare un refresh completo dal cloud.
+  const withSubcategoryTree = (p: Product): Product =>
+    subcategoriesList.length > 0 ? enrichProductsWithSubcategoryTree([p], subcategoriesList)[0] : p;
+
   const updateProduct = (updated: Product) => {
-    setProductsList((prev) => prev.map((p) => (p.id === updated.id ? updated : p)));
-    syncSupabaseProduct(updated);
+    const enriched = withSubcategoryTree(updated);
+    setProductsList((prev) => prev.map((p) => (p.id === enriched.id ? enriched : p)));
+    syncSupabaseProduct(enriched);
   };
 
   const addProduct = (newProd: Omit<Product, 'id'>): Product => {
     const id = newDbId();
-    const fullProduct: Product = {
+    const fullProduct: Product = withSubcategoryTree({
       ...newProd,
       id,
-    };
+    } as Product);
     setProductsList((prev) => [fullProduct, ...prev]);
     syncSupabaseProduct(fullProduct);
     return fullProduct;

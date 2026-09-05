@@ -143,19 +143,47 @@ export function newDbId(): string {
 }
 
 /**
+ * Supabase/PostgREST restituisce al massimo un numero limitato di righe per
+ * richiesta (di norma 1000, anche senza un .limit() esplicito nel codice).
+ * Con più di 1000 prodotti in tabella, metà catalogo spariva silenziosamente
+ * da tutta l'app (nessun errore, solo dati mancanti). Questa funzione pagina
+ * automaticamente con .range() finché non riceve una pagina più corta della
+ * dimensione richiesta, garantendo di leggere SEMPRE tutte le righe reali.
+ */
+async function fetchAllRows<T>(
+  runPage: (from: number, to: number) => Promise<{ data: T[] | null; error: any }>,
+  pageSize = 1000
+): Promise<T[]> {
+  let all: T[] = [];
+  let from = 0;
+  while (true) {
+    const { data, error } = await runPage(from, from + pageSize - 1);
+    if (error) throw error;
+    const batch = data ?? [];
+    all = all.concat(batch);
+    if (batch.length < pageSize) break;
+    from += pageSize;
+  }
+  return all;
+}
+
+/**
  * Fetch products from Supabase table 'products'
  */
 export async function fetchSupabaseProducts(): Promise<Product[] | null> {
   const sb = getSupabase();
   if (!sb) return null;
   try {
-    const { data, error } = await sb.from('products').select('*, categories(name)').eq('active', true);
-    if (error) {
-      console.warn('Supabase fetch products notice:', error.message);
-      return null;
-    }
-    if (!data || data.length === 0) return null;
-    return data.map((row: any) => rowToProduct(row, row.categories?.name));
+    const rows = await fetchAllRows<any>((from, to) =>
+      sb
+        .from('products')
+        .select('*, categories(name)')
+        .eq('active', true)
+        .order('created_at', { ascending: false })
+        .range(from, to)
+    );
+    if (!rows || rows.length === 0) return null;
+    return rows.map((row: any) => rowToProduct(row, row.categories?.name));
   } catch (e) {
     console.warn('Supabase products fetch failed:', e);
     return null;
@@ -245,7 +273,9 @@ export async function fetchSupabaseCategories(): Promise<Category[] | null> {
     if (error) return null;
     if (!data || data.length === 0) return null;
 
-    const { data: productRows } = await sb.from('products').select('category_id').eq('active', true);
+    const productRows = await fetchAllRows<any>((from, to) =>
+      sb.from('products').select('category_id').eq('active', true).range(from, to)
+    );
     const counts: Record<string, number> = {};
     for (const row of productRows ?? []) {
       if (!row.category_id) continue;
@@ -330,6 +360,65 @@ function rowToSubcategory(row: any): Subcategory {
     sortOrder: row.sort_order ?? 0,
     active: !!row.active,
   };
+}
+
+/**
+ * Le sottocategorie sono organizzate su 2 livelli tramite parentSubcategoryId:
+ * marca (nessun parent) -> tipologia (parent = id della marca). I prodotti
+ * salvano solo l'id della tipologia (subcategory_id). CatalogView.tsx però si
+ * aspetta un albero già montato: category.subCategories (le marche) ognuna
+ * con subSubCategories (le tipologie figlie). Questa funzione costruisce
+ * quell'albero, e va richiamata ogni volta che categorie o sottocategorie
+ * cambiano (dopo il caricamento cloud, o dopo una modifica in admin).
+ */
+export function buildCategoryTree(categories: Category[], subcategories: Subcategory[]): Category[] {
+  return categories.map((cat) => {
+    const brands = subcategories
+      .filter((s) => s.categoryId === cat.id && !s.parentSubcategoryId)
+      .map((brand) => ({
+        ...brand,
+        subSubCategories: subcategories
+          .filter((s) => s.parentSubcategoryId === brand.id)
+          .sort((a, b) => a.sortOrder - b.sortOrder),
+      }));
+    return {
+      ...cat,
+      subCategories: brands.sort((a, b) => a.sortOrder - b.sortOrder),
+    } as Category;
+  });
+}
+
+/**
+ * Arricchisce ogni prodotto con subCategoryId/subSubCategoryId (e i nomi
+ * corrispondenti) derivandoli dalla tipologia reale salvata in
+ * subcategoryId, così i filtri "Sottocategorie" e "Micro-categorie" del
+ * catalogo (CatalogView.tsx) trovano davvero i prodotti invece di restare
+ * sempre vuoti.
+ */
+export function enrichProductsWithSubcategoryTree(products: Product[], subcategories: Subcategory[]): Product[] {
+  const byId = new Map(subcategories.map((s) => [s.id, s]));
+  return products.map((p) => {
+    if (!p.subcategoryId) return p;
+    const own = byId.get(p.subcategoryId);
+    if (!own) return p;
+    if (own.parentSubcategoryId) {
+      // own è una tipologia (livello 2): il genitore è la marca (livello 1)
+      const parent = byId.get(own.parentSubcategoryId);
+      return {
+        ...p,
+        subCategoryId: parent?.id ?? own.id,
+        subCategoryName: parent?.name,
+        subSubCategoryId: own.id,
+        subSubCategoryName: own.name,
+      } as Product;
+    }
+    // own è già una marca senza tipologie proprie
+    return {
+      ...p,
+      subCategoryId: own.id,
+      subCategoryName: own.name,
+    } as Product;
+  });
 }
 
 export async function fetchSupabaseSubcategories(): Promise<Subcategory[] | null> {
