@@ -141,11 +141,8 @@ export const LoginModal: React.FC<LoginModalProps> = ({
         initial={{ opacity: 0, scale: 0.95, y: 15 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 15 }}
-        className="relative w-full max-w-md bg-[#060e1d] border border-[#142848] rounded-3xl shadow-[0_0_50px_rgba(2,132,199,0.18)] z-10 overflow-hidden my-auto"
+        className="relative w-full max-w-md bg-[#060e1d] border border-[#142848] rounded-3xl shadow-2xl z-10 overflow-hidden my-auto"
       >
-        {/* Top ambient glow */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-72 h-28 bg-sky-500/15 blur-3xl pointer-events-none" />
-
         {/* Close Button */}
         <button
           id="close-login-modal-btn"
@@ -358,7 +355,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                       onClick={() => setShowAdminCodeField(true)}
                       className="text-[11px] text-slate-500 hover:text-amber-400/80 transition-colors flex items-center gap-1 cursor-pointer"
                     >
-                      <span>🔑 Sei un amministratore? Inserisci codice di sicurezza</span>
+                      <span>Sei un amministratore? Inserisci il codice di sicurezza</span>
                     </button>
                   ) : (
                     <div>
@@ -444,7 +441,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
               type="submit"
               id="login-submit-btn"
               disabled={isLoading}
-              className="w-full bg-[#0284c7] hover:bg-[#0369a1] active:bg-[#075985] text-white font-bold py-3 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow-lg shadow-sky-950/60 transition-all hover:scale-[1.01] mt-2 cursor-pointer"
+              className="w-full bg-sky-600 hover:bg-sky-500 active:bg-sky-700 text-white font-bold py-3 px-4 rounded-xl text-xs flex items-center justify-center gap-2 transition-colors mt-2 cursor-pointer"
             >
               {isLoading ? (
                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />

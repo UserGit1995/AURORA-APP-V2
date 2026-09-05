@@ -13,7 +13,6 @@ import {
   LogIn, 
   LogOut, 
   Mail, 
-  Zap, 
   RotateCcw 
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -300,31 +299,28 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
         </div>
 
-        {/* Third Row: Dual Action Pill Buttons (Riordino Rapido & ADMIN NOEMI) */}
-        <div className="grid grid-cols-2 gap-2.5 pt-0.5">
-          {/* Riordino Rapido Pill (Bright Blue) */}
+        {/* Third Row: Riordino Rapido (e, solo per l'amministratore, il pulsante di Gestione) */}
+        <div className={`grid gap-2.5 pt-0.5 ${isAdmin ? 'grid-cols-2' : 'grid-cols-1'}`}>
           <button
             id="mobile-quick-reorder-pill"
             onClick={onOpenQuickReorder}
             type="button"
-            className="flex items-center justify-center gap-2 bg-[#0075ff] hover:bg-[#0066e0] active:scale-[0.98] text-white font-bold text-xs py-2.5 px-3 rounded-2xl shadow-lg shadow-sky-950/60 transition-all border border-sky-400/30"
+            className="flex items-center justify-center gap-2 bg-sky-600 hover:bg-sky-500 active:scale-[0.98] text-white font-semibold text-xs py-2.5 px-3 rounded-2xl transition-all"
           >
             <RotateCcw className="w-4 h-4 stroke-[2.5]" />
             <span className="truncate">Riordino Rapido</span>
           </button>
 
-          {/* ADMIN (NOEMI) Pill (Golden Yellow / Amber) */}
-          <button
-            id="mobile-admin-pill"
-            onClick={handleAdminAction}
-            type="button"
-            className="flex items-center justify-center gap-1.5 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 active:scale-[0.98] text-slate-950 font-black text-xs py-2.5 px-3 rounded-2xl shadow-lg shadow-amber-950/50 transition-all border border-amber-300/60 uppercase tracking-wide"
-          >
-            <Zap className="w-4 h-4 fill-slate-950 text-slate-950" />
-            <span className="truncate">
-              {isAdmin ? 'ADMIN (NOEMI)' : 'ADMIN (NOEMI)'}
-            </span>
-          </button>
+          {isAdmin && (
+            <button
+              id="mobile-admin-pill"
+              onClick={handleAdminAction}
+              type="button"
+              className="flex items-center justify-center gap-1.5 bg-amber-500 hover:bg-amber-400 active:scale-[0.98] text-slate-950 font-bold text-xs py-2.5 px-3 rounded-2xl transition-all"
+            >
+              <span className="truncate">Gestione</span>
+            </button>
+          )}
         </div>
       </div>
 
@@ -411,10 +407,10 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               id="header-quick-reorder-btn"
               onClick={onOpenQuickReorder}
-              className="relative inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-bold text-xs shadow-md shadow-sky-950/50 hover:scale-[1.02] active:scale-[0.98] transition-all"
+              className="relative inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-sky-600 hover:bg-sky-500 text-white font-semibold text-xs transition-colors"
               title="Riordino Rapido fornitura: 1-click senza checkout e senza carte"
             >
-              <RotateCw className="w-3.5 h-3.5 text-sky-100" />
+              <RotateCw className="w-3.5 h-3.5" />
               <span>{t('header.quickReorder', 'Riordino Rapido')}</span>
             </button>
           )}
@@ -424,7 +420,7 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               id="header-qr-scanner-button"
               onClick={onOpenQrScanner}
-              className="relative inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-sky-500/15 to-indigo-500/15 hover:from-sky-500/25 hover:to-indigo-500/25 text-sky-300 border border-sky-500/30 text-xs font-semibold shadow-xs transition-all"
+              className="relative inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-sky-500/15 hover:bg-sky-500/25 text-sky-300 border border-sky-500/30 text-xs font-semibold transition-colors"
               title="Scansiona codice QR fotocamera per aggiungere al carrello"
             >
               <QrCode className="w-4 h-4 text-sky-400" />
@@ -432,18 +428,15 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
           )}
 
-          {/* SuperAdmin Master Control Button */}
+          {/* Pulsante di accesso al pannello di gestione, visibile solo all'amministratore */}
           {isAdmin && (
             <button
               id="header-admin-control-btn"
               onClick={onOpenAdminPanel}
-              className="relative inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs shadow-md shadow-amber-950/60 hover:scale-[1.03] active:scale-[0.98] transition-all cursor-pointer border border-amber-300/40"
-              title="Pannello SuperAdmin: Modifica catalogo, prezzi, ordini e impostazioni senza limiti"
+              className="relative inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition-colors cursor-pointer"
+              title="Pannello di gestione: catalogo, prezzi, ordini e impostazioni"
             >
-              <span className="text-sm">⚡</span>
-              <span className="uppercase tracking-wider font-extrabold text-[11px]">
-                Admin {currentUser?.name ? `(${currentUser.name})` : ''}
-              </span>
+              <span>Gestione {currentUser?.name ? `(${currentUser.name})` : ''}</span>
             </button>
           )}
 
