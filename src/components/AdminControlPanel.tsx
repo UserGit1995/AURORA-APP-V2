@@ -610,7 +610,14 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
         )}
 
         {/* Tab: Sottocategorie */}
-        {activeTab === 'subcategories' && <SubcategoryManager />}
+        {activeTab === 'subcategories' && (
+          <SubcategoryManager
+            onViewProducts={(query) => {
+              setProductSearch(query);
+              setActiveTab('products');
+            }}
+          />
+        )}
 
         {/* Tab: Importa Immagini */}
         {activeTab === 'images' && <ImageImportTool />}
