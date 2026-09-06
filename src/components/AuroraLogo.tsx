@@ -28,6 +28,10 @@ export const AuroraLogo: React.FC<AuroraLogoProps> = ({
         alt="AURORA - Igiene & Benessere"
         referrerPolicy="no-referrer"
         className={`${sizeStyles[size]} w-auto max-w-full object-contain`}
+        style={{
+          filter:
+            'drop-shadow(0 1px 2px rgba(10,22,40,0.55)) drop-shadow(0 0 8px rgba(10,22,40,0.3))',
+        }}
       />
 
       {showSubtitle && (
