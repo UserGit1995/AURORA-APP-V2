@@ -80,7 +80,7 @@ export const CompareView: React.FC<CompareViewProps> = ({
           </div>
           <div>
             <div className="flex items-center gap-2.5">
-              <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+              <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
                 Confronto Specifiche & Schede Tecniche
               </h2>
               {comparedProducts.length > 0 && (
@@ -201,7 +201,7 @@ export const CompareView: React.FC<CompareViewProps> = ({
             <div className="flex items-center gap-3">
               <label 
                 htmlFor="toggle-highlight-diff"
-                className="flex items-center gap-2 cursor-pointer select-none text-xs font-semibold text-slate-600 hover:text-white transition-colors"
+                className="flex items-center gap-2 cursor-pointer select-none text-xs font-semibold text-slate-600 hover:text-slate-900 transition-colors"
               >
                 <div className="relative">
                   <input
@@ -272,7 +272,7 @@ export const CompareView: React.FC<CompareViewProps> = ({
                           {/* Image */}
                           <div 
                             onClick={() => onSelectProduct(product)}
-                            className="cursor-pointer aspect-square w-full max-w-[140px] mx-auto rounded-2xl bg-gradient-to-b from-white to-sky-50 border border-slate-200 p-3 mb-3 flex items-center justify-center hover:border-sky-500/40 transition-colors"
+                            className="cursor-pointer aspect-square w-full max-w-[140px] mx-auto rounded-2xl bg-white border border-slate-200 shadow-xs p-3 mb-3 flex items-center justify-center hover:border-sky-400 transition-colors"
                           >
                             <img
                               src={product.image}
@@ -289,7 +289,7 @@ export const CompareView: React.FC<CompareViewProps> = ({
                             </span>
                             <h3 
                               onClick={() => onSelectProduct(product)}
-                              className="text-sm font-bold text-white truncate group-hover:text-sky-700 cursor-pointer transition-colors"
+                              className="text-sm font-bold text-slate-900 truncate group-hover:text-sky-700 cursor-pointer transition-colors"
                               title={product.name}
                             >
                               {product.name}
@@ -300,7 +300,7 @@ export const CompareView: React.FC<CompareViewProps> = ({
 
                             {/* Price */}
                             <div className="mt-2.5 flex items-baseline gap-1.5">
-                              <span className="text-lg font-extrabold text-white font-mono">
+                              <span className="text-lg font-extrabold text-slate-900 font-mono">
                                 €{isBusinessCustomer ? (product.price * 1.22).toFixed(2) : product.price.toFixed(2)}
                               </span>
                               <span className="text-[10px] text-slate-400">
@@ -679,7 +679,7 @@ export const CompareView: React.FC<CompareViewProps> = ({
                 <button
                   id="close-compare-picker-modal"
                   onClick={() => setIsAddPickerOpen(false)}
-                  className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-100"
+                  className="p-1.5 rounded-xl text-slate-500 hover:text-slate-900 hover:bg-slate-100"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -708,7 +708,7 @@ export const CompareView: React.FC<CompareViewProps> = ({
                           <span className="text-[10px] font-bold text-sky-600 uppercase tracking-wider block">
                             {product.category}
                           </span>
-                          <h4 className="text-xs sm:text-sm font-bold text-white truncate">
+                          <h4 className="text-xs sm:text-sm font-bold text-slate-900 truncate">
                             {product.name}
                           </h4>
                           <p className="text-[11px] text-slate-400 font-mono">

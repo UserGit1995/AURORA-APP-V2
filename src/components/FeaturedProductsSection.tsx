@@ -38,7 +38,7 @@ export const FeaturedProductsSection: React.FC<FeaturedProductsSectionProps> = (
           <div className="p-1.5 rounded-lg bg-sky-500/15 text-sky-600">
             <Star className="w-4 h-4 fill-sky-400/30" />
           </div>
-          <h2 className="text-white text-base sm:text-lg font-bold tracking-tight">
+          <h2 className="text-slate-900 text-base sm:text-lg font-bold tracking-tight">
             {t('featured.sectionTitle', 'Prodotti in evidenza')}
           </h2>
         </div>
@@ -104,7 +104,7 @@ export const FeaturedProductsSection: React.FC<FeaturedProductsSectionProps> = (
                       className={`p-1.5 rounded-full backdrop-blur-xs transition-colors shrink-0 ${
                         isCompared
                           ? 'text-amber-300 bg-amber-500/20 border border-amber-500/40 shadow-xs'
-                          : 'text-slate-400 hover:text-white bg-slate-50/80 hover:bg-slate-100'
+                          : 'text-slate-500 hover:text-slate-900 bg-slate-50/80 hover:bg-slate-100'
                       }`}
                       title={isCompared ? t('featured.inCompare', 'Rimuovi dal confronto') : t('featured.compare', 'Aggiungi al confronto')}
                       aria-label="Confronta prodotto"
@@ -123,7 +123,7 @@ export const FeaturedProductsSection: React.FC<FeaturedProductsSectionProps> = (
                     className={`p-1.5 rounded-full backdrop-blur-xs transition-colors shrink-0 ${
                       isFav
                         ? 'text-rose-400 bg-rose-500/10'
-                        : 'text-slate-400 hover:text-white bg-slate-50/80 hover:bg-slate-100'
+                        : 'text-slate-500 hover:text-slate-900 bg-slate-50/80 hover:bg-slate-100'
                     }`}
                     aria-label="Aggiungi ai preferiti"
                     title={isFav ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'}
@@ -134,7 +134,7 @@ export const FeaturedProductsSection: React.FC<FeaturedProductsSectionProps> = (
               </div>
 
               {/* Product Image */}
-              <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-gradient-to-b from-white to-sky-50 flex items-center justify-center p-2 my-1">
+              <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-white border border-slate-200 shadow-xs flex items-center justify-center p-2 my-1">
                 <img
                   src={product.image}
                   alt={product.name}
@@ -145,7 +145,7 @@ export const FeaturedProductsSection: React.FC<FeaturedProductsSectionProps> = (
 
               {/* Product Info */}
               <div className="mt-2 text-left">
-                <h3 className="text-white text-xs sm:text-sm font-bold truncate leading-tight group-hover:text-sky-700 transition-colors">
+                <h3 className="text-slate-900 text-xs sm:text-sm font-bold truncate leading-tight group-hover:text-sky-700 transition-colors">
                   {product.name}
                 </h3>
                 <div className="flex items-center justify-between gap-1 mt-0.5">

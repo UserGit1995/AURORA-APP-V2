@@ -286,7 +286,7 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
             id="orders-export-history-pdf-btn"
             onClick={() => setShowExportModal(true)}
             disabled={isExportingHistory}
-            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gradient-to-r from-white to-sky-50 hover:from-white hover:to-sky-50 text-sky-700 hover:text-white border border-sky-500/30 text-xs font-bold shadow-md shadow-sky-950/40 transition-all hover:scale-[1.02] active:scale-[0.98]"
+            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white hover:bg-sky-50 text-sky-700 hover:text-sky-800 border border-sky-200 text-xs font-bold shadow-xs transition-all hover:scale-[1.02] active:scale-[0.98]"
             title={language === 'it' ? 'Esporta registro storico forniture e estratto conto in PDF' : 'Export supply history and statement in PDF'}
           >
             {isExportingHistory ? (

@@ -13,7 +13,8 @@ import {
   LogIn, 
   LogOut, 
   Mail, 
-  RotateCcw 
+  RotateCcw,
+  SlidersHorizontal
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useLanguage } from '../context/LanguageContext';
@@ -58,6 +59,7 @@ export const Header: React.FC<HeaderProps> = ({
   const { t, language } = useLanguage();
   const { isAdmin, currentUser, logout } = useAdmin();
   const [isListening, setIsListening] = useState(false);
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [speechError, setSpeechError] = useState<string | null>(null);
   const [interimText, setInterimText] = useState<string>('');
   const recognitionRef = useRef<any>(null);
@@ -507,10 +509,10 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* Profile Info / Login Trigger */}
           {currentUser ? (
-            <div className="flex items-center gap-1.5">
+            <div className="relative">
               <button
                 id="header-profile-button"
-                onClick={onOpenProfile}
+                onClick={() => setIsProfileMenuOpen((v) => !v)}
                 className="flex items-center gap-2.5 pl-1.5 pr-2 py-1 rounded-full hover:bg-slate-100 border border-transparent hover:border-slate-200 transition-colors text-left"
               >
                 <div className="w-8 h-8 rounded-full bg-sky-600 text-white flex items-center justify-center font-bold text-xs shadow-xs tracking-tight">
@@ -520,19 +522,82 @@ export const Header: React.FC<HeaderProps> = ({
                   <p className="text-slate-900 text-xs font-bold leading-none truncate max-w-[110px]">
                     {currentUser.name}
                   </p>
-                  <p className="text-slate-400 text-[10px] leading-tight mt-0.5">
-                    {currentUser.role === 'superadmin' ? 'SuperAdmin' : 'Cliente B2B'}
+                  <p className={`text-[10px] leading-tight mt-0.5 font-semibold ${currentUser.role === 'superadmin' ? 'text-amber-600' : 'text-slate-400'}`}>
+                    {currentUser.role === 'superadmin' ? 'SUPERADMIN' : 'Cliente B2B'}
                   </p>
                 </div>
               </button>
-              <button
-                id="header-logout-button"
-                onClick={logout}
-                className="p-2 rounded-full hover:bg-rose-500/15 text-slate-400 hover:text-rose-400 transition-colors"
-                title="Disconnetti"
-              >
-                <LogOut className="w-4 h-4" />
-              </button>
+
+              {isProfileMenuOpen && (
+                <>
+                  {/* Backdrop invisibile per chiudere il menu cliccando fuori */}
+                  <button
+                    type="button"
+                    aria-label="Chiudi menu profilo"
+                    onClick={() => setIsProfileMenuOpen(false)}
+                    className="fixed inset-0 z-40 cursor-default"
+                  />
+                  <div className="absolute right-0 top-[calc(100%+8px)] z-50 w-64 bg-white border border-slate-200 rounded-2xl shadow-xl p-1.5">
+                    <div className="p-3 pb-2.5">
+                      <p className="text-slate-900 text-sm font-bold leading-tight">{currentUser.name}</p>
+                      <p className="text-slate-400 text-xs truncate mt-0.5">{currentUser.email}</p>
+                      {currentUser.role === 'superadmin' && (
+                        <span className="inline-block mt-2 text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
+                          Ruolo: SuperAdmin
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="h-px bg-slate-100 mx-2" />
+
+                    <div className="p-1.5 space-y-0.5">
+                      {isAdmin && onOpenAdminPanel && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIsProfileMenuOpen(false);
+                            onOpenAdminPanel();
+                          }}
+                          className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition-colors text-left"
+                        >
+                          <SlidersHorizontal className="w-4 h-4 text-slate-400" />
+                          Pannello Amministratore
+                        </button>
+                      )}
+                      {onOpenQuickReorder && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIsProfileMenuOpen(false);
+                            onOpenQuickReorder();
+                          }}
+                          className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition-colors text-left"
+                        >
+                          <RotateCw className="w-4 h-4 text-slate-400" />
+                          Ordini Ricorrenti
+                        </button>
+                      )}
+                    </div>
+
+                    <div className="h-px bg-slate-100 mx-2" />
+
+                    <div className="p-1.5">
+                      <button
+                        id="header-logout-button"
+                        type="button"
+                        onClick={() => {
+                          setIsProfileMenuOpen(false);
+                          logout();
+                        }}
+                        className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-sm font-semibold text-rose-600 hover:bg-rose-50 transition-colors text-left"
+                      >
+                        <LogOut className="w-4 h-4" />
+                        Disconnetti Sessione
+                      </button>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
           ) : (
             <button

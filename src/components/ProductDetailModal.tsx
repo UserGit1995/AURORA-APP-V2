@@ -70,7 +70,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
         <button
           id="close-product-modal"
           onClick={onClose}
-          className="absolute top-4 right-4 z-10 p-2 rounded-full bg-slate-50 text-slate-400 hover:text-white border border-slate-200 transition-colors"
+          className="absolute top-4 right-4 z-10 p-2 rounded-full bg-slate-50 text-slate-500 hover:text-slate-900 border border-slate-200 transition-colors"
           aria-label="Chiudi"
         >
           <X className="w-5 h-5" />
@@ -113,7 +113,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
         {activeTab === 'overview' ? (
           <div className="grid grid-cols-1 md:grid-cols-12 flex-1">
             {/* Left: Product Image Showcase */}
-            <div className="md:col-span-5 relative bg-gradient-to-b from-white to-sky-50 p-6 flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-slate-200">
+            <div className="md:col-span-5 relative bg-white p-6 flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-slate-200">
               {product.discountPercent && (
                 <div className="absolute top-4 left-4 bg-amber-500/20 border border-amber-500/30 text-amber-300 text-xs font-bold px-2.5 py-1 rounded-lg">
                   Sconto -{product.discountPercent}%
@@ -177,7 +177,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                         className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold border transition-colors ${
                           isCompared
                             ? 'border-amber-500/40 bg-amber-500/20 text-amber-300'
-                            : 'border-slate-200 bg-slate-50 text-slate-400 hover:text-white'
+                            : 'border-slate-200 bg-slate-50 text-slate-500 hover:text-slate-900'
                         }`}
                         title={isCompared ? 'Rimuovi dal confronto' : 'Aggiungi al confronto'}
                       >
@@ -192,7 +192,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                       className={`p-1.5 rounded-full border transition-colors ${
                         isFavorite
                           ? 'border-rose-500/30 bg-rose-500/15 text-rose-400'
-                          : 'border-slate-200 bg-slate-50 text-slate-400 hover:text-white'
+                          : 'border-slate-200 bg-slate-50 text-slate-500 hover:text-slate-900'
                       }`}
                       aria-label="Preferito"
                     >
@@ -201,7 +201,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                   </div>
                 </div>
 
-                <h2 className="text-xl sm:text-2xl font-bold text-white mt-1">
+                <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mt-1">
                   {product.name}
                 </h2>
                 <p className="text-xs text-slate-400 mt-0.5">

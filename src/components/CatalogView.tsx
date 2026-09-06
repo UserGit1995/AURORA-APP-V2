@@ -745,7 +745,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                   </div>
                 </div>
 
-                <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-gradient-to-b from-white to-sky-50 flex items-center justify-center p-2 my-1">
+                <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-white border border-slate-200 shadow-xs flex items-center justify-center p-2 my-1">
                   <img
                     src={product.image}
                     alt={product.name}

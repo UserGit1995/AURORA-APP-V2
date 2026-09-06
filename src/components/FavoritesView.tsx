@@ -32,7 +32,7 @@ export const FavoritesView: React.FC<FavoritesViewProps> = ({
             <Heart className="w-5 h-5 fill-rose-400" />
           </div>
           <div>
-            <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+            <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
               Prodotti Preferiti e Riordino Rapido
             </h2>
             <p className="text-xs text-slate-400 mt-0.5">
@@ -77,7 +77,7 @@ export const FavoritesView: React.FC<FavoritesViewProps> = ({
           </div>
 
           {/* Text Details */}
-          <h3 className="text-lg sm:text-xl font-bold text-white tracking-tight mb-2">
+          <h3 className="text-lg sm:text-xl font-bold text-slate-900 tracking-tight mb-2">
             La tua lista preferiti è vuota
           </h3>
           <p className="text-xs sm:text-sm text-slate-400 max-w-md mx-auto leading-relaxed mb-7">
@@ -138,7 +138,7 @@ export const FavoritesView: React.FC<FavoritesViewProps> = ({
                         className={`p-1.5 rounded-full transition-colors ${
                           isCompared
                             ? 'text-amber-300 bg-amber-500/20 border border-amber-500/40'
-                            : 'text-slate-400 hover:text-white bg-slate-50/80 hover:bg-slate-100'
+                            : 'text-slate-500 hover:text-slate-900 bg-slate-50/80 hover:bg-slate-100'
                         }`}
                         title={isCompared ? 'Rimuovi dal confronto' : 'Aggiungi al confronto'}
                       >
@@ -160,7 +160,7 @@ export const FavoritesView: React.FC<FavoritesViewProps> = ({
                   </div>
                 </div>
 
-                <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-gradient-to-b from-white to-sky-50 flex items-center justify-center p-2 mb-2">
+                <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-white border border-slate-200 shadow-xs flex items-center justify-center p-2 mb-2">
                   <img
                     src={product.image}
                     alt={product.name}
@@ -193,7 +193,7 @@ export const FavoritesView: React.FC<FavoritesViewProps> = ({
                     <button
                       id={`fav-add-cart-btn-${product.id}`}
                       onClick={(e) => onAddToCart(product, e)}
-                      className="p-1 rounded-lg bg-slate-50 hover:bg-[#0284c7] text-slate-600 hover:text-white transition-colors"
+                      className="p-1 rounded-lg bg-slate-50 hover:bg-[#0284c7] text-slate-600 hover:text-slate-900 transition-colors"
                       title="Aggiungi al carrello"
                     >
                       <Plus className="w-3.5 h-3.5" />
