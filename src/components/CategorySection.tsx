@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Folder, ArrowRight } from 'lucide-react';
+import React, { useRef } from 'react';
+import { Folder, ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
 import { Category } from '../types';
 import { useLanguage } from '../context/LanguageContext';
 
@@ -17,125 +17,127 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
   onViewAll,
 }) => {
   const { t } = useLanguage();
-  const [activeDot, setActiveDot] = useState(0);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Take the primary categories (First 4 for mobile view, full list for desktop)
-  const mobileCategories = categories.slice(0, 4);
+  const scrollBy = (dir: 'left' | 'right') => {
+    scrollRef.current?.scrollBy({ left: dir === 'left' ? -320 : 320, behavior: 'smooth' });
+  };
+
+  const totalProducts = categories.reduce((sum, c) => sum + (c.countNumber || 0), 0);
 
   return (
     <section className="w-full mt-6 sm:mt-7">
       {/* Section Header */}
       <div className="flex items-center justify-between mb-3.5 sm:mb-4">
         <div className="flex items-center gap-2 sm:gap-2.5">
-          <div className="p-1 sm:p-1.5 rounded-lg bg-sky-500/15 text-sky-400">
+          <div className="p-1.5 rounded-lg bg-sky-500/15 text-sky-400">
             <Folder className="w-4 h-4" />
           </div>
-          <h2 className="text-white text-sm sm:text-lg font-bold tracking-tight">
-            {t('categories.sectionTitle', 'Categorie principali')}
-          </h2>
+          <div>
+            <h2 className="text-white text-sm sm:text-lg font-bold tracking-tight leading-tight">
+              {t('categories.sectionTitle', 'Categorie principali')}
+            </h2>
+            <p className="hidden sm:block text-slate-400 text-xs">
+              Esplora la gamma completa per la pulizia professionale e personale
+            </p>
+          </div>
         </div>
-        <button
-          id="view-all-categories-btn"
-          onClick={onViewAll}
-          className="text-xs sm:text-sm font-semibold text-sky-400 hover:text-sky-300 transition-colors flex items-center gap-1 group"
-        >
-          <span>{t('categories.viewAll', 'Vedi tutte')}</span>
-          <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
-        </button>
-      </div>
 
-      {/* 1. MOBILE ONLY VIEW (4 Category Cards Matching Screenshot) */}
-      <div className="grid grid-cols-4 gap-2 md:hidden">
-        {mobileCategories.map((cat, idx) => {
-          const isSelected = selectedCategoryId === cat.id;
-          const translatedName = t(`cat.${cat.id}`, cat.name);
-
-          return (
-            <div
-              key={`mobile-${cat.id}`}
-              id={`cat-card-mobile-${cat.id}`}
-              onClick={() => {
-                setActiveDot(idx);
-                onSelectCategory(cat.id);
-              }}
-              className={`group cursor-pointer rounded-2xl p-1.5 text-center transition-all duration-200 ${
-                isSelected
-                  ? 'bg-[#0e2244] border-2 border-sky-400 shadow-lg shadow-sky-950/40'
-                  : 'bg-[#08152a] hover:bg-[#0b1d3a] border border-[#13284d]'
-              }`}
+        <div className="flex items-center gap-2 shrink-0">
+          {selectedCategoryId && (
+            <button
+              onClick={onViewAll}
+              className="text-xs font-semibold text-sky-400 hover:text-sky-300 underline underline-offset-2"
             >
-              {/* Image Frame */}
-              <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-[#040c1a] mb-1.5">
-                <img
-                  src={cat.image}
-                  alt={translatedName}
-                  referrerPolicy="no-referrer"
-                  className="w-full h-full object-cover object-center"
-                />
-              </div>
-
-              {/* Title */}
-              <h3 className="text-white text-[11px] font-bold truncate leading-tight">
-                {translatedName}
-              </h3>
-            </div>
-          );
-        })}
+              Mostra tutte
+            </button>
+          )}
+          <div className="hidden sm:flex items-center gap-1">
+            <button
+              onClick={() => scrollBy('left')}
+              className="p-2 rounded-xl border border-[#1c2a44] hover:bg-[#0e1c34] text-slate-300 transition-colors"
+              aria-label="Scorri a sinistra"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => scrollBy('right')}
+              className="p-2 rounded-xl border border-[#1c2a44] hover:bg-[#0e1c34] text-slate-300 transition-colors"
+              aria-label="Scorri a destra"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
       </div>
 
-      {/* Mobile Only Carousel Indicator Dots */}
-      <div className="flex md:hidden items-center justify-center gap-1.5 mt-3 pt-0.5">
-        {[0, 1, 2, 3, 4].map((dotIndex) => (
-          <button
-            key={dotIndex}
-            type="button"
-            onClick={() => setActiveDot(dotIndex)}
-            className={`rounded-full transition-all duration-200 ${
-              activeDot === dotIndex
-                ? 'w-2.5 h-2.5 bg-sky-400 shadow-sm shadow-sky-500/50'
-                : 'w-2 h-2 bg-[#1b345b] hover:bg-slate-600'
-            }`}
-            aria-label={`Slide ${dotIndex + 1}`}
-          />
-        ))}
-      </div>
+      {/* Carosello orizzontale */}
+      <div
+        ref={scrollRef}
+        className="flex gap-3.5 overflow-x-auto pb-2 scroll-smooth snap-x"
+        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+      >
+        {/* Card "Catalogo completo" */}
+        <button
+          onClick={onViewAll}
+          className={`shrink-0 snap-start w-36 sm:w-44 h-40 rounded-2xl p-4 flex flex-col justify-between text-left transition-all border ${
+            !selectedCategoryId
+              ? 'bg-sky-600 border-sky-500 text-white shadow-lg shadow-sky-950/40'
+              : 'bg-[#081326] border-[#142646] text-slate-200 hover:border-[#1e3966]'
+          }`}
+        >
+          <span className="p-2 rounded-xl bg-white/15 w-fit">
+            <Sparkles className="w-5 h-5" />
+          </span>
+          <div>
+            <div className="font-bold text-sm leading-tight">Catalogo completo</div>
+            <div className="text-[11px] opacity-80 mt-0.5">{totalProducts} prodotti</div>
+          </div>
+        </button>
 
-      {/* 2. DESKTOP & TABLET VIEW (Full Categories Grid with Product Counts) */}
-      <div className="hidden md:grid md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7 gap-3">
+        {/* Card categorie */}
         {categories.map((cat) => {
           const isSelected = selectedCategoryId === cat.id;
           const translatedName = t(`cat.${cat.id}`, cat.name);
-          const countDisplay = `${cat.countNumber || 0} ${t('categories.productsCount', 'prodotti')}`;
-
           return (
-            <div
-              key={`desktop-${cat.id}`}
+            <button
+              key={cat.id}
               id={`cat-card-${cat.id}`}
               onClick={() => onSelectCategory(cat.id)}
-              className={`group cursor-pointer rounded-2xl p-2.5 text-center transition-all duration-200 ${
+              className={`relative shrink-0 snap-start w-48 sm:w-56 h-40 rounded-2xl overflow-hidden text-left transition-all border group ${
                 isSelected
-                  ? 'bg-[#0f244a] border-2 border-sky-400 shadow-lg shadow-sky-950/40 -translate-y-0.5'
-                  : 'bg-[#081326] hover:bg-[#0c1c36] border border-[#142646] hover:border-[#1e3966] hover:-translate-y-0.5'
+                  ? 'border-sky-400 ring-2 ring-sky-500/60 shadow-lg -translate-y-0.5'
+                  : 'border-[#142646] hover:border-sky-500/50 hover:-translate-y-0.5'
               }`}
             >
-              {/* Image Frame */}
-              <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-[#050c18] mb-2.5">
-                <img
-                  src={cat.image || '/logo-login.png'}
-                  alt={translatedName}
-                  referrerPolicy="no-referrer"
-                  className="w-full h-full object-cover object-center transition-transform duration-300 group-hover:scale-105"
-                />
-              </div>
+              <img
+                src={cat.image || '/logo-login.png'}
+                alt={translatedName}
+                referrerPolicy="no-referrer"
+                className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              />
+              <div
+                className={`absolute inset-0 ${
+                  isSelected
+                    ? 'bg-gradient-to-t from-sky-950/95 via-sky-950/60 to-sky-950/20'
+                    : 'bg-gradient-to-t from-slate-950/90 via-slate-950/55 to-slate-950/20 group-hover:from-slate-950/95'
+                }`}
+              />
 
-              {/* Title & Count */}
-              <h3 className="text-white text-xs sm:text-sm font-bold truncate leading-tight group-hover:text-sky-300 transition-colors">
-                {translatedName}
-              </h3>
-              <p className="text-slate-400 text-[11px] mt-0.5 truncate">
-                {countDisplay}
-              </p>
-            </div>
+              <div className="relative z-10 h-full p-4 flex flex-col justify-between">
+                <span className="self-start text-[10px] font-semibold px-2 py-0.5 rounded-full bg-black/40 backdrop-blur-md text-white border border-white/20">
+                  {cat.countNumber || 0} prodotti
+                </span>
+                <div>
+                  <div className="font-bold text-base leading-tight text-white group-hover:text-sky-300 transition-colors">
+                    {translatedName}
+                  </div>
+                  {cat.description && (
+                    <div className="text-[11px] text-slate-200/90 line-clamp-1 mt-0.5">{cat.description}</div>
+                  )}
+                </div>
+              </div>
+            </button>
           );
         })}
       </div>

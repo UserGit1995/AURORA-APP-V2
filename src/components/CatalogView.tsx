@@ -672,6 +672,10 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                       <span className="text-[10px] font-bold bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded-md border border-amber-500/30">
                         -{product.discountPercent}%
                       </span>
+                    ) : product.isFeatured ? (
+                      <span className="text-[10px] font-bold bg-sky-500/20 text-sky-300 px-1.5 py-0.5 rounded-md border border-sky-500/30">
+                        In Evidenza
+                      </span>
                     ) : null}
 
                     {isLowStock && (
