@@ -200,15 +200,15 @@ export const OrderTrackingTimeline: React.FC<OrderTrackingTimelineProps> = ({
       {/* Visual Step-Based Progress Stepper Box */}
       <div className={`rounded-2xl p-4 sm:p-5 transition-all shadow-inner ${
         isActive 
-          ? 'bg-[#050e20] border border-sky-500/30 ring-1 ring-sky-500/20' 
-          : 'bg-[#050c18] border border-[#11233e]'
+          ? 'bg-slate-50 border border-sky-500/30 ring-1 ring-sky-500/20' 
+          : 'bg-slate-50 border border-slate-200'
       }`}>
         {/* Top Header of Stepper */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 pb-3 border-b border-[#0f1f38]">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-200">
           <div className="flex items-center gap-2.5">
             <div className={`p-2 rounded-xl border ${
               isActive 
-                ? 'bg-sky-500/20 text-sky-300 border-sky-500/40 shadow-xs' 
+                ? 'bg-sky-500/20 text-sky-700 border-sky-500/40 shadow-xs' 
                 : currentStage === 4 
                 ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30'
                 : 'bg-slate-800/40 text-slate-400 border-slate-700'
@@ -250,7 +250,7 @@ export const OrderTrackingTimeline: React.FC<OrderTrackingTimelineProps> = ({
                 className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-sky-600/30 to-indigo-600/30 hover:from-sky-500/40 hover:to-indigo-500/40 text-sky-200 hover:text-white border border-sky-400/50 transition-all shadow-xs"
                 title="Avanza lo stato dell'ordine da 'In elaborazione' a 'Spedito' ed emetti l'avviso toast"
               >
-                <Truck className="w-3.5 h-3.5 text-sky-400 animate-pulse" />
+                <Truck className="w-3.5 h-3.5 text-sky-600 animate-pulse" />
                 <span>{language === 'it' ? 'Simula Spedizione (In elaborazione ➔ Spedito)' : 'Advance to Shipped'}</span>
               </button>
             )}
@@ -281,7 +281,7 @@ export const OrderTrackingTimeline: React.FC<OrderTrackingTimelineProps> = ({
         {/* 4-Step Visual Stepper Grid with Continuous Connected Line */}
         <div className="relative px-2 sm:px-6 py-3">
           {/* Connector Line Background */}
-          <div className="absolute top-7 left-8 right-8 sm:left-14 sm:right-14 h-1.5 bg-[#0e203c] rounded-full -z-0" />
+          <div className="absolute top-7 left-8 right-8 sm:left-14 sm:right-14 h-1.5 bg-slate-50 rounded-full -z-0" />
           
           {/* Active Gradient Filled Progress Connector */}
           <motion.div
@@ -315,18 +315,18 @@ export const OrderTrackingTimeline: React.FC<OrderTrackingTimelineProps> = ({
                   <div
                     className={`relative w-9 h-9 sm:w-11 sm:h-11 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${
                       isCancelled
-                        ? 'bg-[#180e12] border-rose-500/50 text-rose-400'
+                        ? 'bg-slate-50 border-rose-500/50 text-rose-400'
                         : isStepCompleted
                         ? 'bg-[#0284c7] border-sky-300 text-white shadow-md shadow-sky-500/40 group-hover:scale-110'
                         : isStepCurrent
-                        ? 'bg-[#071d3f] border-sky-400 text-sky-200 ring-4 ring-sky-500/30 shadow-lg shadow-sky-500/50 group-hover:scale-110'
-                        : 'bg-[#09152b] border-[#142646] text-slate-500 group-hover:border-slate-500 group-hover:text-slate-400'
+                        ? 'bg-slate-50 border-sky-400 text-sky-200 ring-4 ring-sky-500/30 shadow-lg shadow-sky-500/50 group-hover:scale-110'
+                        : 'bg-slate-50 border-slate-200 text-slate-500 group-hover:border-slate-500 group-hover:text-slate-400'
                     } ${isSelected ? 'ring-2 ring-white/80' : ''}`}
                   >
                     {isStepCompleted ? (
                       <Check className="w-4 h-4 sm:w-5 sm:h-5 stroke-[2.5]" />
                     ) : (
-                      <Icon className={`w-4 h-4 sm:w-5 sm:h-5 ${isStepCurrent ? 'animate-pulse text-sky-300' : ''}`} />
+                      <Icon className={`w-4 h-4 sm:w-5 sm:h-5 ${isStepCurrent ? 'animate-pulse text-sky-700' : ''}`} />
                     )}
 
                     {/* Step Number Tag */}
@@ -336,7 +336,7 @@ export const OrderTrackingTimeline: React.FC<OrderTrackingTimelineProps> = ({
                           ? 'bg-emerald-400 text-emerald-950 shadow-xs'
                           : isStepCurrent
                           ? 'bg-sky-400 text-sky-950 font-bold shadow-xs'
-                          : 'bg-[#142646] text-slate-400'
+                          : 'bg-slate-50 text-slate-400'
                       }`}
                     >
                       {step.stepNumber}
@@ -347,15 +347,15 @@ export const OrderTrackingTimeline: React.FC<OrderTrackingTimelineProps> = ({
                   <div className="mt-2.5 max-w-[85px] sm:max-w-[130px]">
                     <span className={`block text-xs sm:text-sm font-bold tracking-tight transition-colors ${
                       isStepCompleted 
-                        ? 'text-white' 
+                        ? 'text-slate-900' 
                         : isStepCurrent 
-                        ? 'text-sky-300 font-extrabold' 
+                        ? 'text-sky-700 font-extrabold' 
                         : 'text-slate-500'
                     }`}>
                       {step.label}
                     </span>
                     <span className={`block text-[9.5px] sm:text-[10.5px] mt-0.5 leading-tight font-medium ${
-                      isStepCurrent ? 'text-sky-300' : 'text-slate-400'
+                      isStepCurrent ? 'text-sky-700' : 'text-slate-400'
                     }`}>
                       {step.sublabel}
                     </span>
@@ -373,7 +373,7 @@ export const OrderTrackingTimeline: React.FC<OrderTrackingTimelineProps> = ({
                         <span>{t('orders.stepCurrent', 'In corso')}</span>
                       </span>
                     ) : (
-                      <span className="text-[9px] sm:text-[10px] font-medium text-slate-500 bg-[#0c1a32] px-1.5 py-0.5 rounded-full">
+                      <span className="text-[9px] sm:text-[10px] font-medium text-slate-500 bg-slate-50 px-1.5 py-0.5 rounded-full">
                         {t('orders.stepUpcoming', 'In attesa')}
                       </span>
                     )}
@@ -391,7 +391,7 @@ export const OrderTrackingTimeline: React.FC<OrderTrackingTimelineProps> = ({
               initial={{ opacity: 0, height: 0, y: -6 }}
               animate={{ opacity: 1, height: 'auto', y: 0 }}
               exit={{ opacity: 0, height: 0, y: -6 }}
-              className="mt-4 pt-3.5 border-t border-[#122340] overflow-hidden"
+              className="mt-4 pt-3.5 border-t border-slate-200 overflow-hidden"
             >
               {(() => {
                 const activeStep = steps.find((s) => s.stepNumber === activeStepTab);
@@ -399,31 +399,31 @@ export const OrderTrackingTimeline: React.FC<OrderTrackingTimelineProps> = ({
                 const Icon = activeStep.icon;
 
                 return (
-                  <div className="bg-[#08152e] border border-[#173056] rounded-xl p-3.5 sm:p-4 text-xs text-slate-300 shadow-lg">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2 pb-2 border-b border-[#122442]">
+                  <div className="bg-slate-50 border border-slate-200 rounded-xl p-3.5 sm:p-4 text-xs text-slate-600 shadow-lg">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2 pb-2 border-b border-slate-200">
                       <div className="flex items-center gap-2">
-                        <div className="p-1.5 rounded-lg bg-sky-500/20 text-sky-300 border border-sky-500/30">
+                        <div className="p-1.5 rounded-lg bg-sky-500/20 text-sky-700 border border-sky-500/30">
                           <Icon className="w-4 h-4" />
                         </div>
                         <span className="font-bold text-white text-xs sm:text-sm">
                           {language === 'it' ? `Tappa ${activeStep.stepNumber}` : `Step ${activeStep.stepNumber}`}: {activeStep.label} — {activeStep.sublabel}
                         </span>
                       </div>
-                      <span className="text-xs font-mono text-sky-300 font-semibold bg-[#050c1a] px-2.5 py-1 rounded-md border border-[#142646]">
+                      <span className="text-xs font-mono text-sky-700 font-semibold bg-slate-50 px-2.5 py-1 rounded-md border border-slate-200">
                         {activeStep.timestamp}
                       </span>
                     </div>
 
-                    <p className="text-slate-300 text-xs leading-relaxed mb-3">
+                    <p className="text-slate-600 text-xs leading-relaxed mb-3">
                       {activeStep.description}
                     </p>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs bg-[#050c18] p-3 rounded-xl border border-[#11233e]">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs bg-slate-50 p-3 rounded-xl border border-slate-200">
                       <div>
                         <span className="text-slate-400 block text-[10px] uppercase font-bold tracking-wider">
                           {language === 'it' ? 'Posizione / Hub:' : 'Location / Hub:'}
                         </span>
-                        <span className="font-semibold text-white mt-0.5 block">{activeStep.location}</span>
+                        <span className="font-semibold text-slate-900 mt-0.5 block">{activeStep.location}</span>
                       </div>
                       <div>
                         <span className="text-slate-400 block text-[10px] uppercase font-bold tracking-wider">
@@ -433,7 +433,7 @@ export const OrderTrackingTimeline: React.FC<OrderTrackingTimelineProps> = ({
                           activeStep.status === 'completed' 
                             ? 'text-emerald-400' 
                             : activeStep.status === 'current' 
-                            ? 'text-sky-300' 
+                            ? 'text-sky-700' 
                             : 'text-slate-400'
                         }`}>
                           {activeStep.status === 'completed' 
@@ -448,7 +448,7 @@ export const OrderTrackingTimeline: React.FC<OrderTrackingTimelineProps> = ({
                     {activeStep.detailsList && activeStep.detailsList.length > 0 && (
                       <ul className="mt-3 space-y-1.5 pl-1">
                         {activeStep.detailsList.map((item, idx) => (
-                          <li key={idx} className="flex items-center gap-2 text-xs text-slate-300">
+                          <li key={idx} className="flex items-center gap-2 text-xs text-slate-600">
                             <div className="w-1.5 h-1.5 rounded-full bg-sky-400 shrink-0" />
                             <span>{item}</span>
                           </li>
@@ -464,14 +464,14 @@ export const OrderTrackingTimeline: React.FC<OrderTrackingTimelineProps> = ({
 
         {/* Collapsible Detailed Milestones Log */}
         {showDetailsToggle && (
-          <div className="mt-3 pt-3 border-t border-[#0f1f38] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2">
+          <div className="mt-3 pt-3 border-t border-slate-200 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2">
             <button
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
                 setIsExpanded(!isExpanded);
               }}
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-sky-400 hover:text-sky-300 transition-colors"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-sky-600 hover:text-sky-700 transition-colors"
             >
               <span>{isExpanded ? (language === 'it' ? 'Nascondi cronologia tappe' : 'Hide milestone history') : (language === 'it' ? 'Mostra cronologia dettagliata & log logistici' : 'Show detailed logistics timeline')}</span>
               {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
@@ -484,9 +484,9 @@ export const OrderTrackingTimeline: React.FC<OrderTrackingTimelineProps> = ({
                   e.stopPropagation();
                   onOpenCarrierTracking();
                 }}
-                className="text-xs font-semibold text-slate-200 hover:text-white px-3 py-1.5 rounded-xl bg-[#0b1b36] hover:bg-[#0f244a] border border-sky-500/30 transition-colors inline-flex items-center gap-1.5 shadow-xs"
+                className="text-xs font-semibold text-slate-700 hover:text-white px-3 py-1.5 rounded-xl bg-slate-50 hover:bg-slate-100 border border-sky-500/30 transition-colors inline-flex items-center gap-1.5 shadow-xs"
               >
-                <Truck className="w-3.5 h-3.5 text-sky-400" />
+                <Truck className="w-3.5 h-3.5 text-sky-600" />
                 <span>{language === 'it' ? `Traccia con ${order.courier}` : `Track via ${order.courier}`}</span>
               </button>
             )}
@@ -500,9 +500,9 @@ export const OrderTrackingTimeline: React.FC<OrderTrackingTimelineProps> = ({
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="mt-3 pt-3 border-t border-[#122340] space-y-3 overflow-hidden"
+              className="mt-3 pt-3 border-t border-slate-200 space-y-3 overflow-hidden"
             >
-              <div className="relative pl-6 space-y-3.5 before:absolute before:left-2.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-[#152a4e]">
+              <div className="relative pl-6 space-y-3.5 before:absolute before:left-2.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-50">
                 {steps.map((step) => {
                   const isDone = step.status === 'completed';
                   const isNow = step.status === 'current';
@@ -515,25 +515,25 @@ export const OrderTrackingTimeline: React.FC<OrderTrackingTimelineProps> = ({
                           ? 'bg-emerald-500 border-emerald-300 text-white'
                           : isNow
                           ? 'bg-sky-400 border-sky-200 text-[#051124] animate-ping'
-                          : 'bg-[#09152b] border-[#183158]'
+                          : 'bg-slate-50 border-slate-200'
                       }`}>
                         {isDone && <Check className="w-2 h-2 stroke-[3]" />}
                       </span>
 
-                      <div className="bg-[#071328] border border-[#122646] p-3 rounded-xl">
+                      <div className="bg-slate-50 border border-slate-200 p-3 rounded-xl">
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-1">
-                          <span className="font-bold text-white flex items-center gap-1.5">
+                          <span className="font-bold text-slate-900 flex items-center gap-1.5">
                             <span>{step.stepNumber}. {step.label} — {step.sublabel}</span>
                           </span>
-                          <span className="text-[11px] font-mono text-sky-300 font-semibold">
+                          <span className="text-[11px] font-mono text-sky-700 font-semibold">
                             {step.timestamp}
                           </span>
                         </div>
-                        <p className="text-xs text-slate-300">
+                        <p className="text-xs text-slate-600">
                           {step.description}
                         </p>
                         <div className="mt-1.5 flex items-center gap-2 text-[11px] text-slate-400">
-                          <MapPin className="w-3.5 h-3.5 text-sky-400" />
+                          <MapPin className="w-3.5 h-3.5 text-sky-600" />
                           <span>{step.location}</span>
                         </div>
                       </div>

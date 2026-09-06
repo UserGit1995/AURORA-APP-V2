@@ -89,24 +89,24 @@ export const ProductTrendSparkline: React.FC<ProductTrendSparklineProps> = ({ pr
   }, [trendData]);
 
   return (
-    <div className="mt-3.5 bg-[#081326] border border-[#142848] rounded-xl p-3">
+    <div className="mt-3.5 bg-slate-50 border border-slate-200 rounded-xl p-3">
       {/* Sparkline Header & Switcher */}
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-1.5">
-          <Activity className="w-3.5 h-3.5 text-sky-400" />
-          <span className="text-[11px] font-bold text-slate-300 uppercase tracking-wider">
+          <Activity className="w-3.5 h-3.5 text-sky-600" />
+          <span className="text-[11px] font-bold text-slate-600 uppercase tracking-wider">
             Trend Storico (6 Mesi)
           </span>
         </div>
 
-        <div className="flex items-center bg-[#050c18] border border-[#142848] rounded-lg p-0.5">
+        <div className="flex items-center bg-slate-50 border border-slate-200 rounded-lg p-0.5">
           <button
             id="sparkline-price-tab"
             type="button"
             onClick={() => setActiveMetric('price')}
             className={`px-2 py-0.5 rounded-md text-[10.5px] font-semibold transition-colors ${
               activeMetric === 'price'
-                ? 'bg-sky-500/20 text-sky-300 border border-sky-500/40 shadow-xs'
+                ? 'bg-sky-500/20 text-sky-700 border border-sky-500/40 shadow-xs'
                 : 'text-slate-400 hover:text-white'
             }`}
           >
@@ -128,11 +128,11 @@ export const ProductTrendSparkline: React.FC<ProductTrendSparklineProps> = ({ pr
       </div>
 
       {/* Mini Stats Summary Pill */}
-      <div className="flex items-center justify-between text-[11px] text-slate-300 mb-1.5 px-0.5">
+      <div className="flex items-center justify-between text-[11px] text-slate-600 mb-1.5 px-0.5">
         {activeMetric === 'price' ? (
           <>
             <span className="text-slate-400 text-[10.5px]">
-              Min: <strong className="text-white font-mono">€{priceStats.min.toFixed(2)}</strong> / Max: <strong className="text-white font-mono">€{priceStats.max.toFixed(2)}</strong>
+              Min: <strong className="text-slate-900 font-mono">€{priceStats.min.toFixed(2)}</strong> / Max: <strong className="text-slate-900 font-mono">€{priceStats.max.toFixed(2)}</strong>
             </span>
             <span className="inline-flex items-center gap-0.5 font-medium text-[10.5px]">
               {priceStats.percentDiff < -0.5 ? (
@@ -146,7 +146,7 @@ export const ProductTrendSparkline: React.FC<ProductTrendSparklineProps> = ({ pr
                   +{priceStats.percentDiff.toFixed(1)}%
                 </span>
               ) : (
-                <span className="text-sky-300 inline-flex items-center">
+                <span className="text-sky-700 inline-flex items-center">
                   <Minus className="w-3 h-3" />
                   Prezzo stabile
                 </span>
@@ -156,7 +156,7 @@ export const ProductTrendSparkline: React.FC<ProductTrendSparklineProps> = ({ pr
         ) : (
           <>
             <span className="text-slate-400 text-[10.5px]">
-              Media mensile: <strong className="text-white font-mono">{demandStats.avg} colli</strong>
+              Media mensile: <strong className="text-slate-900 font-mono">{demandStats.avg} colli</strong>
             </span>
             <span className="inline-flex items-center gap-0.5 font-medium text-[10.5px]">
               {demandStats.percentDiff >= 0 ? (
@@ -202,10 +202,10 @@ export const ProductTrendSparkline: React.FC<ProductTrendSparklineProps> = ({ pr
                 if (active && payload && payload.length) {
                   const data = payload[0].payload as TrendDataPoint;
                   return (
-                    <div className="bg-[#050c18] border border-[#1b345b] p-2 rounded-lg shadow-xl text-left pointer-events-none">
+                    <div className="bg-slate-50 border border-slate-200 p-2 rounded-lg shadow-xl text-left pointer-events-none">
                       <p className="text-[10px] text-slate-400 font-bold uppercase">{data.month} 2026</p>
                       {activeMetric === 'price' ? (
-                        <p className="text-xs font-bold text-sky-300 font-mono">
+                        <p className="text-xs font-bold text-sky-700 font-mono">
                           €{data.price.toFixed(2)} <span className="text-[10px] text-slate-400 font-normal">/ {product.unit}</span>
                         </p>
                       ) : (

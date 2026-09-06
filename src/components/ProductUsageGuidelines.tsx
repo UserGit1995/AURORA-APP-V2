@@ -330,12 +330,12 @@ export const ProductUsageGuidelines: React.FC<ProductUsageGuidelinesProps> = ({ 
   const capsCount = Math.max(1, Math.round(calculatedMl / 30)); // Assuming 30ml cap size
 
   return (
-    <div className="space-y-4 text-slate-200">
+    <div className="space-y-4 text-slate-700">
       {/* Top Banner: Chemical ID & Safety Header */}
-      <div className="bg-[#050e20] border border-[#13274c] rounded-2xl p-4 sm:p-5 shadow-inner">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#0f1f3e]">
+      <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-inner">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-sky-500/15 border border-sky-400/30 text-sky-400">
+            <div className="p-2.5 rounded-xl bg-sky-500/15 border border-sky-400/30 text-sky-600">
               <FlaskConical className="w-5 h-5" />
             </div>
             <div>
@@ -361,7 +361,7 @@ export const ProductUsageGuidelines: React.FC<ProductUsageGuidelinesProps> = ({ 
 
           <div className="flex items-center gap-2 text-xs">
             <span className="text-slate-400">Formula:</span>
-            <span className="font-semibold text-white bg-[#0a1834] px-2 py-1 rounded-lg border border-[#162d55]">
+            <span className="font-semibold text-slate-900 bg-slate-50 px-2 py-1 rounded-lg border border-slate-200">
               {profile.readyToUse ? 'Pronto all\'uso' : 'Super Concentrato'}
             </span>
           </div>
@@ -369,29 +369,29 @@ export const ProductUsageGuidelines: React.FC<ProductUsageGuidelinesProps> = ({ 
 
         {/* Key Quick Specs Bar */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mt-3 text-xs">
-          <div className="bg-[#08152c] p-2.5 rounded-xl border border-[#13284c]">
+          <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200">
             <span className="text-[10.5px] text-slate-400 block flex items-center gap-1">
-              <Thermometer className="w-3 h-3 text-sky-400" />
+              <Thermometer className="w-3 h-3 text-sky-600" />
               Temperatura
             </span>
-            <span className="font-semibold text-white text-[11.5px] block mt-0.5 truncate">
+            <span className="font-semibold text-slate-900 text-[11.5px] block mt-0.5 truncate">
               {profile.temperature}
             </span>
           </div>
 
-          <div className="bg-[#08152c] p-2.5 rounded-xl border border-[#13284c]">
+          <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200">
             <span className="text-[10.5px] text-slate-400 block flex items-center gap-1">
-              <Clock className="w-3 h-3 text-sky-400" />
+              <Clock className="w-3 h-3 text-sky-600" />
               Tempo di Contatto
             </span>
-            <span className="font-semibold text-sky-300 text-[11.5px] block mt-0.5">
+            <span className="font-semibold text-sky-700 text-[11.5px] block mt-0.5">
               {profile.contactTime}
             </span>
           </div>
 
-          <div className="bg-[#08152c] p-2.5 rounded-xl border border-[#13284c]">
+          <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200">
             <span className="text-[10.5px] text-slate-400 block flex items-center gap-1">
-              <Droplets className="w-3 h-3 text-sky-400" />
+              <Droplets className="w-3 h-3 text-sky-600" />
               Risciacquo
             </span>
             <span className={`font-semibold text-[11.5px] block mt-0.5 ${
@@ -401,7 +401,7 @@ export const ProductUsageGuidelines: React.FC<ProductUsageGuidelinesProps> = ({ 
             </span>
           </div>
 
-          <div className="bg-[#08152c] p-2.5 rounded-xl border border-[#13284c]">
+          <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200">
             <span className="text-[10.5px] text-slate-400 block flex items-center gap-1">
               <CheckCircle2 className="w-3 h-3 text-emerald-400" />
               HACCP Food Safe
@@ -415,15 +415,15 @@ export const ProductUsageGuidelines: React.FC<ProductUsageGuidelinesProps> = ({ 
 
       {/* Dilution Protocols & Interactive Calculator */}
       {!profile.readyToUse ? (
-        <div className="bg-[#071328] border border-[#14284d] rounded-2xl p-4 sm:p-5">
-          <div className="flex items-center justify-between mb-3 pb-2 border-b border-[#102242]">
+        <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 sm:p-5">
+          <div className="flex items-center justify-between mb-3 pb-2 border-b border-slate-200">
             <div className="flex items-center gap-2">
-              <Calculator className="w-4 h-4 text-sky-400" />
-              <h4 className="text-xs font-bold text-white uppercase tracking-wider">
+              <Calculator className="w-4 h-4 text-sky-600" />
+              <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
                 Tabella e Calcolatore di Dosaggio / Diluizione
               </h4>
             </div>
-            <span className="text-[10.5px] text-sky-400 font-medium">
+            <span className="text-[10.5px] text-sky-600 font-medium">
               Precisione Professionale B2B
             </span>
           </div>
@@ -441,21 +441,21 @@ export const ProductUsageGuidelines: React.FC<ProductUsageGuidelinesProps> = ({ 
                   onClick={() => setSelectedDilutionRateIndex(idx)}
                   className={`p-2.5 rounded-xl text-left border transition-all ${
                     selectedDilutionRateIndex === idx
-                      ? 'bg-[#0a1e3e] border-sky-400 text-white shadow-md shadow-sky-950/40 ring-1 ring-sky-400/30'
-                      : 'bg-[#09152b] border-[#132646] text-slate-300 hover:border-slate-500'
+                      ? 'bg-slate-50 border-sky-400 text-slate-900 shadow-md shadow-sky-950/40 ring-1 ring-sky-400/30'
+                      : 'bg-slate-50 border-slate-200 text-slate-600 hover:border-slate-500'
                   }`}
                 >
                   <div className="flex items-center justify-between mb-1">
                     <span className="font-bold text-xs text-white truncate max-w-[130px]">
                       {rate.useCase}
                     </span>
-                    <span className="text-[10px] font-mono font-bold text-sky-300 bg-sky-500/15 px-1.5 py-0.5 rounded">
+                    <span className="text-[10px] font-mono font-bold text-sky-700 bg-sky-500/15 px-1.5 py-0.5 rounded">
                       {rate.ratio}
                     </span>
                   </div>
                   <div className="flex items-center justify-between text-[10.5px] text-slate-400">
                     <span>{rate.dosagePerLiter}</span>
-                    <span className="text-slate-300">{rate.actionTime}</span>
+                    <span className="text-slate-600">{rate.actionTime}</span>
                   </div>
                 </button>
               ))}
@@ -463,9 +463,9 @@ export const ProductUsageGuidelines: React.FC<ProductUsageGuidelinesProps> = ({ 
           </div>
 
           {/* Interactive Calculator: Water Volume Selection */}
-          <div className="bg-[#040b18] border border-[#11233e] rounded-xl p-3.5 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+          <div className="bg-slate-50 border border-slate-200 rounded-xl p-3.5 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-sky-500/20 text-sky-300 shrink-0">
+              <div className="p-2 rounded-lg bg-sky-500/20 text-sky-700 shrink-0">
                 <Droplets className="w-5 h-5" />
               </div>
               <div>
@@ -481,7 +481,7 @@ export const ProductUsageGuidelines: React.FC<ProductUsageGuidelinesProps> = ({ 
                       className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
                         selectedWaterLiters === liters
                           ? 'bg-[#0284c7] text-white shadow-xs'
-                          : 'bg-[#0a162d] text-slate-400 hover:text-white border border-[#162a4c]'
+                          : 'bg-slate-50 text-slate-400 hover:text-white border border-slate-200'
                       }`}
                     >
                       {liters} Litr{liters === 1 ? 'o' : 'i'}
@@ -492,15 +492,15 @@ export const ProductUsageGuidelines: React.FC<ProductUsageGuidelinesProps> = ({ 
             </div>
 
             {/* Result Box */}
-            <div className="bg-[#071733] border border-sky-500/30 rounded-xl p-3 text-right flex flex-col justify-center shrink-0">
+            <div className="bg-slate-50 border border-sky-500/30 rounded-xl p-3 text-right flex flex-col justify-center shrink-0">
               <span className="text-[10.5px] text-slate-400 uppercase tracking-wider block">
                 Dose Chimico Raccomandata:
               </span>
               <div className="flex items-baseline justify-end gap-1.5 mt-0.5">
-                <span className="text-xl sm:text-2xl font-black text-sky-300 font-mono">
+                <span className="text-xl sm:text-2xl font-black text-sky-700 font-mono">
                   {calculatedMl} ml
                 </span>
-                <span className="text-xs text-slate-300">
+                <span className="text-xs text-slate-600">
                   (ca. {capsCount} tapp{capsCount === 1 ? 'o' : 'i'})
                 </span>
               </div>
@@ -512,7 +512,7 @@ export const ProductUsageGuidelines: React.FC<ProductUsageGuidelinesProps> = ({ 
         </div>
       ) : (
         /* Ready to use banner */
-        <div className="bg-[#071328] border border-[#14284d] rounded-2xl p-4 flex items-center gap-3">
+        <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 flex items-center gap-3">
           <div className="p-2.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 shrink-0">
             <CheckCircle2 className="w-5 h-5" />
           </div>
@@ -520,7 +520,7 @@ export const ProductUsageGuidelines: React.FC<ProductUsageGuidelinesProps> = ({ 
             <h4 className="text-xs font-bold text-white uppercase tracking-wider">
               Prodotto Pronto all'Uso (No Diluizione)
             </h4>
-            <p className="text-xs text-slate-300 mt-0.5">
+            <p className="text-xs text-slate-600 mt-0.5">
               Questo formulato è già premiscelato alle concentrazioni ideali di efficacia e sicurezza. Applicare direttamente sulla superficie tramite trigger spray o dosatore integrato senza aggiungere acqua.
             </p>
           </div>
@@ -528,11 +528,11 @@ export const ProductUsageGuidelines: React.FC<ProductUsageGuidelinesProps> = ({ 
       )}
 
       {/* Safety PPE Card (Dispositivi di Protezione Individuale) */}
-      <div className="bg-[#071328] border border-[#14284d] rounded-2xl p-4 sm:p-5">
-        <div className="flex items-center justify-between mb-3 pb-2 border-b border-[#102242]">
+      <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 sm:p-5">
+        <div className="flex items-center justify-between mb-3 pb-2 border-b border-slate-200">
           <div className="flex items-center gap-2">
             <ShieldAlert className="w-4 h-4 text-amber-400" />
-            <h4 className="text-xs font-bold text-white uppercase tracking-wider">
+            <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
               Scheda di Sicurezza & Dispositivi di Protezione (DPI)
             </h4>
           </div>
@@ -547,17 +547,17 @@ export const ProductUsageGuidelines: React.FC<ProductUsageGuidelinesProps> = ({ 
             return (
               <div 
                 key={idx} 
-                className="bg-[#050c18] border border-[#11233e] p-2.5 rounded-xl flex items-center gap-2.5"
+                className="bg-slate-50 border border-slate-200 p-2.5 rounded-xl flex items-center gap-2.5"
               >
                 <div className={`p-2 rounded-lg ${
                   ppe.required 
                     ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' 
-                    : 'bg-[#0c1a34] text-slate-400 border border-[#152a4e]'
+                    : 'bg-slate-50 text-slate-400 border border-slate-200'
                 }`}>
                   <Icon className="w-4 h-4" />
                 </div>
                 <div>
-                  <span className="font-bold text-xs text-white block">
+                  <span className="font-bold text-xs text-slate-900 block">
                     {ppe.name}
                   </span>
                   <span className="text-[10px] text-slate-400">
@@ -571,13 +571,13 @@ export const ProductUsageGuidelines: React.FC<ProductUsageGuidelinesProps> = ({ 
 
         {/* Safety Warnings Bullet List */}
         {profile.safetyWarnings && profile.safetyWarnings.length > 0 && (
-          <div className="bg-[#120a0d] border border-rose-500/30 rounded-xl p-3 text-xs space-y-1.5">
+          <div className="bg-slate-50 border border-rose-500/30 rounded-xl p-3 text-xs space-y-1.5">
             <div className="flex items-center gap-1.5 text-rose-400 font-bold text-[11px] mb-1">
               <AlertTriangle className="w-3.5 h-3.5" />
               <span>Avvertenze & Precauzioni di Manipolazione:</span>
             </div>
             {profile.safetyWarnings.map((warn, wIdx) => (
-              <p key={wIdx} className="text-slate-300 text-[11px] leading-relaxed pl-5 relative before:absolute before:left-2 before:top-1.5 before:w-1 before:h-1 before:rounded-full before:bg-rose-400">
+              <p key={wIdx} className="text-slate-600 text-[11px] leading-relaxed pl-5 relative before:absolute before:left-2 before:top-1.5 before:w-1 before:h-1 before:rounded-full before:bg-rose-400">
                 {warn}
               </p>
             ))}
@@ -588,10 +588,10 @@ export const ProductUsageGuidelines: React.FC<ProductUsageGuidelinesProps> = ({ 
       {/* Surface Compatibility & HACCP Protocol */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
         {/* Compatible & Incompatible Surfaces */}
-        <div className="bg-[#071328] border border-[#14284d] rounded-2xl p-4">
-          <div className="flex items-center gap-2 mb-2.5 pb-2 border-b border-[#102242]">
-            <Layers className="w-4 h-4 text-sky-400" />
-            <h5 className="font-bold text-white uppercase text-[11px] tracking-wider">
+        <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4">
+          <div className="flex items-center gap-2 mb-2.5 pb-2 border-b border-slate-200">
+            <Layers className="w-4 h-4 text-sky-600" />
+            <h5 className="font-bold text-slate-900 uppercase text-[11px] tracking-wider">
               Compatibilità Superfici
             </h5>
           </div>
@@ -611,7 +611,7 @@ export const ProductUsageGuidelines: React.FC<ProductUsageGuidelinesProps> = ({ 
             </div>
 
             {profile.incompatibleSurfaces && profile.incompatibleSurfaces.length > 0 && (
-              <div className="pt-2 border-t border-[#0f1f3a]">
+              <div className="pt-2 border-t border-slate-200">
                 <span className="text-[10.5px] font-semibold text-rose-400 block mb-1">
                   ✕ Non utilizzare o prestare cautela su:
                 </span>
@@ -628,22 +628,22 @@ export const ProductUsageGuidelines: React.FC<ProductUsageGuidelinesProps> = ({ 
         </div>
 
         {/* HACCP & Compliance */}
-        <div className="bg-[#071328] border border-[#14284d] rounded-2xl p-4 flex flex-col justify-between">
+        <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 flex flex-col justify-between">
           <div>
-            <div className="flex items-center gap-2 mb-2.5 pb-2 border-b border-[#102242]">
-              <FileText className="w-4 h-4 text-sky-400" />
-              <h5 className="font-bold text-white uppercase text-[11px] tracking-wider">
+            <div className="flex items-center gap-2 mb-2.5 pb-2 border-b border-slate-200">
+              <FileText className="w-4 h-4 text-sky-600" />
+              <h5 className="font-bold text-slate-900 uppercase text-[11px] tracking-wider">
                 Protocollo HACCP & Settore Alimentare
               </h5>
             </div>
-            <p className="text-slate-300 text-[11.5px] leading-relaxed">
+            <p className="text-slate-600 text-[11.5px] leading-relaxed">
               {profile.haccpProtocol}
             </p>
           </div>
 
-          <div className="mt-3 pt-2.5 border-t border-[#0f1f3a] flex items-center justify-between text-[10.5px] text-slate-400">
+          <div className="mt-3 pt-2.5 border-t border-slate-200 flex items-center justify-between text-[10.5px] text-slate-400">
             <span>Scheda Dati di Sicurezza (SDS)</span>
-            <span className="text-sky-400 font-semibold font-mono">Disponibile su richiesta</span>
+            <span className="text-sky-600 font-semibold font-mono">Disponibile su richiesta</span>
           </div>
         </div>
       </div>

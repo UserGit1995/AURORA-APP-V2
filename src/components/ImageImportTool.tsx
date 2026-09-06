@@ -114,8 +114,8 @@ export const ImageImportTool: React.FC = () => {
         <h3 className="text-xs font-bold text-amber-400 uppercase tracking-wider">Importa immagini in blocco</h3>
       </div>
 
-      <div className="bg-[#08152b] border border-slate-800 rounded-2xl p-4 text-xs text-slate-400 space-y-2">
-        <p>Carica un file CSV con almeno due colonne: <b className="text-white">Nome</b> e <b className="text-white">Immagine</b> (link o percorso).</p>
+      <div className="bg-slate-50 border border-slate-800 rounded-2xl p-4 text-xs text-slate-400 space-y-2">
+        <p>Carica un file CSV con almeno due colonne: <b className="text-slate-900">Nome</b> e <b className="text-slate-900">Immagine</b> (link o percorso).</p>
         <p>Ogni riga viene confrontata con i tuoi articoli già caricati. <b className="text-amber-300">Nulla si applica finché non confermi</b> — controlla ogni abbinamento prima.</p>
       </div>
 
@@ -142,8 +142,8 @@ export const ImageImportTool: React.FC = () => {
 
       {rows.length > 0 && (
         <>
-          <div className="flex items-center justify-between bg-[#071329] border border-slate-800 rounded-xl p-3">
-            <span className="text-xs text-slate-300">
+          <div className="flex items-center justify-between bg-slate-50 border border-slate-800 rounded-xl p-3">
+            <span className="text-xs text-slate-600">
               {rows.length} righe lette — <b className="text-amber-300">{confirmedCount}</b> pronte per essere applicate
             </span>
             <button
@@ -170,12 +170,12 @@ export const ImageImportTool: React.FC = () => {
                 <div
                   key={idx}
                   className={`p-3 rounded-xl border text-xs flex items-center gap-3 ${
-                    row.confirmed ? 'border-emerald-500/40 bg-emerald-500/5' : 'border-slate-800 bg-[#071329]'
+                    row.confirmed ? 'border-emerald-500/40 bg-emerald-500/5' : 'border-slate-800 bg-slate-50'
                   }`}
                 >
-                  <img src={row.imageUrl} alt="" className="w-12 h-12 rounded-lg object-cover bg-slate-900 shrink-0" onError={(e) => ((e.target as HTMLImageElement).style.opacity = '0.2')} />
+                  <img src={row.imageUrl} alt="" className="w-12 h-12 rounded-lg object-cover bg-slate-100 shrink-0" onError={(e) => ((e.target as HTMLImageElement).style.opacity = '0.2')} />
                   <div className="flex-1 min-w-0">
-                    <p className="text-slate-400 truncate">File: <span className="text-slate-200">{row.sourceName}</span></p>
+                    <p className="text-slate-400 truncate">File: <span className="text-slate-700">{row.sourceName}</span></p>
                     <div className="flex items-center gap-1.5 mt-1">
                       {isStrong ? (
                         <Check className="w-3 h-3 text-emerald-400 shrink-0" />
@@ -189,7 +189,7 @@ export const ImageImportTool: React.FC = () => {
                     <select
                       value={row.matchedProductId || ''}
                       onChange={(e) => overrideMatch(idx, e.target.value)}
-                      className="mt-1.5 w-full bg-[#0c1c38] border border-slate-700 rounded-lg px-2 py-1 text-[11px] text-white outline-none"
+                      className="mt-1.5 w-full bg-slate-50 border border-slate-700 rounded-lg px-2 py-1 text-[11px] text-slate-900 outline-none"
                     >
                       <option value="">— Correggi manualmente, scegli il prodotto giusto —</option>
                       {productsList.map((p) => (

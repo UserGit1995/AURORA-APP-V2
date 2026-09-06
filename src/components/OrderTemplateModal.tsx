@@ -205,18 +205,18 @@ export const OrderTemplateModal: React.FC<OrderTemplateModalProps> = ({
         initial={{ opacity: 0, scale: 0.96, y: 15 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.96, y: 15 }}
-        className="relative w-full max-w-2xl bg-[#071120] border border-[#183154] rounded-3xl shadow-2xl z-10 flex flex-col max-h-[92vh] overflow-hidden"
+        className="relative w-full max-w-2xl bg-slate-50 border border-slate-200 rounded-3xl shadow-2xl z-10 flex flex-col max-h-[92vh] overflow-hidden"
       >
         {/* Header */}
-        <div className="p-4 sm:p-5 border-b border-[#142848] bg-[#09152b] flex items-center justify-between">
+        <div className="p-4 sm:p-5 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-2xl bg-sky-500/15 text-sky-400 border border-sky-500/25">
+            <div className="p-2.5 rounded-2xl bg-sky-500/15 text-sky-600 border border-sky-500/25">
               <Bookmark className="w-5 h-5" />
             </div>
             <div>
               <h3 className="text-base sm:text-lg font-bold text-white flex items-center gap-2">
                 {isIt ? 'Modelli di Riordino B2B' : 'B2B Restock Templates'}
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-sky-950 text-sky-300 border border-sky-500/30">
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-sky-950 text-sky-700 border border-sky-500/30">
                   {templates.length} {isIt ? 'modelli' : 'templates'}
                 </span>
               </h3>
@@ -231,26 +231,26 @@ export const OrderTemplateModal: React.FC<OrderTemplateModalProps> = ({
           <button
             id="close-template-modal-btn"
             onClick={onClose}
-            className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-[#0e203c] transition-colors"
+            className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-100 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Tab Navigation */}
-        <div className="px-4 sm:px-5 pt-3 pb-2 bg-[#060d19] border-b border-[#132542] flex items-center gap-2">
+        <div className="px-4 sm:px-5 pt-3 pb-2 bg-slate-50 border-b border-slate-200 flex items-center gap-2">
           <button
             id="tab-load-templates-btn"
             onClick={() => setActiveTab('load')}
             className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
               activeTab === 'load'
-                ? 'bg-sky-500/20 text-sky-300 border border-sky-500/40 shadow-xs'
-                : 'text-slate-400 hover:text-slate-200 hover:bg-[#0a182e]'
+                ? 'bg-sky-500/20 text-sky-700 border border-sky-500/40 shadow-xs'
+                : 'text-slate-400 hover:text-slate-700 hover:bg-slate-100'
             }`}
           >
             <Layers className="w-3.5 h-3.5" />
             <span>{isIt ? 'Carica Modello Riordino' : 'Load Restock Template'}</span>
-            <span className="ml-1 px-1.5 py-0.2 bg-[#0e2240] text-sky-300 rounded text-[10px]">
+            <span className="ml-1 px-1.5 py-0.2 bg-slate-50 text-sky-700 rounded text-[10px]">
               {templates.length}
             </span>
           </button>
@@ -263,8 +263,8 @@ export const OrderTemplateModal: React.FC<OrderTemplateModalProps> = ({
               cartItems.length === 0 ? 'opacity-40 cursor-not-allowed text-slate-500' : ''
             } ${
               activeTab === 'save'
-                ? 'bg-sky-500/20 text-sky-300 border border-sky-500/40 shadow-xs'
-                : 'text-slate-400 hover:text-slate-200 hover:bg-[#0a182e]'
+                ? 'bg-sky-500/20 text-sky-700 border border-sky-500/40 shadow-xs'
+                : 'text-slate-400 hover:text-slate-700 hover:bg-slate-100'
             }`}
             title={
               cartItems.length === 0
@@ -301,7 +301,7 @@ export const OrderTemplateModal: React.FC<OrderTemplateModalProps> = ({
                     placeholder={
                       isIt ? 'Cerca per nome, tag o frequenza...' : 'Search by name, tag or frequency...'
                     }
-                    className="w-full bg-[#050c18] border border-[#132542] rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-500"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-500"
                   />
                 </div>
 
@@ -320,7 +320,7 @@ export const OrderTemplateModal: React.FC<OrderTemplateModalProps> = ({
                       className={`shrink-0 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold transition-all ${
                         selectedTagFilter === filter.id
                           ? 'bg-sky-500 text-white shadow-xs'
-                          : 'bg-[#08152c] text-slate-400 hover:text-white border border-[#122544]'
+                          : 'bg-slate-50 text-slate-400 hover:text-slate-900 border border-slate-200'
                       }`}
                     >
                       {filter.label}
@@ -331,9 +331,9 @@ export const OrderTemplateModal: React.FC<OrderTemplateModalProps> = ({
 
               {/* Templates Grid / Split View */}
               {filteredTemplates.length === 0 ? (
-                <div className="py-12 text-center text-slate-400 bg-[#050c18] border border-[#122544] rounded-2xl p-6">
+                <div className="py-12 text-center text-slate-400 bg-slate-50 border border-slate-200 rounded-2xl p-6">
                   <Bookmark className="w-10 h-10 stroke-1 text-slate-600 mx-auto mb-2" />
-                  <p className="text-sm font-semibold text-slate-300">
+                  <p className="text-sm font-semibold text-slate-600">
                     {t('cart.noTemplatesFound', 'Nessun modello trovato')}
                   </p>
                   <p className="text-xs text-slate-500 mt-1">
@@ -362,15 +362,15 @@ export const OrderTemplateModal: React.FC<OrderTemplateModalProps> = ({
                           className={`cursor-pointer rounded-2xl p-3 border transition-all text-left relative ${
                             isSelected
                               ? 'bg-sky-500/15 border-sky-500 text-white ring-1 ring-sky-500/40 shadow-md shadow-sky-950/50'
-                              : 'bg-[#050c18] border-[#132542] text-slate-300 hover:border-slate-700 hover:bg-[#08152c]'
+                              : 'bg-slate-50 border-slate-200 text-slate-600 hover:border-slate-700 hover:bg-slate-100'
                           }`}
                         >
                           <div className="flex items-start justify-between gap-2 mb-1">
-                            <h4 className="text-xs font-bold text-white line-clamp-1 flex items-center gap-1.5">
+                            <h4 className="text-xs font-bold text-slate-900 line-clamp-1 flex items-center gap-1.5">
                               {tpl.name}
                             </h4>
                             {tpl.isPreset ? (
-                              <span className="shrink-0 text-[9px] font-bold px-1.5 py-0.5 rounded bg-sky-950/80 text-sky-300 border border-sky-500/30">
+                              <span className="shrink-0 text-[9px] font-bold px-1.5 py-0.5 rounded bg-sky-950/80 text-sky-700 border border-sky-500/30">
                                 B2B Predefinito
                               </span>
                             ) : (
@@ -381,13 +381,13 @@ export const OrderTemplateModal: React.FC<OrderTemplateModalProps> = ({
                           </div>
 
                           {tpl.tag && (
-                            <div className="inline-flex items-center gap-1 text-[10px] text-sky-400 font-medium mb-1.5">
+                            <div className="inline-flex items-center gap-1 text-[10px] text-sky-600 font-medium mb-1.5">
                               <Calendar className="w-3 h-3" />
                               <span>{tpl.tag}</span>
                             </div>
                           )}
 
-                          <div className="flex items-center justify-between text-[11px] text-slate-400 pt-1.5 border-t border-[#11223e]">
+                          <div className="flex items-center justify-between text-[11px] text-slate-400 pt-1.5 border-t border-slate-200">
                             <span>
                               {stats.totalItems} {isIt ? 'colli totali' : 'units'} ({tpl.items.length} {isIt ? 'rif.' : 'items'})
                             </span>
@@ -402,13 +402,13 @@ export const OrderTemplateModal: React.FC<OrderTemplateModalProps> = ({
 
                   {/* Right Column: Selected Template Detail Preview (7 cols) */}
                   {selectedTemplate && (
-                    <div className="md:col-span-7 bg-[#050c18] border border-[#132542] rounded-2xl p-4 flex flex-col justify-between">
+                    <div className="md:col-span-7 bg-slate-50 border border-slate-200 rounded-2xl p-4 flex flex-col justify-between">
                       <div>
                         {/* Header preview */}
-                        <div className="flex items-start justify-between gap-2 pb-3 border-b border-[#122544] mb-3">
+                        <div className="flex items-start justify-between gap-2 pb-3 border-b border-slate-200 mb-3">
                           <div>
                             <div className="flex items-center gap-2 mb-1">
-                              <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-300 border border-sky-500/30">
+                              <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-700 border border-sky-500/30">
                                 {selectedTemplate.tag || 'B2B Restock'}
                               </span>
                               {selectedTemplate.isPreset && (
@@ -417,7 +417,7 @@ export const OrderTemplateModal: React.FC<OrderTemplateModalProps> = ({
                                 </span>
                               )}
                             </div>
-                            <h4 className="text-sm font-bold text-white">{selectedTemplate.name}</h4>
+                            <h4 className="text-sm font-bold text-slate-900">{selectedTemplate.name}</h4>
                             {selectedTemplate.description && (
                               <p className="text-xs text-slate-400 mt-1 leading-snug">
                                 {selectedTemplate.description}
@@ -438,7 +438,7 @@ export const OrderTemplateModal: React.FC<OrderTemplateModalProps> = ({
                                   </button>
                                   <button
                                     onClick={() => setDeleteConfirmId(null)}
-                                    className="p-1 rounded bg-slate-800 text-slate-300 text-[10px] px-1.5 py-1"
+                                    className="p-1 rounded bg-slate-800 text-slate-600 text-[10px] px-1.5 py-1"
                                   >
                                     <X className="w-3 h-3" />
                                   </button>
@@ -465,10 +465,10 @@ export const OrderTemplateModal: React.FC<OrderTemplateModalProps> = ({
                           {getTemplateStats(selectedTemplate).resolvedProducts.map(({ product, quantity }) => (
                             <div
                               key={product.id}
-                              className="flex items-center justify-between gap-2 p-2 rounded-xl bg-[#08152c] border border-[#112442] text-xs"
+                              className="flex items-center justify-between gap-2 p-2 rounded-xl bg-slate-50 border border-slate-200 text-xs"
                             >
                               <div className="flex items-center gap-2 min-w-0">
-                                <div className="w-8 h-8 rounded-lg bg-[#050c18] p-0.5 shrink-0 flex items-center justify-center">
+                                <div className="w-8 h-8 rounded-lg bg-slate-50 p-0.5 shrink-0 flex items-center justify-center">
                                   <img
                                     src={product.image}
                                     alt={product.name}
@@ -483,10 +483,10 @@ export const OrderTemplateModal: React.FC<OrderTemplateModalProps> = ({
                               </div>
 
                               <div className="text-right shrink-0 flex items-center gap-3">
-                                <span className="font-bold px-2 py-0.5 rounded-md bg-sky-950 text-sky-300 border border-sky-500/30 text-xs">
+                                <span className="font-bold px-2 py-0.5 rounded-md bg-sky-950 text-sky-700 border border-sky-500/30 text-xs">
                                   {quantity} {isIt ? 'colli' : 'units'}
                                 </span>
-                                <span className="font-mono text-white text-xs font-semibold">
+                                <span className="font-mono text-slate-900 text-xs font-semibold">
                                   €{(product.price * quantity).toFixed(2)}
                                 </span>
                               </div>
@@ -496,11 +496,11 @@ export const OrderTemplateModal: React.FC<OrderTemplateModalProps> = ({
                       </div>
 
                       {/* Load Mode & Action footer */}
-                      <div className="pt-3 border-t border-[#122544] space-y-3">
+                      <div className="pt-3 border-t border-slate-200 space-y-3">
                         {/* Option: Replace or Append */}
                         <div className="flex items-center justify-between gap-2 text-xs">
                           <span className="text-slate-400">{isIt ? 'Modalità caricamento:' : 'Load Mode:'}</span>
-                          <div className="flex items-center gap-1 bg-[#09152b] p-1 rounded-xl border border-[#132542]">
+                          <div className="flex items-center gap-1 bg-slate-50 p-1 rounded-xl border border-slate-200">
                             <button
                               type="button"
                               onClick={() => setLoadMode('replace')}
@@ -530,7 +530,7 @@ export const OrderTemplateModal: React.FC<OrderTemplateModalProps> = ({
                         <button
                           id="apply-template-btn"
                           onClick={() => handleApply(selectedTemplate)}
-                          className="w-full bg-[#0284c7] hover:bg-[#0369a1] active:bg-[#075985] text-white font-bold py-2.5 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow-lg shadow-sky-950/60 transition-all hover:scale-[1.01]"
+                          className="w-full bg-[#0284c7] hover:bg-[#0369a1] active:bg-slate-50 text-white font-bold py-2.5 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow-lg shadow-sky-950/60 transition-all hover:scale-[1.01]"
                         >
                           <RotateCw className="w-3.5 h-3.5" />
                           <span>
@@ -563,13 +563,13 @@ export const OrderTemplateModal: React.FC<OrderTemplateModalProps> = ({
               )}
 
               {/* Cart contents summary being saved */}
-              <div className="bg-[#050c18] border border-[#132542] rounded-2xl p-4 space-y-3">
+              <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3">
                 <div className="flex items-center justify-between">
                   <h4 className="text-xs font-bold text-white flex items-center gap-2">
-                    <ShoppingBag className="w-3.5 h-3.5 text-sky-400" />
+                    <ShoppingBag className="w-3.5 h-3.5 text-sky-600" />
                     <span>{isIt ? 'Contenuto del Carrello da Salvare:' : 'Cart Items Being Saved:'}</span>
                   </h4>
-                  <span className="text-xs font-bold text-sky-300">
+                  <span className="text-xs font-bold text-sky-700">
                     {cartItems.reduce((sum, ci) => sum + ci.quantity, 0)} {isIt ? 'colli totali' : 'total units'}
                   </span>
                 </div>
@@ -578,13 +578,13 @@ export const OrderTemplateModal: React.FC<OrderTemplateModalProps> = ({
                   {cartItems.map((ci) => (
                     <div
                       key={ci.product.id}
-                      className="p-2 rounded-xl bg-[#08152c] border border-[#112442] flex items-center justify-between text-xs"
+                      className="p-2 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between text-xs"
                     >
                       <div className="flex items-center gap-2 min-w-0">
-                        <span className="w-5 h-5 rounded-md bg-sky-950 text-sky-300 font-bold text-[10px] flex items-center justify-center shrink-0 border border-sky-500/30">
+                        <span className="w-5 h-5 rounded-md bg-sky-950 text-sky-700 font-bold text-[10px] flex items-center justify-center shrink-0 border border-sky-500/30">
                           {ci.quantity}x
                         </span>
-                        <span className="text-slate-200 font-medium truncate text-xs">{ci.product.name}</span>
+                        <span className="text-slate-700 font-medium truncate text-xs">{ci.product.name}</span>
                       </div>
                       <span className="font-mono text-slate-400 text-[11px] shrink-0">
                         €{(ci.product.price * ci.quantity).toFixed(2)}
@@ -597,7 +597,7 @@ export const OrderTemplateModal: React.FC<OrderTemplateModalProps> = ({
               {/* Form fields */}
               <div className="space-y-3">
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">
+                  <label className="block text-xs font-bold text-slate-600 mb-1">
                     {t('cart.templateName', 'Nome del Modello')} *
                   </label>
                   <input
@@ -611,12 +611,12 @@ export const OrderTemplateModal: React.FC<OrderTemplateModalProps> = ({
                         ? 'es. Rifornimento Settimanale Bagni & Reception'
                         : 'e.g. Weekly Restock Restrooms & Offices'
                     }
-                    className="w-full bg-[#050c18] border border-[#14294d] rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-400"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-400"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">
+                  <label className="block text-xs font-bold text-slate-600 mb-1">
                     {t('cart.templateCategory', 'Categoria / Frequenza')}
                   </label>
                   <div className="flex flex-wrap gap-1.5 mb-2">
@@ -628,7 +628,7 @@ export const OrderTemplateModal: React.FC<OrderTemplateModalProps> = ({
                         className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all ${
                           templateTag === tag
                             ? 'bg-sky-500 text-white shadow-xs'
-                            : 'bg-[#08152c] text-slate-400 hover:text-white border border-[#132542]'
+                            : 'bg-slate-50 text-slate-400 hover:text-slate-900 border border-slate-200'
                         }`}
                       >
                         {tag}
@@ -641,12 +641,12 @@ export const OrderTemplateModal: React.FC<OrderTemplateModalProps> = ({
                     value={templateTag}
                     onChange={(e) => setTemplateTag(e.target.value)}
                     placeholder={isIt ? 'Oppure scrivi un tag personalizzato...' : 'Or enter custom tag...'}
-                    className="w-full bg-[#050c18] border border-[#14294d] rounded-xl px-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-400"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 text-xs text-slate-900 placeholder-slate-500 focus:outline-none focus:border-sky-400"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">
+                  <label className="block text-xs font-bold text-slate-600 mb-1">
                     {t('cart.templateDesc', 'Descrizione / Note')}
                   </label>
                   <textarea
@@ -659,17 +659,17 @@ export const OrderTemplateModal: React.FC<OrderTemplateModalProps> = ({
                         ? 'es. Ordine programmato per la sanificazione inizio mese.'
                         : 'e.g. Scheduled order for beginning of the month sanitization.'
                     }
-                    className="w-full bg-[#050c18] border border-[#14294d] rounded-xl px-3.5 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-400"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-900 placeholder-slate-500 focus:outline-none focus:border-sky-400"
                   />
                 </div>
               </div>
 
               {/* Submit Save */}
-              <div className="pt-3 border-t border-[#142848] flex items-center justify-end gap-2">
+              <div className="pt-3 border-t border-slate-200 flex items-center justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setActiveTab('load')}
-                  className="px-4 py-2.5 rounded-xl text-xs font-semibold bg-[#0e203c] text-slate-300 hover:bg-[#142d54]"
+                  className="px-4 py-2.5 rounded-xl text-xs font-semibold bg-slate-50 text-slate-600 hover:bg-slate-100"
                 >
                   {isIt ? 'Annulla' : 'Cancel'}
                 </button>

@@ -77,10 +77,10 @@ const ToastItem: React.FC<ToastItemProps> = ({ toast, onDismiss }) => {
       onMouseLeave={() => setIsHovered(false)}
       className={`pointer-events-auto relative overflow-hidden rounded-2xl border shadow-2xl backdrop-blur-md transition-all ${
         isShipped
-          ? 'bg-[#061226]/95 border-sky-500/50 shadow-[0_10px_35px_rgba(2,132,199,0.35)] ring-1 ring-sky-400/40'
+          ? 'bg-slate-50/95 border-sky-500/50 shadow-[0_10px_35px_rgba(2,132,199,0.35)] ring-1 ring-sky-400/40'
           : toast.type === 'success'
-          ? 'bg-[#061814]/95 border-emerald-500/50 shadow-[0_10px_35px_rgba(16,185,129,0.25)]'
-          : 'bg-[#0a1528]/95 border-slate-700/60 shadow-[0_10px_30px_rgba(0,0,0,0.5)]'
+          ? 'bg-slate-50/95 border-emerald-500/50 shadow-[0_10px_35px_rgba(16,185,129,0.25)]'
+          : 'bg-slate-50/95 border-slate-700/60 shadow-[0_10px_30px_rgba(0,0,0,0.5)]'
       }`}
     >
       {/* Top Ambient Glow Line */}
@@ -108,7 +108,7 @@ const ToastItem: React.FC<ToastItemProps> = ({ toast, onDismiss }) => {
                 <CheckCircle2 className="w-5 h-5" />
               </div>
             ) : (
-              <div className="w-10 h-10 rounded-xl bg-sky-500/20 border border-sky-500/30 flex items-center justify-center text-sky-400">
+              <div className="w-10 h-10 rounded-xl bg-sky-500/20 border border-sky-500/30 flex items-center justify-center text-sky-600">
                 <Package className="w-5 h-5" />
               </div>
             )}
@@ -121,13 +121,13 @@ const ToastItem: React.FC<ToastItemProps> = ({ toast, onDismiss }) => {
                 {toast.title}
               </h4>
               {toast.orderId && (
-                <span className="font-mono text-[11px] font-bold px-2 py-0.5 rounded-full bg-sky-950/80 text-sky-300 border border-sky-400/30">
+                <span className="font-mono text-[11px] font-bold px-2 py-0.5 rounded-full bg-sky-950/80 text-sky-700 border border-sky-400/30">
                   {toast.orderId}
                 </span>
               )}
             </div>
 
-            <p className="text-xs text-slate-300 mt-1 leading-relaxed">
+            <p className="text-xs text-slate-600 mt-1 leading-relaxed">
               {toast.message}
             </p>
 
@@ -136,11 +136,11 @@ const ToastItem: React.FC<ToastItemProps> = ({ toast, onDismiss }) => {
               <div className="mt-2.5 flex items-center gap-2 text-[11px] flex-wrap">
                 {toast.courier && (
                   <span className="text-slate-400">
-                    Vettore: <strong className="text-slate-200">{toast.courier}</strong>
+                    Vettore: <strong className="text-slate-700">{toast.courier}</strong>
                   </span>
                 )}
                 {toast.trackingNumber && (
-                  <span className="font-mono text-[10.5px] bg-[#0c1e3a] text-sky-300 px-1.5 py-0.5 rounded border border-sky-500/30 font-semibold">
+                  <span className="font-mono text-[10.5px] bg-slate-50 text-sky-700 px-1.5 py-0.5 rounded border border-sky-500/30 font-semibold">
                     AWB: {toast.trackingNumber}
                   </span>
                 )}
@@ -171,7 +171,7 @@ const ToastItem: React.FC<ToastItemProps> = ({ toast, onDismiss }) => {
             type="button"
             onClick={onDismiss}
             aria-label="Chiudi notifica"
-            className="absolute top-3 right-3 p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/60 transition-colors"
+            className="absolute top-3 right-3 p-1.5 rounded-lg text-slate-400 hover:text-slate-900 hover:bg-slate-800/60 transition-colors"
           >
             <X className="w-4 h-4" />
           </button>

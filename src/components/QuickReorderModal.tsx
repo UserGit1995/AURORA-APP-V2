@@ -271,12 +271,12 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
         onClick={submittedOrder ? handleResetAndClose : onClose}
       />
 
-      <div className="relative w-full max-w-4xl bg-[#060e1d] border border-[#132746] rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+      <div className="relative w-full max-w-4xl bg-slate-50 border border-slate-200 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
         
         {/* Header */}
-        <div className="p-4 sm:p-5 border-b border-[#122442] bg-[#081326] flex items-center justify-between">
+        <div className="p-4 sm:p-5 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-2xl bg-gradient-to-tr from-sky-500/20 to-indigo-500/20 border border-sky-400/30 text-sky-400 shadow-xs">
+            <div className="p-2.5 rounded-2xl bg-gradient-to-tr from-sky-500/20 to-indigo-500/20 border border-sky-400/30 text-sky-600 shadow-xs">
               <RotateCw className="w-5 h-5" />
             </div>
             <div>
@@ -284,7 +284,7 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
                 <h3 className="text-white font-bold text-base sm:text-lg">
                   Riordino Rapido B2B
                 </h3>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-sky-500/15 text-sky-300 border border-sky-500/30">
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-sky-500/15 text-sky-700 border border-sky-500/30">
                   1-CLICK • ORDINE DIRETTO
                 </span>
               </div>
@@ -296,7 +296,7 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
           <button
             id="close-quick-reorder-modal-btn"
             onClick={submittedOrder ? handleResetAndClose : onClose}
-            className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-[#0f1e38] transition-colors"
+            className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-100 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -310,7 +310,7 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
             <div className="lg:col-span-7 p-4 sm:p-5 space-y-4">
               
               {/* Tab Navigation */}
-              <div className="flex bg-[#0a152b] p-1 rounded-2xl border border-[#14294d] text-xs font-bold">
+              <div className="flex bg-slate-50 p-1 rounded-2xl border border-slate-200 text-xs font-bold">
                 <button
                   type="button"
                   id="tab-frequent-btn"
@@ -318,7 +318,7 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
                   className={`flex-1 py-2 px-2.5 rounded-xl transition-all flex items-center justify-center gap-1.5 ${
                     activeTab === 'frequent'
                       ? 'bg-sky-500 text-white shadow-xs'
-                      : 'text-slate-400 hover:text-slate-200'
+                      : 'text-slate-400 hover:text-slate-700'
                   }`}
                 >
                   <Sparkles className="w-3.5 h-3.5" />
@@ -332,7 +332,7 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
                   className={`flex-1 py-2 px-2.5 rounded-xl transition-all flex items-center justify-center gap-1.5 ${
                     activeTab === 'history'
                       ? 'bg-sky-500 text-white shadow-xs'
-                      : 'text-slate-400 hover:text-slate-200'
+                      : 'text-slate-400 hover:text-slate-700'
                   }`}
                 >
                   <RotateCcw className="w-3.5 h-3.5" />
@@ -346,7 +346,7 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
                   className={`flex-1 py-2 px-2.5 rounded-xl transition-all flex items-center justify-center gap-1.5 ${
                     activeTab === 'sku'
                       ? 'bg-sky-500 text-white shadow-xs'
-                      : 'text-slate-400 hover:text-slate-200'
+                      : 'text-slate-400 hover:text-slate-700'
                   }`}
                 >
                   <Package className="w-3.5 h-3.5" />
@@ -359,7 +359,7 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
                 <div className="space-y-2.5">
                   <div className="flex items-center justify-between text-xs text-slate-400 px-1">
                     <span>Prodotti ad alta rotazione consigliati per riordino:</span>
-                    <span className="text-[11px] text-sky-400">{frequentProducts.length} referenze</span>
+                    <span className="text-[11px] text-sky-600">{frequentProducts.length} referenze</span>
                   </div>
 
                   <div className="space-y-2 max-h-[340px] overflow-y-auto pr-1">
@@ -368,9 +368,9 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
                       return (
                         <div
                           key={product.id}
-                          className="bg-[#09152b] border border-[#14294d] hover:border-sky-500/40 rounded-2xl p-2.5 flex items-center justify-between gap-3 transition-colors"
+                          className="bg-slate-50 border border-slate-200 hover:border-sky-500/40 rounded-2xl p-2.5 flex items-center justify-between gap-3 transition-colors"
                         >
-                          <div className="w-11 h-11 rounded-xl bg-[#060c17] p-1 shrink-0 flex items-center justify-center">
+                          <div className="w-11 h-11 rounded-xl bg-slate-50 p-1 shrink-0 flex items-center justify-center">
                             <img
                               src={product.image}
                               alt={product.name}
@@ -388,7 +388,7 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
                               <span>{product.packageQty}</span>
                               <span>•</span>
                               {isBusinessCustomer ? (
-                                <span className="text-sky-400 font-bold font-mono">
+                                <span className="text-sky-600 font-bold font-mono">
                                   €{(product.price * 1.22).toFixed(2)}
                                 </span>
                               ) : (
@@ -400,21 +400,21 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
                           </div>
 
                           {inList ? (
-                            <div className="flex items-center bg-[#0d1e3d] border border-sky-400/40 rounded-xl px-1 py-0.5 shrink-0">
+                            <div className="flex items-center bg-slate-50 border border-sky-400/40 rounded-xl px-1 py-0.5 shrink-0">
                               <button
                                 type="button"
                                 onClick={() => handleUpdateQuantity(product.id, -1)}
-                                className="p-1 text-slate-400 hover:text-white"
+                                className="p-1 text-slate-500 hover:text-slate-900"
                               >
                                 <Minus className="w-3 h-3" />
                               </button>
-                              <span className="px-2 text-xs font-bold text-sky-300 min-w-[1.2rem] text-center">
+                              <span className="px-2 text-xs font-bold text-sky-700 min-w-[1.2rem] text-center">
                                 {inList.quantity}
                               </span>
                               <button
                                 type="button"
                                 onClick={() => handleUpdateQuantity(product.id, 1)}
-                                className="p-1 text-slate-400 hover:text-white"
+                                className="p-1 text-slate-500 hover:text-slate-900"
                               >
                                 <Plus className="w-3 h-3" />
                               </button>
@@ -423,7 +423,7 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
                             <button
                               type="button"
                               onClick={() => handleAddProductToQuickList(product, 1)}
-                              className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-sky-500/15 hover:bg-sky-500/25 text-sky-300 border border-sky-500/30 text-xs font-bold transition-colors shrink-0"
+                              className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-sky-500/15 hover:bg-sky-500/25 text-sky-700 border border-sky-500/30 text-xs font-bold transition-colors shrink-0"
                             >
                               <Plus className="w-3.5 h-3.5" />
                               <span>Aggiungi</span>
@@ -447,21 +447,21 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
                     {orders.map((order) => (
                       <div
                         key={order.id}
-                        className="bg-[#09152b] border border-[#14294d] rounded-2xl p-3.5 space-y-2 hover:border-sky-500/40 transition-colors"
+                        className="bg-slate-50 border border-slate-200 rounded-2xl p-3.5 space-y-2 hover:border-sky-500/40 transition-colors"
                       >
                         <div className="flex items-center justify-between">
                           <div>
-                            <span className="text-xs font-mono font-bold text-sky-400">{order.id}</span>
+                            <span className="text-xs font-mono font-bold text-sky-600">{order.id}</span>
                             <span className="text-[11px] text-slate-400 ml-2">({order.date})</span>
                           </div>
-                          <span className="text-xs font-bold font-mono text-white">
+                          <span className="text-xs font-bold font-mono text-slate-900">
                             €{order.total.toFixed(2)} <span className="text-[10px] text-slate-400">({order.itemsCount} colli)</span>
                           </span>
                         </div>
 
-                        <div className="text-[11px] text-slate-300 flex flex-wrap gap-1">
+                        <div className="text-[11px] text-slate-600 flex flex-wrap gap-1">
                           {order.items.slice(0, 3).map((item, idx) => (
-                            <span key={idx} className="bg-[#060e1d] px-2 py-0.5 rounded-lg border border-[#132746]">
+                            <span key={idx} className="bg-slate-50 px-2 py-0.5 rounded-lg border border-slate-200">
                               {item.productName} ({item.qty}x)
                             </span>
                           ))}
@@ -489,8 +489,8 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
               {/* TAB 3: SKU RAPID ENTRY */}
               {activeTab === 'sku' && (
                 <div className="space-y-4">
-                  <form onSubmit={handleAddBySku} className="bg-[#09152b] border border-[#14294d] rounded-2xl p-3.5 space-y-3">
-                    <label className="block text-xs font-bold text-white">
+                  <form onSubmit={handleAddBySku} className="bg-slate-50 border border-slate-200 rounded-2xl p-3.5 space-y-3">
+                    <label className="block text-xs font-bold text-slate-900">
                       Inserisci Codice Articolo (SKU) o Nome:
                     </label>
                     <div className="flex gap-2">
@@ -504,7 +504,7 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
                             setSkuError(null);
                           }}
                           placeholder="es. DET-LAV-01, SGR-UNIV-03..."
-                          className="w-full bg-[#060e1d] border border-[#14294d] rounded-xl pl-8 pr-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-400"
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-8 pr-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-400"
                         />
                       </div>
                       <div className="w-20">
@@ -514,7 +514,7 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
                           max="999"
                           value={skuQty}
                           onChange={(e) => setSkuQty(parseInt(e.target.value) || 1)}
-                          className="w-full bg-[#060e1d] border border-[#14294d] rounded-xl px-2 py-2 text-xs text-center text-white focus:outline-none focus:border-sky-400"
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl px-2 py-2 text-xs text-center text-white focus:outline-none focus:border-sky-400"
                           title="Quantità colli"
                         />
                       </div>
@@ -534,8 +534,8 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
                     )}
                   </form>
 
-                  <div className="p-3 bg-[#060e1d] border border-[#132746] rounded-2xl text-[11px] text-slate-400 space-y-1">
-                    <p className="font-bold text-slate-300">Codici SKU rapidi frequenti:</p>
+                  <div className="p-3 bg-slate-50 border border-slate-200 rounded-2xl text-[11px] text-slate-400 space-y-1">
+                    <p className="font-bold text-slate-600">Codici SKU rapidi frequenti:</p>
                     <div className="flex flex-wrap gap-1.5 pt-1">
                       {PRODUCTS.slice(0, 6).map((p) => (
                         <button
@@ -545,7 +545,7 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
                             setSkuSearch(p.code);
                             handleAddProductToQuickList(p, 1);
                           }}
-                          className="px-2 py-1 rounded-lg bg-[#0c1c38] hover:bg-[#122b56] text-sky-300 border border-[#1a3a6b] font-mono text-[10px] transition-colors"
+                          className="px-2 py-1 rounded-lg bg-slate-50 hover:bg-slate-100 text-sky-700 border border-slate-200 font-mono text-[10px] transition-colors"
                         >
                           +{p.code} ({p.name.slice(0, 18)}...)
                         </button>
@@ -558,12 +558,12 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
             </div>
 
             {/* RIGHT COLUMN: REORDER SUMMARY & DIRECT SUBMISSION (NO PAY / NO CARD) */}
-            <div className="lg:col-span-5 p-4 sm:p-5 bg-[#050b17] flex flex-col justify-between space-y-4">
+            <div className="lg:col-span-5 p-4 sm:p-5 bg-slate-50 flex flex-col justify-between space-y-4">
               
               <div className="space-y-3">
-                <div className="flex items-center justify-between pb-2 border-b border-[#122442]">
+                <div className="flex items-center justify-between pb-2 border-b border-slate-200">
                   <h4 className="text-xs font-bold text-white flex items-center gap-1.5">
-                    <Package className="w-4 h-4 text-sky-400" />
+                    <Package className="w-4 h-4 text-sky-600" />
                     <span>Lista Riordino ({totalColli} colli)</span>
                   </h4>
                   {selectedItems.length > 0 && (
@@ -587,14 +587,14 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
                     selectedItems.map((item) => (
                       <div
                         key={item.id}
-                        className="flex items-center justify-between p-2 rounded-xl bg-[#081326] border border-[#122442] text-xs"
+                        className="flex items-center justify-between p-2 rounded-xl bg-slate-50 border border-slate-200 text-xs"
                       >
                         <div className="min-w-0 flex-1 pr-2">
                           <p className="text-white font-medium truncate">{item.product.name}</p>
                           <p className="text-[10px] text-slate-400">
                             {isAzienda ? (
                               <>
-                                €{(item.product.price * 1.22).toFixed(2)}/cad (IVA inc.) • <span className="text-sky-300 font-bold font-mono">€{((item.product.price * 1.22) * item.quantity).toFixed(2)}</span>
+                                €{(item.product.price * 1.22).toFixed(2)}/cad (IVA inc.) • <span className="text-sky-700 font-bold font-mono">€{((item.product.price * 1.22) * item.quantity).toFixed(2)}</span>
                               </>
                             ) : (
                               <>
@@ -604,21 +604,21 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
                           </p>
                         </div>
                         <div className="flex items-center gap-1">
-                          <div className="flex items-center bg-[#060e1d] border border-[#132746] rounded-lg px-1 py-0.5">
+                          <div className="flex items-center bg-slate-50 border border-slate-200 rounded-lg px-1 py-0.5">
                             <button
                               type="button"
                               onClick={() => handleUpdateQuantity(item.product.id, -1)}
-                              className="text-slate-400 hover:text-white p-0.5"
+                              className="text-slate-500 hover:text-slate-900 p-0.5"
                             >
                               <Minus className="w-2.5 h-2.5" />
                             </button>
-                            <span className="px-1.5 text-[11px] font-bold text-white">
+                            <span className="px-1.5 text-[11px] font-bold text-slate-900">
                               {item.quantity}
                             </span>
                             <button
                               type="button"
                               onClick={() => handleUpdateQuantity(item.product.id, 1)}
-                              className="text-slate-400 hover:text-white p-0.5"
+                              className="text-slate-500 hover:text-slate-900 p-0.5"
                             >
                               <Plus className="w-2.5 h-2.5" />
                             </button>
@@ -637,7 +637,7 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
                 </div>
 
                 {/* Recipient & Shipping Options */}
-                <div className="bg-[#081326] border border-[#122442] rounded-2xl p-3 space-y-2 text-xs">
+                <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3 space-y-2 text-xs">
                   <div className="flex items-center justify-between">
                     <span className="text-slate-400 font-medium">Intestatario fornitura:</span>
                     <div className="flex gap-1.5">
@@ -646,8 +646,8 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
                         onClick={() => setCustomerType('azienda')}
                         className={`px-2 py-0.5 rounded-lg text-[10px] font-bold ${
                           customerType === 'azienda'
-                            ? 'bg-sky-500/20 text-sky-300 border border-sky-400/40'
-                            : 'text-slate-500 hover:text-slate-300'
+                            ? 'bg-sky-500/20 text-sky-700 border border-sky-400/40'
+                            : 'text-slate-500 hover:text-slate-600'
                         }`}
                       >
                         Azienda
@@ -658,7 +658,7 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
                         className={`px-2 py-0.5 rounded-lg text-[10px] font-bold ${
                           customerType === 'privato'
                             ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/40'
-                            : 'text-slate-500 hover:text-slate-300'
+                            : 'text-slate-500 hover:text-slate-600'
                         }`}
                       >
                         Privato
@@ -671,7 +671,7 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
                     value={companyOrName}
                     onChange={(e) => setCompanyOrName(e.target.value)}
                     placeholder="Nome Azienda o Referente"
-                    className="w-full bg-[#060e1d] border border-[#132746] rounded-xl px-2.5 py-1.5 text-white text-xs placeholder-slate-500 focus:outline-none"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 text-slate-900 text-xs placeholder-slate-500 focus:outline-none"
                   />
 
                   <div className="grid grid-cols-2 gap-1.5 pt-1">
@@ -680,8 +680,8 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
                       onClick={() => setDeliveryOption('corriere')}
                       className={`py-1 px-2 rounded-xl text-[10px] font-bold border transition-colors flex items-center justify-center gap-1 ${
                         deliveryOption === 'corriere'
-                          ? 'bg-sky-500/20 text-sky-300 border-sky-400/40'
-                          : 'bg-[#060e1d] text-slate-400 border-[#132746]'
+                          ? 'bg-sky-500/20 text-sky-700 border-sky-400/40'
+                          : 'bg-slate-50 text-slate-400 border-slate-200'
                       }`}
                     >
                       <Truck className="w-3 h-3" />
@@ -693,7 +693,7 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
                       className={`py-1 px-2 rounded-xl text-[10px] font-bold border transition-colors flex items-center justify-center gap-1 ${
                         deliveryOption === 'ritiro_sede'
                           ? 'bg-amber-500/20 text-amber-300 border-amber-400/40'
-                          : 'bg-[#060e1d] text-slate-400 border-[#132746]'
+                          : 'bg-slate-50 text-slate-400 border-slate-200'
                       }`}
                     >
                       <Store className="w-3 h-3" />
@@ -703,20 +703,20 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
                 </div>
 
                 {/* Subtotal & Summary */}
-                <div className="space-y-1 text-xs pt-1 border-t border-[#122442]">
+                <div className="space-y-1 text-xs pt-1 border-t border-slate-200">
                   <div className="flex justify-between text-slate-400 text-[11px]">
                     <span>Imponibile ({totalColli} colli):</span>
-                    <span className="font-mono text-white">€{subtotal.toFixed(2)}</span>
+                    <span className="font-mono text-slate-900">€{subtotal.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-slate-400 text-[11px]">
                     <span>{isAzienda ? 'IVA 22% (Attività/Aziende):' : 'IVA (0% - Listino Privati):'}</span>
-                    <span className={`font-mono ${isAzienda ? 'text-white' : 'text-emerald-400'}`}>
+                    <span className={`font-mono ${isAzienda ? 'text-slate-900' : 'text-emerald-400'}`}>
                       {isAzienda ? `€${vat.toFixed(2)}` : '€0.00 (non applicata)'}
                     </span>
                   </div>
-                  <div className="flex justify-between text-sm font-bold text-white pt-1">
+                  <div className="flex justify-between text-sm font-bold text-slate-900 pt-1">
                     <span>{isAzienda ? 'Totale Documento (con IVA):' : 'Totale Documento (Senza IVA):'}</span>
-                    <span className={`font-mono ${isAzienda ? 'text-sky-400' : 'text-emerald-400'}`}>
+                    <span className={`font-mono ${isAzienda ? 'text-sky-600' : 'text-emerald-400'}`}>
                       €{total.toFixed(2)}
                     </span>
                   </div>
@@ -761,30 +761,30 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
             </div>
 
             <div>
-              <h3 className="text-xl font-bold text-white">Riordino Inviato con Successo!</h3>
-              <p className="text-slate-300 text-xs mt-1 max-w-md">
+              <h3 className="text-xl font-bold text-slate-900">Riordino Inviato con Successo!</h3>
+              <p className="text-slate-600 text-xs mt-1 max-w-md">
                 La fornitura è stata confermata e registrata nel sistema logistico per l'allestimento immediato.
               </p>
             </div>
 
-            <div className="w-full max-w-md bg-[#081326] border border-[#14284b] rounded-2xl p-4 text-left space-y-2 text-xs">
-              <div className="flex justify-between border-b border-[#122340] pb-2">
+            <div className="w-full max-w-md bg-slate-50 border border-slate-200 rounded-2xl p-4 text-left space-y-2 text-xs">
+              <div className="flex justify-between border-b border-slate-200 pb-2">
                 <span className="text-slate-400">Codice Riordino:</span>
-                <span className="font-mono text-sky-400 font-bold">{submittedOrder.id}</span>
+                <span className="font-mono text-sky-600 font-bold">{submittedOrder.id}</span>
               </div>
-              <div className="flex justify-between border-b border-[#122340] pb-2">
+              <div className="flex justify-between border-b border-slate-200 pb-2">
                 <span className="text-slate-400">Destinatario:</span>
-                <span className="text-white font-medium">
+                <span className="text-slate-900 font-medium">
                   {submittedOrder.shippingAddress?.companyName || submittedOrder.shippingAddress?.recipient}
                 </span>
               </div>
-              <div className="flex justify-between border-b border-[#122340] pb-2">
+              <div className="flex justify-between border-b border-slate-200 pb-2">
                 <span className="text-slate-400">Totale Colli:</span>
-                <span className="text-slate-200 font-bold">{submittedOrder.itemsCount} colli</span>
+                <span className="text-slate-700 font-bold">{submittedOrder.itemsCount} colli</span>
               </div>
-              <div className="flex justify-between border-b border-[#122340] pb-2">
+              <div className="flex justify-between border-b border-slate-200 pb-2">
                 <span className="text-slate-400">Importo Documento:</span>
-                <span className="text-sky-400 font-mono font-bold">€{submittedOrder.total.toFixed(2)}</span>
+                <span className="text-sky-600 font-mono font-bold">€{submittedOrder.total.toFixed(2)}</span>
               </div>
               <div className="flex justify-between pt-1">
                 <span className="text-slate-400">Spedizione / Ricezione:</span>
@@ -800,12 +800,12 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
                 id="quick-reorder-download-pdf-btn"
                 disabled={isDownloadingPdf}
                 onClick={handleDownloadPdf}
-                className="flex-1 inline-flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-[#0e223f] hover:bg-[#153460] text-sky-300 border border-sky-500/40 text-xs font-bold transition-colors"
+                className="flex-1 inline-flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-slate-50 hover:bg-slate-100 text-sky-700 border border-sky-500/40 text-xs font-bold transition-colors"
               >
                 {isDownloadingPdf ? (
-                  <Loader2 className="w-4 h-4 text-sky-400 animate-spin" />
+                  <Loader2 className="w-4 h-4 text-sky-600 animate-spin" />
                 ) : (
-                  <Download className="w-4 h-4 text-sky-400" />
+                  <Download className="w-4 h-4 text-sky-600" />
                 )}
                 <span>Scarica Scheda Riordino PDF</span>
               </button>

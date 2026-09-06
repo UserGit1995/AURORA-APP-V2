@@ -58,7 +58,7 @@ export const SubcategoryManager: React.FC<SubcategoryManagerProps> = ({ onViewPr
     return (
     <div key={sub.id}>
       <div
-        className="flex items-center justify-between gap-2 p-2.5 rounded-xl bg-[#071329] border border-slate-800 text-xs"
+        className="flex items-center justify-between gap-2 p-2.5 rounded-xl bg-slate-50 border border-slate-800 text-xs"
         style={{ marginLeft: depth * 20 }}
       >
         {editingId === sub.id ? (
@@ -67,12 +67,12 @@ export const SubcategoryManager: React.FC<SubcategoryManagerProps> = ({ onViewPr
               autoFocus
               value={editName}
               onChange={(e) => setEditName(e.target.value)}
-              className="flex-1 bg-[#0c1c38] border border-amber-400 rounded-lg px-2 py-1 text-white text-xs"
+              className="flex-1 bg-slate-50 border border-amber-400 rounded-lg px-2 py-1 text-white text-xs"
             />
             <button onClick={() => handleSaveEdit(sub)} className="px-2.5 py-1 bg-amber-500 text-slate-950 font-bold rounded-lg text-[11px]">
               Salva
             </button>
-            <button onClick={() => setEditingId(null)} className="px-2.5 py-1 bg-slate-800 text-slate-300 rounded-lg text-[11px]">
+            <button onClick={() => setEditingId(null)} className="px-2.5 py-1 bg-slate-800 text-slate-600 rounded-lg text-[11px]">
               Annulla
             </button>
           </>
@@ -97,7 +97,7 @@ export const SubcategoryManager: React.FC<SubcategoryManagerProps> = ({ onViewPr
               {count > 0 && onViewProducts && (
                 <button
                   onClick={() => onViewProducts(searchQuery)}
-                  className="p-1.5 rounded-lg bg-sky-500/10 text-sky-400 hover:bg-sky-500/20"
+                  className="p-1.5 rounded-lg bg-sky-500/10 text-sky-600 hover:bg-sky-500/20"
                   title="Vedi articoli di questa (sotto-)sottocategoria"
                 >
                   <PackageSearch className="w-3.5 h-3.5" />
@@ -108,7 +108,7 @@ export const SubcategoryManager: React.FC<SubcategoryManagerProps> = ({ onViewPr
                   setEditingId(sub.id);
                   setEditName(sub.name);
                 }}
-                className="p-1.5 rounded-lg bg-slate-800 text-slate-300 hover:text-white"
+                className="p-1.5 rounded-lg bg-slate-100 text-slate-600 hover:text-slate-900"
                 title="Modifica"
               >
                 <Edit3 className="w-3.5 h-3.5" />
@@ -154,7 +154,7 @@ export const SubcategoryManager: React.FC<SubcategoryManagerProps> = ({ onViewPr
         <select
           value={selectedCategoryId}
           onChange={(e) => setSelectedCategoryId(e.target.value)}
-          className="w-full bg-[#0c1c38] border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white outline-none"
+          className="w-full bg-slate-50 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-slate-900 outline-none"
         >
           {categoriesList.map((c) => (
             <option key={c.id} value={c.id}>{c.name}</option>
@@ -162,7 +162,7 @@ export const SubcategoryManager: React.FC<SubcategoryManagerProps> = ({ onViewPr
         </select>
       </label>
 
-      <form onSubmit={handleAdd} className="bg-[#08152b] p-4 rounded-2xl border border-slate-800 space-y-3">
+      <form onSubmit={handleAdd} className="bg-slate-50 p-4 rounded-2xl border border-slate-800 space-y-3">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <input
             type="text"
@@ -170,12 +170,12 @@ export const SubcategoryManager: React.FC<SubcategoryManagerProps> = ({ onViewPr
             placeholder="Nome (es. Ace, oppure Bicchieri)"
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
-            className="bg-[#0c1c38] border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white outline-none"
+            className="bg-slate-50 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-slate-900 outline-none"
           />
           <select
             value={newParentId}
             onChange={(e) => setNewParentId(e.target.value)}
-            className="bg-[#0c1c38] border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white outline-none"
+            className="bg-slate-50 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-slate-900 outline-none"
           >
             <option value="">— Sottocategoria diretta —</option>
             {topLevelSubs.map((s) => (
