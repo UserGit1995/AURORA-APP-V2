@@ -30,14 +30,14 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
       {/* Section Header */}
       <div className="flex items-center justify-between mb-3.5 sm:mb-4">
         <div className="flex items-center gap-2 sm:gap-2.5">
-          <div className="p-1.5 rounded-lg bg-sky-500/15 text-sky-400">
+          <div className="p-1.5 rounded-lg bg-sky-100 text-sky-600">
             <Folder className="w-4 h-4" />
           </div>
           <div>
-            <h2 className="text-white text-sm sm:text-lg font-bold tracking-tight leading-tight">
+            <h2 className="text-slate-900 text-sm sm:text-lg font-bold tracking-tight leading-tight">
               {t('categories.sectionTitle', 'Categorie principali')}
             </h2>
-            <p className="hidden sm:block text-slate-400 text-xs">
+            <p className="hidden sm:block text-slate-500 text-xs">
               Esplora la gamma completa per la pulizia professionale e personale
             </p>
           </div>
@@ -47,7 +47,7 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
           {selectedCategoryId && (
             <button
               onClick={onViewAll}
-              className="text-xs font-semibold text-sky-400 hover:text-sky-300 underline underline-offset-2"
+              className="text-xs font-semibold text-sky-600 hover:text-sky-700 underline underline-offset-2"
             >
               Mostra tutte
             </button>
@@ -55,14 +55,14 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
           <div className="hidden sm:flex items-center gap-1">
             <button
               onClick={() => scrollBy('left')}
-              className="p-2 rounded-xl border border-[#1c2a44] hover:bg-[#0e1c34] text-slate-300 transition-colors"
+              className="p-2 rounded-xl border border-slate-200 hover:bg-slate-100 text-slate-500 transition-colors"
               aria-label="Scorri a sinistra"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
             <button
               onClick={() => scrollBy('right')}
-              className="p-2 rounded-xl border border-[#1c2a44] hover:bg-[#0e1c34] text-slate-300 transition-colors"
+              className="p-2 rounded-xl border border-slate-200 hover:bg-slate-100 text-slate-500 transition-colors"
               aria-label="Scorri a destra"
             >
               <ChevronRight className="w-4 h-4" />
@@ -82,8 +82,8 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
           onClick={onViewAll}
           className={`shrink-0 snap-start w-36 sm:w-44 h-40 rounded-2xl p-4 flex flex-col justify-between text-left transition-all border ${
             !selectedCategoryId
-              ? 'bg-sky-600 border-sky-500 text-white shadow-lg shadow-sky-950/40'
-              : 'bg-[#081326] border-[#142646] text-slate-200 hover:border-[#1e3966]'
+              ? 'bg-sky-600 border-sky-500 text-white shadow-sm'
+              : 'bg-white border-slate-200 text-slate-700 hover:border-sky-300 shadow-xs'
           }`}
         >
           <span className="p-2 rounded-xl bg-white/15 w-fit">
@@ -106,8 +106,8 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
               onClick={() => onSelectCategory(cat.id)}
               className={`relative shrink-0 snap-start w-48 sm:w-56 h-40 rounded-2xl overflow-hidden text-left transition-all border group ${
                 isSelected
-                  ? 'border-sky-400 ring-2 ring-sky-500/60 shadow-lg -translate-y-0.5'
-                  : 'border-[#142646] hover:border-sky-500/50 hover:-translate-y-0.5'
+                  ? 'border-sky-400 ring-2 ring-sky-500/60 shadow-md -translate-y-0.5'
+                  : 'border-slate-200 hover:border-sky-400 hover:-translate-y-0.5 hover:shadow-md'
               }`}
             >
               <img
@@ -129,7 +129,7 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
                   {cat.countNumber || 0} prodotti
                 </span>
                 <div>
-                  <div className="font-bold text-base leading-tight text-white group-hover:text-sky-300 transition-colors">
+                  <div className="font-bold text-base leading-tight text-white group-hover:text-sky-700 transition-colors">
                     {translatedName}
                   </div>
                   {cat.description && (

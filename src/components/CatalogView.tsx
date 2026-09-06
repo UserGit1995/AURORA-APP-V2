@@ -97,7 +97,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
         return {
           title: 'Nuovi Arrivi e Nuove Formulazioni',
           description: 'Le ultime novità in catalogo per igiene professionale e sanificazione avanzata.',
-          icon: <Sparkles className="w-5 h-5 text-sky-400" />,
+          icon: <Sparkles className="w-5 h-5 text-sky-600" />,
         };
       case 'piu-venduti':
         return {
@@ -110,7 +110,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
         return {
           title: 'Catalogo Generale Prodotti',
           description: 'Tutte le linee di prodotto per la pulizia professionale, cura persona e igiene.',
-          icon: <Folder className="w-5 h-5 text-sky-400" />,
+          icon: <Folder className="w-5 h-5 text-sky-600" />,
         };
     }
   };
@@ -239,11 +239,11 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-xl bg-[#0d1e3a] border border-[#162d52]">
+          <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200">
             {headerInfo.icon}
           </div>
           <div>
-            <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+            <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
               {headerInfo.title}
             </h2>
             <p className="text-xs text-slate-400 mt-0.5">
@@ -266,12 +266,12 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
             }}
             className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all border ${
               isSelectionMode
-                ? 'bg-sky-500/20 text-sky-300 border-sky-400/50 shadow-xs shadow-sky-950/40'
-                : 'bg-[#09152b] hover:bg-[#0e203c] text-slate-300 hover:text-white border-[#142848]'
+                ? 'bg-sky-500/20 text-sky-700 border-sky-400/50 shadow-xs shadow-sky-950/40'
+                : 'bg-slate-50 hover:bg-slate-100 text-slate-500 hover:text-slate-900 border-slate-200'
             }`}
             title={isSelectionMode ? 'Disattiva selezione multipla' : 'Attiva modalità selezione multipla'}
           >
-            <CheckSquare className="w-3.5 h-3.5 text-sky-400" />
+            <CheckSquare className="w-3.5 h-3.5 text-sky-600" />
             <span>{isSelectionMode ? 'Modalità Selezione Attiva' : 'Selezione Multipla'}</span>
             {selectedProductIds.length > 0 && (
               <span className="ml-0.5 px-1.5 py-0.2 rounded-full bg-sky-500 text-white text-[10px] font-bold">
@@ -303,22 +303,22 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
             exit={{ opacity: 0, y: -8, height: 0 }}
             className="mb-5 overflow-hidden"
           >
-            <div className="bg-[#07152e] border border-sky-500/40 rounded-2xl p-3 sm:p-4 flex flex-wrap items-center justify-between gap-3 shadow-lg shadow-sky-950/30">
+            <div className="bg-slate-50 border border-sky-500/40 rounded-2xl p-3 sm:p-4 flex flex-wrap items-center justify-between gap-3 shadow-lg shadow-sky-950/30">
               <div className="flex items-center gap-2.5">
                 <button
                   id="select-all-visible-btn"
                   type="button"
                   onClick={handleSelectAllVisible}
-                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#0e2448] hover:bg-[#143264] text-xs font-semibold text-sky-200 border border-sky-500/30 transition-colors"
+                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-xs font-semibold text-sky-200 border border-sky-500/30 transition-colors"
                 >
                   {allVisibleSelected ? (
                     <>
-                      <CheckSquare className="w-3.5 h-3.5 text-sky-400" />
+                      <CheckSquare className="w-3.5 h-3.5 text-sky-600" />
                       <span>Deseleziona Visibili ({filteredProducts.length})</span>
                     </>
                   ) : (
                     <>
-                      <Square className="w-3.5 h-3.5 text-sky-400" />
+                      <Square className="w-3.5 h-3.5 text-sky-600" />
                       <span>Seleziona Visibili ({filteredProducts.length})</span>
                     </>
                   )}
@@ -329,7 +329,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                     id="clear-selection-btn"
                     type="button"
                     onClick={handleClearSelection}
-                    className="text-xs text-slate-400 hover:text-white underline transition-colors px-2 py-1"
+                    className="text-xs text-slate-500 hover:text-slate-900 underline transition-colors px-2 py-1"
                   >
                     Azzera ({selectedProductIds.length})
                   </button>
@@ -338,11 +338,11 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
 
               <div className="flex items-center gap-2 flex-wrap">
                 <span className="text-xs text-slate-300 font-medium mr-1 hidden sm:inline">
-                  <strong className="text-sky-300">{selectedProductIds.length}</strong> selezionati
+                  <strong className="text-sky-700">{selectedProductIds.length}</strong> selezionati
                   {selectedProductIds.length > 0 && (
                     <span className="text-slate-300 ml-1">
                       (€ {isBusinessCustomer ? (totalSelectedPrice * 1.22).toFixed(2) : totalSelectedPrice.toFixed(2)}{' '}
-                      <span className={isBusinessCustomer ? "text-sky-400" : "text-emerald-400"}>
+                      <span className={isBusinessCustomer ? "text-sky-600" : "text-emerald-400"}>
                         {isBusinessCustomer ? 'con IVA' : 'senza IVA'}
                       </span>)
                     </span>
@@ -355,13 +355,13 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                   type="button"
                   disabled={selectedProductIds.length === 0 || isExportingCsv}
                   onClick={handleExportSelectedToCsv}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-[#0d223f] hover:bg-[#13325c] disabled:opacity-40 disabled:cursor-not-allowed text-sky-200 border border-sky-400/30 transition-colors shadow-xs"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-50 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed text-sky-200 border border-sky-400/30 transition-colors shadow-xs"
                   title="Esporta i prodotti selezionati in formato CSV per la gestione dell'inventario e riordini offline"
                 >
                   {isExportingCsv ? (
-                    <Loader2 className="w-3.5 h-3.5 text-sky-400 animate-spin" />
+                    <Loader2 className="w-3.5 h-3.5 text-sky-600 animate-spin" />
                   ) : (
-                    <FileSpreadsheet className="w-3.5 h-3.5 text-sky-400" />
+                    <FileSpreadsheet className="w-3.5 h-3.5 text-sky-600" />
                   )}
                   <span>Esporta CSV ({selectedProductIds.length})</span>
                 </button>
@@ -371,7 +371,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                   type="button"
                   disabled={selectedProductIds.length === 0}
                   onClick={handleBulkAddSelectedToFavorites}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-[#122340] hover:bg-[#183058] disabled:opacity-40 disabled:cursor-not-allowed text-rose-300 border border-rose-500/30 transition-colors"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-50 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed text-rose-300 border border-rose-500/30 transition-colors"
                 >
                   <Heart className="w-3.5 h-3.5 text-rose-400 fill-rose-400/20" />
                   <span>Ai Preferiti ({selectedProductIds.length})</span>
@@ -392,7 +392,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                   id="close-selection-mode-btn"
                   type="button"
                   onClick={handleExitSelectionMode}
-                  className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-[#0e203c] transition-colors ml-1"
+                  className="p-1.5 rounded-xl text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors ml-1"
                   title="Esci dalla modalità selezione"
                 >
                   <X className="w-4 h-4" />
@@ -418,7 +418,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
           >
             <div className="flex items-center gap-2">
               {bulkFeedback.type === 'csv' ? (
-                <FileSpreadsheet className="w-4 h-4 text-sky-400 shrink-0" />
+                <FileSpreadsheet className="w-4 h-4 text-sky-600 shrink-0" />
               ) : (
                 <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
               )}
@@ -432,7 +432,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
             </div>
             <button
               onClick={() => setBulkFeedback(null)}
-              className="text-slate-400 hover:text-white p-1"
+              className="text-slate-500 hover:text-slate-900 p-1"
             >
               <X className="w-3.5 h-3.5" />
             </button>
@@ -453,8 +453,8 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
             }}
             className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
               !activeFilterCategory
-                ? 'bg-[#0284c7] text-white shadow-md shadow-sky-950/50'
-                : 'bg-[#09152b] text-slate-400 hover:text-white border border-[#132746]'
+                ? 'bg-[#0284c7] text-white shadow-sm'
+                : 'bg-slate-50 text-slate-500 hover:text-slate-900 border border-slate-200'
             }`}
           >
             Tutte le Categorie ({products.length})
@@ -474,8 +474,8 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                 }}
                 className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
                   isSelected
-                    ? 'bg-[#0284c7] text-white shadow-md shadow-sky-950/50'
-                    : 'bg-[#09152b] text-slate-400 hover:text-white border border-[#132746]'
+                    ? 'bg-[#0284c7] text-white shadow-sm'
+                    : 'bg-slate-50 text-slate-500 hover:text-slate-900 border border-slate-200'
                 }`}
               >
                 {cat.image && (
@@ -495,8 +495,8 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
 
         {/* Level 2: Subcategory Pills (Appears when a Level 1 Category with subcategories is active) */}
         {currentSelectedCategory && currentSelectedCategory.subCategories && currentSelectedCategory.subCategories.length > 0 && (
-          <div className="flex items-center gap-2 overflow-x-auto p-2 bg-[#061226] border border-sky-950/80 rounded-xl scrollbar-none">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-sky-400 pl-1 shrink-0 flex items-center gap-1">
+          <div className="flex items-center gap-2 overflow-x-auto p-2 bg-slate-50 border border-sky-950/80 rounded-xl scrollbar-none">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-sky-600 pl-1 shrink-0 flex items-center gap-1">
               <Layers className="w-3 h-3" />
               <span>Sottocategorie:</span>
             </span>
@@ -548,7 +548,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
 
         {/* Level 3: Micro-category Pills (Appears when a Level 2 Subcategory with micro-categories is active) */}
         {currentSelectedSubCategory && currentSelectedSubCategory.subSubCategories && currentSelectedSubCategory.subSubCategories.length > 0 && (
-          <div className="flex items-center gap-2 overflow-x-auto p-2 bg-[#051722] border border-emerald-950/80 rounded-xl scrollbar-none">
+          <div className="flex items-center gap-2 overflow-x-auto p-2 bg-slate-50 border border-emerald-950/80 rounded-xl scrollbar-none">
             <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-400 pl-1 shrink-0 flex items-center gap-1">
               <Tag className="w-3 h-3" />
               <span>Micro-categorie:</span>
@@ -597,11 +597,11 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
 
       {/* Products Grid */}
       {filteredProducts.length === 0 ? (
-        <div className="bg-[#081326] border border-[#142646] rounded-2xl p-10 text-center space-y-3">
-          <div className="w-12 h-12 rounded-2xl bg-sky-500/10 border border-sky-500/30 text-sky-400 mx-auto flex items-center justify-center">
+        <div className="bg-slate-50 border border-slate-200 rounded-2xl p-10 text-center space-y-3">
+          <div className="w-12 h-12 rounded-2xl bg-sky-500/10 border border-sky-500/30 text-sky-600 mx-auto flex items-center justify-center">
             <Layers className="w-6 h-6" />
           </div>
-          <p className="text-sm font-bold text-white">Nessun articolo trovato per questo filtro</p>
+          <p className="text-sm font-bold text-slate-900">Nessun articolo trovato per questo filtro</p>
           <p className="text-xs text-slate-400 max-w-md mx-auto">
             {activeFilterSubCategory
               ? 'Non ci sono ancora articoli assegnati a questa specifica sottocategoria.'
@@ -640,12 +640,12 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                     onSelectProduct(product);
                   }
                 }}
-                className={`group relative cursor-pointer bg-[#081326] hover:bg-[#0c1c36] border rounded-2xl p-3 flex flex-col justify-between transition-all duration-200 hover:translate-y-[-2px] ${
+                className={`group relative cursor-pointer bg-slate-50 hover:bg-slate-100 border rounded-2xl p-3 flex flex-col justify-between transition-all duration-200 hover:translate-y-[-2px] ${
                   isSelected
-                    ? 'border-sky-400 bg-[#071836] ring-2 ring-sky-500/40 shadow-md shadow-sky-950/50'
+                    ? 'border-sky-400 bg-slate-50 ring-2 ring-sky-500/40 shadow-md shadow-sky-950/50'
                     : isCompared 
                     ? 'border-amber-500/50 ring-1 ring-amber-500/30' 
-                    : 'border-[#142646] hover:border-[#1e3966]'
+                    : 'border-slate-200 hover:border-sky-300'
                 }`}
               >
                 {/* Top Badge & Multi-Select Checkbox Bar */}
@@ -660,7 +660,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                         className={`p-1 rounded-lg border transition-all flex items-center justify-center ${
                           isSelected
                             ? 'bg-sky-500 border-sky-400 text-white shadow-xs'
-                            : 'bg-[#060e1d] border-slate-600 hover:border-sky-400 text-transparent'
+                            : 'bg-slate-50 border-slate-600 hover:border-sky-400 text-transparent'
                         }`}
                         title={isSelected ? 'Deseleziona' : 'Seleziona'}
                       >
@@ -673,7 +673,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                         -{product.discountPercent}%
                       </span>
                     ) : product.isFeatured ? (
-                      <span className="text-[10px] font-bold bg-sky-500/20 text-sky-300 px-1.5 py-0.5 rounded-md border border-sky-500/30">
+                      <span className="text-[10px] font-bold bg-sky-500/20 text-sky-700 px-1.5 py-0.5 rounded-md border border-sky-500/30">
                         In Evidenza
                       </span>
                     ) : null}
@@ -704,7 +704,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                           e.stopPropagation();
                           onOpenRestockAnalysis(product.id);
                         }}
-                        className="p-1.5 rounded-full backdrop-blur-xs transition-colors shrink-0 text-slate-400 hover:text-sky-300 bg-[#0a1528]/80 hover:bg-[#112344]"
+                        className="p-1.5 rounded-full backdrop-blur-xs transition-colors shrink-0 text-slate-400 hover:text-sky-700 bg-slate-50/80 hover:bg-slate-100"
                         title="Analisi Riordino AI per questo prodotto"
                       >
                         <Sparkles className="w-3.5 h-3.5" />
@@ -720,7 +720,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                         className={`p-1.5 rounded-full backdrop-blur-xs transition-colors shrink-0 ${
                           isCompared
                             ? 'text-amber-300 bg-amber-500/20 border border-amber-500/40'
-                            : 'text-slate-400 hover:text-white bg-[#0a1528]/80 hover:bg-[#112344]'
+                            : 'text-slate-400 hover:text-white bg-slate-50/80 hover:bg-slate-100'
                         }`}
                         title={isCompared ? 'Rimuovi dal confronto' : 'Aggiungi al confronto'}
                       >
@@ -737,7 +737,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                       className={`p-1.5 rounded-full backdrop-blur-xs transition-colors shrink-0 ${
                         isFav
                           ? 'text-rose-400 bg-rose-500/10'
-                          : 'text-slate-400 hover:text-white bg-[#0a1528]/80 hover:bg-[#112344]'
+                          : 'text-slate-400 hover:text-white bg-slate-50/80 hover:bg-slate-100'
                       }`}
                     >
                       <Heart className={`w-3.5 h-3.5 ${isFav ? 'fill-rose-400 text-rose-400' : ''}`} />
@@ -745,7 +745,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                   </div>
                 </div>
 
-                <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-gradient-to-b from-[#060e1d] to-[#0a1529] flex items-center justify-center p-2 my-1">
+                <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-gradient-to-b from-white to-sky-50 flex items-center justify-center p-2 my-1">
                   <img
                     src={product.image}
                     alt={product.name}
@@ -762,7 +762,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                 </div>
 
                 <div className="mt-2 text-left">
-                  <h3 className="text-white text-xs font-bold truncate leading-tight group-hover:text-sky-300">
+                  <h3 className="text-slate-900 text-xs font-bold truncate leading-tight group-hover:text-sky-600">
                     {product.name}
                   </h3>
                   <div className="flex items-center justify-between gap-1 mt-0.5">
@@ -776,18 +776,18 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                     )}
                   </div>
 
-                  <div className="flex items-center justify-between mt-2.5 pt-1.5 border-t border-[#122340]">
+                  <div className="flex items-center justify-between mt-2.5 pt-1.5 border-t border-slate-200">
                     <div>
                       {isBusinessCustomer ? (
-                        <span className="text-white text-xs font-bold">€{(product.price * 1.22).toFixed(2)}</span>
+                        <span className="text-slate-900 text-xs font-bold">€{(product.price * 1.22).toFixed(2)}</span>
                       ) : (
-                        <span className="text-white text-xs font-bold">€{product.price.toFixed(2)}</span>
+                        <span className="text-slate-900 text-xs font-bold">€{product.price.toFixed(2)}</span>
                       )}
                     </div>
                     <button
                       id={`catalog-add-cart-btn-${product.id}`}
                       onClick={(e) => onAddToCart(product, e)}
-                      className="p-1 rounded-lg bg-[#102342] hover:bg-[#0284c7] text-slate-300 hover:text-white transition-colors"
+                      className="p-1 rounded-lg bg-slate-100 hover:bg-[#0284c7] text-slate-500 hover:text-white transition-colors"
                       title="Aggiungi al carrello"
                     >
                       <Plus className="w-3.5 h-3.5" />
@@ -807,22 +807,22 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
             initial={{ opacity: 0, y: 30, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 30, scale: 0.95 }}
-            className="fixed bottom-5 left-1/2 -translate-x-1/2 z-40 w-[94%] max-w-2xl bg-[#061124]/95 backdrop-blur-md border border-sky-500/50 rounded-2xl p-3 sm:p-3.5 px-4 shadow-2xl shadow-sky-950/70 flex flex-wrap items-center justify-between gap-3"
+            className="fixed bottom-5 left-1/2 -translate-x-1/2 z-40 w-[94%] max-w-2xl bg-slate-50/95 backdrop-blur-md border border-sky-500/50 rounded-2xl p-3 sm:p-3.5 px-4 shadow-2xl shadow-sky-950/70 flex flex-wrap items-center justify-between gap-3"
           >
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-xl bg-sky-500/20 text-sky-400 border border-sky-500/40 flex items-center justify-center font-bold text-xs">
+              <div className="w-8 h-8 rounded-xl bg-sky-500/20 text-sky-600 border border-sky-500/40 flex items-center justify-center font-bold text-xs">
                 {selectedProductIds.length}
               </div>
               <div>
-                <div className="text-xs font-bold text-white flex items-center gap-1.5">
+                <div className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
                   <span>{selectedProductIds.length} {selectedProductIds.length === 1 ? 'prodotto selezionato' : 'prodotti selezionati'}</span>
                 </div>
-                <div className="text-[11px] text-sky-300 font-mono">
+                <div className="text-[11px] text-sky-700 font-mono">
                   Totale:{' '}
                   <strong>
                     € {isBusinessCustomer ? (totalSelectedPrice * 1.22).toFixed(2) : totalSelectedPrice.toFixed(2)}
                   </strong>{' '}
-                  <span className={`font-semibold ${isBusinessCustomer ? 'text-sky-400' : 'text-emerald-400'}`}>
+                  <span className={`font-semibold ${isBusinessCustomer ? 'text-sky-600' : 'text-emerald-400'}`}>
                     {isBusinessCustomer ? '(con IVA 22%)' : '(senza IVA)'}
                   </span>
                 </div>
@@ -835,13 +835,13 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                 type="button"
                 disabled={selectedProductIds.length === 0 || isExportingCsv}
                 onClick={handleExportSelectedToCsv}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-[#091b33] hover:bg-[#0f2d52] disabled:opacity-40 text-sky-200 border border-sky-400/40 transition-colors"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-50 hover:bg-slate-100 disabled:opacity-40 text-sky-200 border border-sky-400/40 transition-colors"
                 title="Scarica file CSV per inventario e giacenze offline"
               >
                 {isExportingCsv ? (
-                  <Loader2 className="w-3.5 h-3.5 text-sky-400 animate-spin" />
+                  <Loader2 className="w-3.5 h-3.5 text-sky-600 animate-spin" />
                 ) : (
-                  <FileSpreadsheet className="w-3.5 h-3.5 text-sky-400" />
+                  <FileSpreadsheet className="w-3.5 h-3.5 text-sky-600" />
                 )}
                 <span className="hidden sm:inline">Esporta CSV</span>
               </button>
@@ -850,7 +850,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                 id="floating-bulk-fav-btn"
                 type="button"
                 onClick={handleBulkAddSelectedToFavorites}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-[#0d1c36] hover:bg-[#132a52] text-rose-300 border border-rose-500/30 transition-colors"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-50 hover:bg-slate-100 text-rose-300 border border-rose-500/30 transition-colors"
                 title="Aggiungi tutti i prodotti selezionati ai preferiti"
               >
                 <Heart className="w-3.5 h-3.5 text-rose-400 fill-rose-400/20" />
@@ -872,7 +872,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                 id="floating-clear-selection-btn"
                 type="button"
                 onClick={handleClearSelection}
-                className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-[#0e203c] transition-colors"
+                className="p-1.5 rounded-xl text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors"
                 title="Deseleziona tutti"
               >
                 <X className="w-4 h-4" />

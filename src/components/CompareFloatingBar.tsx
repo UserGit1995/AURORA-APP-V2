@@ -30,7 +30,7 @@ export const CompareFloatingBar: React.FC<CompareFloatingBarProps> = ({
         transition={{ type: 'spring', stiffness: 350, damping: 30 }}
         className="fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-40 w-[94%] max-w-2xl"
       >
-        <div className="bg-[#071328]/95 backdrop-blur-md border border-[#1d3d6e] rounded-2xl sm:rounded-3xl p-3 sm:p-4 shadow-2xl shadow-black/80 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div className="bg-slate-50/95 backdrop-blur-md border border-slate-200 rounded-2xl sm:rounded-3xl p-3 sm:p-4 shadow-2xl shadow-black/80 flex flex-col sm:flex-row items-center justify-between gap-3">
           {/* Left: Indicator & Thumbnails */}
           <div className="flex items-center gap-3 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
             <div className="hidden sm:flex items-center justify-center w-10 h-10 rounded-2xl bg-amber-500/15 border border-amber-500/30 text-amber-300 shrink-0 shadow-xs">
@@ -39,10 +39,10 @@ export const CompareFloatingBar: React.FC<CompareFloatingBarProps> = ({
 
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-white tracking-wide">
+                <span className="text-xs font-bold text-slate-900 tracking-wide">
                   Confronto Prodotti
                 </span>
-                <span className="text-[11px] font-semibold bg-[#112444] text-sky-300 px-2 py-0.5 rounded-full border border-[#1b3b6c]">
+                <span className="text-[11px] font-semibold bg-slate-50 text-sky-700 px-2 py-0.5 rounded-full border border-slate-200">
                   {comparedProducts.length}/{maxCompare}
                 </span>
               </div>
@@ -58,7 +58,7 @@ export const CompareFloatingBar: React.FC<CompareFloatingBarProps> = ({
               {comparedProducts.map((product) => (
                 <div
                   key={product.id}
-                  className="group relative w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-[#091832] border border-[#183560] p-1 shrink-0 flex items-center justify-center"
+                  className="group relative w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-slate-50 border border-slate-200 p-1 shrink-0 flex items-center justify-center"
                   title={product.name}
                 >
                   <img
@@ -85,7 +85,7 @@ export const CompareFloatingBar: React.FC<CompareFloatingBarProps> = ({
               {Array.from({ length: Math.max(0, maxCompare - comparedProducts.length) }).map((_, idx) => (
                 <div
                   key={`empty-${idx}`}
-                  className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl border border-dashed border-[#183560] bg-[#061022]/60 flex items-center justify-center text-slate-600 text-[10px] shrink-0"
+                  className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl border border-dashed border-slate-200 bg-slate-50/60 flex items-center justify-center text-slate-600 text-[10px] shrink-0"
                   title="Aggiungi altri articoli dal catalogo"
                 >
                   +
@@ -113,7 +113,7 @@ export const CompareFloatingBar: React.FC<CompareFloatingBarProps> = ({
               className={`flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold shadow-lg transition-all ${
                 comparedProducts.length >= 2
                   ? 'bg-gradient-to-r from-[#0284c7] via-[#0284c7] to-[#0ea5e9] hover:from-[#0369a1] hover:to-[#0284c7] text-white shadow-sky-900/40 animate-pulse'
-                  : 'bg-[#0f2444] text-slate-300 hover:text-white border border-[#1d3d6e]'
+                  : 'bg-slate-50 text-slate-600 hover:text-slate-900 border border-slate-200'
               }`}
             >
               <Scale className="w-4 h-4" />

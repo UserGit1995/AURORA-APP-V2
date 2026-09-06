@@ -141,25 +141,25 @@ export const LoginModal: React.FC<LoginModalProps> = ({
         initial={{ opacity: 0, scale: 0.95, y: 15 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 15 }}
-        className="relative w-full max-w-md bg-[#060e1d] border border-[#142848] rounded-3xl shadow-2xl z-10 overflow-hidden my-auto"
+        className="relative w-full max-w-md bg-slate-50 border border-slate-200 rounded-3xl shadow-2xl z-10 overflow-hidden my-auto"
       >
         {/* Close Button */}
         <button
           id="close-login-modal-btn"
           onClick={onClose}
-          className="absolute top-4 right-4 p-2 rounded-full text-slate-400 hover:text-white bg-[#0d1d38]/80 hover:bg-[#132c54] border border-[#1a3359] transition-colors z-20"
+          className="absolute top-4 right-4 p-2 rounded-full text-slate-500 hover:text-slate-900 bg-slate-50/80 hover:bg-slate-100 border border-slate-200 transition-colors z-20"
         >
           <X className="w-4 h-4" />
         </button>
 
         {/* Header with Official Aurora Logo */}
-        <div className="pt-7 pb-3.5 px-6 text-center flex flex-col items-center border-b border-[#0f213d] bg-[#071329]/60">
+        <div className="pt-7 pb-3.5 px-6 text-center flex flex-col items-center border-b border-slate-200 bg-slate-50/60">
           <div className="relative mb-2 p-1">
             <AuroraLogo size="login" showSubtitle={true} />
           </div>
 
           {/* Mode Switcher Tabs */}
-          <div className="grid grid-cols-2 p-1 bg-[#09152b] border border-[#14284b] rounded-xl w-full max-w-xs mt-2.5">
+          <div className="grid grid-cols-2 p-1 bg-slate-50 border border-slate-200 rounded-xl w-full max-w-xs mt-2.5">
             <button
               type="button"
               id="tab-login-btn"
@@ -170,7 +170,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
               className={`py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer ${
                 authMode === 'login'
                   ? 'bg-sky-500 text-white shadow-sm'
-                  : 'text-slate-400 hover:text-slate-200'
+                  : 'text-slate-500 hover:text-slate-900'
               }`}
             >
               {isIt ? 'Accedi' : 'Sign In'}
@@ -185,7 +185,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
               className={`py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer ${
                 authMode === 'register'
                   ? 'bg-sky-500 text-white shadow-sm'
-                  : 'text-slate-400 hover:text-slate-200'
+                  : 'text-slate-500 hover:text-slate-900'
               }`}
             >
               {isIt ? 'Registrati' : 'Register'}
@@ -198,7 +198,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
           {/* Informative Guidance Banner */}
           {authMode === 'register' ? (
             <div className="mb-4 space-y-2">
-              <p className="text-xs font-bold text-slate-300">
+              <p className="text-xs font-bold text-slate-600">
                 Seleziona la tipologia di account:
               </p>
               <div className="grid grid-cols-2 gap-2">
@@ -211,8 +211,8 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                   }}
                   className={`p-2.5 rounded-xl border flex flex-col items-center text-center gap-1.5 transition-all cursor-pointer ${
                     customerType === 'privato'
-                      ? 'bg-sky-950/70 border-sky-500 text-white shadow-md shadow-sky-950/50 ring-1 ring-sky-400/40'
-                      : 'bg-[#08152c] border-[#142848] text-slate-400 hover:text-slate-200'
+                      ? 'bg-sky-50 border-sky-500 text-slate-900 shadow-sm ring-1 ring-sky-300'
+                      : 'bg-slate-50 border-slate-200 text-slate-500 hover:text-slate-900'
                   }`}
                 >
                   <ShoppingBag className={`w-4 h-4 ${customerType === 'privato' ? 'text-sky-400' : 'text-slate-400'}`} />
@@ -231,8 +231,8 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                   }}
                   className={`p-2.5 rounded-xl border flex flex-col items-center text-center gap-1.5 transition-all cursor-pointer ${
                     customerType === 'attivita'
-                      ? 'bg-sky-950/70 border-sky-500 text-white shadow-md shadow-sky-950/50 ring-1 ring-sky-400/40'
-                      : 'bg-[#08152c] border-[#142848] text-slate-400 hover:text-slate-200'
+                      ? 'bg-sky-50 border-sky-500 text-slate-900 shadow-sm ring-1 ring-sky-300'
+                      : 'bg-slate-50 border-slate-200 text-slate-500 hover:text-slate-900'
                   }`}
                 >
                   <Briefcase className={`w-4 h-4 ${customerType === 'attivita' ? 'text-sky-400' : 'text-slate-400'}`} />
@@ -244,7 +244,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
               </div>
             </div>
           ) : (
-            <div className="mb-4 p-2.5 rounded-xl bg-sky-950/30 border border-sky-500/20 text-[11px] text-slate-300 flex items-center gap-2">
+            <div className="mb-4 p-2.5 rounded-xl bg-sky-50 border border-sky-200 text-[11px] text-slate-600 flex items-center gap-2">
               <Sparkles className="w-3.5 h-3.5 text-sky-400 shrink-0" />
               <span>Inserisci le tue credenziali per accedere al tuo account.</span>
             </div>
@@ -271,7 +271,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
             {authMode === 'register' && (
               <>
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">
+                  <label className="block text-xs font-bold text-slate-600 mb-1">
                     {customerType === 'privato' ? 'Nome e Cognome *' : 'Nome e Cognome Referente *'}
                   </label>
                   <div className="relative">
@@ -285,7 +285,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                       onChange={(e) => setName(e.target.value)}
                       required
                       placeholder={customerType === 'privato' ? 'es. Mario Rossi' : 'es. Mario Rossi (Referente Acquisti)'}
-                      className="w-full bg-[#050c18] border border-[#132542] rounded-xl pl-10 pr-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-500"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-3.5 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-sky-500"
                     />
                   </div>
                 </div>
@@ -293,7 +293,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                 {customerType === 'attivita' && (
                   <>
                     <div>
-                      <label className="block text-xs font-bold text-slate-300 mb-1">
+                      <label className="block text-xs font-bold text-slate-600 mb-1">
                         Ragione Sociale / Nome Attività *
                       </label>
                       <div className="relative">
@@ -307,13 +307,13 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                           onChange={(e) => setCompany(e.target.value)}
                           required
                           placeholder="es. Rossi Forniture S.r.l. o Negozio Casalinghi"
-                          className="w-full bg-[#050c18] border border-[#132542] rounded-xl pl-10 pr-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-500"
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-3.5 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-sky-500"
                         />
                       </div>
                     </div>
 
                     <div>
-                      <label className="block text-xs font-bold text-slate-300 mb-1">
+                      <label className="block text-xs font-bold text-slate-600 mb-1">
                         Partita IVA / Codice Fiscale Azienda *
                       </label>
                       <input
@@ -323,14 +323,14 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                         onChange={(e) => setPiva(e.target.value)}
                         required
                         placeholder="IT01234567890"
-                        className="w-full bg-[#050c18] border border-[#132542] rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-500 font-mono uppercase"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-sky-500 font-mono uppercase"
                       />
                     </div>
                   </>
                 )}
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">
+                  <label className="block text-xs font-bold text-slate-600 mb-1">
                     Recapito Telefonico <span className="text-slate-500 font-normal">(Opzionale per spedizioni)</span>
                   </label>
                   <div className="relative">
@@ -343,7 +343,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
                       placeholder="+39 333 1234567"
-                      className="w-full bg-[#050c18] border border-[#132542] rounded-xl pl-10 pr-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-500 font-mono"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-3.5 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-sky-500 font-mono"
                     />
                   </div>
                 </div>
@@ -368,7 +368,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                         value={adminCode}
                         onChange={(e) => setAdminCode(e.target.value)}
                         placeholder="Inserisci passkey admin (opzionale)"
-                        className="w-full bg-[#050c18] border border-amber-500/40 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 font-mono"
+                        className="w-full bg-slate-50 border border-amber-500/40 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-amber-400 font-mono"
                       />
                     </div>
                   )}
@@ -377,7 +377,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
             )}
 
             <div>
-              <label className="block text-xs font-bold text-slate-300 mb-1">
+              <label className="block text-xs font-bold text-slate-600 mb-1">
                 <span>{isIt ? 'Indirizzo Email *' : 'Email Address *'}</span>
               </label>
               <div className="relative">
@@ -391,13 +391,13 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   placeholder="nome@dominio.it"
-                  className="w-full bg-[#050c18] border border-[#132542] rounded-xl pl-10 pr-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-500 font-mono"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-3.5 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-sky-500 font-mono"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-300 mb-1">
+              <label className="block text-xs font-bold text-slate-600 mb-1">
                 <span>{isIt ? 'Password *' : 'Password *'}</span>
               </label>
               <div className="relative">
@@ -411,12 +411,12 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   placeholder="••••••••••••"
-                  className="w-full bg-[#050c18] border border-[#132542] rounded-xl pl-10 pr-10 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-500 font-mono"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-10 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-sky-500 font-mono"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-500 hover:text-slate-300 cursor-pointer"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-700 cursor-pointer"
                 >
                   {showPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
                 </button>
@@ -430,7 +430,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                   type="checkbox"
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
-                  className="w-4 h-4 rounded border-slate-700 bg-[#050c18] text-sky-500 focus:ring-0"
+                  className="w-4 h-4 rounded border-slate-700 bg-slate-50 text-sky-500 focus:ring-0"
                 />
                 <span>{isIt ? 'Resta connesso' : 'Stay signed in'}</span>
               </label>
@@ -465,7 +465,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
         </div>
 
         {/* Footer info */}
-        <div className="p-3.5 bg-[#040a14] border-t border-[#0e1d35] text-center text-[11px] text-slate-500">
+        <div className="p-3.5 bg-slate-50 border-t border-slate-200 text-center text-[11px] text-slate-500">
           AURORA Casalinghi & Forniture • Accesso Sicuro
         </div>
       </motion.div>
