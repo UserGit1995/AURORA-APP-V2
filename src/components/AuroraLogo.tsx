@@ -25,14 +25,14 @@ export const AuroraLogo: React.FC<AuroraLogoProps> = ({
     <div className={`inline-flex flex-col items-center select-none ${className}`}>
       <img
         src={logoLoginAsset}
-        alt="AURORA Logo"
+        alt="AURORA - Igiene & Benessere"
         referrerPolicy="no-referrer"
-        className={`${sizeStyles[size]} w-auto max-w-full object-contain filter drop-shadow-[0_2px_12px_rgba(56,189,248,0.35)]`}
+        className={`${sizeStyles[size]} w-auto max-w-full object-contain`}
       />
 
       {showSubtitle && (
-        <span className="text-[10px] sm:text-xs font-semibold tracking-[0.25em] uppercase text-sky-300/90 mt-2 font-mono">
-          B2B Supply & Hygiene Solutions
+        <span className="text-[10px] sm:text-xs font-semibold tracking-[0.2em] uppercase text-sky-400/80 mt-1.5">
+          Igiene &amp; Benessere
         </span>
       )}
     </div>
