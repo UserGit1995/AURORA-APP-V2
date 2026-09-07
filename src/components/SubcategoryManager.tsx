@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Plus, Edit3, Trash2, ChevronRight, FolderTree, PackageSearch } from 'lucide-react';
+import { Plus, Edit3, Trash2, ChevronRight, FolderTree, PackageSearch, ImagePlus, X } from 'lucide-react';
 import { useAdmin } from '../context/AdminContext';
 import { Subcategory } from '../types';
+import { ProductImageUploader } from './ProductImageUploader';
 
 interface SubcategoryManagerProps {
   // Chiamato quando l'utente vuole vedere gli articoli dentro una
@@ -17,6 +18,7 @@ export const SubcategoryManager: React.FC<SubcategoryManagerProps> = ({ onViewPr
   const [newParentId, setNewParentId] = useState<string>(''); // vuoto = sottocategoria diretta
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
+  const [uploadingLogoFor, setUploadingLogoFor] = useState<string | null>(null);
 
   const subsForCategory = subcategoriesList.filter((s) => s.categoryId === selectedCategoryId);
   const topLevelSubs = subsForCategory.filter((s) => !s.parentSubcategoryId);
@@ -49,16 +51,22 @@ export const SubcategoryManager: React.FC<SubcategoryManagerProps> = ({ onViewPr
     setEditingId(null);
   };
 
+  const handleLogoChange = (sub: Subcategory, imageUri: string) => {
+    updateSubcategory({ ...sub, image: imageUri });
+    setUploadingLogoFor(null);
+  };
+
   const renderRow = (sub: Subcategory, depth: number) => {
     const count = totalProductCount(sub);
     // Per una tipologia (depth>0) il nome da solo ("Lacca e Styling") è troppo
     // generico: cerchiamo per marca (il genitore), così il tab Prodotti mostra
     // tutti gli articoli di quella marca e la tipologia specifica si trova a colpo d'occhio.
     const searchQuery = depth === 0 ? sub.name : subsForCategory.find((p) => p.id === sub.parentSubcategoryId)?.name || sub.name;
+    const isBrand = depth === 0;
     return (
     <div key={sub.id}>
       <div
-        className="flex items-center justify-between gap-2 p-2.5 rounded-xl bg-slate-50 border border-slate-800 text-xs"
+        className="flex items-center justify-between gap-2 p-2.5 rounded-xl bg-white border border-slate-200 text-xs"
         style={{ marginLeft: depth * 20 }}
       >
         {editingId === sub.id ? (
@@ -67,37 +75,55 @@ export const SubcategoryManager: React.FC<SubcategoryManagerProps> = ({ onViewPr
               autoFocus
               value={editName}
               onChange={(e) => setEditName(e.target.value)}
-              className="flex-1 bg-slate-50 border border-amber-400 rounded-lg px-2 py-1 text-white text-xs"
+              className="flex-1 bg-white border border-amber-400 rounded-lg px-2 py-1 text-slate-900 text-xs"
             />
             <button onClick={() => handleSaveEdit(sub)} className="px-2.5 py-1 bg-amber-500 text-slate-950 font-bold rounded-lg text-[11px]">
               Salva
             </button>
-            <button onClick={() => setEditingId(null)} className="px-2.5 py-1 bg-slate-800 text-slate-600 rounded-lg text-[11px]">
+            <button onClick={() => setEditingId(null)} className="px-2.5 py-1 bg-slate-100 text-slate-600 rounded-lg text-[11px]">
               Annulla
             </button>
           </>
         ) : (
           <>
             <div className="flex items-center gap-1.5 min-w-0">
-              {depth > 0 && <ChevronRight className="w-3 h-3 text-slate-500 shrink-0" />}
-              <span className="text-white font-semibold truncate">{sub.name}</span>
-              {depth === 0 && childrenOf(sub.id).length > 0 && (
-                <span className="text-[10px] text-slate-500">({childrenOf(sub.id).length} sotto-sottocategorie)</span>
+              {depth > 0 && <ChevronRight className="w-3 h-3 text-slate-400 shrink-0" />}
+              {isBrand && (
+                <div className="w-6 h-6 rounded-full overflow-hidden bg-sky-50 border border-sky-200 flex items-center justify-center shrink-0">
+                  {sub.image ? (
+                    <img src={sub.image} alt={sub.name} className="w-full h-full object-contain" />
+                  ) : (
+                    <span className="text-sky-600 font-bold text-[10px]">{sub.name.charAt(0).toUpperCase()}</span>
+                  )}
+                </div>
+              )}
+              <span className="text-slate-900 font-semibold truncate">{sub.name}</span>
+              {isBrand && childrenOf(sub.id).length > 0 && (
+                <span className="text-[10px] text-slate-400">({childrenOf(sub.id).length} sotto-sottocategorie)</span>
               )}
               <span
                 className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md shrink-0 ${
-                  count > 0 ? 'bg-emerald-500/10 text-emerald-400' : 'bg-slate-700/50 text-slate-500'
+                  count > 0 ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-100 text-slate-400'
                 }`}
-                title={depth === 0 ? 'Totale articoli in questa marca (incluse le tipologie)' : 'Articoli assegnati qui'}
+                title={isBrand ? 'Totale articoli in questa marca (incluse le tipologie)' : 'Articoli assegnati qui'}
               >
                 {count} art.
               </span>
             </div>
             <div className="flex items-center gap-1.5 shrink-0">
+              {isBrand && (
+                <button
+                  onClick={() => setUploadingLogoFor(uploadingLogoFor === sub.id ? null : sub.id)}
+                  className="p-1.5 rounded-lg bg-amber-50 text-amber-600 hover:bg-amber-100"
+                  title="Carica il logo originale di questa marca"
+                >
+                  <ImagePlus className="w-3.5 h-3.5" />
+                </button>
+              )}
               {count > 0 && onViewProducts && (
                 <button
                   onClick={() => onViewProducts(searchQuery)}
-                  className="p-1.5 rounded-lg bg-sky-500/10 text-sky-600 hover:bg-sky-500/20"
+                  className="p-1.5 rounded-lg bg-sky-50 text-sky-600 hover:bg-sky-100"
                   title="Vedi articoli di questa (sotto-)sottocategoria"
                 >
                   <PackageSearch className="w-3.5 h-3.5" />
@@ -108,7 +134,7 @@ export const SubcategoryManager: React.FC<SubcategoryManagerProps> = ({ onViewPr
                   setEditingId(sub.id);
                   setEditName(sub.name);
                 }}
-                className="p-1.5 rounded-lg bg-slate-100 text-slate-600 hover:text-slate-900"
+                className="p-1.5 rounded-lg bg-slate-100 text-slate-500 hover:text-slate-900"
                 title="Modifica"
               >
                 <Edit3 className="w-3.5 h-3.5" />
@@ -125,7 +151,7 @@ export const SubcategoryManager: React.FC<SubcategoryManagerProps> = ({ onViewPr
                     deleteSubcategory(sub.id);
                   }
                 }}
-                className="p-1.5 rounded-lg bg-rose-500/10 text-rose-400 hover:bg-rose-500/20"
+                className="p-1.5 rounded-lg bg-rose-50 text-rose-500 hover:bg-rose-100"
                 title="Elimina"
               >
                 <Trash2 className="w-3.5 h-3.5" />
@@ -134,6 +160,30 @@ export const SubcategoryManager: React.FC<SubcategoryManagerProps> = ({ onViewPr
           </>
         )}
       </div>
+
+      {isBrand && uploadingLogoFor === sub.id && (
+        <div className="mt-2 mb-1 p-3 rounded-xl bg-white border border-amber-200" style={{ marginLeft: depth * 20 }}>
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-[11px] font-semibold text-slate-600">Logo di "{sub.name}"</span>
+            <button onClick={() => setUploadingLogoFor(null)} className="text-slate-400 hover:text-slate-700">
+              <X className="w-3.5 h-3.5" />
+            </button>
+          </div>
+          <ProductImageUploader
+            currentImage={sub.image || ''}
+            onImageChange={(uri) => handleLogoChange(sub, uri)}
+          />
+          {sub.image && (
+            <button
+              onClick={() => handleLogoChange(sub, '')}
+              className="mt-2 text-[11px] font-semibold text-rose-500 hover:text-rose-700"
+            >
+              Rimuovi logo e torna al badge con iniziale
+            </button>
+          )}
+        </div>
+      )}
+
       {childrenOf(sub.id).map((child) => renderRow(child, depth + 1))}
     </div>
   );
@@ -142,19 +192,21 @@ export const SubcategoryManager: React.FC<SubcategoryManagerProps> = ({ onViewPr
   return (
     <div className="p-4 sm:p-6 overflow-y-auto flex-1 space-y-5 text-left">
       <div className="flex items-center gap-2">
-        <FolderTree className="w-4 h-4 text-amber-400" />
-        <h3 className="text-xs font-bold text-amber-400 uppercase tracking-wider">Sottocategorie e sotto-sottocategorie</h3>
+        <FolderTree className="w-4 h-4 text-sky-600" />
+        <h3 className="text-sm font-bold text-slate-900">Sottocategorie e sotto-sottocategorie</h3>
       </div>
       <p className="text-[11px] text-slate-500 -mt-3">
-        Il numero accanto a ogni nome è quanti articoli ci sono davvero dentro. Clicca l'icona <PackageSearch className="w-3 h-3 inline mx-0.5" /> per vederli ed eventualmente spostarli su un'altra marca/tipologia dal tab Prodotti.
+        Il numero accanto a ogni nome è quanti articoli ci sono davvero dentro. Sulle marche, l'icona{' '}
+        <ImagePlus className="w-3 h-3 inline mx-0.5" /> carica il logo originale (mostrato nella pagina "Marche" del sito al posto del
+        badge con l'iniziale). L'icona <PackageSearch className="w-3 h-3 inline mx-0.5" /> apre gli articoli nel tab Prodotti.
       </p>
 
       <label className="block">
-        <span className="text-[11px] font-semibold text-slate-400 block mb-1">Categoria principale</span>
+        <span className="text-[11px] font-semibold text-slate-500 block mb-1">Categoria principale</span>
         <select
           value={selectedCategoryId}
           onChange={(e) => setSelectedCategoryId(e.target.value)}
-          className="w-full bg-slate-50 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-slate-900 outline-none"
+          className="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-900 outline-none"
         >
           {categoriesList.map((c) => (
             <option key={c.id} value={c.id}>{c.name}</option>
@@ -162,7 +214,7 @@ export const SubcategoryManager: React.FC<SubcategoryManagerProps> = ({ onViewPr
         </select>
       </label>
 
-      <form onSubmit={handleAdd} className="bg-slate-50 p-4 rounded-2xl border border-slate-800 space-y-3">
+      <form onSubmit={handleAdd} className="bg-white p-4 rounded-2xl border border-slate-200 space-y-3">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <input
             type="text"
@@ -170,12 +222,12 @@ export const SubcategoryManager: React.FC<SubcategoryManagerProps> = ({ onViewPr
             placeholder="Nome (es. Ace, oppure Bicchieri)"
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
-            className="bg-slate-50 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-slate-900 outline-none"
+            className="bg-white border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-900 outline-none"
           />
           <select
             value={newParentId}
             onChange={(e) => setNewParentId(e.target.value)}
-            className="bg-slate-50 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-slate-900 outline-none"
+            className="bg-white border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-900 outline-none"
           >
             <option value="">— Sottocategoria diretta —</option>
             {topLevelSubs.map((s) => (
@@ -203,4 +255,3 @@ export const SubcategoryManager: React.FC<SubcategoryManagerProps> = ({ onViewPr
     </div>
   );
 };
-
