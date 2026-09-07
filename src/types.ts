@@ -41,6 +41,9 @@ export interface Product {
   isFavorite?: boolean;
   isFeatured?: boolean;
   isOffer?: boolean;
+  isEco?: boolean;
+  isMedicalDevice?: boolean;
+  isBestseller?: boolean;
   discountPercent?: number;
   stock: number;
   lowStockThreshold?: number;

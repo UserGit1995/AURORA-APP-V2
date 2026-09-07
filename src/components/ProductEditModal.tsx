@@ -385,7 +385,7 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
           />
 
           {/* Flags & Toggles */}
-          <div className="flex flex-wrap gap-4 pt-2 border-t border-slate-800">
+          <div className="flex flex-wrap gap-4 pt-2 border-t border-slate-200">
             <label className="flex items-center gap-2 cursor-pointer">
               <input
                 type="checkbox"
@@ -404,6 +404,16 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
                 className="w-4 h-4 rounded text-amber-500 accent-amber-500"
               />
               <span className="text-xs text-slate-700 font-medium">Sezione Offerte Speciali</span>
+            </label>
+
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={!!formData.isBestseller}
+                onChange={(e) => setFormData({ ...formData, isBestseller: e.target.checked })}
+                className="w-4 h-4 rounded text-amber-500 accent-amber-500"
+              />
+              <span className="text-xs text-slate-700 font-medium">I più venduti</span>
             </label>
           </div>
 

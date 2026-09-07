@@ -65,6 +65,9 @@ function productToRow(p: Product) {
       lowStockThreshold: p.lowStockThreshold ?? null,
       discountPercent: p.discountPercent ?? null,
       specs: p.specs ?? null,
+      isEco: p.isEco ?? false,
+      isMedicalDevice: p.isMedicalDevice ?? false,
+      isBestseller: p.isBestseller ?? false,
     },
   };
 }
@@ -84,6 +87,9 @@ function rowToProduct(row: any, categoryName?: string): Product {
     code: row.sku || '',
     isFeatured: !!row.is_featured,
     isOffer: !!row.is_on_offer,
+    isEco: !!extra.isEco,
+    isMedicalDevice: !!extra.isMedicalDevice,
+    isBestseller: !!extra.isBestseller,
     discountPercent: extra.discountPercent ?? undefined,
     stock: extra.stock ?? (row.in_stock ? 999 : 0),
     lowStockThreshold: extra.lowStockThreshold ?? undefined,
@@ -347,6 +353,7 @@ function subcategoryToRow(s: Subcategory) {
     slug,
     sort_order: s.sortOrder ?? 0,
     active: s.active ?? true,
+    image_url: s.image || null,
   };
 }
 
@@ -359,6 +366,7 @@ function rowToSubcategory(row: any): Subcategory {
     slug: row.slug,
     sortOrder: row.sort_order ?? 0,
     active: !!row.active,
+    image: row.image_url || '',
   };
 }
 

@@ -64,6 +64,8 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
 }) => {
   const { isBusinessCustomer, formatProductPrice } = useAdmin();
   const [activeFilterCategory, setActiveFilterCategory] = useState<string | null>(selectedCategoryId);
+  const [quickFilter, setQuickFilter] = useState<'tutti' | 'offerta' | 'bestseller' | 'eco' | 'medico'>('tutti');
+  const [sortBy, setSortBy] = useState<'popolarita' | 'prezzo-asc' | 'prezzo-desc' | 'nome'>('popolarita');
   const [activeFilterSubCategory, setActiveFilterSubCategory] = useState<string | null>(null);
   const [activeFilterSubSubCategory, setActiveFilterSubSubCategory] = useState<string | null>(null);
   const [isSelectionMode, setIsSelectionMode] = useState<boolean>(false);
@@ -123,6 +125,19 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
       if (viewType === 'offerte' && !product.isOffer && !product.discountPercent) {
         return false;
       }
+      // Barra filtri rapidi
+      if (quickFilter === 'offerta' && !product.isOffer && !product.discountPercent) {
+        return false;
+      }
+      if (quickFilter === 'bestseller' && !product.isBestseller) {
+        return false;
+      }
+      if (quickFilter === 'eco' && !product.isEco) {
+        return false;
+      }
+      if (quickFilter === 'medico' && !product.isMedicalDevice) {
+        return false;
+      }
       // Category filter (Level 1)
       if (activeFilterCategory && product.categoryId !== activeFilterCategory) {
         return false;
@@ -149,7 +164,26 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
       }
       return true;
     });
-  }, [products, viewType, activeFilterCategory, activeFilterSubCategory, activeFilterSubSubCategory, searchQuery]);
+  }, [products, viewType, activeFilterCategory, activeFilterSubCategory, activeFilterSubSubCategory, searchQuery, quickFilter]);
+
+  const sortedProducts = useMemo(() => {
+    const arr = [...filteredProducts];
+    switch (sortBy) {
+      case 'prezzo-asc':
+        return arr.sort((a, b) => a.price - b.price);
+      case 'prezzo-desc':
+        return arr.sort((a, b) => b.price - a.price);
+      case 'nome':
+        return arr.sort((a, b) => a.name.localeCompare(b.name, 'it'));
+      case 'popolarita':
+      default:
+        // Popolarità: prima i più venduti, poi quelli in evidenza, poi il resto.
+        return arr.sort((a, b) => {
+          const score = (p: typeof a) => (p.isBestseller ? 2 : 0) + (p.isFeatured ? 1 : 0);
+          return score(b) - score(a);
+        });
+    }
+  }, [filteredProducts, sortBy]);
 
   const selectedProducts = useMemo(() => {
     return products.filter((p) => selectedProductIds.includes(p.id));
@@ -167,7 +201,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
   };
 
   const handleSelectAllVisible = () => {
-    const visibleIds = filteredProducts.map((p) => p.id);
+    const visibleIds = sortedProducts.map((p) => p.id);
     const allSelected = visibleIds.every((id) => selectedProductIds.includes(id));
     if (allSelected) {
       setSelectedProductIds((prev) => prev.filter((id) => !visibleIds.includes(id)));
@@ -231,8 +265,8 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
   };
 
   const allVisibleSelected = 
-    filteredProducts.length > 0 && 
-    filteredProducts.every((p) => selectedProductIds.includes(p.id));
+    sortedProducts.length > 0 && 
+    sortedProducts.every((p) => selectedProductIds.includes(p.id));
 
   return (
     <div className="w-full animate-in fade-in duration-200 relative pb-12">
@@ -314,12 +348,12 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                   {allVisibleSelected ? (
                     <>
                       <CheckSquare className="w-3.5 h-3.5 text-sky-600" />
-                      <span>Deseleziona Visibili ({filteredProducts.length})</span>
+                      <span>Deseleziona Visibili ({sortedProducts.length})</span>
                     </>
                   ) : (
                     <>
                       <Square className="w-3.5 h-3.5 text-sky-600" />
-                      <span>Seleziona Visibili ({filteredProducts.length})</span>
+                      <span>Seleziona Visibili ({sortedProducts.length})</span>
                     </>
                   )}
                 </button>
@@ -595,8 +629,49 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
         )}
       </div>
 
+      {/* Barra filtri rapidi + ordinamento */}
+      <div className="flex flex-wrap items-center justify-between gap-3 bg-white border border-slate-200 rounded-2xl px-3.5 py-2.5">
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <span className="hidden sm:flex items-center gap-1.5 text-xs font-semibold text-slate-500 mr-1">
+            <SlidersHorizontal className="w-3.5 h-3.5" />
+            Filtra:
+          </span>
+          {([
+            { id: 'tutti', label: 'Tutti', activeClass: 'bg-sky-600 text-white border-sky-600' },
+            { id: 'offerta', label: 'In Offerta', activeClass: 'bg-sky-50 text-sky-700 border-sky-300' },
+            { id: 'bestseller', label: 'I più venduti', activeClass: 'bg-amber-50 text-amber-700 border-amber-300' },
+            { id: 'eco', label: 'Eco-Bio', activeClass: 'bg-emerald-50 text-emerald-700 border-emerald-300' },
+            { id: 'medico', label: 'Presidio Medico', activeClass: 'bg-rose-50 text-rose-700 border-rose-300' },
+          ] as const).map((f) => (
+            <button
+              key={f.id}
+              onClick={() => setQuickFilter(f.id)}
+              className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors ${
+                quickFilter === f.id ? f.activeClass : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300'
+              }`}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
+
+        <label className="flex items-center gap-2 text-xs shrink-0">
+          <span className="hidden sm:inline text-slate-400">Ordina per:</span>
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
+            className="bg-white border border-slate-200 rounded-lg pl-2.5 pr-7 py-1.5 text-xs font-semibold text-slate-700 outline-none focus:border-sky-400"
+          >
+            <option value="popolarita">Più richiesti / Popolarità</option>
+            <option value="prezzo-asc">Prezzo: dal più basso</option>
+            <option value="prezzo-desc">Prezzo: dal più alto</option>
+            <option value="nome">Nome A-Z</option>
+          </select>
+        </label>
+      </div>
+
       {/* Products Grid */}
-      {filteredProducts.length === 0 ? (
+      {sortedProducts.length === 0 ? (
         <div className="bg-slate-50 border border-slate-200 rounded-2xl p-10 text-center space-y-3">
           <div className="w-12 h-12 rounded-2xl bg-sky-500/10 border border-sky-500/30 text-sky-600 mx-auto flex items-center justify-center">
             <Layers className="w-6 h-6" />
@@ -623,7 +698,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3.5">
-          {filteredProducts.map((product) => {
+          {sortedProducts.map((product) => {
             const isFav = favorites.includes(product.id);
             const isCompared = comparedProductIds.includes(product.id);
             const isLowStock = product.stock <= (product.lowStockThreshold ?? 100);

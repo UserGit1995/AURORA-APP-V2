@@ -46,15 +46,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onCloseMobile
 }) => {
   const { t } = useLanguage();
-  const { isAdmin } = useAdmin();
+  const { isAdmin, currentUser } = useAdmin();
 
   const navItems: { id: NavTab; label: string; icon: React.ReactNode; badge?: number; badgeColor?: string }[] = [
     { id: 'home', label: t('nav.home', 'Home'), icon: <Home className="w-[18px] h-[18px]" /> },
     { id: 'categorie', label: t('nav.categories', 'Categorie'), icon: <LayoutGrid className="w-[18px] h-[18px]" /> },
-    { id: 'offerte', label: t('nav.deals', 'Offerte'), icon: <Tag className="w-[18px] h-[18px]" /> },
-    { id: 'novita', label: t('nav.news', 'Novità'), icon: <Sparkles className="w-[18px] h-[18px]" /> },
+    { id: 'offerte', label: t('nav.deals', 'Offerte Speciali'), icon: <Tag className="w-[18px] h-[18px]" /> },
+    { id: 'novita', label: t('nav.news', 'Novità Eco & Bio'), icon: <Sparkles className="w-[18px] h-[18px]" /> },
     { id: 'piu-venduti', label: t('nav.bestsellers', 'I più venduti'), icon: <Flame className="w-[18px] h-[18px]" /> },
-    { id: 'ordini', label: t('nav.orders', 'Ordini'), icon: <ClipboardList className="w-[18px] h-[18px]" /> },
+    { id: 'ordini', label: t('nav.orders', 'I miei Ordini'), icon: <ClipboardList className="w-[18px] h-[18px]" /> },
     { 
       id: 'preferiti', 
       label: t('nav.favorites', 'Preferiti'), 
@@ -102,7 +102,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </div>
 
             {/* Navigation Links */}
-            <nav className="space-y-1.5 mt-2">
+            <p className="px-3.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 mt-1 mb-2">
+              {t('nav.sectionLabel', 'Navigazione')}
+            </p>
+            <nav className="space-y-1.5">
               {navItems.map((item) => {
                 const isActive = activeTab === item.id;
                 return (
@@ -142,6 +145,32 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
           {/* Quick Reorder, B2B Portal Login & Bottom Help Card */}
           <div className="pt-6 space-y-2.5 mt-auto">
+            {onOpenQuickReorder && (
+              <button
+                id="sidebar-quick-reorder-btn"
+                type="button"
+                onClick={() => {
+                  onOpenQuickReorder();
+                  if (onCloseMobile) onCloseMobile();
+                }}
+                className="w-full bg-teal-600 hover:bg-teal-500 border border-teal-600 text-white text-xs font-bold py-2.5 px-3 rounded-2xl transition-all flex items-center justify-between group text-left cursor-pointer"
+              >
+                <div className="flex items-center gap-2.5">
+                  <div className="p-1.5 rounded-xl bg-white/15 text-white">
+                    <RotateCw className="w-3.5 h-3.5" />
+                  </div>
+                  <div>
+                    <span className="flex items-center gap-1.5 text-white text-xs font-bold">
+                      {t('nav.quickReorder', 'Riordino Rapido')}
+                      <span className="text-[9px] font-bold bg-white/20 px-1.5 py-0.5 rounded-full">1-Click</span>
+                    </span>
+                    <span className="block text-[10px] text-teal-100 font-medium mt-0.5">{t('nav.quickReorderSub', 'Fornitura ricorrente')}</span>
+                  </div>
+                </div>
+                <span className="text-white group-hover:translate-x-1 transition-transform text-xs font-bold">›</span>
+              </button>
+            )}
+
             {isAdmin && onOpenAdminPanel && (
               <button
                 id="sidebar-superadmin-control-btn"
@@ -150,12 +179,24 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   onOpenAdminPanel();
                   if (onCloseMobile) onCloseMobile();
                 }}
-                className="w-full bg-amber-50 hover:bg-amber-100 border border-amber-300 text-amber-800 text-xs font-semibold py-2.5 px-3 rounded-xl transition-all flex items-center justify-between cursor-pointer"
+                className="w-full bg-amber-50 hover:bg-amber-100 border border-amber-200 text-left py-2.5 px-3 rounded-2xl transition-all flex items-center justify-between group cursor-pointer"
               >
-                <div className="flex items-center gap-2">
-                  <SlidersHorizontal className="w-3.5 h-3.5" />
-                  <span>Pannello di gestione</span>
+                <div className="flex items-center gap-2.5">
+                  <div className="p-1.5 rounded-xl bg-amber-100 text-amber-700">
+                    <SlidersHorizontal className="w-3.5 h-3.5" />
+                  </div>
+                  <div>
+                    <span className="flex items-center gap-1.5 text-slate-900 text-xs font-bold">
+                      Pannello Gestione
+                      <span className="text-[9px] font-bold bg-amber-200 text-amber-800 px-1.5 py-0.5 rounded-full">SUPERADMIN</span>
+                    </span>
+                    <span className="flex items-center gap-1 text-[10px] text-amber-700 font-medium mt-0.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                      {currentUser?.name || 'Admin'} (Online)
+                    </span>
+                  </div>
                 </div>
+                <span className="text-amber-600 group-hover:translate-x-1 transition-transform text-xs font-bold">›</span>
               </button>
             )}
 
@@ -174,29 +215,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   <span>{t('nav.login', 'Accedi / Registrati')}</span>
                 </div>
                 <span className="text-[10px] text-sky-700 font-mono bg-sky-100 px-1.5 py-0.5 rounded">ACCOUNT</span>
-              </button>
-            )}
-
-            {onOpenQuickReorder && (
-              <button
-                id="sidebar-quick-reorder-btn"
-                type="button"
-                onClick={() => {
-                  onOpenQuickReorder();
-                  if (onCloseMobile) onCloseMobile();
-                }}
-                className="w-full bg-sky-600 hover:bg-sky-500 border border-sky-600 text-white text-xs font-bold py-2.5 px-3 rounded-2xl transition-all flex items-center justify-between group text-left cursor-pointer"
-              >
-                <div className="flex items-center gap-2.5">
-                  <div className="p-1.5 rounded-xl bg-white/15 text-white">
-                    <RotateCw className="w-3.5 h-3.5" />
-                  </div>
-                  <div>
-                    <span className="block text-white text-xs font-bold">{t('nav.quickReorder', 'Riordino Rapido')}</span>
-                    <span className="block text-[10px] text-sky-100 font-medium">{t('nav.quickReorderSub', '1-Click • Senza Carte')}</span>
-                  </div>
-                </div>
-                <span className="text-white group-hover:translate-x-1 transition-transform text-xs font-bold">→</span>
               </button>
             )}
 

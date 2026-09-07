@@ -1,14 +1,15 @@
 import React from 'react';
-import { ShieldCheck, Truck, Layers, ArrowRight } from 'lucide-react';
+import { ShieldCheck, Truck, Layers, ArrowRight, Zap } from 'lucide-react';
 import { HERO_IMAGE } from '../data/catalog';
 import { useLanguage } from '../context/LanguageContext';
 import { AuroraLogo } from './AuroraLogo';
 
 interface HeroBannerProps {
   onExploreCatalog: () => void;
+  onQuickReorder?: () => void;
 }
 
-export const HeroBanner: React.FC<HeroBannerProps> = ({ onExploreCatalog }) => {
+export const HeroBanner: React.FC<HeroBannerProps> = ({ onExploreCatalog, onQuickReorder }) => {
   const { t, language } = useLanguage();
 
   return (
@@ -30,9 +31,21 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({ onExploreCatalog }) => {
             </h1>
             <p className="text-slate-600 text-sm sm:text-base mt-2.5 leading-relaxed">
               {language === 'it' ? (
-                <>Igiene, pulizia e benessere per la casa e la <span className="font-semibold text-slate-900 underline decoration-sky-500/60 decoration-2 underline-offset-4">persona.</span></>
+                <>
+                  Igiene, pulizia e benessere per la casa e la{' '}
+                  <span className="font-semibold text-slate-900 underline decoration-sky-500/60 decoration-2 underline-offset-4">
+                    persona.
+                  </span>{' '}
+                  Formulazioni professionali all'avanguardia, sostenibili e sicure.
+                </>
               ) : (
-                <>Hygiene, cleaning, and sanitizing solutions for facilities and <span className="font-semibold text-slate-900 underline decoration-sky-500/60 decoration-2 underline-offset-4">personal care.</span></>
+                <>
+                  Hygiene, cleaning, and sanitizing solutions for facilities and{' '}
+                  <span className="font-semibold text-slate-900 underline decoration-sky-500/60 decoration-2 underline-offset-4">
+                    personal care.
+                  </span>{' '}
+                  Advanced, sustainable and safe professional formulas.
+                </>
               )}
             </p>
           </div>
@@ -45,27 +58,27 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({ onExploreCatalog }) => {
               </div>
               <div className="min-w-0">
                 <p className="text-slate-900 text-xs font-bold leading-tight">{t('hero.qualityTitle', 'Qualità Premium')}</p>
-                <p className="text-slate-500 text-[11px] leading-tight mt-0.5">{t('hero.qualityDesc', 'Prodotti selezionati')}</p>
+                <p className="text-slate-500 text-[11px] leading-tight mt-0.5">{t('hero.qualityDesc', 'Formule testate & dermatologicamente sicure')}</p>
               </div>
             </div>
 
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-sky-100 border border-sky-200 text-sky-600 flex items-center justify-center shrink-0">
+              <div className="w-8 h-8 rounded-lg bg-teal-100 border border-teal-200 text-teal-600 flex items-center justify-center shrink-0">
                 <Truck className="w-4 h-4" />
               </div>
               <div className="min-w-0">
                 <p className="text-slate-900 text-xs font-bold leading-tight">{t('hero.deliveryTitle', 'Consegna Veloce')}</p>
-                <p className="text-slate-500 text-[11px] leading-tight mt-0.5">{t('hero.deliveryDesc', 'Affidabile e puntuale')}</p>
+                <p className="text-slate-500 text-[11px] leading-tight mt-0.5">{t('hero.deliveryDesc', 'Spedizione in 24/48h affidabile e puntuale')}</p>
               </div>
             </div>
 
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-sky-100 border border-sky-200 text-sky-600 flex items-center justify-center shrink-0">
+              <div className="w-8 h-8 rounded-lg bg-indigo-100 border border-indigo-200 text-indigo-600 flex items-center justify-center shrink-0">
                 <Layers className="w-4 h-4" />
               </div>
               <div className="min-w-0">
                 <p className="text-slate-900 text-xs font-bold leading-tight">{t('hero.choiceTitle', 'Ampia Scelta')}</p>
-                <p className="text-slate-500 text-[11px] leading-tight mt-0.5">{t('hero.choiceDesc', 'Sempre disponibili')}</p>
+                <p className="text-slate-500 text-[11px] leading-tight mt-0.5">{t('hero.choiceDesc', 'Oltre 1.200 referenze sempre in magazzino')}</p>
               </div>
             </div>
           </div>
@@ -78,33 +91,33 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({ onExploreCatalog }) => {
               </div>
               <div className="min-w-0">
                 <p className="text-slate-900 text-xs font-bold truncate">{t('hero.qualityTitle', 'Qualità Premium')}</p>
-                <p className="text-slate-500 text-[10.5px] truncate">{t('hero.qualityDesc', 'Prodotti selezionati')}</p>
+                <p className="text-slate-500 text-[10.5px] truncate">{t('hero.qualityDesc', 'Formule testate & dermatologicamente sicure')}</p>
               </div>
             </div>
 
             <div className="bg-white/80 backdrop-blur-xs border border-slate-200 rounded-xl p-2.5 flex items-center gap-2.5 transition-transform hover:-translate-y-0.5 shadow-xs">
-              <div className="p-1.5 rounded-lg bg-sky-100 text-sky-600 shrink-0">
+              <div className="p-1.5 rounded-lg bg-teal-100 text-teal-600 shrink-0">
                 <Truck className="w-4 h-4" />
               </div>
               <div className="min-w-0">
                 <p className="text-slate-900 text-xs font-bold truncate">{t('hero.deliveryTitle', 'Consegna Veloce')}</p>
-                <p className="text-slate-500 text-[10.5px] truncate">{t('hero.deliveryDesc', 'Affidabile e puntuale')}</p>
+                <p className="text-slate-500 text-[10.5px] truncate">{t('hero.deliveryDesc', 'Spedizione in 24/48h affidabile e puntuale')}</p>
               </div>
             </div>
 
             <div className="bg-white/80 backdrop-blur-xs border border-slate-200 rounded-xl p-2.5 flex items-center gap-2.5 transition-transform hover:-translate-y-0.5 shadow-xs">
-              <div className="p-1.5 rounded-lg bg-sky-100 text-sky-600 shrink-0">
+              <div className="p-1.5 rounded-lg bg-indigo-100 text-indigo-600 shrink-0">
                 <Layers className="w-4 h-4" />
               </div>
               <div className="min-w-0">
                 <p className="text-slate-900 text-xs font-bold truncate">{t('hero.choiceTitle', 'Ampia Scelta')}</p>
-                <p className="text-slate-500 text-[10.5px] truncate">{t('hero.choiceDesc', 'Sempre disponibili')}</p>
+                <p className="text-slate-500 text-[10.5px] truncate">{t('hero.choiceDesc', 'Oltre 1.200 referenze sempre in magazzino')}</p>
               </div>
             </div>
           </div>
 
-          {/* Action Button */}
-          <div className="pt-1">
+          {/* Action Buttons */}
+          <div className="pt-1 flex flex-wrap items-center gap-2.5">
             <button
               id="hero-explore-catalog-btn"
               onClick={onExploreCatalog}
@@ -113,18 +126,43 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({ onExploreCatalog }) => {
               <span>{t('hero.exploreBtn', 'Scopri il catalogo')}</span>
               <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
             </button>
+            {onQuickReorder && (
+              <button
+                id="hero-quick-reorder-btn"
+                onClick={onQuickReorder}
+                className="inline-flex items-center gap-2 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-xs sm:text-sm font-semibold px-5 py-2.5 rounded-full transition-all duration-200 shadow-xs"
+              >
+                <Zap className="w-3.5 h-3.5 text-sky-600" />
+                <span>Riordino Rapido 1-Click</span>
+              </button>
+            )}
           </div>
         </div>
 
         {/* Right Image Composition */}
-        <div className="md:col-span-5 relative flex items-end justify-center overflow-hidden min-h-[220px] lg:min-h-full rounded-2xl">
-          <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-l from-transparent via-white/10 to-white/70 md:to-slate-50 z-1 pointer-events-none" />
+        <div className="md:col-span-5 relative flex items-end justify-center overflow-hidden min-h-[220px] lg:min-h-full rounded-2xl mt-5 md:mt-0">
           <img
             src={HERO_IMAGE}
             alt="Soluzioni per igiene e pulizia"
             referrerPolicy="no-referrer"
             className="w-full h-full object-cover object-center md:object-right transform scale-105"
           />
+
+          {/* Badge "In Pronta Consegna" */}
+          <span className="absolute top-3.5 right-3.5 z-10 text-[10px] font-bold px-2.5 py-1 rounded-full bg-emerald-500 text-white shadow-sm">
+            In Pronta Consegna
+          </span>
+
+          {/* Fascia didascalia in basso */}
+          <div className="absolute inset-x-0 bottom-0 z-10 bg-slate-900/85 backdrop-blur-xs px-3.5 py-2.5 flex items-center justify-between gap-2">
+            <div className="min-w-0">
+              <p className="text-sky-400 text-[10px] font-bold tracking-wide uppercase">Selezione Aurora</p>
+              <p className="text-white text-xs font-semibold truncate">Ocean Breeze &amp; Gentle Care</p>
+            </div>
+            <span className="shrink-0 text-[10px] font-bold px-2 py-0.5 rounded-full bg-teal-500/20 text-teal-300 border border-teal-400/30">
+              PMC &amp; Bio
+            </span>
+          </div>
         </div>
       </div>
     </div>

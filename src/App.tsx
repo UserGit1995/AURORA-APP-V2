@@ -19,6 +19,9 @@ import { CompareFloatingBar } from './components/CompareFloatingBar';
 import { RestockAnalysisModal } from './components/RestockAnalysisModal';
 import { QuickReorderModal } from './components/QuickReorderModal';
 import { LoginModal } from './components/LoginModal';
+import { BrandsSection } from './components/BrandsSection';
+import { AllBrandsView } from './components/AllBrandsView';
+import { BrandDetailView } from './components/BrandDetailView';
 
 import { 
   CATEGORIES, 
@@ -35,6 +38,7 @@ export default function App() {
   const { 
     productsList, 
     categoriesList, 
+    subcategoriesList,
     ordersList, 
     updateProduct, 
     isAdmin,
@@ -43,6 +47,8 @@ export default function App() {
 
   const [activeTab, setActiveTab] = useState<NavTab>('home');
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedBrandName, setSelectedBrandName] = useState<string | null>(null);
+  const [showAllBrands, setShowAllBrands] = useState(false);
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
 
   // Selected product for modal detail
@@ -366,7 +372,32 @@ export default function App() {
 
         {/* Dynamic Page Views */}
         <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto pb-24">
-          {searchQuery.trim() ? (
+          {selectedBrandName ? (
+            <BrandDetailView
+              brandName={selectedBrandName}
+              brandImage={subcategoriesList.find((s) => !s.parentSubcategoryId && s.name === selectedBrandName)?.image}
+              subcategories={subcategoriesList}
+              products={productsList}
+              favorites={favorites}
+              onToggleFavorite={handleToggleFavorite}
+              comparedProductIds={comparedProductIds}
+              onToggleCompare={handleToggleCompare}
+              onSelectProduct={setSelectedProduct}
+              onAddToCart={handleAddToCart}
+              onBack={() => setSelectedBrandName(null)}
+            />
+          ) : showAllBrands ? (
+            <AllBrandsView
+              categories={categoriesList}
+              subcategories={subcategoriesList}
+              products={productsList}
+              onSelectBrand={(name) => {
+                setShowAllBrands(false);
+                setSelectedBrandName(name);
+              }}
+              onBack={() => setShowAllBrands(false)}
+            />
+          ) : searchQuery.trim() ? (
             /* Search results mode */
             <CatalogView
               viewType="categorie"
@@ -393,6 +424,7 @@ export default function App() {
                   setActiveTab('categorie');
                   setSelectedCategoryId(null);
                 }}
+                onQuickReorder={() => setIsQuickReorderOpen(true)}
               />
 
               {/* 2. Categorie principali */}
@@ -404,6 +436,15 @@ export default function App() {
                   setActiveTab('categorie');
                   setSelectedCategoryId(null);
                 }}
+              />
+
+              {/* 2.1 Marche */}
+              <BrandsSection
+                categories={categoriesList}
+                subcategories={subcategoriesList}
+                products={productsList}
+                onSelectBrand={(name) => setSelectedBrandName(name)}
+                onViewAllBrands={() => setShowAllBrands(true)}
               />
 
               {/* 2.5 Quick Reorder Highlight Banner Card (Mobile only, matches smartphone mockup) */}
