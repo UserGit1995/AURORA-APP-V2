@@ -1,7 +1,9 @@
-import React, { useMemo } from 'react';
-import { Award, ArrowRight } from 'lucide-react';
+import React, { useMemo, useState } from 'react';
+import { Award, ArrowRight, Camera, X } from 'lucide-react';
 import { Category, Subcategory, Product } from '../types';
 import { buildBrandSummaries, withProductCounts, BrandSummary } from '../lib/brands';
+import { useAdmin } from '../context/AdminContext';
+import { ProductImageUploader } from './ProductImageUploader';
 
 interface BrandsSectionProps {
   categories: Category[];
@@ -26,29 +28,93 @@ export function colorForBrand(name: string) {
   return BADGE_COLORS[Math.abs(hash) % BADGE_COLORS.length];
 }
 
-export const BrandTile: React.FC<{ brand: BrandSummary; onClick: () => void }> = ({ brand, onClick }) => (
-  <button
-    id={`brand-card-${brand.name}`}
-    onClick={onClick}
-    className="w-full bg-white border border-slate-200 hover:border-sky-300 hover:shadow-md rounded-2xl p-3.5 flex flex-col items-center text-center gap-2 transition-all hover:-translate-y-0.5"
-  >
-    <div
-      className={`w-14 h-14 rounded-full flex items-center justify-center border overflow-hidden shrink-0 ${
-        brand.image ? 'bg-white border-slate-200' : colorForBrand(brand.name)
-      }`}
-    >
-      {brand.image ? (
-        <img src={brand.image} alt={brand.name} className="w-full h-full object-contain p-1.5" />
-      ) : (
-        <span className="font-bold text-lg">{brand.name.charAt(0).toUpperCase()}</span>
+export const BrandTile: React.FC<{ brand: BrandSummary; onClick: () => void }> = ({ brand, onClick }) => {
+  // Solo l'amministratore vede il pulsantino per caricare il logo vero della
+  // marca (foto dal PC, non un URL) direttamente da qui, senza dover passare
+  // dal pannello Sottocategorie.
+  const { isAdmin, subcategoriesList, updateSubcategory } = useAdmin();
+  const [isUploaderOpen, setIsUploaderOpen] = useState(false);
+
+  const handleLogoChange = (imageUri: string) => {
+    // La stessa marca puo' comparire come piu' righe (una per categoria):
+    // aggiorniamo il logo su tutte, cosi' resta coerente ovunque.
+    subcategoriesList
+      .filter((s) => brand.subcategoryIds.includes(s.id))
+      .forEach((row) => updateSubcategory({ ...row, image: imageUri }));
+    setIsUploaderOpen(false);
+  };
+
+  return (
+    <div className="relative">
+      <button
+        id={`brand-card-${brand.name}`}
+        onClick={onClick}
+        className="w-full bg-white border border-slate-200 hover:border-sky-300 hover:shadow-md rounded-2xl p-3.5 flex flex-col items-center text-center gap-2 transition-all hover:-translate-y-0.5"
+      >
+        <div
+          className={`w-14 h-14 rounded-full flex items-center justify-center border overflow-hidden shrink-0 ${
+            brand.image ? 'bg-white border-slate-200' : colorForBrand(brand.name)
+          }`}
+        >
+          {brand.image ? (
+            <img src={brand.image} alt={brand.name} className="w-full h-full object-contain p-1.5" />
+          ) : (
+            <span className="font-bold text-lg">{brand.name.charAt(0).toUpperCase()}</span>
+          )}
+        </div>
+        <div className="min-w-0 w-full">
+          <p className="text-slate-900 text-xs font-bold truncate">{brand.name}</p>
+          <p className="text-slate-400 text-[10.5px] mt-0.5">{brand.productCount} prodotti</p>
+        </div>
+      </button>
+
+      {isAdmin && (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsUploaderOpen(true);
+          }}
+          className="absolute top-2 right-2 p-1.5 rounded-full bg-slate-900/80 hover:bg-slate-900 text-white shadow-sm transition-colors"
+          title={`Carica il logo di ${brand.name} (solo admin)`}
+        >
+          <Camera className="w-3 h-3" />
+        </button>
+      )}
+
+      {isAdmin && isUploaderOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsUploaderOpen(false);
+          }}
+        >
+          <div
+            className="w-full max-w-xs bg-white border border-slate-200 rounded-2xl shadow-xl p-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-sm font-bold text-slate-900">Logo di {brand.name}</p>
+              <button onClick={() => setIsUploaderOpen(false)} className="text-slate-400 hover:text-slate-700">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <ProductImageUploader currentImage={brand.image || ''} onImageChange={handleLogoChange} />
+            {brand.image && (
+              <button
+                onClick={() => handleLogoChange('')}
+                className="mt-2.5 text-xs font-semibold text-rose-500 hover:text-rose-700"
+              >
+                Rimuovi logo e torna al badge con iniziale
+              </button>
+            )}
+          </div>
+        </div>
       )}
     </div>
-    <div className="min-w-0 w-full">
-      <p className="text-slate-900 text-xs font-bold truncate">{brand.name}</p>
-      <p className="text-slate-400 text-[10.5px] mt-0.5">{brand.productCount} prodotti</p>
-    </div>
-  </button>
-);
+  );
+};
 
 // Sulla home mostriamo solo un assaggio: le marche coi più prodotti, che sono
 // anche quelle più richieste. Il resto si trova nella pagina "Tutte le marche".
