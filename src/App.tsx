@@ -392,7 +392,6 @@ export default function App() {
               subcategories={subcategoriesList}
               products={productsList}
               onSelectBrand={(name) => {
-                setShowAllBrands(false);
                 setSelectedBrandName(name);
               }}
               onBack={() => setShowAllBrands(false)}
