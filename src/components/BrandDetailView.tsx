@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { ArrowLeft } from 'lucide-react';
-import { Product, Subcategory } from '../types';
+import { Category, Product, Subcategory } from '../types';
 import { productsByBrandGroupedByType } from '../lib/brands';
 import { ProductGridCard } from './ProductGridCard';
 import { colorForBrand } from './BrandsSection';
@@ -8,6 +8,7 @@ import { colorForBrand } from './BrandsSection';
 interface BrandDetailViewProps {
   brandName: string;
   brandImage?: string;
+  categories: Category[];
   subcategories: Subcategory[];
   products: Product[];
   favorites: string[];
@@ -22,6 +23,7 @@ interface BrandDetailViewProps {
 export const BrandDetailView: React.FC<BrandDetailViewProps> = ({
   brandName,
   brandImage,
+  categories,
   subcategories,
   products,
   favorites,
@@ -33,8 +35,8 @@ export const BrandDetailView: React.FC<BrandDetailViewProps> = ({
   onBack,
 }) => {
   const groups = useMemo(
-    () => productsByBrandGroupedByType(brandName, subcategories, products),
-    [brandName, subcategories, products]
+    () => productsByBrandGroupedByType(brandName, categories, subcategories, products),
+    [brandName, categories, subcategories, products]
   );
   const totalCount = groups.reduce((sum, g) => sum + g.products.length, 0);
 

@@ -376,6 +376,7 @@ export default function App() {
             <BrandDetailView
               brandName={selectedBrandName}
               brandImage={subcategoriesList.find((s) => !s.parentSubcategoryId && s.name === selectedBrandName)?.image}
+              categories={categoriesList}
               subcategories={subcategoriesList}
               products={productsList}
               favorites={favorites}

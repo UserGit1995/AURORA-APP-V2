@@ -7,15 +7,35 @@ export interface BrandSummary {
   subcategoryIds: string[]; // tutte le righe "marca" con questo nome (una per categoria)
 }
 
+// La pagina "Marche" è solo per prodotti cosmetici/igiene/pulizia (detersivi,
+// ammorbidenti, saponi, creme viso e corpo, doposole, schiume da barba, gel,
+// insetticidi/antizanzare, candele profumate...). Gli accessori (spugne,
+// scope, palette...) NON ci devono comparire anche se condividono la marca
+// con un prodotto igienico/cosmetico: restano visibili solo dentro la loro
+// categoria normale.
+const EXCLUDED_BRAND_CATEGORY_NAMES = ['Accessori Pulizia'];
+
+function brandEligibleCategoryIds(categoriesList: Category[]): Set<string> {
+  return new Set(
+    categoriesList
+      .filter((c) => !EXCLUDED_BRAND_CATEGORY_NAMES.includes(c.name))
+      .map((c) => c.id)
+  );
+}
+
 /**
  * Le marche sono salvate come sottocategorie di primo livello (parentSubcategoryId
  * nullo). La stessa marca reale può comparire come più righe distinte se venduta
  * in più categorie (es. "Nivea" sia in Detersivi che in Igiene Corpo): qui le
  * raggruppiamo per nome così l'utente vede UNA scheda marca con tutti i suoi
- * prodotti, a prescindere dalla categoria in cui sono catalogati.
+ * prodotti, a prescindere dalla categoria in cui sono catalogati (categoria
+ * Accessori Pulizia esclusa, vedi sopra).
  */
 export function buildBrandSummaries(categoriesList: Category[], subcategoriesList: Subcategory[]): BrandSummary[] {
-  const brandRows = subcategoriesList.filter((s) => !s.parentSubcategoryId && s.active);
+  const eligibleCategoryIds = brandEligibleCategoryIds(categoriesList);
+  const brandRows = subcategoriesList.filter(
+    (s) => !s.parentSubcategoryId && s.active && eligibleCategoryIds.has(s.categoryId)
+  );
   const byName = new Map<string, BrandSummary>();
 
   for (const row of brandRows) {
@@ -37,7 +57,7 @@ export function buildBrandSummaries(categoriesList: Category[], subcategoriesLis
   return Array.from(byName.values()).sort((a, b) => a.name.localeCompare(b.name, 'it'));
 }
 
-/** Calcola quanti prodotti ha ogni marca (diretti + nelle loro tipologie figlie). */
+/** Calcola quanti prodotti ha ogni marca (diretti + nelle loro tipologie figlie), Accessori Pulizia escluso. */
 export function withProductCounts(
   brands: BrandSummary[],
   subcategoriesList: Subcategory[],
@@ -56,14 +76,18 @@ export function withProductCounts(
   });
 }
 
-/** Prodotti di una marca, raggruppati per tipologia (nome sotto-sottocategoria). */
+/** Prodotti di una marca, raggruppati per tipologia (nome sotto-sottocategoria), Accessori Pulizia escluso. */
 export function productsByBrandGroupedByType(
   brandName: string,
+  categoriesList: Category[],
   subcategoriesList: Subcategory[],
   productsList: Product[]
 ): { typeName: string; products: Product[] }[] {
+  const eligibleCategoryIds = brandEligibleCategoryIds(categoriesList);
   const key = brandName.trim().toLowerCase();
-  const brandRows = subcategoriesList.filter((s) => !s.parentSubcategoryId && s.name.trim().toLowerCase() === key);
+  const brandRows = subcategoriesList.filter(
+    (s) => !s.parentSubcategoryId && s.name.trim().toLowerCase() === key && eligibleCategoryIds.has(s.categoryId)
+  );
   const brandIds = new Set(brandRows.map((r) => r.id));
   const childRows = subcategoriesList.filter((s) => s.parentSubcategoryId && brandIds.has(s.parentSubcategoryId));
 
