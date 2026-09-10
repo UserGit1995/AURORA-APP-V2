@@ -25,7 +25,6 @@ import {
 import { motion, AnimatePresence } from 'motion/react';
 import { Product, Order, CustomerType, DeliveryOption } from '../types';
 import { PRODUCTS } from '../data/catalog';
-import { generateOrderReceiptPdf } from '../utils/orderPdfGenerator';
 import { useAdmin } from '../context/AdminContext';
 
 interface QuickReorderModalProps {
@@ -250,6 +249,7 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
     if (!submittedOrder) return;
     setIsDownloadingPdf(true);
     try {
+      const { generateOrderReceiptPdf } = await import('../utils/orderPdfGenerator');
       generateOrderReceiptPdf(submittedOrder);
     } catch (err) {
       console.error('Errore generazione PDF:', err);

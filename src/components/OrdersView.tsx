@@ -37,7 +37,6 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Order, Product } from '../types';
-import { generateOrderReceiptPdf, generateOrderHistoryPdf } from '../utils/orderPdfGenerator';
 import { OrderTrackingTimeline } from './OrderTrackingTimeline';
 import { OrderInquiryModal } from './OrderInquiryModal';
 import { useLanguage } from '../context/LanguageContext';
@@ -111,7 +110,7 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
     return orders.filter((o) => o.status === 'In elaborazione' || o.status === 'Spedito').length;
   }, [orders]);
 
-  const handleExportHistory = (scopeOverride?: 'filtered' | 'all') => {
+  const handleExportHistory = async (scopeOverride?: 'filtered' | 'all') => {
     const scopeToUse = scopeOverride || exportScope;
     const targetOrders = scopeToUse === 'all' ? orders : filteredOrders;
 
@@ -140,6 +139,7 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
         }
       }
 
+      const { generateOrderHistoryPdf } = await import('../utils/orderPdfGenerator');
       generateOrderHistoryPdf(targetOrders, {
         filterLabel: filterDescription,
         language: language === 'it' ? 'it' : 'en',
@@ -163,10 +163,11 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
     }
   };
 
-  const handleDownloadPdf = (order: Order, e?: React.MouseEvent) => {
+  const handleDownloadPdf = async (order: Order, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
     setDownloadingPdfId(order.id);
     try {
+      const { generateOrderReceiptPdf } = await import('../utils/orderPdfGenerator');
       generateOrderReceiptPdf(order);
       setDownloadSuccessId(order.id);
       setTimeout(() => {

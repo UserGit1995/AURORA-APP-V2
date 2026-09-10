@@ -31,8 +31,16 @@ import {
 } from './data/catalog';
 import { Product, CartItem, Order, NotificationItem, OrderTemplate } from './types';
 import { useAdmin } from './context/AdminContext';
-import { AdminControlPanel } from './components/AdminControlPanel';
-import { ProductEditModal } from './components/ProductEditModal';
+// Il pannello admin (e le sue schermate) pesa parecchio (grafici, editor
+// immagini, gestione ordini/sottocategorie): lo carichiamo solo quando serve
+// davvero, così i clienti normali non lo scaricano mai. Il sito resta uguale,
+// solo più leggero e veloce da aprire.
+const AdminControlPanel = React.lazy(() =>
+  import('./components/AdminControlPanel').then((m) => ({ default: m.AdminControlPanel }))
+);
+const ProductEditModal = React.lazy(() =>
+  import('./components/ProductEditModal').then((m) => ({ default: m.ProductEditModal }))
+);
 
 export default function App() {
   const { 
@@ -671,20 +679,24 @@ export default function App() {
 
       {/* SuperAdmin Master Control Panel Modal - STRICTLY FOR AUTHENTICATED ADMIN ONLY */}
       {isAdmin && (
-        <AdminControlPanel
-          isOpen={isAdminPanelOpen}
-          onClose={() => setIsAdminPanelOpen(false)}
-        />
+        <React.Suspense fallback={null}>
+          <AdminControlPanel
+            isOpen={isAdminPanelOpen}
+            onClose={() => setIsAdminPanelOpen(false)}
+          />
+        </React.Suspense>
       )}
 
       {/* Direct Product Quick Edit Modal (Admin only) */}
       {isAdmin && editingProduct && (
-        <ProductEditModal
-          isOpen={!!editingProduct}
-          product={editingProduct}
-          categories={categoriesList}
-          onClose={() => setEditingProduct(null)}
-        />
+        <React.Suspense fallback={null}>
+          <ProductEditModal
+            isOpen={!!editingProduct}
+            product={editingProduct}
+            categories={categoriesList}
+            onClose={() => setEditingProduct(null)}
+          />
+        </React.Suspense>
       )}
     </div>
   );
