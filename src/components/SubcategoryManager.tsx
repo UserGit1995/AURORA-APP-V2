@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Plus, Edit3, Trash2, ChevronRight, FolderTree, PackageSearch, ImagePlus, X } from 'lucide-react';
 import { useAdmin } from '../context/AdminContext';
 import { Subcategory } from '../types';
@@ -20,14 +20,41 @@ export const SubcategoryManager: React.FC<SubcategoryManagerProps> = ({ onViewPr
   const [editName, setEditName] = useState('');
   const [uploadingLogoFor, setUploadingLogoFor] = useState<string | null>(null);
 
-  const subsForCategory = subcategoriesList.filter((s) => s.categoryId === selectedCategoryId);
-  const topLevelSubs = subsForCategory.filter((s) => !s.parentSubcategoryId);
-  const childrenOf = (parentId: string) => subsForCategory.filter((s) => s.parentSubcategoryId === parentId);
+  const subsForCategory = useMemo(
+    () => subcategoriesList.filter((s) => s.categoryId === selectedCategoryId),
+    [subcategoriesList, selectedCategoryId]
+  );
+  const topLevelSubs = useMemo(() => subsForCategory.filter((s) => !s.parentSubcategoryId), [subsForCategory]);
+
+  // Con ~3000 prodotti, ricalcolare i conteggi con un filter() per ogni riga
+  // (moltiplicato per centinaia di marche/tipologie) blocca la schermata.
+  // Li precalcoliamo tutti una sola volta con due mappe (marca->figli,
+  // sottocategoria->numero di prodotti diretti), poi ogni riga fa solo letture O(1).
+  const childrenByParent = useMemo(() => {
+    const map = new Map<string, Subcategory[]>();
+    for (const s of subsForCategory) {
+      if (!s.parentSubcategoryId) continue;
+      const arr = map.get(s.parentSubcategoryId) || [];
+      arr.push(s);
+      map.set(s.parentSubcategoryId, arr);
+    }
+    return map;
+  }, [subsForCategory]);
+  const childrenOf = (parentId: string) => childrenByParent.get(parentId) || [];
+
+  const directCountById = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const p of productsList) {
+      if (!p.subcategoryId) continue;
+      map.set(p.subcategoryId, (map.get(p.subcategoryId) || 0) + 1);
+    }
+    return map;
+  }, [productsList]);
 
   // Conta i prodotti assegnati direttamente a questa sottocategoria; per una
   // marca (livello 0) somma anche i prodotti di tutte le sue tipologie figlie,
   // così si vede subito se una marca/tipologia è vuota o piena.
-  const directProductCount = (subId: string) => productsList.filter((p) => p.subcategoryId === subId).length;
+  const directProductCount = (subId: string) => directCountById.get(subId) || 0;
   const totalProductCount = (sub: Subcategory): number =>
     directProductCount(sub.id) + childrenOf(sub.id).reduce((sum, child) => sum + totalProductCount(child), 0);
 

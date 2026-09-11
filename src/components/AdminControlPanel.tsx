@@ -67,6 +67,10 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({ isOpen, on
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [activeTab, setActiveTab] = useState<'products' | 'orders' | 'categories' | 'subcategories' | 'images' | 'settings'>('products');
   const [productSearch, setProductSearch] = useState('');
+  // Con ~3000 articoli, disegnarli tutti insieme blocca il pannello: mostriamo
+  // un blocco alla volta, come nel catalogo pubblico.
+  const ADMIN_PAGE_SIZE = 80;
+  const [adminVisibleCount, setAdminVisibleCount] = useState(ADMIN_PAGE_SIZE);
 
   // Ricerca articoli nel pannello admin: nome, codice/SKU, categoria, marca/tipologia.
   const filteredAdminProducts = useMemo(() => {
@@ -82,6 +86,10 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({ isOpen, on
       );
     });
   }, [productsList, productSearch]);
+
+  React.useEffect(() => {
+    setAdminVisibleCount(ADMIN_PAGE_SIZE);
+  }, [productSearch]);
 
   // Modals inside admin
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
@@ -292,7 +300,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({ isOpen, on
             )}
 
             <div className="grid grid-cols-1 gap-2">
-              {filteredAdminProducts.map((prod) => (
+              {filteredAdminProducts.slice(0, adminVisibleCount).map((prod) => (
                 <div
                   key={prod.id}
                   className="flex flex-wrap sm:flex-nowrap items-center justify-between gap-3 p-3 rounded-xl bg-slate-50 border border-slate-200 hover:border-sky-300 transition-colors text-sm"
@@ -341,6 +349,17 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({ isOpen, on
                 <p className="text-sm text-slate-500 text-center py-8">Nessun articolo trovato per questa ricerca.</p>
               )}
             </div>
+            {adminVisibleCount < filteredAdminProducts.length && (
+              <div className="flex justify-center pt-1">
+                <button
+                  type="button"
+                  onClick={() => setAdminVisibleCount((v) => v + ADMIN_PAGE_SIZE)}
+                  className={BTN_SECONDARY}
+                >
+                  Carica altri ({filteredAdminProducts.length - adminVisibleCount} rimanenti)
+                </button>
+              </div>
+            )}
           </div>
         )}
 
