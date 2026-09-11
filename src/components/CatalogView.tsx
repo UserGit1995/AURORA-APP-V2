@@ -66,6 +66,11 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
   const [activeFilterCategory, setActiveFilterCategory] = useState<string | null>(selectedCategoryId);
   const [quickFilter, setQuickFilter] = useState<'tutti' | 'offerta' | 'bestseller' | 'eco' | 'medico'>('tutti');
   const [sortBy, setSortBy] = useState<'popolarita' | 'prezzo-asc' | 'prezzo-desc' | 'nome'>('popolarita');
+  // Con migliaia di prodotti, disegnarli tutti insieme nella pagina manda in
+  // tilt lo scroll su telefono. Mostriamo un blocco alla volta e carichiamo
+  // il resto solo quando l'utente arriva in fondo o clicca "Carica altri".
+  const PAGE_SIZE = 60;
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [activeFilterSubCategory, setActiveFilterSubCategory] = useState<string | null>(null);
   const [activeFilterSubSubCategory, setActiveFilterSubSubCategory] = useState<string | null>(null);
   const [isSelectionMode, setIsSelectionMode] = useState<boolean>(false);
@@ -78,6 +83,10 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
     setActiveFilterSubCategory(null);
     setActiveFilterSubSubCategory(null);
   }, [selectedCategoryId]);
+
+  React.useEffect(() => {
+    setVisibleCount(PAGE_SIZE);
+  }, [activeFilterCategory, activeFilterSubCategory, activeFilterSubSubCategory, quickFilter, sortBy, searchQuery, viewType]);
 
   const currentSelectedCategory = useMemo(() => {
     return categories.find((c) => c.id === activeFilterCategory);
@@ -517,7 +526,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                     src={cat.image}
                     alt=""
                     className="w-4 h-4 rounded object-cover"
-                    referrerPolicy="no-referrer"
+                    referrerPolicy="no-referrer" loading="lazy" decoding="async"
                   />
                 )}
                 <span>{cat.name}</span>
@@ -570,7 +579,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                       src={sub.image}
                       alt=""
                       className="w-3.5 h-3.5 rounded object-cover"
-                      referrerPolicy="no-referrer"
+                      referrerPolicy="no-referrer" loading="lazy" decoding="async"
                     />
                   )}
                   <span>{sub.name}</span>
@@ -618,7 +627,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                       src={micro.image}
                       alt=""
                       className="w-3.5 h-3.5 rounded object-cover"
-                      referrerPolicy="no-referrer"
+                      referrerPolicy="no-referrer" loading="lazy" decoding="async"
                     />
                   )}
                   <span>{micro.name}</span>
@@ -698,7 +707,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3.5">
-          {sortedProducts.map((product) => {
+          {sortedProducts.slice(0, visibleCount).map((product) => {
             const isFav = favorites.includes(product.id);
             const isCompared = comparedProductIds.includes(product.id);
             const isLowStock = product.stock <= (product.lowStockThreshold ?? 100);
@@ -824,7 +833,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                   <img
                     src={product.image}
                     alt={product.name}
-                    referrerPolicy="no-referrer"
+                    referrerPolicy="no-referrer" loading="lazy" decoding="async"
                     className="w-full h-full object-contain transition-all duration-500 ease-out will-change-transform group-hover:scale-110 group-hover:brightness-105"
                   />
                   {isSelected && (
@@ -872,6 +881,18 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
               </div>
             );
           })}
+        </div>
+      )}
+
+      {/* Carica altri: evita di disegnare migliaia di prodotti insieme, che manda in tilt lo scroll */}
+      {visibleCount < sortedProducts.length && (
+        <div className="flex justify-center pt-2">
+          <button
+            onClick={() => setVisibleCount((v) => v + PAGE_SIZE)}
+            className="px-6 py-2.5 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-semibold text-sm rounded-full shadow-xs transition-colors"
+          >
+            Carica altri articoli ({sortedProducts.length - visibleCount} rimanenti)
+          </button>
         </div>
       )}
 
