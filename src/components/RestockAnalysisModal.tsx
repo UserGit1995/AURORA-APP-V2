@@ -154,21 +154,21 @@ export const RestockAnalysisModal: React.FC<RestockAnalysisModalProps> = ({
         initial={{ opacity: 0, scale: 0.96, y: 15 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.96, y: 15 }}
-        className="relative w-full max-w-4xl max-h-[92vh] flex flex-col bg-slate-50 border border-slate-200 rounded-3xl shadow-2xl z-10 overflow-hidden"
+        className="relative w-full max-w-4xl max-h-[92vh] flex flex-col bg-[#0d1420] border border-[#1c2433] rounded-3xl shadow-2xl z-10 overflow-hidden"
       >
         {/* Header */}
-        <div className="p-5 sm:p-6 border-b border-slate-200 bg-gradient-to-r from-white via-slate-50 to-sky-50 flex items-center justify-between shrink-0">
+        <div className="p-5 sm:p-6 border-b border-[#1c2433] bg-gradient-to-r from-white via-slate-50 to-sky-50 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-sky-500/20 text-sky-700 border border-sky-500/30 shadow-inner">
-              <Sparkles className="w-6 h-6 text-sky-600 animate-pulse" />
+            <div className="p-2.5 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-sky-500/20 text-sky-300 border border-sky-500/30 shadow-inner">
+              <Sparkles className="w-6 h-6 text-sky-400 animate-pulse" />
             </div>
             <div>
               <div className="flex items-center gap-2 flex-wrap">
                 <h3 className="text-lg sm:text-xl font-bold text-white tracking-tight">
                   Analisi Riordino & Previsione Scorte AI
                 </h3>
-                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10.5px] font-bold bg-sky-500/15 text-sky-700 border border-sky-500/30">
-                  <Sparkles className="w-3 h-3 text-sky-600" />
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10.5px] font-bold bg-sky-500/15 text-sky-300 border border-sky-500/30">
+                  <Sparkles className="w-3 h-3 text-sky-400" />
                   <span>Gemini 3.7 Flash</span>
                 </span>
               </div>
@@ -183,15 +183,15 @@ export const RestockAnalysisModal: React.FC<RestockAnalysisModalProps> = ({
               id="refresh-restock-btn"
               onClick={loadAnalysis}
               disabled={loading}
-              className="p-2 rounded-xl text-slate-400 hover:text-sky-700 hover:bg-slate-100 border border-slate-200 transition-colors disabled:opacity-50"
+              className="p-2 rounded-xl text-slate-400 hover:text-sky-300 hover:bg-[#1a2230] border border-[#1c2433] transition-colors disabled:opacity-50"
               title="Ricalcola analisi con Gemini"
             >
-              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin text-sky-600' : ''}`} />
+              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin text-sky-400' : ''}`} />
             </button>
             <button
               id="close-restock-modal"
               onClick={onClose}
-              className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-100 border border-slate-200 transition-colors"
+              className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-[#1a2230] border border-[#1c2433] transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
@@ -204,10 +204,10 @@ export const RestockAnalysisModal: React.FC<RestockAnalysisModalProps> = ({
             <div className="py-16 text-center flex flex-col items-center justify-center space-y-4">
               <div className="relative">
                 <div className="w-14 h-14 rounded-full border-3 border-sky-500/20 border-t-sky-400 animate-spin flex items-center justify-center" />
-                <Sparkles className="w-6 h-6 text-sky-600 absolute inset-0 m-auto animate-pulse" />
+                <Sparkles className="w-6 h-6 text-sky-400 absolute inset-0 m-auto animate-pulse" />
               </div>
               <div className="max-w-md">
-                <h4 className="text-base font-bold text-slate-900">
+                <h4 className="text-base font-bold text-white">
                   Gemini sta analizzando lo storico acquisti e i livelli di magazzino...
                 </h4>
                 <p className="text-xs text-slate-400 mt-1">
@@ -229,11 +229,11 @@ export const RestockAnalysisModal: React.FC<RestockAnalysisModalProps> = ({
           ) : analysisResult ? (
             <>
               {/* Executive Summary Card */}
-              <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-white via-slate-50 to-sky-50 border border-slate-200 p-4 sm:p-5 shadow-lg">
+              <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-white via-slate-50 to-sky-50 border border-[#1c2433] p-4 sm:p-5 shadow-lg">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                   <div className="space-y-1.5 flex-1">
                     <div className="flex items-center gap-2">
-                      <span className="text-[11px] font-bold uppercase tracking-wider text-sky-600 flex items-center gap-1.5">
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-sky-400 flex items-center gap-1.5">
                         <Sparkles className="w-3.5 h-3.5" />
                         <span>Sintesi Esecutiva AI</span>
                       </span>
@@ -244,7 +244,7 @@ export const RestockAnalysisModal: React.FC<RestockAnalysisModalProps> = ({
                         </span>
                       )}
                     </div>
-                    <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-normal">
+                    <p className="text-xs sm:text-sm text-slate-300 leading-relaxed font-normal">
                       {analysisResult.summary}
                     </p>
                     {analysisResult.fallbackNotice && (
@@ -255,7 +255,7 @@ export const RestockAnalysisModal: React.FC<RestockAnalysisModalProps> = ({
                   </div>
 
                   {/* Batch Actions & Cost Card */}
-                  <div className="bg-slate-50 border border-slate-200 rounded-xl p-3.5 flex flex-row md:flex-col justify-between items-center md:items-end gap-3 shrink-0">
+                  <div className="bg-[#0d1420] border border-[#1c2433] rounded-xl p-3.5 flex flex-row md:flex-col justify-between items-center md:items-end gap-3 shrink-0">
                     <div className="text-left md:text-right">
                       <span className="text-[10.5px] text-slate-400 block">Stima Imponibile Riassortimento</span>
                       <span className="text-base sm:text-lg font-bold text-white font-mono">
@@ -269,7 +269,7 @@ export const RestockAnalysisModal: React.FC<RestockAnalysisModalProps> = ({
                       className={`w-full md:w-auto inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all shadow-md ${
                         batchAddedSuccess
                           ? 'bg-emerald-600 text-white shadow-emerald-500/20'
-                          : 'bg-[#0284c7] hover:bg-[#0369a1] active:bg-slate-50 text-white shadow-sky-500/20'
+                          : 'bg-[#0284c7] hover:bg-[#0369a1] active:bg-[#0d1420] text-white shadow-sky-500/20'
                       }`}
                     >
                       {batchAddedSuccess ? (
@@ -296,7 +296,7 @@ export const RestockAnalysisModal: React.FC<RestockAnalysisModalProps> = ({
                     className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-colors ${
                       urgencyFilter === 'all'
                         ? 'bg-[#0284c7] text-white shadow-xs'
-                        : 'bg-slate-50 text-slate-400 hover:text-white border border-slate-200'
+                        : 'bg-[#0d1420] text-slate-400 hover:text-white border border-[#1c2433]'
                     }`}
                   >
                     Tutti ({analysisResult.recommendations.length})
@@ -306,7 +306,7 @@ export const RestockAnalysisModal: React.FC<RestockAnalysisModalProps> = ({
                     className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-colors ${
                       urgencyFilter === 'critical'
                         ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
-                        : 'bg-slate-50 text-slate-400 hover:text-white border border-slate-200'
+                        : 'bg-[#0d1420] text-slate-400 hover:text-white border border-[#1c2433]'
                     }`}
                   >
                     Urgenza Critica / Alta ({analysisResult.recommendations.filter((r) => r.urgency === 'CRITICA' || r.urgency === 'ALTA').length})
@@ -315,8 +315,8 @@ export const RestockAnalysisModal: React.FC<RestockAnalysisModalProps> = ({
                     onClick={() => setUrgencyFilter('medium')}
                     className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-colors ${
                       urgencyFilter === 'medium'
-                        ? 'bg-sky-500/20 text-sky-700 border border-sky-500/40'
-                        : 'bg-slate-50 text-slate-400 hover:text-white border border-slate-200'
+                        ? 'bg-sky-500/20 text-sky-300 border border-sky-500/40'
+                        : 'bg-[#0d1420] text-slate-400 hover:text-white border border-[#1c2433]'
                     }`}
                   >
                     Urgenza Media ({analysisResult.recommendations.filter((r) => r.urgency === 'MEDIA').length})
@@ -326,7 +326,7 @@ export const RestockAnalysisModal: React.FC<RestockAnalysisModalProps> = ({
                     className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-colors ${
                       urgencyFilter === 'optimal'
                         ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
-                        : 'bg-slate-50 text-slate-400 hover:text-white border border-slate-200'
+                        : 'bg-[#0d1420] text-slate-400 hover:text-white border border-[#1c2433]'
                     }`}
                   >
                     Scorte Ottimali ({analysisResult.recommendations.filter((r) => r.urgency === 'OTTIMALE').length})
@@ -339,7 +339,7 @@ export const RestockAnalysisModal: React.FC<RestockAnalysisModalProps> = ({
                       onClose();
                       onOpenCart();
                     }}
-                    className="text-xs font-semibold text-sky-600 hover:text-sky-700 inline-flex items-center gap-1 transition-colors"
+                    className="text-xs font-semibold text-sky-400 hover:text-sky-300 inline-flex items-center gap-1 transition-colors"
                   >
                     <span>Visualizza carrello</span>
                     <ArrowRight className="w-3.5 h-3.5" />
@@ -350,7 +350,7 @@ export const RestockAnalysisModal: React.FC<RestockAnalysisModalProps> = ({
               {/* Recommendations List */}
               <div className="space-y-3">
                 {filteredRecommendations.length === 0 ? (
-                  <div className="p-8 text-center bg-slate-50 border border-slate-200 rounded-2xl">
+                  <div className="p-8 text-center bg-[#0d1420] border border-[#1c2433] rounded-2xl">
                     <p className="text-xs text-slate-400">Nessun articolo per il filtro selezionato.</p>
                   </div>
                 ) : (
@@ -379,8 +379,8 @@ export const RestockAnalysisModal: React.FC<RestockAnalysisModalProps> = ({
                           );
                         case 'MEDIA':
                           return (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10.5px] font-bold bg-sky-500/20 text-sky-700 border border-sky-500/35">
-                              <Clock className="w-3 h-3 text-sky-600" />
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10.5px] font-bold bg-sky-500/20 text-sky-300 border border-sky-500/35">
+                              <Clock className="w-3 h-3 text-sky-400" />
                               <span>Pianificabile</span>
                             </span>
                           );
@@ -399,19 +399,19 @@ export const RestockAnalysisModal: React.FC<RestockAnalysisModalProps> = ({
                       <div
                         key={rec.productId}
                         id={`restock-card-${rec.productId}`}
-                        className={`bg-slate-50 border rounded-2xl p-4 sm:p-5 transition-all shadow-md ${
+                        className={`bg-[#0d1420] border rounded-2xl p-4 sm:p-5 transition-all shadow-md ${
                           rec.urgency === 'CRITICA'
                             ? 'border-rose-500/30 hover:border-rose-500/50 bg-gradient-to-r from-white via-slate-50 to-sky-50'
                             : rec.urgency === 'ALTA'
                             ? 'border-amber-500/30 hover:border-amber-500/50'
-                            : 'border-slate-200 hover:border-sky-500/30'
+                            : 'border-[#1c2433] hover:border-sky-500/30'
                         }`}
                       >
                         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                           {/* Left: Product summary & Badges */}
                           <div className="flex items-start gap-3.5 flex-1">
                             {product && (
-                              <div className="w-14 h-14 rounded-xl bg-slate-50 border border-slate-200 p-1.5 shrink-0 flex items-center justify-center overflow-hidden">
+                              <div className="w-14 h-14 rounded-xl bg-[#0d1420] border border-[#1c2433] p-1.5 shrink-0 flex items-center justify-center overflow-hidden">
                                 <img
                                   src={product.image}
                                   alt={product.name}
@@ -423,33 +423,33 @@ export const RestockAnalysisModal: React.FC<RestockAnalysisModalProps> = ({
 
                             <div className="space-y-1">
                               <div className="flex items-center gap-2 flex-wrap">
-                                <h4 className="text-sm font-bold text-slate-900">
+                                <h4 className="text-sm font-bold text-white">
                                   {rec.productName}
                                 </h4>
                                 {urgencyBadge()}
                                 {product?.code && (
-                                  <span className="font-mono text-[10px] bg-slate-50 px-1.5 py-0.5 rounded border border-slate-200 text-slate-400">
+                                  <span className="font-mono text-[10px] bg-[#0d1420] px-1.5 py-0.5 rounded border border-[#1c2433] text-slate-400">
                                     {product.code}
                                   </span>
                                 )}
                               </div>
 
                               {/* Inventory & Velocity Metrics */}
-                              <div className="flex items-center gap-3 text-xs text-slate-600 flex-wrap pt-0.5">
+                              <div className="flex items-center gap-3 text-xs text-slate-400 flex-wrap pt-0.5">
                                 <div className="flex items-center gap-1">
                                   <span className="text-slate-400">Giacenza magazzino:</span>
-                                  <strong className={`font-mono ${rec.currentStock <= 100 ? 'text-rose-400 font-bold' : 'text-slate-700'}`}>
+                                  <strong className={`font-mono ${rec.currentStock <= 100 ? 'text-rose-400 font-bold' : 'text-slate-300'}`}>
                                     {rec.currentStock} colli
                                   </strong>
                                 </div>
-                                <span className="text-slate-600">•</span>
+                                <span className="text-slate-400">•</span>
                                 <div className="flex items-center gap-1">
                                   <span className="text-slate-400">Ordini passati:</span>
-                                  <strong className="text-sky-700 font-mono">
+                                  <strong className="text-sky-300 font-mono">
                                     {rec.pastOrderedQty} colli
                                   </strong>
                                 </div>
-                                <span className="text-slate-600">•</span>
+                                <span className="text-slate-400">•</span>
                                 <div className="flex items-center gap-1">
                                   <span className="text-slate-400">Autonomia stimata:</span>
                                   <strong className={`font-mono ${rec.daysUntilDepletion <= 15 ? 'text-rose-400 font-bold' : 'text-emerald-400'}`}>
@@ -459,9 +459,9 @@ export const RestockAnalysisModal: React.FC<RestockAnalysisModalProps> = ({
                               </div>
 
                               {/* AI Rationale explanation */}
-                              <div className="mt-2 text-xs text-slate-600 bg-slate-50 border border-slate-200 rounded-xl p-2.5 flex items-start gap-2">
-                                <Sparkles className="w-3.5 h-3.5 text-sky-600 shrink-0 mt-0.5" />
-                                <p className="leading-relaxed text-[11.5px] text-slate-600">
+                              <div className="mt-2 text-xs text-slate-400 bg-[#0d1420] border border-[#1c2433] rounded-xl p-2.5 flex items-start gap-2">
+                                <Sparkles className="w-3.5 h-3.5 text-sky-400 shrink-0 mt-0.5" />
+                                <p className="leading-relaxed text-[11.5px] text-slate-400">
                                   {rec.rationale}
                                 </p>
                               </div>
@@ -469,13 +469,13 @@ export const RestockAnalysisModal: React.FC<RestockAnalysisModalProps> = ({
                           </div>
 
                           {/* Right: Quantity Stepper & Add Action */}
-                          <div className="flex sm:flex-row lg:flex-col items-center lg:items-end justify-between gap-3 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-200 shrink-0">
+                          <div className="flex sm:flex-row lg:flex-col items-center lg:items-end justify-between gap-3 pt-2 sm:pt-0 border-t sm:border-t-0 border-[#1c2433] shrink-0">
                             <div className="text-left lg:text-right">
                               <span className="text-[10px] text-slate-400 block">Q.tà riordino consigliata</span>
                               <div className="flex items-center gap-1.5 mt-1">
                                 <button
                                   onClick={() => handleQtyChange(rec.productId, -1)}
-                                  className="w-7 h-7 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-600 hover:text-slate-900 transition-colors"
+                                  className="w-7 h-7 rounded-lg bg-[#0d1420] hover:bg-[#1a2230] border border-[#1c2433] flex items-center justify-center text-slate-400 hover:text-white transition-colors"
                                 >
                                   <Minus className="w-3 h-3" />
                                 </button>
@@ -487,11 +487,11 @@ export const RestockAnalysisModal: React.FC<RestockAnalysisModalProps> = ({
                                     const val = Math.max(1, parseInt(e.target.value) || 1);
                                     setAdjustedQuantities((prev) => ({ ...prev, [rec.productId]: val }));
                                   }}
-                                  className="w-12 h-7 bg-slate-50 border border-slate-200 rounded-lg text-center font-mono font-bold text-xs text-slate-900 focus:outline-none focus:border-sky-500"
+                                  className="w-12 h-7 bg-[#0d1420] border border-[#1c2433] rounded-lg text-center font-mono font-bold text-xs text-white focus:outline-none focus:border-sky-500"
                                 />
                                 <button
                                   onClick={() => handleQtyChange(rec.productId, 1)}
-                                  className="w-7 h-7 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-600 hover:text-slate-900 transition-colors"
+                                  className="w-7 h-7 rounded-lg bg-[#0d1420] hover:bg-[#1a2230] border border-[#1c2433] flex items-center justify-center text-slate-400 hover:text-white transition-colors"
                                 >
                                   <Plus className="w-3 h-3" />
                                 </button>
@@ -501,7 +501,7 @@ export const RestockAnalysisModal: React.FC<RestockAnalysisModalProps> = ({
                             <div className="flex items-center gap-2">
                               <div className="text-right hidden sm:block">
                                 <span className="text-[10px] text-slate-400 block">Totale parziale</span>
-                                <span className="font-mono text-xs font-bold text-slate-900">
+                                <span className="font-mono text-xs font-bold text-white">
                                   €{itemCost.toFixed(2)}
                                 </span>
                               </div>
@@ -540,15 +540,15 @@ export const RestockAnalysisModal: React.FC<RestockAnalysisModalProps> = ({
         </div>
 
         {/* Modal Footer */}
-        <div className="p-4 border-t border-slate-200 bg-slate-50 flex items-center justify-between shrink-0">
+        <div className="p-4 border-t border-[#1c2433] bg-[#0d1420] flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2 text-xs text-slate-400">
-            <ShieldAlert className="w-3.5 h-3.5 text-sky-600" />
+            <ShieldAlert className="w-3.5 h-3.5 text-sky-400" />
             <span>Prezzi e disponibilità di magazzino calcolati in tempo reale per ordini B2B.</span>
           </div>
 
           <button
             onClick={onClose}
-            className="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-50 hover:bg-slate-100 text-slate-600 hover:text-slate-900 transition-colors"
+            className="px-4 py-2 rounded-xl text-xs font-semibold bg-[#0d1420] hover:bg-[#1a2230] text-slate-400 hover:text-white transition-colors"
           >
             Chiudi
           </button>

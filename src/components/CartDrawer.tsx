@@ -216,16 +216,16 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
       />
 
       <div className="fixed inset-y-0 right-0 max-w-full flex pl-6 sm:pl-10">
-        <div className="w-screen max-w-lg bg-slate-50 border-l border-slate-200 shadow-2xl flex flex-col justify-between overflow-hidden">
+        <div className="w-screen max-w-lg bg-[#0d1420] border-l border-[#1c2433] shadow-2xl flex flex-col justify-between overflow-hidden">
           
           {/* Header */}
-          <div className="p-4 sm:p-5 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+          <div className="p-4 sm:p-5 border-b border-[#1c2433] flex items-center justify-between bg-[#0d1420]">
             <div className="flex items-center gap-2.5">
-              <div className="p-2 rounded-xl bg-sky-500/15 text-sky-600">
+              <div className="p-2 rounded-xl bg-sky-500/15 text-sky-400">
                 <ShoppingBag className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-slate-900 font-bold text-base">
+                <h3 className="text-white font-bold text-base">
                   {step === 'cart' ? 'Riepilogo Lista Ordine' : step === 'form' ? 'Dati Ordine & Destinatario' : 'Richiesta Ordine Inviata'}
                 </h3>
                 <p className="text-slate-400 text-xs">
@@ -240,7 +240,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
             <button
               id="close-cart-drawer-btn"
               onClick={step === 'success' ? handleCompleteAndClose : onClose}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+              className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-[#1a2230] transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
@@ -250,18 +250,18 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
           {step === 'cart' && (
             <>
               {/* Free shipping banner */}
-              <div className="px-5 py-2.5 bg-slate-50 border-b border-slate-200">
+              <div className="px-5 py-2.5 bg-[#0d1420] border-b border-[#1c2433]">
                 <div className="flex justify-between text-xs mb-1">
-                  <span className="text-slate-600">
+                  <span className="text-slate-400">
                     {remainingForFreeShipping === 0 
                       ? '🎉 Consegna Gratuita inclusa!' 
                       : `Aggiungi €${remainingForFreeShipping.toFixed(2)} per la spedizione gratuita`}
                   </span>
-                  <span className="text-sky-600 font-bold">
+                  <span className="text-sky-400 font-bold">
                     {Math.min(100, Math.round((subtotal / freeShippingThreshold) * 100))}%
                   </span>
                 </div>
-                <div className="w-full h-1.5 bg-slate-50 rounded-full overflow-hidden">
+                <div className="w-full h-1.5 bg-[#0d1420] rounded-full overflow-hidden">
                   <div 
                     className="h-full bg-gradient-to-r from-sky-500 to-cyan-400 rounded-full transition-all duration-300"
                     style={{ width: `${Math.min(100, (subtotal / freeShippingThreshold) * 100)}%` }}
@@ -270,7 +270,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
               </div>
 
               {/* Template Quick Toolbar */}
-              <div className="px-4 py-2.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between gap-2 flex-wrap">
+              <div className="px-4 py-2.5 bg-[#0d1420] border-b border-[#1c2433] flex items-center justify-between gap-2 flex-wrap">
                 <div className="flex items-center gap-2">
                   <button
                     id="cart-open-templates-btn"
@@ -278,10 +278,10 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                       setTemplateModalMode('load');
                       setIsTemplateModalOpen(true);
                     }}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-sky-700 hover:text-sky-900 border border-sky-300 text-xs font-semibold transition-all shadow-xs"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#0d1420] hover:bg-[#1a2230] text-sky-300 hover:text-sky-900 border border-sky-500/40 text-xs font-semibold transition-all shadow-xs"
                     title={isIt ? 'Visualizza e carica modelli di riordino B2B' : 'View and load B2B restock templates'}
                   >
-                    <Bookmark className="w-3.5 h-3.5 text-sky-600" />
+                    <Bookmark className="w-3.5 h-3.5 text-sky-400" />
                     <span>{t('cart.templates', 'Modelli Riordino')}</span>
                   </button>
 
@@ -292,7 +292,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                         setTemplateModalMode('save');
                         setIsTemplateModalOpen(true);
                       }}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 hover:text-emerald-900 border border-emerald-300 text-xs font-semibold transition-all shadow-xs"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-100 text-emerald-300 hover:text-emerald-900 border border-emerald-500/40 text-xs font-semibold transition-all shadow-xs"
                       title={isIt ? 'Salva gli articoli correnti come modello riutilizzabile' : 'Save current items as reusable template'}
                     >
                       <BookmarkPlus className="w-3.5 h-3.5 text-emerald-400" />
@@ -328,7 +328,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                     </div>
                     <button
                       onClick={() => setTemplateFeedbackMsg(null)}
-                      className="text-emerald-600 hover:text-emerald-900 p-0.5"
+                      className="text-emerald-400 hover:text-emerald-900 p-0.5"
                     >
                       <X className="w-3.5 h-3.5" />
                     </button>
@@ -340,16 +340,16 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
               <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3">
                 {/* Customer Type Quick Selector in Cart */}
                 {items.length > 0 && (
-                  <div className="bg-slate-50 border border-slate-200 rounded-2xl p-2.5 flex items-center justify-between gap-2 text-xs">
+                  <div className="bg-[#0d1420] border border-[#1c2433] rounded-2xl p-2.5 flex items-center justify-between gap-2 text-xs">
                     <div className="flex items-center gap-1.5">
                       {isAzienda ? (
                         <span className="w-2 h-2 rounded-full bg-sky-400" />
                       ) : (
                         <span className="w-2 h-2 rounded-full bg-emerald-400" />
                       )}
-                      <span className="text-[11px] text-slate-600 font-medium">
+                      <span className="text-[11px] text-slate-400 font-medium">
                         Listino:{' '}
-                        <strong className={isAzienda ? "text-sky-700" : "text-emerald-300"}>
+                        <strong className={isAzienda ? "text-sky-300" : "text-emerald-300"}>
                           {isAzienda ? 'Attività / Fornitore (con IVA 22%)' : 'Cliente Privato (senza IVA)'}
                         </strong>
                       </span>
@@ -361,7 +361,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                         className={`px-2 py-1 rounded-lg text-[10px] font-bold transition-all ${
                           !isAzienda 
                             ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40' 
-                            : 'text-slate-400 hover:text-slate-700'
+                            : 'text-slate-400 hover:text-slate-300'
                         }`}
                       >
                         Privato
@@ -371,8 +371,8 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                         onClick={() => setCustomerType('azienda')}
                         className={`px-2 py-1 rounded-lg text-[10px] font-bold transition-all ${
                           isAzienda 
-                            ? 'bg-sky-500/20 text-sky-700 border border-sky-500/40' 
-                            : 'text-slate-400 hover:text-slate-700'
+                            ? 'bg-sky-500/20 text-sky-300 border border-sky-500/40' 
+                            : 'text-slate-400 hover:text-slate-300'
                         }`}
                       >
                         Azienda
@@ -384,11 +384,11 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                 {items.length === 0 ? (
                   <div className="space-y-5">
                     {/* Empty cart banner */}
-                    <div className="py-6 flex flex-col items-center justify-center text-center text-slate-400 bg-slate-50 border border-slate-200 rounded-2xl p-4">
-                      <div className="p-3 rounded-2xl bg-slate-50 text-slate-500 mb-2 border border-slate-200">
+                    <div className="py-6 flex flex-col items-center justify-center text-center text-slate-400 bg-[#0d1420] border border-[#1c2433] rounded-2xl p-4">
+                      <div className="p-3 rounded-2xl bg-[#0d1420] text-slate-500 mb-2 border border-[#1c2433]">
                         <ShoppingBag className="w-8 h-8 stroke-1" />
                       </div>
-                      <p className="text-sm font-semibold text-slate-700">{t('cart.empty', 'La lista d\'ordine è vuota')}</p>
+                      <p className="text-sm font-semibold text-slate-300">{t('cart.empty', 'La lista d\'ordine è vuota')}</p>
                       <p className="text-xs text-slate-500 mt-1 max-w-xs">
                         {isIt
                           ? 'Aggiungi singoli prodotti dal catalogo oppure carica subito un modello di rifornimento preconfigurato.'
@@ -399,7 +399,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                     {/* Quick restock templates section */}
                     <div className="space-y-2.5">
                       <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold uppercase tracking-wider text-sky-600 flex items-center gap-1.5">
+                        <span className="text-xs font-bold uppercase tracking-wider text-sky-400 flex items-center gap-1.5">
                           <Sparkles className="w-3.5 h-3.5" />
                           <span>{isIt ? 'Carica un Modello di Riordino Rapido:' : 'Load a Quick Restock Template:'}</span>
                         </span>
@@ -408,7 +408,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                             setTemplateModalMode('load');
                             setIsTemplateModalOpen(true);
                           }}
-                          className="text-xs text-slate-500 hover:text-slate-900 transition-colors"
+                          className="text-xs text-slate-500 hover:text-white transition-colors"
                         >
                           {isIt ? 'Tutti i modelli →' : 'All templates →'}
                         </button>
@@ -429,18 +429,18 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                           return (
                             <div
                               key={tpl.id}
-                              className="p-3 rounded-2xl bg-slate-50 border border-slate-200 hover:border-sky-500/40 transition-all text-left flex items-center justify-between gap-3 group"
+                              className="p-3 rounded-2xl bg-[#0d1420] border border-[#1c2433] hover:border-sky-500/40 transition-all text-left flex items-center justify-between gap-3 group"
                             >
                               <div className="min-w-0">
                                 <div className="flex items-center gap-2 mb-1">
-                                  <span className="text-[10px] font-bold px-2 py-0.2 rounded-full bg-sky-950 text-sky-700 border border-sky-500/30">
+                                  <span className="text-[10px] font-bold px-2 py-0.2 rounded-full bg-sky-950 text-sky-300 border border-sky-500/30">
                                     {tpl.tag}
                                   </span>
                                   <span className="text-[11px] text-slate-400 font-mono">
                                     {totalItems} {isIt ? 'colli' : 'units'} • €{totalCost.toFixed(2)}
                                   </span>
                                 </div>
-                                <h5 className="text-xs font-bold text-slate-900 group-hover:text-sky-700 transition-colors line-clamp-1">
+                                <h5 className="text-xs font-bold text-white group-hover:text-sky-300 transition-colors line-clamp-1">
                                   {tpl.name}
                                 </h5>
                                 {tpl.description && (
@@ -476,9 +476,9 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                   items.map((item) => (
                     <div 
                       key={item.product.id}
-                      className="bg-slate-50 border border-slate-200 rounded-2xl p-3 flex gap-3 items-center"
+                      className="bg-[#0d1420] border border-[#1c2433] rounded-2xl p-3 flex gap-3 items-center"
                     >
-                      <div className="w-14 h-14 rounded-xl bg-slate-50 p-1 shrink-0 flex items-center justify-center">
+                      <div className="w-14 h-14 rounded-xl bg-[#0d1420] p-1 shrink-0 flex items-center justify-center">
                         <img 
                           src={item.product.image} 
                           alt={item.product.name} 
@@ -488,11 +488,11 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                       </div>
 
                       <div className="flex-1 min-w-0">
-                        <h4 className="text-xs font-bold text-slate-900 truncate">{item.product.name}</h4>
+                        <h4 className="text-xs font-bold text-white truncate">{item.product.name}</h4>
                         <p className="text-[11px] text-slate-400">{item.product.packageQty}</p>
                         {isAzienda ? (
                           <div className="mt-1">
-                            <span className="text-xs font-bold text-sky-600">
+                            <span className="text-xs font-bold text-sky-400">
                               €{((item.product.price * 1.22) * item.quantity).toFixed(2)}
                             </span>
                             <span className="text-[10px] text-slate-400 ml-1">
@@ -520,19 +520,19 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
-                        <div className="flex items-center bg-slate-50 border border-slate-200 rounded-lg px-1 py-0.5">
+                        <div className="flex items-center bg-[#0d1420] border border-[#1c2433] rounded-lg px-1 py-0.5">
                           <button
                             onClick={() => onUpdateQuantity(item.product.id, -1)}
-                            className="p-1 text-slate-400 hover:text-slate-900"
+                            className="p-1 text-slate-400 hover:text-white"
                           >
                             <Minus className="w-3 h-3" />
                           </button>
-                          <span className="px-2 text-xs font-bold text-slate-900 min-w-[1.2rem] text-center">
+                          <span className="px-2 text-xs font-bold text-white min-w-[1.2rem] text-center">
                             {item.quantity}
                           </span>
                           <button
                             onClick={() => onUpdateQuantity(item.product.id, 1)}
-                            className="p-1 text-slate-400 hover:text-slate-900"
+                            className="p-1 text-slate-400 hover:text-white"
                           >
                             <Plus className="w-3 h-3" />
                           </button>
@@ -545,34 +545,34 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
 
               {/* Footer Summary */}
               {items.length > 0 && (
-                <div className="p-4 sm:p-5 border-t border-slate-200 bg-slate-50 space-y-3">
-                  <div className="space-y-1.5 text-xs text-slate-600">
+                <div className="p-4 sm:p-5 border-t border-[#1c2433] bg-[#0d1420] space-y-3">
+                  <div className="space-y-1.5 text-xs text-slate-400">
                     {isAzienda ? (
                       <>
                         <div className="flex justify-between">
                           <span>Imponibile Netto:</span>
-                          <span className="font-mono text-slate-900 font-medium">€{subtotal.toFixed(2)}</span>
+                          <span className="font-mono text-white font-medium">€{subtotal.toFixed(2)}</span>
                         </div>
                         <div className="flex justify-between">
                           <span>IVA (22% per Attività/Aziende):</span>
-                          <span className="font-mono text-slate-900 font-medium">€{vat.toFixed(2)}</span>
+                          <span className="font-mono text-white font-medium">€{vat.toFixed(2)}</span>
                         </div>
-                        <div className="flex justify-between text-sm font-bold text-slate-900 pt-2 border-t border-slate-200">
+                        <div className="flex justify-between text-sm font-bold text-white pt-2 border-t border-[#1c2433]">
                           <span>Totale Fornitura (IVA inclusa):</span>
-                          <span className="text-sky-600 font-mono">€{total.toFixed(2)}</span>
+                          <span className="text-sky-400 font-mono">€{total.toFixed(2)}</span>
                         </div>
                       </>
                     ) : (
                       <>
                         <div className="flex justify-between">
                           <span>Imponibile:</span>
-                          <span className="font-mono text-slate-900 font-medium">€{subtotal.toFixed(2)}</span>
+                          <span className="font-mono text-white font-medium">€{subtotal.toFixed(2)}</span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-emerald-400">IVA (0% - Listino Utenti Privati):</span>
                           <span className="font-mono text-emerald-400 font-medium">€0.00 (non applicata)</span>
                         </div>
-                        <div className="flex justify-between text-sm font-bold text-slate-900 pt-2 border-t border-slate-200">
+                        <div className="flex justify-between text-sm font-bold text-white pt-2 border-t border-[#1c2433]">
                           <span>Totale Ordine (Senza IVA):</span>
                           <span className="text-emerald-400 font-mono">€{total.toFixed(2)}</span>
                         </div>
@@ -588,10 +588,10 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                         setTemplateModalMode('save');
                         setIsTemplateModalOpen(true);
                       }}
-                      className="px-3.5 py-3 rounded-xl bg-slate-50 hover:bg-slate-100 text-sky-700 hover:text-slate-900 border border-sky-500/30 text-xs font-bold flex items-center justify-center gap-1.5 transition-colors"
+                      className="px-3.5 py-3 rounded-xl bg-[#0d1420] hover:bg-[#1a2230] text-sky-300 hover:text-white border border-sky-500/30 text-xs font-bold flex items-center justify-center gap-1.5 transition-colors"
                       title={isIt ? 'Salva questi articoli e quantità come modello riutilizzabile' : 'Save these items and quantities as reusable template'}
                     >
-                      <BookmarkPlus className="w-4 h-4 text-sky-600" />
+                      <BookmarkPlus className="w-4 h-4 text-sky-400" />
                       <span className="hidden sm:inline">{isIt ? 'Salva Modello' : 'Save Template'}</span>
                     </button>
 
@@ -620,8 +620,8 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
               <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 text-xs">
                 
                 {/* 1. SELEZIONE TIPO UTENTE (AZIENDA / PRIVATO) */}
-                <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3.5">
-                  <label className="block text-slate-600 font-bold mb-2">
+                <div className="bg-[#0d1420] border border-[#1c2433] rounded-2xl p-3.5">
+                  <label className="block text-slate-400 font-bold mb-2">
                     Tipologia Intestatario Ordine:
                   </label>
                   <div className="grid grid-cols-2 gap-2">
@@ -631,11 +631,11 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                       onClick={() => setCustomerType('azienda')}
                       className={`flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl border text-xs font-bold transition-all ${
                         customerType === 'azienda'
-                          ? 'bg-sky-500/20 text-sky-700 border-sky-400/60 shadow-xs'
-                          : 'bg-slate-50 text-slate-500 border-slate-200 hover:text-slate-900'
+                          ? 'bg-sky-500/20 text-sky-300 border-sky-400/60 shadow-xs'
+                          : 'bg-[#0d1420] text-slate-500 border-[#1c2433] hover:text-white'
                       }`}
                     >
-                      <Building2 className="w-4 h-4 text-sky-600" />
+                      <Building2 className="w-4 h-4 text-sky-400" />
                       <span>Azienda / P.IVA</span>
                     </button>
 
@@ -645,8 +645,8 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                       onClick={() => setCustomerType('privato')}
                       className={`flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl border text-xs font-bold transition-all ${
                         customerType === 'privato'
-                          ? 'bg-sky-500/20 text-sky-700 border-sky-400/60 shadow-xs'
-                          : 'bg-slate-50 text-slate-500 border-slate-200 hover:text-slate-900'
+                          ? 'bg-sky-500/20 text-sky-300 border-sky-400/60 shadow-xs'
+                          : 'bg-[#0d1420] text-slate-500 border-[#1c2433] hover:text-white'
                       }`}
                     >
                       <User className="w-4 h-4 text-emerald-400" />
@@ -661,9 +661,9 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                 </div>
 
                 {/* 2. DATI INTESTAZIONE */}
-                <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3.5 space-y-3">
-                  <h4 className="font-bold text-slate-900 text-xs flex items-center gap-1.5">
-                    {customerType === 'azienda' ? <Building2 className="w-3.5 h-3.5 text-sky-600" /> : <User className="w-3.5 h-3.5 text-emerald-400" />}
+                <div className="bg-[#0d1420] border border-[#1c2433] rounded-2xl p-3.5 space-y-3">
+                  <h4 className="font-bold text-white text-xs flex items-center gap-1.5">
+                    {customerType === 'azienda' ? <Building2 className="w-3.5 h-3.5 text-sky-400" /> : <User className="w-3.5 h-3.5 text-emerald-400" />}
                     <span>{customerType === 'azienda' ? 'Dati Azienda / Società' : 'Dati Anagrafici Privato'}</span>
                   </h4>
 
@@ -677,8 +677,8 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                           value={companyName}
                           onChange={(e) => setCompanyName(e.target.value)}
                           placeholder="es. AURORA Retail & Facility Service S.r.l."
-                          className={`w-full bg-slate-50 border rounded-xl px-3 py-2 text-slate-900 placeholder-slate-500 focus:outline-none focus:border-sky-400 ${
-                            formErrors.companyName ? 'border-rose-500' : 'border-slate-200'
+                          className={`w-full bg-[#0d1420] border rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-sky-400 ${
+                            formErrors.companyName ? 'border-rose-500' : 'border-[#1c2433]'
                           }`}
                         />
                         {formErrors.companyName && <span className="text-[10px] text-rose-400">{formErrors.companyName}</span>}
@@ -693,8 +693,8 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                             value={vatNumber}
                             onChange={(e) => setVatNumber(e.target.value)}
                             placeholder="es. IT09876543210"
-                            className={`w-full bg-slate-50 border rounded-xl px-3 py-2 text-slate-900 placeholder-slate-500 focus:outline-none focus:border-sky-400 ${
-                              formErrors.vatNumber ? 'border-rose-500' : 'border-slate-200'
+                            className={`w-full bg-[#0d1420] border rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-sky-400 ${
+                              formErrors.vatNumber ? 'border-rose-500' : 'border-[#1c2433]'
                             }`}
                           />
                         </div>
@@ -706,7 +706,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                             value={sdiCode}
                             onChange={(e) => setSdiCode(e.target.value)}
                             placeholder="es. AUR789K o PEC"
-                            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 placeholder-slate-500 focus:outline-none focus:border-sky-400"
+                            className="w-full bg-[#0d1420] border border-[#1c2433] rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-sky-400"
                           />
                         </div>
                       </div>
@@ -720,8 +720,8 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                         value={fiscalCode}
                         onChange={(e) => setFiscalCode(e.target.value.toUpperCase())}
                         placeholder="es. RCISMN85T10F205Z"
-                        className={`w-full bg-slate-50 border rounded-xl px-3 py-2 text-slate-900 uppercase placeholder-slate-500 focus:outline-none focus:border-emerald-400 ${
-                          formErrors.fiscalCode ? 'border-rose-500' : 'border-slate-200'
+                        className={`w-full bg-[#0d1420] border rounded-xl px-3 py-2 text-white uppercase placeholder-slate-500 focus:outline-none focus:border-emerald-400 ${
+                          formErrors.fiscalCode ? 'border-rose-500' : 'border-[#1c2433]'
                         }`}
                       />
                       {formErrors.fiscalCode && <span className="text-[10px] text-rose-400">{formErrors.fiscalCode}</span>}
@@ -739,8 +739,8 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
                       placeholder="es. Simone Aricò"
-                      className={`w-full bg-slate-50 border rounded-xl px-3 py-2 text-slate-900 placeholder-slate-500 focus:outline-none focus:border-sky-400 ${
-                        formErrors.fullName ? 'border-rose-500' : 'border-slate-200'
+                      className={`w-full bg-[#0d1420] border rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-sky-400 ${
+                        formErrors.fullName ? 'border-rose-500' : 'border-[#1c2433]'
                       }`}
                     />
                     {formErrors.fullName && <span className="text-[10px] text-rose-400">{formErrors.fullName}</span>}
@@ -755,8 +755,8 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="nome@dominio.it"
-                        className={`w-full bg-slate-50 border rounded-xl px-3 py-2 text-slate-900 placeholder-slate-500 focus:outline-none focus:border-sky-400 ${
-                          formErrors.email ? 'border-rose-500' : 'border-slate-200'
+                        className={`w-full bg-[#0d1420] border rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-sky-400 ${
+                          formErrors.email ? 'border-rose-500' : 'border-[#1c2433]'
                         }`}
                       />
                       {formErrors.email && <span className="text-[10px] text-rose-400">{formErrors.email}</span>}
@@ -770,8 +770,8 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
                         placeholder="+39 ..."
-                        className={`w-full bg-slate-50 border rounded-xl px-3 py-2 text-slate-900 placeholder-slate-500 focus:outline-none focus:border-sky-400 ${
-                          formErrors.phone ? 'border-rose-500' : 'border-slate-200'
+                        className={`w-full bg-[#0d1420] border rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-sky-400 ${
+                          formErrors.phone ? 'border-rose-500' : 'border-[#1c2433]'
                         }`}
                       />
                       {formErrors.phone && <span className="text-[10px] text-rose-400">{formErrors.phone}</span>}
@@ -780,8 +780,8 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                 </div>
 
                 {/* 3. MODALITA CONSEGNA / RITIRO */}
-                <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3.5 space-y-3">
-                  <label className="block text-slate-600 font-bold mb-1">
+                <div className="bg-[#0d1420] border border-[#1c2433] rounded-2xl p-3.5 space-y-3">
+                  <label className="block text-slate-400 font-bold mb-1">
                     Modalità di Consegna / Ricezione Merci:
                   </label>
                   <div className="grid grid-cols-2 gap-2">
@@ -791,11 +791,11 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                       onClick={() => setDeliveryOption('corriere')}
                       className={`flex items-center justify-center gap-2 py-2 px-3 rounded-xl border text-xs font-bold transition-all ${
                         deliveryOption === 'corriere'
-                          ? 'bg-sky-500/20 text-sky-700 border-sky-400/60 shadow-xs'
-                          : 'bg-slate-50 text-slate-500 border-slate-200 hover:text-slate-900'
+                          ? 'bg-sky-500/20 text-sky-300 border-sky-400/60 shadow-xs'
+                          : 'bg-[#0d1420] text-slate-500 border-[#1c2433] hover:text-white'
                       }`}
                     >
-                      <Truck className="w-4 h-4 text-sky-600" />
+                      <Truck className="w-4 h-4 text-sky-400" />
                       <span>Spedizione Corriere</span>
                     </button>
 
@@ -805,8 +805,8 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                       onClick={() => setDeliveryOption('ritiro_sede')}
                       className={`flex items-center justify-center gap-2 py-2 px-3 rounded-xl border text-xs font-bold transition-all ${
                         deliveryOption === 'ritiro_sede'
-                          ? 'bg-sky-500/20 text-sky-700 border-sky-400/60 shadow-xs'
-                          : 'bg-slate-50 text-slate-500 border-slate-200 hover:text-slate-900'
+                          ? 'bg-sky-500/20 text-sky-300 border-sky-400/60 shadow-xs'
+                          : 'bg-[#0d1420] text-slate-500 border-[#1c2433] hover:text-white'
                       }`}
                     >
                       <Store className="w-4 h-4 text-amber-400" />
@@ -824,8 +824,8 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                           value={street}
                           onChange={(e) => setStreet(e.target.value)}
                           placeholder="es. Via dell'Industria 45, Palazzina B"
-                          className={`w-full bg-slate-50 border rounded-xl px-3 py-2 text-slate-900 placeholder-slate-500 focus:outline-none focus:border-sky-400 ${
-                            formErrors.street ? 'border-rose-500' : 'border-slate-200'
+                          className={`w-full bg-[#0d1420] border rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-sky-400 ${
+                            formErrors.street ? 'border-rose-500' : 'border-[#1c2433]'
                           }`}
                         />
                       </div>
@@ -839,7 +839,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                             value={postalCode}
                             onChange={(e) => setPostalCode(e.target.value)}
                             placeholder="20145"
-                            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 placeholder-slate-500 focus:outline-none"
+                            className="w-full bg-[#0d1420] border border-[#1c2433] rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none"
                           />
                         </div>
                         <div className="col-span-1">
@@ -850,7 +850,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                             value={city}
                             onChange={(e) => setCity(e.target.value)}
                             placeholder="Milano"
-                            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 placeholder-slate-500 focus:outline-none"
+                            className="w-full bg-[#0d1420] border border-[#1c2433] rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none"
                           />
                         </div>
                         <div className="col-span-1">
@@ -862,7 +862,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                             onChange={(e) => setProvince(e.target.value.toUpperCase())}
                             placeholder="MI"
                             maxLength={2}
-                            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 uppercase placeholder-slate-500 focus:outline-none"
+                            className="w-full bg-[#0d1420] border border-[#1c2433] rounded-xl px-3 py-2 text-white uppercase placeholder-slate-500 focus:outline-none"
                           />
                         </div>
                       </div>
@@ -875,17 +875,17 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                           value={deliveryNotes}
                           onChange={(e) => setDeliveryNotes(e.target.value)}
                           placeholder="es. Presenza sponda idraulica, orario 09:00 - 13:00"
-                          className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 placeholder-slate-500 focus:outline-none"
+                          className="w-full bg-[#0d1420] border border-[#1c2433] rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none"
                         />
                       </div>
                     </div>
                   ) : (
-                    <div className="p-3 rounded-xl bg-slate-50 border border-amber-500/30 text-amber-200/90 text-xs space-y-1">
+                    <div className="p-3 rounded-xl bg-[#0d1420] border border-amber-500/30 text-amber-200/90 text-xs space-y-1">
                       <p className="font-bold flex items-center gap-1.5 text-amber-300">
                         <Store className="w-3.5 h-3.5" />
                         <span>Punto di Ritiro Magazzino Centrale Aurora</span>
                       </p>
-                      <p className="text-[11px] text-slate-600">
+                      <p className="text-[11px] text-slate-400">
                         Via dell'Industria 45, 20145 Milano (MI) • Orari: Lun-Ven 08:00 - 18:00
                       </p>
                       <p className="text-[10px] text-slate-400 pt-1">
@@ -896,12 +896,12 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                 </div>
 
                 {/* 4. MODALITA DI PAGAMENTO B2B (NO CARTE DI CREDITO) */}
-                <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3 text-xs space-y-1.5">
-                  <div className="flex items-center gap-2 text-sky-700 font-bold">
+                <div className="bg-[#0d1420] border border-[#1c2433] rounded-2xl p-3 text-xs space-y-1.5">
+                  <div className="flex items-center gap-2 text-sky-300 font-bold">
                     <FileText className="w-3.5 h-3.5" />
                     <span>Modalità di Pagamento Convenzionata:</span>
                   </div>
-                  <p className="text-slate-600 text-[11px]">
+                  <p className="text-slate-400 text-[11px]">
                     {customerType === 'azienda'
                       ? '✓ Fatturazione B2B differita (Bonifico Bancario 30/60 gg d.f. / Ri.Ba.) senza anticipo con carta.'
                       : '✓ Pagamento alla consegna / Bonifico Bancario su ricevuta fornitura (Nessun addebito con carta online).'}
@@ -910,12 +910,12 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
               </div>
 
               {/* Form Footer */}
-              <div className="p-4 sm:p-5 border-t border-slate-200 bg-slate-50 space-y-3">
+              <div className="p-4 sm:p-5 border-t border-[#1c2433] bg-[#0d1420] space-y-3">
                 <div className="flex justify-between items-center text-xs">
                   <span className="text-slate-400">
                     {isAzienda ? 'Totale Fornitura (IVA 22% inc.):' : 'Totale Ordine (Senza IVA):'}
                   </span>
-                  <span className={`text-base font-bold font-mono ${isAzienda ? 'text-sky-600' : 'text-emerald-400'}`}>
+                  <span className={`text-base font-bold font-mono ${isAzienda ? 'text-sky-400' : 'text-emerald-400'}`}>
                     €{total.toFixed(2)}
                   </span>
                 </div>
@@ -925,7 +925,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                     type="button"
                     id="back-to-cart-items-btn"
                     onClick={() => setStep('cart')}
-                    className="px-4 py-3 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-600 text-xs font-bold transition-colors"
+                    className="px-4 py-3 rounded-xl bg-[#0d1420] hover:bg-[#1a2230] text-slate-400 text-xs font-bold transition-colors"
                   >
                     Indietro
                   </button>
@@ -949,31 +949,31 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
               <div className="w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mb-4">
                 <CheckCircle2 className="w-10 h-10 animate-bounce" />
               </div>
-              <h4 className="text-xl font-bold text-slate-900 mb-1.5">Richiesta Ordine Inviata!</h4>
-              <p className="text-slate-600 text-xs leading-relaxed max-w-sm mb-3">
-                Il tuo ordine è stato registrato nel sistema logistico Aurora. Abbiamo inviato la copia di conferma via e-mail all'indirizzo <strong className="text-sky-700">{email}</strong>.
+              <h4 className="text-xl font-bold text-white mb-1.5">Richiesta Ordine Inviata!</h4>
+              <p className="text-slate-400 text-xs leading-relaxed max-w-sm mb-3">
+                Il tuo ordine è stato registrato nel sistema logistico Aurora. Abbiamo inviato la copia di conferma via e-mail all'indirizzo <strong className="text-sky-300">{email}</strong>.
               </p>
 
-              <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 w-full text-left space-y-2 mb-4 text-xs">
-                <div className="flex justify-between border-b border-slate-200 pb-2">
+              <div className="bg-[#0d1420] border border-[#1c2433] rounded-2xl p-4 w-full text-left space-y-2 mb-4 text-xs">
+                <div className="flex justify-between border-b border-[#1c2433] pb-2">
                   <span className="text-slate-400">Codice Ordine:</span>
-                  <span className="font-mono text-sky-600 font-bold">{lastSubmittedOrder?.id}</span>
+                  <span className="font-mono text-sky-400 font-bold">{lastSubmittedOrder?.id}</span>
                 </div>
-                <div className="flex justify-between border-b border-slate-200 pb-2">
+                <div className="flex justify-between border-b border-[#1c2433] pb-2">
                   <span className="text-slate-400">Intestatario:</span>
-                  <span className="text-slate-900 font-medium">
+                  <span className="text-white font-medium">
                     {lastSubmittedOrder?.shippingAddress?.companyName || lastSubmittedOrder?.shippingAddress?.recipient}
                   </span>
                 </div>
-                <div className="flex justify-between border-b border-slate-200 pb-2">
+                <div className="flex justify-between border-b border-[#1c2433] pb-2">
                   <span className="text-slate-400">Modalità Consegna:</span>
-                  <span className="text-slate-700">
+                  <span className="text-slate-300">
                     {lastSubmittedOrder?.shippingAddress?.deliveryOption === 'ritiro_sede' ? 'Ritiro in Sede' : 'Spedizione Corriere'}
                   </span>
                 </div>
                 <div className="flex justify-between pt-1">
                   <span className="text-slate-400">Totale Documento:</span>
-                  <span className="text-sky-600 font-bold font-mono">€{lastSubmittedOrder?.total.toFixed(2)}</span>
+                  <span className="text-sky-400 font-bold font-mono">€{lastSubmittedOrder?.total.toFixed(2)}</span>
                 </div>
               </div>
 

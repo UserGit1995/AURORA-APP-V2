@@ -188,11 +188,11 @@ export const ProductImageUploader: React.FC<ProductImageUploaderProps> = ({
   const isUploadedFromPc = currentImage?.startsWith('data:image/');
 
   return (
-    <div className="space-y-3 bg-slate-50/70 p-4 rounded-2xl border border-slate-800">
+    <div className="space-y-3 bg-[#0d1420]/70 p-4 rounded-2xl border border-slate-800">
       {/* Header & Tabs */}
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-2.5">
         <div>
-          <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+          <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider">
             Foto & Immagine Prodotto
           </label>
           <p className="text-[11px] text-slate-400">
@@ -201,7 +201,7 @@ export const ProductImageUploader: React.FC<ProductImageUploaderProps> = ({
         </div>
 
         {/* Tab Switcher */}
-        <div className="flex items-center gap-1 bg-slate-50 p-1 rounded-xl border border-slate-800 text-xs">
+        <div className="flex items-center gap-1 bg-[#0d1420] p-1 rounded-xl border border-slate-800 text-xs">
           <button
             type="button"
             onClick={() => setActiveTab('upload')}
@@ -255,7 +255,7 @@ export const ProductImageUploader: React.FC<ProductImageUploaderProps> = ({
             className={`relative border-2 border-dashed rounded-2xl p-5 text-center cursor-pointer transition-all ${
               isDragging
                 ? 'border-amber-400 bg-amber-500/15 scale-[1.01]'
-                : 'border-slate-700 hover:border-amber-500/50 bg-slate-50/80 hover:bg-slate-100'
+                : 'border-slate-700 hover:border-amber-500/50 bg-[#111826]/80 hover:bg-[#1a2230]'
             }`}
           >
             <input
@@ -278,14 +278,14 @@ export const ProductImageUploader: React.FC<ProductImageUploaderProps> = ({
                   <UploadCloud className="w-6 h-6" />
                 </div>
                 <div>
-                  <p className="text-xs sm:text-sm font-bold text-slate-800">
+                  <p className="text-xs sm:text-sm font-bold text-slate-100">
                     <span className="text-amber-400 underline underline-offset-2">Fai clic per selezionare</span> o trascina qui l'immagine dal computer
                   </p>
                   <p className="text-[11px] text-slate-400 mt-0.5">
                     Supporta PNG, JPG, JPEG, WEBP, GIF, SVG (fino a 15MB)
                   </p>
                 </div>
-                <span className="inline-flex items-center gap-1 text-[10px] font-mono uppercase px-2 py-0.5 rounded-full bg-slate-800 text-slate-600 border border-slate-700 mt-1">
+                <span className="inline-flex items-center gap-1 text-[10px] font-mono uppercase px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700 mt-1">
                   <FolderOpen className="w-3 h-3 text-amber-400" /> Sfoglia file locali
                 </span>
               </div>
@@ -309,7 +309,7 @@ export const ProductImageUploader: React.FC<ProductImageUploaderProps> = ({
               value={urlInput}
               onChange={(e) => setUrlInput(e.target.value)}
               placeholder="Incolla URL immagine (es. https://example.com/foto.jpg)"
-              className="flex-1 bg-slate-50 border border-slate-700 focus:border-amber-400 rounded-xl px-3.5 py-2 text-xs text-white outline-none font-mono"
+              className="flex-1 bg-[#0d1420] border border-slate-700 focus:border-amber-400 rounded-xl px-3.5 py-2 text-xs text-white outline-none font-mono"
             />
             <button
               type="button"
@@ -343,13 +343,13 @@ export const ProductImageUploader: React.FC<ProductImageUploaderProps> = ({
                 className={`p-2 rounded-xl border text-left flex items-center gap-2 transition-all cursor-pointer ${
                   currentImage === preset.url
                     ? 'border-amber-400 bg-amber-500/15 text-amber-300'
-                    : 'border-slate-800 bg-slate-50 hover:border-slate-700 text-slate-600'
+                    : 'border-slate-800 bg-[#0d1420] hover:border-slate-700 text-slate-400'
                 }`}
               >
                 <img
                   src={preset.url}
                   alt={preset.label}
-                  className="w-7 h-7 rounded-lg object-contain bg-white/5 border border-slate-700"
+                  className="w-7 h-7 rounded-lg object-contain bg-[#0e1b30]/5 border border-slate-700"
                 />
                 <span className="text-[11px] font-bold truncate">{preset.label}</span>
               </button>
@@ -360,7 +360,7 @@ export const ProductImageUploader: React.FC<ProductImageUploaderProps> = ({
 
       {/* Current Image Preview Bar */}
       {currentImage ? (
-        <div className="pt-2 border-t border-slate-800 flex flex-wrap items-center justify-between gap-3 bg-slate-50/90 p-3 rounded-xl border border-slate-800">
+        <div className="pt-2 border-t border-slate-800 flex flex-wrap items-center justify-between gap-3 bg-[#0d1420]/90 p-3 rounded-xl border border-slate-800">
           <div className="flex items-center gap-3 min-w-0">
             <div className="relative w-14 h-14 rounded-xl bg-black/40 border border-amber-500/40 p-1 flex items-center justify-center shrink-0 overflow-hidden group">
               <img
@@ -391,7 +391,7 @@ export const ProductImageUploader: React.FC<ProductImageUploaderProps> = ({
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-700 text-xs font-semibold border border-slate-700 transition-colors flex items-center gap-1 cursor-pointer"
+              className="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold border border-slate-700 transition-colors flex items-center gap-1 cursor-pointer"
             >
               <UploadCloud className="w-3.5 h-3.5 text-amber-400" />
               <span>Sostituisci</span>
@@ -408,7 +408,7 @@ export const ProductImageUploader: React.FC<ProductImageUploaderProps> = ({
           </div>
         </div>
       ) : (
-        <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-center text-xs text-slate-500">
+        <div className="p-2.5 rounded-xl bg-[#0d1420] border border-[#1c2433] text-center text-xs text-slate-500">
           Nessuna immagine impostata. Verrà visualizzato il logo placeholder AURORA.
         </div>
       )}

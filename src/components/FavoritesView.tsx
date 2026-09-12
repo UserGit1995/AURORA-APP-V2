@@ -32,7 +32,7 @@ export const FavoritesView: React.FC<FavoritesViewProps> = ({
             <Heart className="w-5 h-5 fill-rose-400" />
           </div>
           <div>
-            <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
+            <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
               Prodotti Preferiti e Riordino Rapido
             </h2>
             <p className="text-xs text-slate-400 mt-0.5">
@@ -45,7 +45,7 @@ export const FavoritesView: React.FC<FavoritesViewProps> = ({
       {favoriteProducts.length === 0 ? (
         <div
           id="favorites-empty-container"
-          className="relative overflow-hidden bg-gradient-to-b from-white to-sky-50 border border-slate-200 rounded-3xl p-8 sm:p-14 text-center flex flex-col items-center justify-center shadow-xl"
+          className="relative overflow-hidden bg-gradient-to-b from-white to-sky-50 border border-[#1c2433] rounded-3xl p-8 sm:p-14 text-center flex flex-col items-center justify-center shadow-xl"
         >
           {/* Background ambient lighting effects */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-rose-500/5 rounded-full blur-3xl pointer-events-none" />
@@ -54,30 +54,30 @@ export const FavoritesView: React.FC<FavoritesViewProps> = ({
           {/* Visual CSS + Lucide Illustration */}
           <div className="relative mb-6 flex items-center justify-center">
             {/* Outer dotted orbit */}
-            <div className="w-32 h-32 rounded-full border border-dashed border-slate-200 flex items-center justify-center animate-[spin_40s_linear_infinite]" />
+            <div className="w-32 h-32 rounded-full border border-dashed border-[#1c2433] flex items-center justify-center animate-[spin_40s_linear_infinite]" />
 
             {/* Orbiting mini badges */}
-            <div className="absolute -top-1 -right-1 p-2 rounded-xl bg-slate-50 border border-slate-200 text-rose-400 shadow-md">
+            <div className="absolute -top-1 -right-1 p-2 rounded-xl bg-[#0d1420] border border-[#1c2433] text-rose-400 shadow-md">
               <Heart className="w-3.5 h-3.5 fill-rose-400/80" />
             </div>
-            <div className="absolute -bottom-1 -left-1 p-2 rounded-xl bg-slate-50 border border-slate-200 text-amber-400 shadow-md">
+            <div className="absolute -bottom-1 -left-1 p-2 rounded-xl bg-[#0d1420] border border-[#1c2433] text-amber-400 shadow-md">
               <Sparkles className="w-3.5 h-3.5" />
             </div>
-            <div className="absolute top-1/2 -right-4 -translate-y-1/2 p-1.5 rounded-lg bg-slate-50 border border-slate-200 text-sky-600 shadow-md">
+            <div className="absolute top-1/2 -right-4 -translate-y-1/2 p-1.5 rounded-lg bg-[#0d1420] border border-[#1c2433] text-sky-400 shadow-md">
               <Bookmark className="w-3 h-3" />
             </div>
 
             {/* Central glowing illustration bubble */}
-            <div className="absolute w-20 h-20 rounded-2xl bg-gradient-to-br from-white to-sky-50 border border-slate-200 flex items-center justify-center text-rose-400 shadow-[0_0_24px_rgba(244,63,94,0.15)]">
+            <div className="absolute w-20 h-20 rounded-2xl bg-gradient-to-br from-white to-sky-50 border border-[#1c2433] flex items-center justify-center text-rose-400 shadow-[0_0_24px_rgba(244,63,94,0.15)]">
               <div className="relative">
                 <Heart className="w-9 h-9 stroke-[1.5] text-rose-400/50" />
-                <PackageSearch className="w-5 h-5 text-sky-700 absolute -bottom-1 -right-2" />
+                <PackageSearch className="w-5 h-5 text-sky-300 absolute -bottom-1 -right-2" />
               </div>
             </div>
           </div>
 
           {/* Text Details */}
-          <h3 className="text-lg sm:text-xl font-bold text-slate-900 tracking-tight mb-2">
+          <h3 className="text-lg sm:text-xl font-bold text-white tracking-tight mb-2">
             La tua lista preferiti è vuota
           </h3>
           <p className="text-xs sm:text-sm text-slate-400 max-w-md mx-auto leading-relaxed mb-7">
@@ -107,10 +107,10 @@ export const FavoritesView: React.FC<FavoritesViewProps> = ({
                 key={product.id}
                 id={`favorites-product-card-${product.id}`}
                 onClick={() => onSelectProduct(product)}
-                className={`group cursor-pointer bg-slate-50 hover:bg-slate-100 border rounded-2xl p-3 flex flex-col justify-between transition-all duration-200 ${
+                className={`group cursor-pointer bg-[#0d1420] hover:bg-[#1a2230] border rounded-2xl p-3 flex flex-col justify-between transition-all duration-200 ${
                   isCompared
                     ? 'border-amber-500/50 ring-1 ring-amber-500/30'
-                    : 'border-slate-200 hover:border-sky-300'
+                    : 'border-[#1c2433] hover:border-sky-500/50'
                 }`}
               >
                 <div className="flex items-center justify-between mb-1 gap-1">
@@ -138,7 +138,7 @@ export const FavoritesView: React.FC<FavoritesViewProps> = ({
                         className={`p-1.5 rounded-full transition-colors ${
                           isCompared
                             ? 'text-amber-300 bg-amber-500/20 border border-amber-500/40'
-                            : 'text-slate-500 hover:text-slate-900 bg-slate-50/80 hover:bg-slate-100'
+                            : 'text-slate-500 hover:text-white bg-[#111826]/80 hover:bg-[#1a2230]'
                         }`}
                         title={isCompared ? 'Rimuovi dal confronto' : 'Aggiungi al confronto'}
                       >
@@ -160,7 +160,7 @@ export const FavoritesView: React.FC<FavoritesViewProps> = ({
                   </div>
                 </div>
 
-                <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-white border border-slate-200 shadow-xs flex items-center justify-center p-2 mb-2">
+                <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-[#0e1b30] border border-[#1c2433] shadow-xs flex items-center justify-center p-2 mb-2">
                   <img
                     src={product.image}
                     alt={product.name}
@@ -170,7 +170,7 @@ export const FavoritesView: React.FC<FavoritesViewProps> = ({
                 </div>
 
                 <div className="text-left">
-                  <h3 className="text-slate-900 text-xs font-bold truncate leading-tight">
+                  <h3 className="text-white text-xs font-bold truncate leading-tight">
                     {product.name}
                   </h3>
                   <div className="flex items-center justify-between gap-1 mt-0.5">
@@ -182,18 +182,18 @@ export const FavoritesView: React.FC<FavoritesViewProps> = ({
                     )}
                   </div>
 
-                  <div className="flex items-center justify-between mt-2.5 pt-1.5 border-t border-slate-200">
+                  <div className="flex items-center justify-between mt-2.5 pt-1.5 border-t border-[#1c2433]">
                     <div>
                       {isBusinessCustomer ? (
-                        <span className="text-slate-900 text-xs font-bold">€{(product.price * 1.22).toFixed(2)}</span>
+                        <span className="text-white text-xs font-bold">€{(product.price * 1.22).toFixed(2)}</span>
                       ) : (
-                        <span className="text-slate-900 text-xs font-bold">€{product.price.toFixed(2)}</span>
+                        <span className="text-white text-xs font-bold">€{product.price.toFixed(2)}</span>
                       )}
                     </div>
                     <button
                       id={`fav-add-cart-btn-${product.id}`}
                       onClick={(e) => onAddToCart(product, e)}
-                      className="p-1 rounded-lg bg-slate-50 hover:bg-[#0284c7] text-slate-600 hover:text-slate-900 transition-colors"
+                      className="p-1 rounded-lg bg-[#0d1420] hover:bg-[#0284c7] text-slate-400 hover:text-white transition-colors"
                       title="Aggiungi al carrello"
                     >
                       <Plus className="w-3.5 h-3.5" />

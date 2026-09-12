@@ -316,10 +316,10 @@ export const PurchaseVelocityChart: React.FC = () => {
       {/* Top Header Summary & KPI Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {/* KPI 1: Purchase Velocity */}
-        <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3.5 flex flex-col justify-between">
+        <div className="bg-[#0d1420] border border-[#1c2433] rounded-2xl p-3.5 flex flex-col justify-between">
           <div className="flex items-center justify-between text-slate-400">
             <span className="text-[11px] font-semibold uppercase tracking-wider">Velocità Riordino</span>
-            <div className="w-6 h-6 rounded-lg bg-sky-500/20 text-sky-600 flex items-center justify-center">
+            <div className="w-6 h-6 rounded-lg bg-sky-500/20 text-sky-400 flex items-center justify-center">
               <Zap className="w-3.5 h-3.5" />
             </div>
           </div>
@@ -335,7 +335,7 @@ export const PurchaseVelocityChart: React.FC = () => {
         </div>
 
         {/* KPI 2: Total Volume */}
-        <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3.5 flex flex-col justify-between">
+        <div className="bg-[#0d1420] border border-[#1c2433] rounded-2xl p-3.5 flex flex-col justify-between">
           <div className="flex items-center justify-between text-slate-400">
             <span className="text-[11px] font-semibold uppercase tracking-wider">Volume Totale 2026</span>
             <div className="w-6 h-6 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center">
@@ -356,7 +356,7 @@ export const PurchaseVelocityChart: React.FC = () => {
         </div>
 
         {/* KPI 3: Top Category Rotation */}
-        <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3.5 flex flex-col justify-between">
+        <div className="bg-[#0d1420] border border-[#1c2433] rounded-2xl p-3.5 flex flex-col justify-between">
           <div className="flex items-center justify-between text-slate-400">
             <span className="text-[11px] font-semibold uppercase tracking-wider">Top Categoria</span>
             <div className="w-6 h-6 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center">
@@ -373,7 +373,7 @@ export const PurchaseVelocityChart: React.FC = () => {
         </div>
 
         {/* KPI 4: Seasonal Spike Projection */}
-        <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3.5 flex flex-col justify-between">
+        <div className="bg-[#0d1420] border border-[#1c2433] rounded-2xl p-3.5 flex flex-col justify-between">
           <div className="flex items-center justify-between text-slate-400">
             <span className="text-[11px] font-semibold uppercase tracking-wider">Picco Stagionale</span>
             <div className="w-6 h-6 rounded-lg bg-purple-500/20 text-purple-400 flex items-center justify-center">
@@ -390,10 +390,10 @@ export const PurchaseVelocityChart: React.FC = () => {
       </div>
 
       {/* Chart Control Bar */}
-      <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3.5 space-y-3">
+      <div className="bg-[#0d1420] border border-[#1c2433] rounded-2xl p-3.5 space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-2.5">
           <div className="flex items-center gap-2">
-            <div className="p-1.5 rounded-lg bg-sky-500/20 text-sky-600">
+            <div className="p-1.5 rounded-lg bg-sky-500/20 text-sky-400">
               <Activity className="w-4 h-4" />
             </div>
             <div>
@@ -410,14 +410,14 @@ export const PurchaseVelocityChart: React.FC = () => {
           </div>
 
           {/* View Mode Switcher */}
-          <div className="flex items-center bg-slate-50 border border-slate-200 rounded-xl p-1 gap-1">
+          <div className="flex items-center bg-[#0d1420] border border-[#1c2433] rounded-xl p-1 gap-1">
             <button
               type="button"
               onClick={() => setViewMode('both_years')}
               className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all ${
                 viewMode === 'both_years'
                   ? 'bg-sky-500 text-white shadow-sm'
-                  : 'text-slate-400 hover:text-slate-700'
+                  : 'text-slate-400 hover:text-slate-300'
               }`}
             >
               Multi-Categoria (2026 vs 2025)
@@ -428,7 +428,7 @@ export const PurchaseVelocityChart: React.FC = () => {
               className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all ${
                 viewMode === '2026_only'
                   ? 'bg-sky-500 text-white shadow-sm'
-                  : 'text-slate-400 hover:text-slate-700'
+                  : 'text-slate-400 hover:text-slate-300'
               }`}
             >
               Solo 2026
@@ -439,7 +439,7 @@ export const PurchaseVelocityChart: React.FC = () => {
               className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all ${
                 viewMode === 'single_category_yoy'
                   ? 'bg-sky-500 text-white shadow-sm'
-                  : 'text-slate-400 hover:text-slate-700'
+                  : 'text-slate-400 hover:text-slate-300'
               }`}
             >
               Focus Categoria YoY
@@ -448,7 +448,7 @@ export const PurchaseVelocityChart: React.FC = () => {
         </div>
 
         {/* Timeframe & Category Selectors */}
-        <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-200">
+        <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-[#1c2433]">
           {viewMode !== 'single_category_yoy' ? (
             /* Multi Category Checkbox Pills */
             <div className="flex flex-wrap items-center gap-1.5">
@@ -462,8 +462,8 @@ export const PurchaseVelocityChart: React.FC = () => {
                     onClick={() => toggleCategory(cat.id)}
                     className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-semibold border transition-all ${
                       isSelected
-                        ? 'bg-slate-50 border-slate-600 text-slate-900 shadow-xs'
-                        : 'bg-slate-50 border-slate-200 text-slate-500 hover:text-slate-600'
+                        ? 'bg-[#0d1420] border-slate-600 text-white shadow-xs'
+                        : 'bg-[#0d1420] border-[#1c2433] text-slate-500 hover:text-slate-400'
                     }`}
                   >
                     <span
@@ -490,7 +490,7 @@ export const PurchaseVelocityChart: React.FC = () => {
                     className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-semibold border transition-all ${
                       isFocus
                         ? 'bg-sky-500/20 border-sky-400 text-sky-200 shadow-xs'
-                        : 'bg-slate-50 border-slate-200 text-slate-400 hover:text-slate-700'
+                        : 'bg-[#0d1420] border-[#1c2433] text-slate-400 hover:text-slate-300'
                     }`}
                   >
                     <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: cat.color }} />
@@ -502,14 +502,14 @@ export const PurchaseVelocityChart: React.FC = () => {
           )}
 
           {/* Time range selector */}
-          <div className="flex items-center gap-1 bg-slate-50 border border-slate-200 rounded-lg p-0.5">
+          <div className="flex items-center gap-1 bg-[#0d1420] border border-[#1c2433] rounded-lg p-0.5">
             <button
               type="button"
               onClick={() => setTimeRange('ytd')}
               className={`px-2 py-0.5 rounded-md text-[10.5px] font-semibold transition-colors ${
                 timeRange === 'ytd'
-                  ? 'bg-slate-700 text-slate-900 shadow-xs'
-                  : 'text-slate-400 hover:text-slate-700'
+                  ? 'bg-slate-700 text-white shadow-xs'
+                  : 'text-slate-400 hover:text-slate-300'
               }`}
             >
               YTD (Gen-Ago)
@@ -519,8 +519,8 @@ export const PurchaseVelocityChart: React.FC = () => {
               onClick={() => setTimeRange('full_year')}
               className={`px-2 py-0.5 rounded-md text-[10.5px] font-semibold transition-colors ${
                 timeRange === 'full_year'
-                  ? 'bg-slate-700 text-slate-900 shadow-xs'
-                  : 'text-slate-400 hover:text-slate-700'
+                  ? 'bg-slate-700 text-white shadow-xs'
+                  : 'text-slate-400 hover:text-slate-300'
               }`}
             >
               12 Mesi Completi
@@ -555,12 +555,12 @@ export const PurchaseVelocityChart: React.FC = () => {
                   if (active && payload && payload.length) {
                     const monthObj = MONTHLY_PURCHASE_DATA.find((m) => m.month === label);
                     return (
-                      <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 shadow-2xl text-left pointer-events-none min-w-56 z-50">
-                        <div className="flex items-center justify-between pb-1.5 mb-2 border-b border-slate-200">
-                          <span className="text-xs font-bold text-slate-900">
+                      <div className="bg-[#0d1420] border border-[#1c2433] rounded-xl p-3 shadow-2xl text-left pointer-events-none min-w-56 z-50">
+                        <div className="flex items-center justify-between pb-1.5 mb-2 border-b border-[#1c2433]">
+                          <span className="text-xs font-bold text-white">
                             {monthObj?.fullName || label}
                           </span>
-                          <span className="text-[10px] text-sky-600 font-mono">Consumo Mensile</span>
+                          <span className="text-[10px] text-sky-400 font-mono">Consumo Mensile</span>
                         </div>
 
                         <div className="space-y-1.5">
@@ -575,11 +575,11 @@ export const PurchaseVelocityChart: React.FC = () => {
                                     className="w-2.5 h-2.5 rounded-full shrink-0"
                                     style={{ backgroundColor: entry.color }}
                                   />
-                                  <span className="text-slate-600 text-[11px] truncate max-w-36">
+                                  <span className="text-slate-400 text-[11px] truncate max-w-36">
                                     {entry.name}
                                   </span>
                                 </div>
-                                <span className="font-mono font-bold text-slate-900 text-[11.5px]">
+                                <span className="font-mono font-bold text-white text-[11.5px]">
                                   {entry.value} <span className="text-[9.5px] text-slate-400 font-normal">colli</span>
                                 </span>
                               </div>
@@ -661,7 +661,7 @@ export const PurchaseVelocityChart: React.FC = () => {
         </div>
 
         {/* Footer Category Legend / Velocity Breakdown */}
-        <div className="mt-2 pt-2 border-t border-slate-200 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 text-xs">
+        <div className="mt-2 pt-2 border-t border-[#1c2433] grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 text-xs">
           {VELOCITY_CATEGORIES.filter((cat) =>
             viewMode === 'single_category_yoy'
               ? cat.id === focusedSingleCategoryId
@@ -669,19 +669,19 @@ export const PurchaseVelocityChart: React.FC = () => {
           ).map((cat) => (
             <div
               key={cat.id}
-              className="bg-slate-50 border border-slate-200 rounded-xl p-2.5 flex items-center justify-between"
+              className="bg-[#0d1420] border border-[#1c2433] rounded-xl p-2.5 flex items-center justify-between"
             >
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: cat.color }} />
                 <div>
-                  <span className="font-semibold text-slate-700 text-[11px] block">{cat.name}</span>
+                  <span className="font-semibold text-slate-300 text-[11px] block">{cat.name}</span>
                   <span className="text-[10px] text-slate-400 font-mono">
                     Ciclo: {cat.avgReorderDays} gg • Rot: {cat.turnoverRate}
                   </span>
                 </div>
               </div>
               <div className="text-right">
-                <span className="font-bold text-slate-900 font-mono text-xs block">
+                <span className="font-bold text-white font-mono text-xs block">
                   {cat.totalUnits2026} <span className="text-[10px] text-slate-400 font-normal">colli</span>
                 </span>
                 <span className="text-[10px] text-emerald-400 font-semibold font-mono">
@@ -694,18 +694,18 @@ export const PurchaseVelocityChart: React.FC = () => {
       </div>
 
       {/* AI Purchase Velocity Insights Note */}
-      <div className="bg-slate-50 border border-sky-500/30 rounded-2xl p-3 px-4 flex items-start gap-3">
-        <div className="p-1.5 rounded-xl bg-sky-500/20 text-sky-600 shrink-0 mt-0.5">
+      <div className="bg-[#0d1420] border border-sky-500/30 rounded-2xl p-3 px-4 flex items-start gap-3">
+        <div className="p-1.5 rounded-xl bg-sky-500/20 text-sky-400 shrink-0 mt-0.5">
           <Sparkles className="w-4 h-4" />
         </div>
         <div className="text-xs">
           <h5 className="font-bold text-sky-200 flex items-center gap-1.5">
             <span>Analisi Predittiva Velocità & Consumi B2B</span>
-            <span className="text-[10px] px-1.5 py-0.2 rounded bg-sky-500/20 text-sky-700 font-mono">
+            <span className="text-[10px] px-1.5 py-0.2 rounded bg-sky-500/20 text-sky-300 font-mono">
               Algoritmo Aurora AI
             </span>
           </h5>
-          <p className="text-slate-600 mt-0.5 leading-relaxed">
+          <p className="text-slate-400 mt-0.5 leading-relaxed">
             La categoria <strong>Carta & Monouso</strong> e <strong>Profumatori</strong> registrano la massima
             accelerazione di consumo (<span className="text-emerald-400 font-semibold">+29.1% e +31.4% YoY</span>).
             Si consiglia di programmare il riordino scorte automatico con <strong>14 giorni di anticipo</strong> rispetto

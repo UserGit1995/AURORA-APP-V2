@@ -183,18 +183,18 @@ export const ImageImportTool: React.FC = () => {
   return (
     <div className="p-4 sm:p-6 overflow-y-auto flex-1 space-y-5 text-left">
       <div className="flex items-center gap-2">
-        <ImageIcon className="w-4 h-4 text-sky-600" />
-        <h3 className="text-sm font-bold text-slate-900">Importa immagini in blocco</h3>
+        <ImageIcon className="w-4 h-4 text-sky-400" />
+        <h3 className="text-sm font-bold text-white">Importa immagini in blocco</h3>
       </div>
 
-      <div className="bg-white border border-slate-200 rounded-2xl p-4 text-xs text-slate-500 space-y-2">
+      <div className="bg-[#0e1b30] border border-[#1c2433] rounded-2xl p-4 text-xs text-slate-500 space-y-2">
         <p>
           Scegli la cartella con le foto salvate sul tuo PC (va bene anche con le sottocartelle per marca) oppure un
-          file CSV con colonne <b className="text-slate-900">Nome</b> e <b className="text-slate-900">Immagine</b>.
+          file CSV con colonne <b className="text-white">Nome</b> e <b className="text-white">Immagine</b>.
         </p>
         <p>
           Ogni foto viene confrontata con i tuoi articoli già caricati.{' '}
-          <b className="text-amber-600">Non viene applicato nulla finché non confermi tu</b> — controlla ogni
+          <b className="text-amber-400">Non viene applicato nulla finché non confermi tu</b> — controlla ogni
           abbinamento prima. Solo l'immagine viene aggiornata: nome, prezzo, categoria e tutto il resto del prodotto
           restano invariati.
         </p>
@@ -237,7 +237,7 @@ export const ImageImportTool: React.FC = () => {
         <button
           onClick={() => fileRef.current?.click()}
           disabled={isReadingFolder}
-          className="px-4 py-2.5 bg-white hover:bg-slate-50 disabled:opacity-50 border border-slate-200 text-slate-700 font-semibold text-xs rounded-xl flex items-center gap-2"
+          className="px-4 py-2.5 bg-[#0e1b30] hover:bg-[#111826] disabled:opacity-50 border border-[#1c2433] text-slate-300 font-semibold text-xs rounded-xl flex items-center gap-2"
         >
           <Upload className="w-4 h-4" />
           oppure scegli file CSV
@@ -246,10 +246,10 @@ export const ImageImportTool: React.FC = () => {
 
       {rows.length > 0 && (
         <>
-          <div className="flex flex-wrap items-center justify-between gap-2 bg-white border border-slate-200 rounded-xl p-3">
-            <span className="text-xs text-slate-600">
-              {rows.length} immagini lette — <b className="text-emerald-600">{confirmedCount}</b> pronte da applicare
-              {unmatchedCount > 0 && <span className="text-amber-600"> · {unmatchedCount} senza corrispondenza</span>}
+          <div className="flex flex-wrap items-center justify-between gap-2 bg-[#0e1b30] border border-[#1c2433] rounded-xl p-3">
+            <span className="text-xs text-slate-400">
+              {rows.length} immagini lette — <b className="text-emerald-400">{confirmedCount}</b> pronte da applicare
+              {unmatchedCount > 0 && <span className="text-amber-400"> · {unmatchedCount} senza corrispondenza</span>}
             </span>
             <button
               onClick={handleApply}
@@ -262,7 +262,7 @@ export const ImageImportTool: React.FC = () => {
           </div>
 
           {applied > 0 && (
-            <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs rounded-xl p-3">
+            <div className="bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs rounded-xl p-3">
               ✓ {applied} immagini salvate.
             </div>
           )}
@@ -275,26 +275,26 @@ export const ImageImportTool: React.FC = () => {
                 <div
                   key={idx}
                   className={`p-3 rounded-xl border text-xs flex items-center gap-3 ${
-                    row.confirmed ? 'border-emerald-300 bg-emerald-50/50' : 'border-slate-200 bg-white'
+                    row.confirmed ? 'border-emerald-500/40 bg-emerald-500/15/50' : 'border-[#1c2433] bg-[#0e1b30]'
                   }`}
                 >
-                  <img src={row.imageUrl} alt="" className="w-12 h-12 rounded-lg object-cover bg-slate-100 shrink-0 border border-slate-200" onError={(e) => ((e.target as HTMLImageElement).style.opacity = '0.2')} />
+                  <img src={row.imageUrl} alt="" className="w-12 h-12 rounded-lg object-cover bg-[#161f30] shrink-0 border border-[#1c2433]" onError={(e) => ((e.target as HTMLImageElement).style.opacity = '0.2')} />
                   <div className="flex-1 min-w-0">
-                    <p className="text-slate-400 truncate">File: <span className="text-slate-700">{row.sourceName}</span></p>
+                    <p className="text-slate-400 truncate">File: <span className="text-slate-300">{row.sourceName}</span></p>
                     <div className="flex items-center gap-1.5 mt-1">
                       {isStrong ? (
                         <Check className="w-3 h-3 text-emerald-500 shrink-0" />
                       ) : (
                         <AlertTriangle className="w-3 h-3 text-amber-500 shrink-0" />
                       )}
-                      <span className={`truncate ${isStrong ? 'text-emerald-700' : 'text-amber-700'}`}>
+                      <span className={`truncate ${isStrong ? 'text-emerald-300' : 'text-amber-300'}`}>
                         {matched ? matched.name : 'Nessuna corrispondenza trovata'} ({row.confidence}%)
                       </span>
                     </div>
                     <select
                       value={row.matchedProductId || ''}
                       onChange={(e) => overrideMatch(idx, e.target.value)}
-                      className="mt-1.5 w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-[11px] text-slate-900 outline-none"
+                      className="mt-1.5 w-full bg-[#0e1b30] border border-[#1c2433] rounded-lg px-2 py-1 text-[11px] text-white outline-none"
                     >
                       <option value="">— Correggi manualmente, scegli il prodotto giusto —</option>
                       {productsList.map((p) => (
@@ -306,7 +306,7 @@ export const ImageImportTool: React.FC = () => {
                     onClick={() => toggleConfirm(idx)}
                     disabled={!row.matchedProductId}
                     className={`shrink-0 p-2 rounded-lg ${
-                      row.confirmed ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-400'
+                      row.confirmed ? 'bg-emerald-500 text-white' : 'bg-[#161f30] text-slate-400'
                     } disabled:opacity-30`}
                     title={row.confirmed ? 'Confermato — clicca per annullare' : 'Conferma questo abbinamento'}
                   >

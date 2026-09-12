@@ -237,7 +237,7 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
         );
       case 'Spedito':
         return (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-sky-500/15 text-sky-700 border border-sky-500/30 shadow-xs">
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-sky-500/15 text-sky-300 border border-sky-500/30 shadow-xs">
             <span className="w-1.5 h-1.5 rounded-full bg-sky-400 animate-ping" />
             <Truck className="w-3 h-3" />
             <span>{language === 'it' ? 'In transito / Spedito' : 'In Transit / Shipped'}</span>
@@ -267,7 +267,7 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
       {/* Top Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
         <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-2xl bg-sky-500/15 text-sky-600 border border-sky-500/20">
+          <div className="p-2.5 rounded-2xl bg-sky-500/15 text-sky-400 border border-sky-500/20">
             <ClipboardList className="w-6 h-6" />
           </div>
           <div>
@@ -287,13 +287,13 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
             id="orders-export-history-pdf-btn"
             onClick={() => setShowExportModal(true)}
             disabled={isExportingHistory}
-            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white hover:bg-sky-50 text-sky-700 hover:text-sky-800 border border-sky-200 text-xs font-bold shadow-xs transition-all hover:scale-[1.02] active:scale-[0.98]"
+            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#0e1b30] hover:bg-sky-500/15 text-sky-300 hover:text-sky-200 border border-sky-500/30 text-xs font-bold shadow-xs transition-all hover:scale-[1.02] active:scale-[0.98]"
             title={language === 'it' ? 'Esporta registro storico forniture e estratto conto in PDF' : 'Export supply history and statement in PDF'}
           >
             {isExportingHistory ? (
-              <Loader2 className="w-3.5 h-3.5 text-sky-600 animate-spin" />
+              <Loader2 className="w-3.5 h-3.5 text-sky-400 animate-spin" />
             ) : (
-              <FileSpreadsheet className="w-3.5 h-3.5 text-sky-600" />
+              <FileSpreadsheet className="w-3.5 h-3.5 text-sky-400" />
             )}
             <span>{t('orders.exportHistoryPdf', 'Esporta Storico PDF')}</span>
           </button>
@@ -305,7 +305,7 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
               className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#0284c7] hover:bg-[#0369a1] text-white text-xs font-bold shadow-md shadow-sky-950/40 transition-all hover:scale-[1.02] active:scale-[0.98]"
               title="Avvia riordino rapido istantaneo senza checkout e senza carte"
             >
-              <RotateCw className="w-3.5 h-3.5 text-slate-700" />
+              <RotateCw className="w-3.5 h-3.5 text-slate-300" />
               <span>Nuovo Riordino Rapido</span>
             </button>
           )}
@@ -322,15 +322,15 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
             </button>
           )}
 
-          <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-600 shadow-sm">
-            <Package className="w-4 h-4 text-sky-600" />
+          <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#0d1420] border border-[#1c2433] text-xs text-slate-400 shadow-sm">
+            <Package className="w-4 h-4 text-sky-400" />
             <span>
               <strong>{orders.length}</strong> ordini registrati
             </span>
           </div>
           <button
             onClick={onBackToHome}
-            className="text-xs font-semibold text-sky-600 hover:text-sky-700 px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 hover:border-sky-500/40 transition-colors"
+            className="text-xs font-semibold text-sky-400 hover:text-sky-300 px-3 py-2 rounded-xl bg-[#0d1420] border border-[#1c2433] hover:border-sky-500/40 transition-colors"
           >
             ← Al catalogo
           </button>
@@ -339,22 +339,22 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
 
       {/* AI Restock Callout Banner */}
       {onOpenRestockAnalysis && (
-        <div className="mb-6 relative overflow-hidden rounded-2xl bg-gradient-to-r from-white via-slate-50 to-sky-50 border border-slate-200 p-4 sm:p-5 shadow-lg">
+        <div className="mb-6 relative overflow-hidden rounded-2xl bg-gradient-to-r from-white via-slate-50 to-sky-50 border border-[#1c2433] p-4 sm:p-5 shadow-lg">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex items-start gap-3.5">
-              <div className="p-2.5 rounded-xl bg-sky-500/15 border border-sky-500/30 text-sky-600 shrink-0 mt-0.5">
-                <Sparkles className="w-5 h-5 text-sky-600" />
+              <div className="p-2.5 rounded-xl bg-sky-500/15 border border-sky-500/30 text-sky-400 shrink-0 mt-0.5">
+                <Sparkles className="w-5 h-5 text-sky-400" />
               </div>
               <div>
                 <div className="flex items-center gap-2 flex-wrap">
-                  <h3 className="text-sm font-bold text-slate-900">
+                  <h3 className="text-sm font-bold text-white">
                     Previsione Fabbisogno & Riassortimento Automatico
                   </h3>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-700 border border-sky-500/30">
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-300 border border-sky-500/30">
                     Gemini AI Powered
                   </span>
                 </div>
-                <p className="text-xs text-slate-600 mt-1 max-w-2xl leading-relaxed">
+                <p className="text-xs text-slate-400 mt-1 max-w-2xl leading-relaxed">
                   L'algoritmo analizza i ritmi di consumo dai tuoi ordini storici e li incrocia con i livelli di giacenza a magazzino, stimando giorni di autonomia e consigliando quantità di reintegro per prevenire rotture di stock.
                 </p>
               </div>
@@ -363,7 +363,7 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
             <button
               id="orders-banner-restock-btn"
               onClick={() => onOpenRestockAnalysis()}
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#0284c7] hover:bg-[#0369a1] active:bg-slate-50 text-white text-xs font-bold shadow-md shadow-sky-900/30 transition-all shrink-0 w-full sm:w-auto justify-center"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#0284c7] hover:bg-[#0369a1] active:bg-[#0d1420] text-white text-xs font-bold shadow-md shadow-sky-900/30 transition-all shrink-0 w-full sm:w-auto justify-center"
             >
               <Sparkles className="w-4 h-4" />
               <span>Avvia Analisi Riordino</span>
@@ -374,7 +374,7 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
       )}
 
       {/* Filter and Search Bar */}
-      <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3 sm:p-4 mb-6 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 shadow-md">
+      <div className="bg-[#0d1420] border border-[#1c2433] rounded-2xl p-3 sm:p-4 mb-6 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 shadow-md">
         {/* Filter Pills */}
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
           <button
@@ -383,7 +383,7 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
             className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-colors ${
               statusFilter === 'all'
                 ? 'bg-[#0284c7] text-white shadow-xs'
-                : 'text-slate-400 hover:text-slate-900 hover:bg-slate-100'
+                : 'text-slate-400 hover:text-white hover:bg-[#1a2230]'
             }`}
           >
             {t('orders.filterAll', 'Tutti')} ({orders.length})
@@ -396,7 +396,7 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
             className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 ${
               statusFilter === 'active'
                 ? 'bg-sky-500 text-white shadow-md shadow-sky-500/30 ring-2 ring-sky-400/50'
-                : 'text-sky-700 bg-sky-500/10 hover:bg-sky-500/20 border border-sky-500/30'
+                : 'text-sky-300 bg-sky-500/10 hover:bg-sky-500/20 border border-sky-500/30'
             }`}
           >
             <span className="w-1.5 h-1.5 rounded-full bg-sky-400 animate-pulse" />
@@ -412,7 +412,7 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
             className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-colors ${
               statusFilter === 'In elaborazione'
                 ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
-                : 'text-slate-400 hover:text-white hover:bg-slate-100'
+                : 'text-slate-400 hover:text-white hover:bg-[#1a2230]'
             }`}
           >
             {t('orders.filterProcessing', 'In elaborazione')} ({orders.filter((o) => o.status === 'In elaborazione').length})
@@ -422,8 +422,8 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
             onClick={() => setStatusFilter('Spedito')}
             className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-colors ${
               statusFilter === 'Spedito'
-                ? 'bg-sky-500/20 text-sky-700 border border-sky-500/40'
-                : 'text-slate-400 hover:text-white hover:bg-slate-100'
+                ? 'bg-sky-500/20 text-sky-300 border border-sky-500/40'
+                : 'text-slate-400 hover:text-white hover:bg-[#1a2230]'
             }`}
           >
             {t('orders.filterShipped', 'Spediti')} ({orders.filter((o) => o.status === 'Spedito').length})
@@ -434,7 +434,7 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
             className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-colors ${
               statusFilter === 'Consegnato'
                 ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
-                : 'text-slate-400 hover:text-white hover:bg-slate-100'
+                : 'text-slate-400 hover:text-white hover:bg-[#1a2230]'
             }`}
           >
             {t('orders.filterDelivered', 'Consegnati')} ({orders.filter((o) => o.status === 'Consegnato').length})
@@ -451,13 +451,13 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
               placeholder={language === 'it' ? 'Cerca per ID ordine, colli o destinatario...' : 'Search by order ID, items or recipient...'}
               value={searchFilter}
               onChange={(e) => setSearchFilter(e.target.value)}
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-8 py-2 text-xs text-slate-900 placeholder-slate-500 focus:outline-none focus:border-sky-500 transition-colors"
+              className="w-full bg-[#0d1420] border border-[#1c2433] rounded-xl pl-9 pr-8 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-500 transition-colors"
             />
             {searchFilter && (
               <button
                 id="clear-orders-search-btn"
                 onClick={() => setSearchFilter('')}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 rounded-md text-slate-400 hover:text-slate-900 hover:bg-slate-800 transition-colors"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 rounded-md text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
                 title="Cancella ricerca"
               >
                 <X className="w-3.5 h-3.5" />
@@ -470,13 +470,13 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
             id="orders-quick-export-filtered-btn"
             onClick={() => handleExportHistory('filtered')}
             disabled={isExportingHistory || filteredOrders.length === 0}
-            className="shrink-0 p-2 sm:px-3 sm:py-2 rounded-xl bg-slate-50 hover:bg-slate-100 disabled:opacity-50 text-sky-700 border border-sky-500/30 text-xs font-semibold flex items-center gap-1.5 transition-all shadow-xs hover:border-sky-400/60"
+            className="shrink-0 p-2 sm:px-3 sm:py-2 rounded-xl bg-[#0d1420] hover:bg-[#1a2230] disabled:opacity-50 text-sky-300 border border-sky-500/30 text-xs font-semibold flex items-center gap-1.5 transition-all shadow-xs hover:border-sky-500/60/60"
             title={language === 'it' ? `Scarica PDF degli ordini attualmente visibili (${filteredOrders.length})` : `Download PDF of currently visible orders (${filteredOrders.length})`}
           >
             {isExportingHistory ? (
-              <Loader2 className="w-3.5 h-3.5 animate-spin text-sky-600" />
+              <Loader2 className="w-3.5 h-3.5 animate-spin text-sky-400" />
             ) : (
-              <Download className="w-3.5 h-3.5 text-sky-600" />
+              <Download className="w-3.5 h-3.5 text-sky-400" />
             )}
             <span className="hidden sm:inline">PDF ({filteredOrders.length})</span>
           </button>
@@ -511,15 +511,15 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
       {/* Active Search / Filter Status Summary */}
       {searchFilter.trim() && (
         <div className="mb-4 flex items-center justify-between gap-2 px-3 py-2 rounded-xl bg-sky-950/30 border border-sky-500/20 text-xs">
-          <div className="flex items-center gap-2 text-slate-600">
-            <Search className="w-3.5 h-3.5 text-sky-600" />
+          <div className="flex items-center gap-2 text-slate-400">
+            <Search className="w-3.5 h-3.5 text-sky-400" />
             <span>
-              Risultati per <strong className="text-slate-900">"{searchFilter.trim()}"</strong>: trovati <strong className="text-sky-700">{filteredOrders.length}</strong> ordini su {orders.length}
+              Risultati per <strong className="text-white">"{searchFilter.trim()}"</strong>: trovati <strong className="text-sky-300">{filteredOrders.length}</strong> ordini su {orders.length}
             </span>
           </div>
           <button
             onClick={() => setSearchFilter('')}
-            className="text-[11px] font-semibold text-sky-600 hover:text-sky-700 hover:underline"
+            className="text-[11px] font-semibold text-sky-400 hover:text-sky-300 hover:underline"
           >
             Azzera ricerca
           </button>
@@ -528,11 +528,11 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
 
       {/* Orders List */}
       {filteredOrders.length === 0 ? (
-        <div className="bg-slate-50 border border-slate-200 rounded-2xl p-12 text-center flex flex-col items-center justify-center">
-          <div className="w-12 h-12 rounded-full bg-slate-50 flex items-center justify-center text-slate-500 mb-3">
+        <div className="bg-[#0d1420] border border-[#1c2433] rounded-2xl p-12 text-center flex flex-col items-center justify-center">
+          <div className="w-12 h-12 rounded-full bg-[#0d1420] flex items-center justify-center text-slate-500 mb-3">
             <ClipboardList className="w-6 h-6" />
           </div>
-          <h3 className="text-base font-bold text-slate-900 mb-1">Nessun ordine trovato</h3>
+          <h3 className="text-base font-bold text-white mb-1">Nessun ordine trovato</h3>
           <p className="text-xs text-slate-400 max-w-sm mb-4">
             Nessun ordine corrisponde ai criteri di ricerca o ai filtri selezionati.
           </p>
@@ -541,7 +541,7 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
               setStatusFilter('all');
               setSearchFilter('');
             }}
-            className="text-xs text-sky-600 hover:underline font-semibold"
+            className="text-xs text-sky-400 hover:underline font-semibold"
           >
             Reimposta tutti i filtri
           </button>
@@ -559,8 +559,8 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
                 onClick={() => setSelectedDetailOrder(order)}
                 className={`group relative cursor-pointer rounded-2xl p-4 sm:p-5 transition-all duration-200 shadow-md hover:shadow-xl ${
                   isActiveOrder 
-                    ? 'bg-slate-50 hover:bg-slate-100 border-2 border-sky-500/40 hover:border-sky-400/70 shadow-sky-950/40 ring-1 ring-sky-500/20' 
-                    : 'bg-slate-50 hover:bg-slate-100 border border-slate-200 hover:border-sky-500/40 hover:shadow-sky-950/30'
+                    ? 'bg-[#0d1420] hover:bg-[#1a2230] border-2 border-sky-500/40 hover:border-sky-500/60/70 shadow-sky-950/40 ring-1 ring-sky-500/20' 
+                    : 'bg-[#0d1420] hover:bg-[#1a2230] border border-[#1c2433] hover:border-sky-500/40 hover:shadow-sky-950/30'
                 }`}
               >
                 {/* Active Order Notice Banner */}
@@ -572,7 +572,7 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
                         {language === 'it' ? '⚡ Fornitura Attiva in Gestione Operativa' : '⚡ Active Supply in Fulfillment'}
                       </span>
                     </div>
-                    <span className="text-[11px] font-semibold text-sky-700">
+                    <span className="text-[11px] font-semibold text-sky-300">
                       {order.status === 'Spedito' 
                         ? (language === 'it' ? 'Fase 3/4: Spedito & in Viaggio' : 'Step 3/4: Shipped & in Transit') 
                         : (language === 'it' ? 'Fase 2/4: Processing & Allestimento' : 'Step 2/4: Processing & Picking')}
@@ -581,17 +581,17 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
                 )}
 
                 {/* Header Row: ID, Status Badge, Price & Reorder */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3.5 border-b border-slate-200">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3.5 border-b border-[#1c2433]">
                   <div>
                     <div className="flex items-center gap-2.5 flex-wrap">
-                      <span className="font-mono text-sm sm:text-base font-bold text-white tracking-wide group-hover:text-sky-700 transition-colors flex items-center gap-1.5">
+                      <span className="font-mono text-sm sm:text-base font-bold text-white tracking-wide group-hover:text-sky-300 transition-colors flex items-center gap-1.5">
                         <span>{order.id}</span>
-                        <Maximize2 className="w-3.5 h-3.5 text-slate-500 group-hover:text-sky-600 opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <Maximize2 className="w-3.5 h-3.5 text-slate-500 group-hover:text-sky-400 opacity-0 group-hover:opacity-100 transition-opacity" />
                       </span>
                       {getStatusBadge(order.status)}
                     </div>
                     <p className="text-xs text-slate-400 mt-1">
-                      {language === 'it' ? 'Data emissione ordine:' : 'Order issue date:'} <strong className="text-slate-600">{order.date}</strong>
+                      {language === 'it' ? 'Data emissione ordine:' : 'Order issue date:'} <strong className="text-slate-400">{order.date}</strong>
                     </p>
                   </div>
 
@@ -611,7 +611,7 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
                       className={`shrink-0 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all shadow-sm ${
                         isJustReordered
                           ? 'bg-emerald-600 text-white shadow-emerald-500/20'
-                          : 'bg-[#0284c7] hover:bg-[#0369a1] active:bg-slate-50 text-white shadow-sky-500/20'
+                          : 'bg-[#0284c7] hover:bg-[#0369a1] active:bg-[#0d1420] text-white shadow-sky-500/20'
                       }`}
                       title="Aggiunge tutti i colli di questo ordine direttamente al carrello"
                     >
@@ -631,15 +631,15 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
                 </div>
 
                 {/* Status Indicator Bar & Delivery Estimation Info Card */}
-                <div className="py-4 border-b border-slate-200">
+                <div className="py-4 border-b border-[#1c2433]">
                   {/* Estimated Delivery Box */}
-                  <div className="mb-4 bg-slate-50 border border-slate-200 rounded-xl p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="mb-4 bg-[#0d1420] border border-[#1c2433] rounded-xl p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div className="flex items-center gap-3">
-                      <div className="p-2 rounded-lg bg-sky-500/10 text-sky-600 border border-sky-500/20 shrink-0">
+                      <div className="p-2 rounded-lg bg-sky-500/10 text-sky-400 border border-sky-500/20 shrink-0">
                         {order.status === 'Consegnato' ? (
                           <CheckCircle2 className="w-4 h-4 text-emerald-400" />
                         ) : (
-                          <Calendar className="w-4 h-4 text-sky-600" />
+                          <Calendar className="w-4 h-4 text-sky-400" />
                         )}
                       </div>
                       <div>
@@ -648,7 +648,7 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
                             ? (language === 'it' ? 'Consegna effettuata' : 'Delivered on') 
                             : (language === 'it' ? 'Data di consegna stimata' : 'Estimated delivery date')}
                         </span>
-                        <span className="text-xs sm:text-sm font-bold text-slate-900">
+                        <span className="text-xs sm:text-sm font-bold text-white">
                           {order.estimatedDelivery}
                         </span>
                       </div>
@@ -657,9 +657,9 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
                     {/* Courier and tracking link pill */}
                     {order.courier && (
                       <div className="flex items-center gap-2 text-xs">
-                        <div className="bg-slate-50 border border-slate-200 px-2.5 py-1.5 rounded-lg text-slate-600">
+                        <div className="bg-[#0d1420] border border-[#1c2433] px-2.5 py-1.5 rounded-lg text-slate-400">
                           <span className="text-slate-400">{language === 'it' ? 'Corriere:' : 'Courier:'} </span>
-                          <span className="text-sky-700 font-semibold">{order.courier}</span>
+                          <span className="text-sky-300 font-semibold">{order.courier}</span>
                         </div>
                         {order.trackingNumber && (
                           <button
@@ -668,7 +668,7 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
                               e.stopPropagation();
                               setSelectedTrackingOrder(order);
                             }}
-                            className="bg-sky-500/15 hover:bg-sky-500/25 border border-sky-500/30 text-sky-700 px-2.5 py-1.5 rounded-lg font-medium inline-flex items-center gap-1 transition-colors"
+                            className="bg-sky-500/15 hover:bg-sky-500/25 border border-sky-500/30 text-sky-300 px-2.5 py-1.5 rounded-lg font-medium inline-flex items-center gap-1 transition-colors"
                           >
                             <Truck className="w-3 h-3" />
                             <span>{language === 'it' ? 'Traccia' : 'Track'}</span>
@@ -705,7 +705,7 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
                           e.stopPropagation();
                           onOpenCart();
                         }}
-                        className="text-xs font-medium text-sky-600 hover:text-sky-700 flex items-center gap-1 animate-pulse"
+                        className="text-xs font-medium text-sky-400 hover:text-sky-300 flex items-center gap-1 animate-pulse"
                       >
                         <ShoppingBag className="w-3 h-3" />
                         <span>{language === 'it' ? 'Vai al carrello' : 'View cart'}</span>
@@ -718,10 +718,10 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
                     {order.items.map((item, idx) => (
                       <div 
                         key={idx} 
-                        className="flex items-center justify-between text-xs text-slate-600 bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl"
+                        className="flex items-center justify-between text-xs text-slate-400 bg-[#0d1420] border border-[#1c2433] px-3 py-2 rounded-xl"
                       >
                         <span className="truncate pr-2 font-medium">{item.productName}</span>
-                        <span className="text-sky-700/90 font-mono font-semibold shrink-0">
+                        <span className="text-sky-300/90 font-mono font-semibold shrink-0">
                           {item.qty} {language === 'it' ? 'colli' : 'units'}
                         </span>
                       </div>
@@ -730,7 +730,7 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
                 </div>
 
                 {/* Actions Footer */}
-                <div className="mt-3.5 pt-3 border-t border-slate-200 flex flex-wrap items-center justify-between gap-2 text-xs">
+                <div className="mt-3.5 pt-3 border-t border-[#1c2433] flex flex-wrap items-center justify-between gap-2 text-xs">
                   <div className="flex items-center gap-2 flex-wrap">
                     {order.status === 'In elaborazione' && onUpdateOrderStatus && (
                       <button
@@ -746,7 +746,7 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
                         className="font-semibold flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-sky-400/40 bg-gradient-to-r from-sky-500/20 to-indigo-500/20 hover:from-sky-500/35 hover:to-indigo-500/35 text-sky-200 hover:text-white transition-all shadow-xs"
                         title="Simula passaggio a Spedito ed emetti notifica toast in tempo reale"
                       >
-                        <Truck className="w-3.5 h-3.5 text-sky-600 animate-pulse" />
+                        <Truck className="w-3.5 h-3.5 text-sky-400 animate-pulse" />
                         <span>{language === 'it' ? 'Simula Spedizione (In elaborazione ➔ Spedito)' : 'Advance to Shipped'}</span>
                       </button>
                     )}
@@ -758,15 +758,15 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
                       className={`font-medium flex items-center gap-1.5 px-2.5 py-1 rounded-lg border transition-colors ${
                         downloadSuccessId === order.id
                           ? 'text-emerald-300 bg-emerald-500/15 border-emerald-500/30'
-                          : 'text-slate-400 hover:text-sky-700 bg-slate-50 hover:bg-slate-100 border-slate-200 hover:border-sky-500/40'
+                          : 'text-slate-400 hover:text-sky-300 bg-[#0d1420] hover:bg-[#1a2230] border-[#1c2433] hover:border-sky-500/40'
                       }`}
                       onClick={(e) => handleDownloadPdf(order, e)}
                       title="Scarica ricevuta d'ordine o fattura proforma in PDF"
                     >
                       {downloadingPdfId === order.id ? (
                         <>
-                          <Loader2 className="w-3.5 h-3.5 text-sky-600 animate-spin" />
-                          <span className="text-sky-700">Generazione PDF...</span>
+                          <Loader2 className="w-3.5 h-3.5 text-sky-400 animate-spin" />
+                          <span className="text-sky-300">Generazione PDF...</span>
                         </>
                       ) : downloadSuccessId === order.id ? (
                         <>
@@ -775,7 +775,7 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
                         </>
                       ) : (
                         <>
-                          <Download className="w-3.5 h-3.5 text-sky-600" />
+                          <Download className="w-3.5 h-3.5 text-sky-400" />
                           <span>Scarica Fattura PDF</span>
                         </>
                       )}
@@ -788,16 +788,16 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
                         e.stopPropagation();
                         setSelectedInquiryOrder(order);
                       }}
-                      className="font-medium flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-sky-500/25 bg-sky-500/10 hover:bg-sky-500/20 text-sky-700 transition-colors"
+                      className="font-medium flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-sky-500/25 bg-sky-500/10 hover:bg-sky-500/20 text-sky-300 transition-colors"
                       title="Genera bozza email di richiesta aggiornamento per il reparto logistico di Aurora"
                     >
-                      <Mail className="w-3.5 h-3.5 text-sky-600" />
+                      <Mail className="w-3.5 h-3.5 text-sky-400" />
                       <span>Richiedi Aggiornamento</span>
                     </button>
                   </div>
 
                   <div className="flex items-center gap-3">
-                    <span className="text-sky-600 group-hover:text-sky-700 font-semibold inline-flex items-center gap-1 text-xs">
+                    <span className="text-sky-400 group-hover:text-sky-300 font-semibold inline-flex items-center gap-1 text-xs">
                       <span>Vedi dettagli completi</span>
                       <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
                     </span>
@@ -825,12 +825,12 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
               initial={{ opacity: 0, scale: 0.95, y: 15 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 15 }}
-              className="relative w-full max-w-2xl max-h-[90vh] flex flex-col bg-slate-50 border border-slate-200 rounded-3xl shadow-2xl z-10 overflow-hidden"
+              className="relative w-full max-w-2xl max-h-[90vh] flex flex-col bg-[#0d1420] border border-[#1c2433] rounded-3xl shadow-2xl z-10 overflow-hidden"
             >
               {/* Modal Header */}
-              <div className="p-5 sm:p-6 border-b border-slate-200 bg-gradient-to-r from-white via-slate-50 to-sky-50 flex items-center justify-between shrink-0">
+              <div className="p-5 sm:p-6 border-b border-[#1c2433] bg-gradient-to-r from-white via-slate-50 to-sky-50 flex items-center justify-between shrink-0">
                 <div className="flex items-center gap-3">
-                  <div className="p-3 rounded-2xl bg-sky-500/15 text-sky-600 border border-sky-500/25">
+                  <div className="p-3 rounded-2xl bg-sky-500/15 text-sky-400 border border-sky-500/25">
                     <Receipt className="w-6 h-6" />
                   </div>
                   <div>
@@ -841,7 +841,7 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
                       {getStatusBadge(currentDetailOrder.status)}
                     </div>
                     <p className="text-xs text-slate-400 mt-0.5">
-                      Emesso il <strong className="text-slate-600">{currentDetailOrder.date}</strong> • Consegna: <strong className="text-sky-700">{currentDetailOrder.estimatedDelivery}</strong>
+                      Emesso il <strong className="text-slate-400">{currentDetailOrder.date}</strong> • Consegna: <strong className="text-sky-300">{currentDetailOrder.estimatedDelivery}</strong>
                     </p>
                   </div>
                 </div>
@@ -857,7 +857,7 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
                       className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-gradient-to-r from-sky-500/30 to-indigo-500/30 hover:from-sky-500/40 hover:to-indigo-500/40 text-sky-200 hover:text-white border border-sky-400/50 transition-colors shadow-xs"
                       title="Simula il passaggio da In elaborazione a Spedito"
                     >
-                      <Truck className="w-3.5 h-3.5 text-sky-600 animate-pulse" />
+                      <Truck className="w-3.5 h-3.5 text-sky-400 animate-pulse" />
                       <span>Simula Spedizione</span>
                     </button>
                   )}
@@ -866,10 +866,10 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
                     id="modal-header-inquiry-btn"
                     type="button"
                     onClick={() => setSelectedInquiryOrder(currentDetailOrder)}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-50 hover:bg-slate-100 text-sky-700 border border-sky-500/30 transition-colors shadow-xs"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-[#0d1420] hover:bg-[#1a2230] text-sky-300 border border-sky-500/30 transition-colors shadow-xs"
                     title="Invia richiesta aggiornamento o chiarimenti logistici ad Aurora"
                   >
-                    <Mail className="w-3.5 h-3.5 text-sky-600" />
+                    <Mail className="w-3.5 h-3.5 text-sky-400" />
                     <span className="hidden sm:inline">Invia Richiesta Aggiornamento</span>
                     <span className="sm:hidden">Richiedi Info</span>
                   </button>
@@ -879,15 +879,15 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
                     type="button"
                     disabled={downloadingPdfId === currentDetailOrder.id}
                     onClick={(e) => handleDownloadPdf(currentDetailOrder, e)}
-                    className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-sky-500/15 hover:bg-sky-500/25 text-sky-700 border border-sky-500/30 transition-colors shadow-xs"
+                    className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-sky-500/15 hover:bg-sky-500/25 text-sky-300 border border-sky-500/30 transition-colors shadow-xs"
                     title="Scarica ricevuta o fattura proforma in formato PDF"
                   >
                     {downloadingPdfId === currentDetailOrder.id ? (
-                      <Loader2 className="w-3.5 h-3.5 text-sky-600 animate-spin" />
+                      <Loader2 className="w-3.5 h-3.5 text-sky-400 animate-spin" />
                     ) : downloadSuccessId === currentDetailOrder.id ? (
                       <Check className="w-3.5 h-3.5 text-emerald-400" />
                     ) : (
-                      <Download className="w-3.5 h-3.5 text-sky-600" />
+                      <Download className="w-3.5 h-3.5 text-sky-400" />
                     )}
                     <span>
                       {downloadingPdfId === currentDetailOrder.id 
@@ -901,7 +901,7 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
                   <button
                     id="close-order-detail-modal"
                     onClick={() => setSelectedDetailOrder(null)}
-                    className="p-2 rounded-xl text-slate-400 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+                    className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-[#1a2230] transition-colors"
                   >
                     <X className="w-5 h-5" />
                   </button>
@@ -914,16 +914,16 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
                 {/* 1. Items Breakdown Section */}
                 <div>
                   <div className="flex items-center justify-between mb-3">
-                    <h4 className="text-xs sm:text-sm font-bold text-slate-900 flex items-center gap-2 uppercase tracking-wider">
-                      <Package className="w-4 h-4 text-sky-600" />
+                    <h4 className="text-xs sm:text-sm font-bold text-white flex items-center gap-2 uppercase tracking-wider">
+                      <Package className="w-4 h-4 text-sky-400" />
                       <span>Dettaglio Articoli Ordinati ({selectedDetailOrder.itemsCount} colli)</span>
                     </h4>
                     <span className="text-[11px] text-slate-400">Prezzi B2B al netto di IVA</span>
                   </div>
 
-                  <div className="bg-slate-50 border border-slate-200 rounded-2xl overflow-hidden shadow-inner">
+                  <div className="bg-[#0d1420] border border-[#1c2433] rounded-2xl overflow-hidden shadow-inner">
                     {/* Items table header */}
-                    <div className="grid grid-cols-12 gap-2 px-3.5 py-2.5 bg-slate-50 border-b border-slate-200 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                    <div className="grid grid-cols-12 gap-2 px-3.5 py-2.5 bg-[#0d1420] border-b border-[#1c2433] text-[11px] font-bold text-slate-400 uppercase tracking-wider">
                       <div className="col-span-6 sm:col-span-6">Prodotto & Confezionamento</div>
                       <div className="col-span-2 sm:col-span-2 text-right">Quantità</div>
                       <div className="col-span-2 sm:col-span-2 text-right">Prezzo Unit.</div>
@@ -937,13 +937,13 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
                         return (
                           <div
                             key={idx}
-                            className="grid grid-cols-12 gap-2 px-3.5 py-3 items-center text-xs hover:bg-slate-100/50 transition-colors"
+                            className="grid grid-cols-12 gap-2 px-3.5 py-3 items-center text-xs hover:bg-[#1a2230]/50 transition-colors"
                           >
                             <div className="col-span-6 sm:col-span-6">
-                              <p className="font-semibold text-slate-900 truncate">{item.productName}</p>
+                              <p className="font-semibold text-white truncate">{item.productName}</p>
                               <div className="flex items-center gap-2 text-[10.5px] text-slate-400 mt-0.5">
                                 {item.code && (
-                                  <span className="font-mono bg-slate-50 px-1.5 py-0.5 rounded border border-slate-200">
+                                  <span className="font-mono bg-[#0d1420] px-1.5 py-0.5 rounded border border-[#1c2433]">
                                     {item.code}
                                   </span>
                                 )}
@@ -951,15 +951,15 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
                               </div>
                             </div>
 
-                            <div className="col-span-2 sm:col-span-2 text-right font-mono font-bold text-sky-700">
+                            <div className="col-span-2 sm:col-span-2 text-right font-mono font-bold text-sky-300">
                               {item.qty} colli
                             </div>
 
-                            <div className="col-span-2 sm:col-span-2 text-right font-mono text-slate-600">
+                            <div className="col-span-2 sm:col-span-2 text-right font-mono text-slate-400">
                               €{item.price.toFixed(2)}
                             </div>
 
-                            <div className="col-span-2 sm:col-span-2 text-right font-mono font-bold text-slate-900">
+                            <div className="col-span-2 sm:col-span-2 text-right font-mono font-bold text-white">
                               €{itemSubtotal.toFixed(2)}
                             </div>
                           </div>
@@ -972,10 +972,10 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
                 {/* 2-Columns Grid: Shipping Address & Financial Cost Breakdown */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Shipping Address Box */}
-                  <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 flex flex-col justify-between">
+                  <div className="bg-[#0d1420] border border-[#1c2433] rounded-2xl p-4 flex flex-col justify-between">
                     <div>
-                      <div className="flex items-center gap-2 mb-3 pb-2.5 border-b border-slate-200">
-                        <div className="p-1.5 rounded-lg bg-sky-500/10 text-sky-600">
+                      <div className="flex items-center gap-2 mb-3 pb-2.5 border-b border-[#1c2433]">
+                        <div className="p-1.5 rounded-lg bg-sky-500/10 text-sky-400">
                           <MapPin className="w-4 h-4" />
                         </div>
                         <h4 className="text-xs font-bold text-white uppercase tracking-wider">
@@ -986,37 +986,37 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
                       <div className="space-y-2 text-xs">
                         <div>
                           <span className="text-slate-400 block text-[10.5px]">Intestatario / Ragione Sociale:</span>
-                          <span className="font-bold text-slate-900">
+                          <span className="font-bold text-white">
                             {selectedDetailOrder.shippingAddress?.companyName || 'AURORA Retail & Facility Service S.r.l.'}
                           </span>
                         </div>
 
                         <div>
                           <span className="text-slate-400 block text-[10.5px]">Referente Scarico Merci:</span>
-                          <span className="text-slate-700">
+                          <span className="text-slate-300">
                             {selectedDetailOrder.shippingAddress?.recipient || 'Ufficio Logistica & Ricevimento Merci'}
                           </span>
                         </div>
 
                         <div>
                           <span className="text-slate-400 block text-[10.5px]">Indirizzo di Consegna:</span>
-                          <span className="text-slate-700">
+                          <span className="text-slate-300">
                             {selectedDetailOrder.shippingAddress?.street || 'Via dell\'Industria 45, Palazzina B, Ingresso Magazzino 3'}
                           </span>
-                          <span className="text-slate-600 block font-medium">
+                          <span className="text-slate-400 block font-medium">
                             {selectedDetailOrder.shippingAddress?.postalCode || '20145'} {selectedDetailOrder.shippingAddress?.city || 'Milano'} ({selectedDetailOrder.shippingAddress?.province || 'MI'}) - {selectedDetailOrder.shippingAddress?.country || 'Italia'}
                           </span>
                         </div>
 
                         {selectedDetailOrder.shippingAddress?.phone && (
-                          <div className="flex items-center gap-1.5 text-slate-600 pt-1">
-                            <Phone className="w-3 h-3 text-sky-600" />
+                          <div className="flex items-center gap-1.5 text-slate-400 pt-1">
+                            <Phone className="w-3 h-3 text-sky-400" />
                             <span>{selectedDetailOrder.shippingAddress.phone}</span>
                           </div>
                         )}
 
                         {selectedDetailOrder.shippingAddress?.deliveryNotes && (
-                          <div className="mt-2.5 p-2 rounded-xl bg-slate-50 border border-slate-200 text-[11px] text-amber-200/90">
+                          <div className="mt-2.5 p-2 rounded-xl bg-[#0d1420] border border-[#1c2433] text-[11px] text-amber-200/90">
                             <span className="font-semibold text-amber-300 block">Note Operative Consegna:</span>
                             {selectedDetailOrder.shippingAddress.deliveryNotes}
                           </div>
@@ -1025,17 +1025,17 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
                     </div>
 
                     {selectedDetailOrder.shippingAddress?.vatNumber && (
-                      <div className="mt-3 pt-2 border-t border-slate-200 flex justify-between text-[11px] text-slate-400 font-mono">
+                      <div className="mt-3 pt-2 border-t border-[#1c2433] flex justify-between text-[11px] text-slate-400 font-mono">
                         <span>P.IVA / C.F.:</span>
-                        <span className="text-slate-600 font-bold">{selectedDetailOrder.shippingAddress.vatNumber}</span>
+                        <span className="text-slate-400 font-bold">{selectedDetailOrder.shippingAddress.vatNumber}</span>
                       </div>
                     )}
                   </div>
 
                   {/* Financial Breakdown Box */}
-                  <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 flex flex-col justify-between">
+                  <div className="bg-[#0d1420] border border-[#1c2433] rounded-2xl p-4 flex flex-col justify-between">
                     <div>
-                      <div className="flex items-center gap-2 mb-3 pb-2.5 border-b border-slate-200">
+                      <div className="flex items-center gap-2 mb-3 pb-2.5 border-b border-[#1c2433]">
                         <div className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400">
                           <CreditCard className="w-4 h-4" />
                         </div>
@@ -1052,29 +1052,29 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
 
                         return (
                           <div className="space-y-2 text-xs">
-                            <div className="flex justify-between text-slate-600">
+                            <div className="flex justify-between text-slate-400">
                               <span className="text-slate-400">Imponibile Merci:</span>
                               <span className="font-mono font-medium">€{subtotal.toFixed(2)}</span>
                             </div>
 
-                            <div className="flex justify-between text-slate-600">
+                            <div className="flex justify-between text-slate-400">
                               <span className="text-slate-400">Spese di Spedizione / Logistica:</span>
                               <span className="font-mono text-emerald-400 font-medium">
                                 {shippingCost === 0 ? 'Gratuite (B2B Express)' : `€${shippingCost.toFixed(2)}`}
                               </span>
                             </div>
 
-                            <div className="flex justify-between text-slate-600">
+                            <div className="flex justify-between text-slate-400">
                               <span className="text-slate-400">IVA (22% ordinaria):</span>
                               <span className="font-mono font-medium">€{vatAmount.toFixed(2)}</span>
                             </div>
 
-                            <div className="mt-3 pt-3 border-t border-slate-200 flex justify-between items-baseline">
+                            <div className="mt-3 pt-3 border-t border-[#1c2433] flex justify-between items-baseline">
                               <div>
-                                <span className="text-xs font-bold text-slate-900 block">Totale Documento</span>
+                                <span className="text-xs font-bold text-white block">Totale Documento</span>
                                 <span className="text-[10px] text-slate-400">Imponibile + IVA inclusa</span>
                               </div>
-                              <span className="text-xl font-bold font-mono text-slate-900 text-right">
+                              <span className="text-xl font-bold font-mono text-white text-right">
                                 €{selectedDetailOrder.total.toFixed(2)}
                               </span>
                             </div>
@@ -1084,10 +1084,10 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
                     </div>
 
                     {/* Payment method terms */}
-                    <div className="mt-4 pt-2.5 border-t border-slate-200">
-                      <div className="p-2 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between text-xs">
+                    <div className="mt-4 pt-2.5 border-t border-[#1c2433]">
+                      <div className="p-2 rounded-xl bg-[#0d1420] border border-[#1c2433] flex items-center justify-between text-xs">
                         <span className="text-slate-400 text-[11px]">Pagamento concordato:</span>
-                        <span className="font-semibold text-sky-700 text-[11px] text-right">
+                        <span className="font-semibold text-sky-300 text-[11px] text-right">
                           {selectedDetailOrder.paymentMethod || 'Bonifico Bancario B2B 30/60 gg'}
                         </span>
                       </div>
@@ -1115,19 +1115,19 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
                 </div>
 
                 {/* 4. Dedicated Logistics Request Assistant Callout Card */}
-                <div className="bg-gradient-to-r from-white via-slate-50 to-sky-50 border border-slate-200 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-md">
+                <div className="bg-gradient-to-r from-white via-slate-50 to-sky-50 border border-[#1c2433] rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-md">
                   <div className="flex items-center gap-3">
-                    <div className="p-2.5 rounded-xl bg-sky-500/20 text-sky-600 border border-sky-500/30 shrink-0">
+                    <div className="p-2.5 rounded-xl bg-sky-500/20 text-sky-400 border border-sky-500/30 shrink-0">
                       <Mail className="w-5 h-5" />
                     </div>
                     <div>
                       <h5 className="text-xs font-bold text-white flex items-center gap-2">
                         <span>Assistenza Logistica & Gestione Spedizione</span>
-                        <span className="text-[10px] font-semibold text-sky-700 bg-sky-500/20 px-1.5 py-0.5 rounded border border-sky-400/25">
+                        <span className="text-[10px] font-semibold text-sky-300 bg-sky-500/20 px-1.5 py-0.5 rounded border border-sky-400/25">
                           AURORA Logistica
                         </span>
                       </h5>
-                      <p className="text-[11px] text-slate-600 mt-0.5">
+                      <p className="text-[11px] text-slate-400 mt-0.5">
                         Necessiti di un sollecito urgente, variazioni orari di scarico merci o verifica tracking?
                       </p>
                     </div>
@@ -1146,7 +1146,7 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
               </div>
 
               {/* Modal Footer Actions */}
-              <div className="p-4 sm:p-5 border-t border-slate-200 bg-slate-50 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shrink-0">
+              <div className="p-4 sm:p-5 border-t border-[#1c2433] bg-[#0d1420] flex flex-col sm:flex-row sm:items-center justify-between gap-3 shrink-0">
                 <div className="flex flex-wrap items-center gap-2">
                   <button
                     id="modal-footer-download-pdf-btn"
@@ -1156,13 +1156,13 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
                     className={`inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold border transition-all ${
                       downloadSuccessId === currentDetailOrder.id
                         ? 'text-emerald-300 bg-emerald-500/20 border-emerald-500/40 shadow-emerald-900/20'
-                        : 'text-slate-900 bg-slate-50 hover:bg-slate-100 border-slate-200 shadow-sm'
+                        : 'text-white bg-[#0d1420] hover:bg-[#1a2230] border-[#1c2433] shadow-sm'
                     }`}
                     title="Genera ed esporta la ricevuta/fattura B2B in formato PDF stampabile"
                   >
                     {downloadingPdfId === currentDetailOrder.id ? (
                       <>
-                        <Loader2 className="w-4 h-4 text-sky-600 animate-spin" />
+                        <Loader2 className="w-4 h-4 text-sky-400 animate-spin" />
                         <span>Generazione Documento PDF...</span>
                       </>
                     ) : downloadSuccessId === currentDetailOrder.id ? (
@@ -1172,7 +1172,7 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
                       </>
                     ) : (
                       <>
-                        <Download className="w-4 h-4 text-sky-600" />
+                        <Download className="w-4 h-4 text-sky-400" />
                         <span>Scarica Fattura PDF</span>
                       </>
                     )}
@@ -1182,10 +1182,10 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
                     id="modal-footer-inquiry-btn"
                     type="button"
                     onClick={() => setSelectedInquiryOrder(currentDetailOrder)}
-                    className="inline-flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl text-xs font-semibold bg-slate-50 hover:bg-slate-100 text-sky-200 border border-sky-500/30 transition-colors shadow-xs"
+                    className="inline-flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl text-xs font-semibold bg-[#0d1420] hover:bg-[#1a2230] text-sky-200 border border-sky-500/30 transition-colors shadow-xs"
                     title="Invia richiesta di aggiornamento via email precompilata al reparto logistica"
                   >
-                    <Mail className="w-4 h-4 text-sky-600" />
+                    <Mail className="w-4 h-4 text-sky-400" />
                     <span>Invia Richiesta Aggiornamento</span>
                   </button>
                 </div>
@@ -1193,7 +1193,7 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
                 <div className="flex items-center justify-end gap-2.5">
                   <button
                     onClick={() => setSelectedDetailOrder(null)}
-                    className="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-50 hover:bg-slate-100 text-slate-600 hover:text-slate-900 transition-colors"
+                    className="px-4 py-2 rounded-xl text-xs font-semibold bg-[#0d1420] hover:bg-[#1a2230] text-slate-400 hover:text-white transition-colors"
                   >
                     Chiudi
                   </button>
@@ -1244,28 +1244,28 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
               initial={{ opacity: 0, scale: 0.95, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              className="relative w-full max-w-lg bg-slate-50 border border-slate-200 rounded-3xl p-6 shadow-2xl z-10"
+              className="relative w-full max-w-lg bg-[#0d1420] border border-[#1c2433] rounded-3xl p-6 shadow-2xl z-10"
             >
-              <div className="flex items-center justify-between pb-4 border-b border-slate-200 mb-5">
+              <div className="flex items-center justify-between pb-4 border-b border-[#1c2433] mb-5">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-xl bg-sky-500/15 text-sky-600">
+                  <div className="p-2 rounded-xl bg-sky-500/15 text-sky-400">
                     <Truck className="w-5 h-5" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-bold text-slate-900">Dettaglio Spedizione B2B</h3>
+                    <h3 className="text-lg font-bold text-white">Dettaglio Spedizione B2B</h3>
                     <p className="text-xs text-slate-400 font-mono">Ordine {currentTrackingOrder.id}</p>
                   </div>
                 </div>
                 <button
                   onClick={() => setSelectedTrackingOrder(null)}
-                  className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-100"
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-[#1a2230]"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
               {/* Status Summary */}
-              <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 mb-5 space-y-2 text-xs">
+              <div className="bg-[#0d1420] border border-[#1c2433] rounded-2xl p-4 mb-5 space-y-2 text-xs">
                 <div className="flex justify-between">
                   <span className="text-slate-400">Stato spedizione:</span>
                   <div>{getStatusBadge(currentTrackingOrder.status)}</div>
@@ -1276,11 +1276,11 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-400">Vettore logistico:</span>
-                  <span className="text-sky-700 font-medium">{currentTrackingOrder.courier || 'GLS B2B'}</span>
+                  <span className="text-sky-300 font-medium">{currentTrackingOrder.courier || 'GLS B2B'}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-400">Numero di tracciamento (AWB):</span>
-                  <span className="text-white font-mono font-bold bg-slate-50 px-2 py-0.5 rounded border border-slate-200">
+                  <span className="text-white font-mono font-bold bg-[#0d1420] px-2 py-0.5 rounded border border-[#1c2433]">
                     {currentTrackingOrder.trackingNumber || 'GLS-IT-992019'}
                   </span>
                 </div>
@@ -1301,7 +1301,7 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
               </div>
 
               {/* Close / Action Buttons */}
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 pt-4 border-t border-slate-200">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 pt-4 border-t border-[#1c2433]">
                 <button
                   id="tracking-modal-inquiry-btn"
                   type="button"
@@ -1310,7 +1310,7 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
                     setSelectedTrackingOrder(null);
                     setSelectedInquiryOrder(order);
                   }}
-                  className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-slate-50 hover:bg-slate-100 text-sky-700 border border-sky-500/25 transition-colors"
+                  className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-[#0d1420] hover:bg-[#1a2230] text-sky-300 border border-sky-500/25 transition-colors"
                 >
                   <Mail className="w-3.5 h-3.5" />
                   <span>Richiedi Info Logistica</span>
@@ -1319,7 +1319,7 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
                 <div className="flex items-center justify-end gap-2">
                   <button
                     onClick={() => setSelectedTrackingOrder(null)}
-                    className="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-50 hover:bg-slate-100 text-slate-600 transition-colors"
+                    className="px-4 py-2 rounded-xl text-xs font-semibold bg-[#0d1420] hover:bg-[#1a2230] text-slate-400 transition-colors"
                   >
                     Chiudi
                   </button>
@@ -1366,16 +1366,16 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
               initial={{ opacity: 0, scale: 0.95, y: 15 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 15 }}
-              className="relative w-full max-w-lg bg-slate-50 border border-slate-200 rounded-3xl p-5 sm:p-6 shadow-2xl z-10"
+              className="relative w-full max-w-lg bg-[#0d1420] border border-[#1c2433] rounded-3xl p-5 sm:p-6 shadow-2xl z-10"
             >
               {/* Header */}
-              <div className="flex items-center justify-between pb-4 border-b border-slate-200 mb-5">
+              <div className="flex items-center justify-between pb-4 border-b border-[#1c2433] mb-5">
                 <div className="flex items-center gap-3">
-                  <div className="p-2.5 rounded-2xl bg-sky-500/15 text-sky-600 border border-sky-500/25">
+                  <div className="p-2.5 rounded-2xl bg-sky-500/15 text-sky-400 border border-sky-500/25">
                     <FileSpreadsheet className="w-5 h-5" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-bold text-slate-900">
+                    <h3 className="text-lg font-bold text-white">
                       {language === 'it' ? 'Esporta Storico Forniture PDF' : 'Export Orders History PDF'}
                     </h3>
                     <p className="text-xs text-slate-400">
@@ -1386,7 +1386,7 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
                 <button
                   disabled={isExportingHistory}
                   onClick={() => setShowExportModal(false)}
-                  className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-100 transition-colors"
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-[#1a2230] transition-colors"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -1405,14 +1405,14 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
                     className={`cursor-pointer rounded-2xl p-3.5 border transition-all ${
                       exportScope === 'filtered'
                         ? 'bg-sky-500/15 border-sky-500 text-white ring-1 ring-sky-500/40'
-                        : 'bg-slate-50 border-slate-200 text-slate-400 hover:border-slate-700'
+                        : 'bg-[#0d1420] border-[#1c2433] text-slate-400 hover:border-slate-700'
                     }`}
                   >
                     <div className="flex items-center justify-between mb-1.5">
                       <span className="text-xs font-bold text-sky-200">
                         {language === 'it' ? 'Vista Corrente Filtrata' : 'Current Filtered View'}
                       </span>
-                      <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-sky-950 text-sky-700 border border-sky-500/30">
+                      <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-sky-950 text-sky-300 border border-sky-500/30">
                         {filteredOrders.length} {language === 'it' ? 'ordini' : 'orders'}
                       </span>
                     </div>
@@ -1433,14 +1433,14 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
                     className={`cursor-pointer rounded-2xl p-3.5 border transition-all ${
                       exportScope === 'all'
                         ? 'bg-sky-500/15 border-sky-500 text-white ring-1 ring-sky-500/40'
-                        : 'bg-slate-50 border-slate-200 text-slate-400 hover:border-slate-700'
+                        : 'bg-[#0d1420] border-[#1c2433] text-slate-400 hover:border-slate-700'
                     }`}
                   >
                     <div className="flex items-center justify-between mb-1.5">
                       <span className="text-xs font-bold text-sky-200">
                         {language === 'it' ? 'Tutto lo Storico Completo' : 'Full Order History'}
                       </span>
-                      <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
+                      <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-[#161f30] text-slate-300 border border-[#1c2433]">
                         {orders.length} {language === 'it' ? 'ordini' : 'orders'}
                       </span>
                     </div>
@@ -1458,56 +1458,56 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
                 const totalItems = targetOrders.reduce((sum, o) => sum + o.itemsCount, 0);
 
                 return (
-                  <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 mb-5 space-y-2.5">
-                    <div className="flex items-center justify-between text-xs pb-2 border-b border-slate-200">
+                  <div className="bg-[#0d1420] border border-[#1c2433] rounded-2xl p-4 mb-5 space-y-2.5">
+                    <div className="flex items-center justify-between text-xs pb-2 border-b border-[#1c2433]">
                       <span className="text-slate-400">{language === 'it' ? 'Ordini inclusi nel report:' : 'Orders included:'}</span>
-                      <span className="text-slate-900 font-bold">{targetOrders.length} {language === 'it' ? 'ordini' : 'orders'}</span>
+                      <span className="text-white font-bold">{targetOrders.length} {language === 'it' ? 'ordini' : 'orders'}</span>
                     </div>
-                    <div className="flex items-center justify-between text-xs pb-2 border-b border-slate-200">
+                    <div className="flex items-center justify-between text-xs pb-2 border-b border-[#1c2433]">
                       <span className="text-slate-400">{language === 'it' ? 'Volume colli complessivo:' : 'Total unit volume:'}</span>
-                      <span className="text-sky-700 font-bold">{totalItems} {language === 'it' ? 'colli totali' : 'total units'}</span>
+                      <span className="text-sky-300 font-bold">{totalItems} {language === 'it' ? 'colli totali' : 'total units'}</span>
                     </div>
                     <div className="flex items-center justify-between text-xs">
                       <span className="text-slate-400">{language === 'it' ? 'Totale Forniture (IVA inc.):' : 'Total Spend (VAT inc.):'}</span>
-                      <span className="text-base font-bold font-mono text-slate-900">€ {totalGross.toFixed(2)}</span>
+                      <span className="text-base font-bold font-mono text-white">€ {totalGross.toFixed(2)}</span>
                     </div>
                   </div>
                 );
               })()}
 
               {/* Document Features Included List */}
-              <div className="bg-slate-50/60 border border-sky-500/20 rounded-2xl p-3.5 mb-6 text-[11px] text-slate-600 space-y-1.5">
+              <div className="bg-[#0d1420]/60 border border-sky-500/20 rounded-2xl p-3.5 mb-6 text-[11px] text-slate-400 space-y-1.5">
                 <p className="font-bold text-sky-200 flex items-center gap-1.5 mb-1">
-                  <Sparkles className="w-3.5 h-3.5 text-sky-600" />
+                  <Sparkles className="w-3.5 h-3.5 text-sky-400" />
                   <span>{language === 'it' ? 'Contenuto del Documento PDF Formattato:' : 'Included in the Formatted PDF Document:'}</span>
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-3 gap-y-1 text-slate-400">
                   <div className="flex items-center gap-1.5">
-                    <Check className="w-3 h-3 text-sky-600 shrink-0" />
+                    <Check className="w-3 h-3 text-sky-400 shrink-0" />
                     <span>{language === 'it' ? 'Intestazione & Dati Fiscali B2B' : 'B2B Corporate Fiscal Header'}</span>
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <Check className="w-3 h-3 text-sky-600 shrink-0" />
+                    <Check className="w-3 h-3 text-sky-400 shrink-0" />
                     <span>{language === 'it' ? 'Registro Dettagliato Ordini' : 'Detailed Order Registry Table'}</span>
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <Check className="w-3 h-3 text-sky-600 shrink-0" />
+                    <Check className="w-3 h-3 text-sky-400 shrink-0" />
                     <span>{language === 'it' ? 'Spaccato Top Prodotti Acquistati' : 'Top Purchased Products Breakdown'}</span>
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <Check className="w-3 h-3 text-sky-600 shrink-0" />
+                    <Check className="w-3 h-3 text-sky-400 shrink-0" />
                     <span>{language === 'it' ? 'Riepilogo Imponibile & IVA 22%' : 'Taxable & VAT 22% Summary'}</span>
                   </div>
                 </div>
               </div>
 
               {/* Action Buttons */}
-              <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-200">
+              <div className="flex items-center justify-end gap-3 pt-4 border-t border-[#1c2433]">
                 <button
                   type="button"
                   disabled={isExportingHistory}
                   onClick={() => setShowExportModal(false)}
-                  className="px-4 py-2.5 rounded-xl text-xs font-semibold bg-slate-50 hover:bg-slate-100 text-slate-600 transition-colors"
+                  className="px-4 py-2.5 rounded-xl text-xs font-semibold bg-[#0d1420] hover:bg-[#1a2230] text-slate-400 transition-colors"
                 >
                   {language === 'it' ? 'Annulla' : 'Cancel'}
                 </button>
@@ -1516,7 +1516,7 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
                   type="button"
                   disabled={isExportingHistory || (exportScope === 'filtered' ? filteredOrders.length === 0 : orders.length === 0)}
                   onClick={() => handleExportHistory()}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold bg-[#0284c7] hover:bg-[#0369a1] active:bg-slate-50 text-white shadow-lg shadow-sky-950/50 transition-all hover:scale-[1.02]"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold bg-[#0284c7] hover:bg-[#0369a1] active:bg-[#0d1420] text-white shadow-lg shadow-sky-950/50 transition-all hover:scale-[1.02]"
                 >
                   {isExportingHistory ? (
                     <>

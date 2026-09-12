@@ -207,7 +207,7 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   return (
-    <header className="relative z-20 w-full bg-white border-b border-slate-200 transition-all">
+    <header className="relative z-20 w-full bg-[#0e1b30] border-b border-[#1c2433] transition-all">
       {/* 1. MOBILE SMARTPHONE HEADER (EXACT REPLICA OF ATTACHED SCREENSHOT) */}
       <div className="lg:hidden px-4 pt-3 pb-3 space-y-3">
         {/* Top Row: [Hamburger] [AURORA Logo Centered] [Bell Badge] [Mail Badge] */}
@@ -216,7 +216,7 @@ export const Header: React.FC<HeaderProps> = ({
           <button
             id="mobile-menu-toggle"
             onClick={onToggleMobileMenu}
-            className="w-10 h-10 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center border border-slate-200 active:scale-95 transition-transform"
+            className="w-10 h-10 rounded-xl bg-[#161f30] text-slate-300 flex items-center justify-center border border-[#1c2433] active:scale-95 transition-transform"
             aria-label="Menu di navigazione"
           >
             <Menu className="w-5 h-5" />
@@ -233,7 +233,7 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               id="mobile-header-notifications-btn"
               onClick={onOpenNotifications}
-              className="relative w-10 h-10 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center border border-slate-200 active:scale-95 transition-transform"
+              className="relative w-10 h-10 rounded-full bg-[#161f30] text-slate-400 flex items-center justify-center border border-[#1c2433] active:scale-95 transition-transform"
               aria-label="Notifiche"
             >
               <Bell className="w-4.5 h-4.5" />
@@ -246,7 +246,7 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               id="mobile-header-mail-btn"
               onClick={onOpenContact || onOpenCart}
-              className="relative w-10 h-10 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center border border-slate-200 active:scale-95 transition-transform"
+              className="relative w-10 h-10 rounded-full bg-[#161f30] text-slate-400 flex items-center justify-center border border-[#1c2433] active:scale-95 transition-transform"
               aria-label="Messaggi e Richieste"
             >
               <Mail className="w-4.5 h-4.5" />
@@ -273,10 +273,10 @@ export const Header: React.FC<HeaderProps> = ({
                   ? "Parla adesso (es. 'Detergente pavimenti')..."
                   : "Cerca prodotti..."
               }
-              className={`w-full bg-slate-100 text-slate-900 placeholder-slate-400 text-xs sm:text-sm rounded-2xl pl-10 pr-11 py-2.5 border transition-all duration-200 focus:outline-hidden ${
+              className={`w-full bg-[#161f30] text-white placeholder-slate-500 text-xs sm:text-sm rounded-2xl pl-10 pr-11 py-2.5 border transition-all duration-200 focus:outline-hidden ${
                 isListening
-                  ? 'border-sky-400 ring-2 ring-sky-500/40 bg-sky-50'
-                  : 'border-slate-200 focus:border-sky-500'
+                  ? 'border-sky-400 ring-2 ring-sky-500/40 bg-sky-500/15'
+                  : 'border-[#1c2433] focus:border-sky-500'
               }`}
             />
             {/* Mic Voice Search Button */}
@@ -287,7 +287,7 @@ export const Header: React.FC<HeaderProps> = ({
                 className={`p-1.5 rounded-full transition-all ${
                   isListening
                     ? 'bg-rose-500 text-white animate-pulse'
-                    : 'text-sky-600 hover:text-sky-700'
+                    : 'text-sky-400 hover:text-sky-300'
                 }`}
                 title="Ricerca vocale"
               >
@@ -349,10 +349,10 @@ export const Header: React.FC<HeaderProps> = ({
                   ? "Parla adesso (es. 'Detergente pavimenti')..."
                   : t('header.searchPlaceholder', 'Cerca prodotti...')
               }
-              className={`w-full bg-slate-100 text-slate-900 placeholder-slate-400 text-sm rounded-full pl-10 pr-24 py-2 border transition-all duration-200 focus:outline-hidden ${
+              className={`w-full bg-[#161f30] text-white placeholder-slate-500 text-sm rounded-full pl-10 pr-24 py-2 border transition-all duration-200 focus:outline-hidden ${
                 isListening
-                  ? 'border-sky-400 ring-2 ring-sky-500/40 bg-sky-50'
-                  : 'border-slate-200 focus:border-sky-500 focus:ring-1 focus:ring-sky-500/50'
+                  ? 'border-sky-400 ring-2 ring-sky-500/40 bg-sky-500/15'
+                  : 'border-[#1c2433] focus:border-sky-500 focus:ring-1 focus:ring-sky-500/50'
               }`}
             />
             <div className="absolute inset-y-0 right-0 pr-2.5 flex items-center gap-1.5">
@@ -360,7 +360,7 @@ export const Header: React.FC<HeaderProps> = ({
                 <button
                   id="clear-search-btn"
                   onClick={() => onSearchChange('')}
-                  className="p-1 rounded-full text-slate-400 hover:text-slate-700 transition-colors"
+                  className="p-1 rounded-full text-slate-400 hover:text-slate-300 transition-colors"
                   title="Cancella ricerca"
                 >
                   <X className="w-3.5 h-3.5" />
@@ -375,7 +375,7 @@ export const Header: React.FC<HeaderProps> = ({
                 className={`relative p-1.5 rounded-full border transition-all ${
                   isListening
                     ? 'bg-rose-500 text-white border-rose-400 shadow-[0_0_12px_rgba(244,63,94,0.6)] animate-pulse'
-                    : 'bg-sky-50 hover:bg-sky-100 text-sky-600 hover:text-sky-700 border-sky-200'
+                    : 'bg-sky-500/15 hover:bg-sky-500/20 text-sky-400 hover:text-sky-300 border-sky-500/30'
                 }`}
                 title="Ricerca vocale"
               >
@@ -392,7 +392,7 @@ export const Header: React.FC<HeaderProps> = ({
                   id="header-search-qr-btn"
                   type="button"
                   onClick={onOpenQrScanner}
-                  className="p-1.5 rounded-full bg-sky-500/15 hover:bg-sky-500/25 text-sky-700 border border-sky-500/30 transition-colors"
+                  className="p-1.5 rounded-full bg-sky-500/15 hover:bg-sky-500/25 text-sky-300 border border-sky-500/30 transition-colors"
                   title="Scansiona QR"
                 >
                   <QrCode className="w-3.5 h-3.5" />
@@ -422,10 +422,10 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               id="header-qr-scanner-button"
               onClick={onOpenQrScanner}
-              className="relative inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-sky-500/15 hover:bg-sky-500/25 text-sky-700 border border-sky-500/30 text-xs font-semibold transition-colors"
+              className="relative inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-sky-500/15 hover:bg-sky-500/25 text-sky-300 border border-sky-500/30 text-xs font-semibold transition-colors"
               title="Scansiona codice QR fotocamera per aggiungere al carrello"
             >
-              <QrCode className="w-4 h-4 text-sky-600" />
+              <QrCode className="w-4 h-4 text-sky-400" />
               <span>{t('header.qrScanner', 'Scanner QR')}</span>
             </button>
           )}
@@ -446,7 +446,7 @@ export const Header: React.FC<HeaderProps> = ({
           <button
             id="header-notifications-button"
             onClick={onOpenNotifications}
-            className="relative p-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-900 border border-slate-200 transition-colors"
+            className="relative p-2 rounded-full bg-[#161f30] hover:bg-slate-200 text-slate-500 hover:text-white border border-[#1c2433] transition-colors"
             aria-label="Notifiche"
           >
             <Bell className="w-4 h-4" />
@@ -482,8 +482,8 @@ export const Header: React.FC<HeaderProps> = ({
                   : { scale: 1 }
               }
               transition={{ duration: 0.6, ease: "easeInOut" }}
-              className={`relative p-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-900 border border-slate-200 transition-colors ${
-                isCartPulsing ? 'text-sky-700 shadow-[0_0_12px_rgba(56,189,248,0.4)]' : ''
+              className={`relative p-2 rounded-full bg-[#161f30] hover:bg-slate-200 text-slate-500 hover:text-white border border-[#1c2433] transition-colors ${
+                isCartPulsing ? 'text-sky-300 shadow-[0_0_12px_rgba(56,189,248,0.4)]' : ''
               }`}
               aria-label="Carrello"
             >
@@ -513,16 +513,16 @@ export const Header: React.FC<HeaderProps> = ({
               <button
                 id="header-profile-button"
                 onClick={() => setIsProfileMenuOpen((v) => !v)}
-                className="flex items-center gap-2.5 pl-1.5 pr-2 py-1 rounded-full hover:bg-slate-100 border border-transparent hover:border-slate-200 transition-colors text-left"
+                className="flex items-center gap-2.5 pl-1.5 pr-2 py-1 rounded-full hover:bg-[#1a2230] border border-transparent hover:border-[#1c2433] transition-colors text-left"
               >
                 <div className="w-8 h-8 rounded-full bg-sky-600 text-white flex items-center justify-center font-bold text-xs shadow-xs tracking-tight">
                   {currentUser.avatarInitials || currentUser.name.substring(0, 2).toUpperCase()}
                 </div>
                 <div className="hidden sm:block">
-                  <p className="text-slate-900 text-xs font-bold leading-none truncate max-w-[110px]">
+                  <p className="text-white text-xs font-bold leading-none truncate max-w-[110px]">
                     {currentUser.name}
                   </p>
-                  <p className={`text-[10px] leading-tight mt-0.5 font-semibold ${currentUser.role === 'superadmin' ? 'text-amber-600' : 'text-slate-400'}`}>
+                  <p className={`text-[10px] leading-tight mt-0.5 font-semibold ${currentUser.role === 'superadmin' ? 'text-amber-400' : 'text-slate-400'}`}>
                     {currentUser.role === 'superadmin' ? 'SUPERADMIN' : 'Cliente B2B'}
                   </p>
                 </div>
@@ -537,18 +537,18 @@ export const Header: React.FC<HeaderProps> = ({
                     onClick={() => setIsProfileMenuOpen(false)}
                     className="fixed inset-0 z-40 cursor-default"
                   />
-                  <div className="absolute right-0 top-[calc(100%+8px)] z-50 w-64 bg-white border border-slate-200 rounded-2xl shadow-xl p-1.5">
+                  <div className="absolute right-0 top-[calc(100%+8px)] z-50 w-64 bg-[#0e1b30] border border-[#1c2433] rounded-2xl shadow-xl p-1.5">
                     <div className="p-3 pb-2.5">
-                      <p className="text-slate-900 text-sm font-bold leading-tight">{currentUser.name}</p>
+                      <p className="text-white text-sm font-bold leading-tight">{currentUser.name}</p>
                       <p className="text-slate-400 text-xs truncate mt-0.5">{currentUser.email}</p>
                       {currentUser.role === 'superadmin' && (
-                        <span className="inline-block mt-2 text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
+                        <span className="inline-block mt-2 text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30">
                           Ruolo: SuperAdmin
                         </span>
                       )}
                     </div>
 
-                    <div className="h-px bg-slate-100 mx-2" />
+                    <div className="h-px bg-[#161f30] mx-2" />
 
                     <div className="p-1.5 space-y-0.5">
                       {isAdmin && onOpenAdminPanel && (
@@ -558,7 +558,7 @@ export const Header: React.FC<HeaderProps> = ({
                             setIsProfileMenuOpen(false);
                             onOpenAdminPanel();
                           }}
-                          className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition-colors text-left"
+                          className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-sm font-medium text-slate-300 hover:bg-[#1a2230] hover:text-white transition-colors text-left"
                         >
                           <SlidersHorizontal className="w-4 h-4 text-slate-400" />
                           Pannello Amministratore
@@ -571,7 +571,7 @@ export const Header: React.FC<HeaderProps> = ({
                             setIsProfileMenuOpen(false);
                             onOpenQuickReorder();
                           }}
-                          className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition-colors text-left"
+                          className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-sm font-medium text-slate-300 hover:bg-[#1a2230] hover:text-white transition-colors text-left"
                         >
                           <RotateCw className="w-4 h-4 text-slate-400" />
                           Ordini Ricorrenti
@@ -579,7 +579,7 @@ export const Header: React.FC<HeaderProps> = ({
                       )}
                     </div>
 
-                    <div className="h-px bg-slate-100 mx-2" />
+                    <div className="h-px bg-[#161f30] mx-2" />
 
                     <div className="p-1.5">
                       <button
@@ -589,7 +589,7 @@ export const Header: React.FC<HeaderProps> = ({
                           setIsProfileMenuOpen(false);
                           logout();
                         }}
-                        className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-sm font-semibold text-rose-600 hover:bg-rose-50 transition-colors text-left"
+                        className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-sm font-semibold text-rose-400 hover:bg-rose-500/15 transition-colors text-left"
                       >
                         <LogOut className="w-4 h-4" />
                         Disconnetti Sessione
@@ -603,7 +603,7 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               id="header-login-btn"
               onClick={onOpenLogin}
-              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-sky-50 hover:bg-sky-100 text-sky-700 hover:text-sky-800 border border-sky-200 text-xs font-bold transition-all shadow-sm"
+              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-sky-500/15 hover:bg-sky-500/20 text-sky-300 hover:text-sky-200 border border-sky-500/30 text-xs font-bold transition-all shadow-sm"
             >
               <LogIn className="w-3.5 h-3.5" />
               <span>{t('auth.login', 'Accedi')}</span>

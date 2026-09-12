@@ -63,29 +63,29 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/75 backdrop-blur-xs animate-in fade-in duration-200 overflow-y-auto">
       <div 
-        className="relative w-full max-w-2xl sm:max-w-4xl max-h-[94vh] overflow-y-auto bg-slate-50 border border-slate-200 rounded-3xl shadow-2xl scrollbar-none flex flex-col"
+        className="relative w-full max-w-2xl sm:max-w-4xl max-h-[94vh] overflow-y-auto bg-[#0d1420] border border-[#1c2433] rounded-3xl shadow-2xl scrollbar-none flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
         <button
           id="close-product-modal"
           onClick={onClose}
-          className="absolute top-4 right-4 z-10 p-2 rounded-full bg-slate-50 text-slate-500 hover:text-slate-900 border border-slate-200 transition-colors"
+          className="absolute top-4 right-4 z-10 p-2 rounded-full bg-[#0d1420] text-slate-500 hover:text-white border border-[#1c2433] transition-colors"
           aria-label="Chiudi"
         >
           <X className="w-5 h-5" />
         </button>
 
         {/* Tab Navigation Header */}
-        <div className="px-5 sm:px-6 pt-5 pb-0 border-b border-slate-200 flex items-center gap-2">
+        <div className="px-5 sm:px-6 pt-5 pb-0 border-b border-[#1c2433] flex items-center gap-2">
           <button
             type="button"
             id="tab-product-overview"
             onClick={() => setActiveTab('overview')}
             className={`inline-flex items-center gap-2 px-4 py-2.5 border-b-2 font-bold text-xs sm:text-sm transition-all ${
               activeTab === 'overview'
-                ? 'border-sky-400 text-sky-600 bg-sky-500/10 rounded-t-xl'
-                : 'border-transparent text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-t-xl'
+                ? 'border-sky-400 text-sky-400 bg-sky-500/10 rounded-t-xl'
+                : 'border-transparent text-slate-400 hover:text-slate-300 hover:bg-[#1a2230] rounded-t-xl'
             }`}
           >
             <Info className="w-4 h-4" />
@@ -98,13 +98,13 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
             onClick={() => setActiveTab('usage')}
             className={`inline-flex items-center gap-2 px-4 py-2.5 border-b-2 font-bold text-xs sm:text-sm transition-all ${
               activeTab === 'usage'
-                ? 'border-sky-400 text-sky-600 bg-sky-500/10 rounded-t-xl'
-                : 'border-transparent text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-t-xl'
+                ? 'border-sky-400 text-sky-400 bg-sky-500/10 rounded-t-xl'
+                : 'border-transparent text-slate-400 hover:text-slate-300 hover:bg-[#1a2230] rounded-t-xl'
             }`}
           >
             <FlaskConical className="w-4 h-4" />
             <span>Guida all'Uso & Sicurezza Chimica</span>
-            <span className="hidden sm:inline-block text-[10px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-sky-500/20 text-sky-700 border border-sky-400/30">
+            <span className="hidden sm:inline-block text-[10px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-sky-500/20 text-sky-300 border border-sky-400/30">
               Diluizione & DPI
             </span>
           </button>
@@ -113,7 +113,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
         {activeTab === 'overview' ? (
           <div className="grid grid-cols-1 md:grid-cols-12 flex-1">
             {/* Left: Product Image Showcase */}
-            <div className="md:col-span-5 relative bg-white p-6 flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-slate-200">
+            <div className="md:col-span-5 relative bg-[#0e1b30] p-6 flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-[#1c2433]">
               {product.discountPercent && (
                 <div className="absolute top-4 left-4 bg-amber-500/20 border border-amber-500/30 text-amber-300 text-xs font-bold px-2.5 py-1 rounded-lg">
                   Sconto -{product.discountPercent}%
@@ -125,7 +125,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                 referrerPolicy="no-referrer"
                 className="w-48 h-48 sm:w-56 sm:h-56 object-contain filter drop-shadow-[0_10px_20px_rgba(0,0,0,0.6)]"
               />
-              <div className="mt-4 flex items-center gap-2 text-xs text-sky-600 font-medium">
+              <div className="mt-4 flex items-center gap-2 text-xs text-sky-400 font-medium">
                 <Package className="w-4 h-4" />
                 <span>Confezione: {product.packageQty}</span>
               </div>
@@ -135,7 +135,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
             <div className="md:col-span-7 p-5 sm:p-6 flex flex-col justify-between">
               <div>
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-semibold text-sky-600 uppercase tracking-wider">
+                  <span className="text-xs font-semibold text-sky-400 uppercase tracking-wider">
                     {product.category}
                   </span>
                   <div className="flex items-center gap-1.5">
@@ -162,7 +162,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                           onClose();
                           onOpenRestockAnalysis(product.id);
                         }}
-                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold border border-sky-500/30 bg-sky-500/15 text-sky-700 hover:bg-sky-500/25 transition-colors"
+                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold border border-sky-500/30 bg-sky-500/15 text-sky-300 hover:bg-sky-500/25 transition-colors"
                         title="Analisi Riordino Gemini AI per questo articolo"
                       >
                         <Sparkles className="w-3.5 h-3.5" />
@@ -177,7 +177,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                         className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold border transition-colors ${
                           isCompared
                             ? 'border-amber-500/40 bg-amber-500/20 text-amber-300'
-                            : 'border-slate-200 bg-slate-50 text-slate-500 hover:text-slate-900'
+                            : 'border-[#1c2433] bg-[#0d1420] text-slate-500 hover:text-white'
                         }`}
                         title={isCompared ? 'Rimuovi dal confronto' : 'Aggiungi al confronto'}
                       >
@@ -192,7 +192,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                       className={`p-1.5 rounded-full border transition-colors ${
                         isFavorite
                           ? 'border-rose-500/30 bg-rose-500/15 text-rose-400'
-                          : 'border-slate-200 bg-slate-50 text-slate-500 hover:text-slate-900'
+                          : 'border-[#1c2433] bg-[#0d1420] text-slate-500 hover:text-white'
                       }`}
                       aria-label="Preferito"
                     >
@@ -201,27 +201,27 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                   </div>
                 </div>
 
-                <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mt-1">
+                <h2 className="text-xl sm:text-2xl font-bold text-white mt-1">
                   {product.name}
                 </h2>
                 <p className="text-xs text-slate-400 mt-0.5">
-                  Codice Articolo: <span className="text-slate-600 font-mono">{product.code}</span>
+                  Codice Articolo: <span className="text-slate-400 font-mono">{product.code}</span>
                 </p>
 
-                <p className="text-slate-600 text-xs sm:text-sm mt-3 leading-relaxed">
+                <p className="text-slate-400 text-xs sm:text-sm mt-3 leading-relaxed">
                   {product.description}
                 </p>
 
                 {/* Specs Box */}
-                <div className="mt-3.5 bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs space-y-1.5">
+                <div className="mt-3.5 bg-[#0d1420] border border-[#1c2433] rounded-xl p-3 text-xs space-y-1.5">
                   <div className="flex justify-between text-slate-400">
                     <span>Formato:</span>
-                    <span className="text-slate-700 font-medium">{product.specs.format}</span>
+                    <span className="text-slate-300 font-medium">{product.specs.format}</span>
                   </div>
                   {product.specs.fragrance && (
                     <div className="flex justify-between text-slate-400">
                       <span>Fragranza:</span>
-                      <span className="text-slate-700 font-medium">{product.specs.fragrance}</span>
+                      <span className="text-slate-300 font-medium">{product.specs.fragrance}</span>
                     </div>
                   )}
                   <div className="flex justify-between text-slate-400">
@@ -245,12 +245,12 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
               </div>
 
               {/* Bottom: Price & Quantity Controls */}
-              <div className="mt-5 pt-4 border-t border-slate-200">
+              <div className="mt-5 pt-4 border-t border-[#1c2433]">
                 <div className="flex items-baseline justify-between mb-3">
                   <div>
-                    <span className="text-2xl font-extrabold text-slate-900">€{displayFinalPrice}</span>
+                    <span className="text-2xl font-extrabold text-white">€{displayFinalPrice}</span>
                     {isBusinessCustomer ? (
-                      <span className="text-xs text-sky-600 ml-2 font-medium bg-sky-500/15 px-2 py-0.5 rounded border border-sky-500/25">
+                      <span className="text-xs text-sky-400 ml-2 font-medium bg-sky-500/15 px-2 py-0.5 rounded border border-sky-500/25">
                         con IVA 22% (Netto €{totalPrice})
                       </span>
                     ) : (
@@ -269,20 +269,20 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
 
                 <div className="flex items-center gap-3">
                   {/* Quantity modifier */}
-                  <div className="flex items-center bg-slate-50 border border-slate-200 rounded-xl px-2 py-1">
+                  <div className="flex items-center bg-[#0d1420] border border-[#1c2433] rounded-xl px-2 py-1">
                     <button
                       onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                      className="p-1.5 text-slate-400 hover:text-slate-900"
+                      className="p-1.5 text-slate-400 hover:text-white"
                       aria-label="Diminuisci quantità"
                     >
                       <Minus className="w-3.5 h-3.5" />
                     </button>
-                    <span className="px-3 text-sm font-bold text-slate-900 min-w-[2rem] text-center">
+                    <span className="px-3 text-sm font-bold text-white min-w-[2rem] text-center">
                       {quantity}
                     </span>
                     <button
                       onClick={() => setQuantity(quantity + 1)}
-                      className="p-1.5 text-slate-400 hover:text-slate-900"
+                      className="p-1.5 text-slate-400 hover:text-white"
                       aria-label="Aumenta quantità"
                     >
                       <Plus className="w-3.5 h-3.5" />
@@ -319,11 +319,11 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
           /* Usage Guidelines Tab Content */
           <div className="p-5 sm:p-6 space-y-6 flex-1">
             {/* Header info in Tab */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-200">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-[#1c2433]">
               <div>
-                <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                <h3 className="text-lg font-bold text-white flex items-center gap-2">
                   <span>Guida all'Uso & Diluizione:</span>
-                  <span className="text-sky-600">{product.name}</span>
+                  <span className="text-sky-400">{product.name}</span>
                 </h3>
                 <p className="text-xs text-slate-400 mt-0.5">
                   Istruzioni operative certificate per il personale addetto alle pulizie e conformità HACCP.
@@ -333,7 +333,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setActiveTab('overview')}
-                  className="text-xs font-semibold text-slate-400 hover:text-slate-900 px-3 py-1.5 rounded-lg bg-slate-50 border border-slate-200 transition-colors"
+                  className="text-xs font-semibold text-slate-400 hover:text-white px-3 py-1.5 rounded-lg bg-[#0d1420] border border-[#1c2433] transition-colors"
                 >
                   ← Torna alla Panoramica
                 </button>
@@ -344,10 +344,10 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
             <ProductUsageGuidelines product={product} />
 
             {/* Bottom Quick Action Bar inside Usage tab */}
-            <div className="pt-4 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div className="pt-4 border-t border-[#1c2433] flex flex-col sm:flex-row items-center justify-between gap-3">
               <div className="flex items-center gap-2">
                 <span className="text-xs text-slate-400">Prezzo unitario:</span>
-                <span className="text-base font-bold text-slate-900">€{product.price.toFixed(2)}</span>
+                <span className="text-base font-bold text-white">€{product.price.toFixed(2)}</span>
                 <span className="text-xs text-slate-400">/ {product.unit}</span>
               </div>
 

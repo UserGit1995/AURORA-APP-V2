@@ -14,12 +14,12 @@ interface BrandsSectionProps {
 }
 
 const BADGE_COLORS = [
-  'bg-sky-50 text-sky-600 border-sky-200',
-  'bg-amber-50 text-amber-600 border-amber-200',
-  'bg-rose-50 text-rose-600 border-rose-200',
-  'bg-emerald-50 text-emerald-600 border-emerald-200',
-  'bg-indigo-50 text-indigo-600 border-indigo-200',
-  'bg-fuchsia-50 text-fuchsia-600 border-fuchsia-200',
+  'bg-sky-500/15 text-sky-400 border-sky-500/30',
+  'bg-amber-500/15 text-amber-400 border-amber-500/30',
+  'bg-rose-500/15 text-rose-400 border-rose-500/30',
+  'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
+  'bg-indigo-500/15 text-indigo-400 border-indigo-200',
+  'bg-fuchsia-500/15 text-fuchsia-400 border-fuchsia-200',
 ];
 
 export function colorForBrand(name: string) {
@@ -49,11 +49,11 @@ export const BrandTile: React.FC<{ brand: BrandSummary; onClick: () => void }> =
       <button
         id={`brand-card-${brand.name}`}
         onClick={onClick}
-        className="w-full bg-white border border-slate-200 hover:border-sky-300 hover:shadow-md rounded-2xl p-3.5 flex flex-col items-center text-center gap-2 transition-all hover:-translate-y-0.5"
+        className="w-full bg-[#0e1b30] border border-[#1c2433] hover:border-sky-500/50 hover:shadow-md rounded-2xl p-3.5 flex flex-col items-center text-center gap-2 transition-all hover:-translate-y-0.5"
       >
         <div
           className={`w-14 h-14 rounded-full flex items-center justify-center border overflow-hidden shrink-0 ${
-            brand.image ? 'bg-white border-slate-200' : colorForBrand(brand.name)
+            brand.image ? 'bg-[#0e1b30] border-[#1c2433]' : colorForBrand(brand.name)
           }`}
         >
           {brand.image ? (
@@ -63,7 +63,7 @@ export const BrandTile: React.FC<{ brand: BrandSummary; onClick: () => void }> =
           )}
         </div>
         <div className="min-w-0 w-full">
-          <p className="text-slate-900 text-xs font-bold truncate">{brand.name}</p>
+          <p className="text-white text-xs font-bold truncate">{brand.name}</p>
           <p className="text-slate-400 text-[10.5px] mt-0.5">{brand.productCount} prodotti</p>
         </div>
       </button>
@@ -91,12 +91,12 @@ export const BrandTile: React.FC<{ brand: BrandSummary; onClick: () => void }> =
           }}
         >
           <div
-            className="w-full max-w-xs bg-white border border-slate-200 rounded-2xl shadow-xl p-4"
+            className="w-full max-w-xs bg-[#0e1b30] border border-[#1c2433] rounded-2xl shadow-xl p-4"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-3">
-              <p className="text-sm font-bold text-slate-900">Logo di {brand.name}</p>
-              <button onClick={() => setIsUploaderOpen(false)} className="text-slate-400 hover:text-slate-700">
+              <p className="text-sm font-bold text-white">Logo di {brand.name}</p>
+              <button onClick={() => setIsUploaderOpen(false)} className="text-slate-400 hover:text-slate-300">
                 <X className="w-4 h-4" />
               </button>
             </div>
@@ -104,7 +104,7 @@ export const BrandTile: React.FC<{ brand: BrandSummary; onClick: () => void }> =
             {brand.image && (
               <button
                 onClick={() => handleLogoChange('')}
-                className="mt-2.5 text-xs font-semibold text-rose-500 hover:text-rose-700"
+                className="mt-2.5 text-xs font-semibold text-rose-500 hover:text-rose-300"
               >
                 Rimuovi logo e torna al badge con iniziale
               </button>
@@ -142,18 +142,18 @@ export const BrandsSection: React.FC<BrandsSectionProps> = ({
     <section className="w-full mt-6 sm:mt-7">
       <div className="flex items-center justify-between mb-3.5 sm:mb-4">
         <div className="flex items-center gap-2 sm:gap-2.5">
-          <div className="p-1.5 rounded-lg bg-amber-50 text-amber-600">
+          <div className="p-1.5 rounded-lg bg-amber-500/15 text-amber-400">
             <Award className="w-4 h-4" />
           </div>
           <div>
-            <h2 className="text-slate-900 text-sm sm:text-lg font-bold tracking-tight leading-tight">Marche</h2>
+            <h2 className="text-white text-sm sm:text-lg font-bold tracking-tight leading-tight">Marche</h2>
             <p className="hidden sm:block text-slate-500 text-xs">Sfoglia tutti i prodotti per marca, in ogni categoria</p>
           </div>
         </div>
         {remaining > 0 && (
           <button
             onClick={onViewAllBrands}
-            className="text-xs font-semibold text-sky-600 hover:text-sky-700 flex items-center gap-1 shrink-0"
+            className="text-xs font-semibold text-sky-400 hover:text-sky-300 flex items-center gap-1 shrink-0"
           >
             Vedi tutte ({brands.length})
             <ArrowRight className="w-3.5 h-3.5" />

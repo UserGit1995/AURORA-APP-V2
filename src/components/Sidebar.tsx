@@ -66,7 +66,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       label: t('nav.compare', 'Confronta'),
       icon: <Scale className="w-[18px] h-[18px]" />,
       badge: comparedCount > 0 ? comparedCount : undefined,
-      badgeColor: 'bg-amber-100 text-amber-700'
+      badgeColor: 'bg-amber-100 text-amber-300'
     }
   ];
 
@@ -81,7 +81,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       )}
 
       <aside
-        className={`fixed top-0 left-0 bottom-0 z-50 w-60 bg-white border-r border-slate-200 overflow-y-auto p-4 transition-transform duration-300 ease-in-out lg:translate-x-0 ${
+        className={`fixed top-0 left-0 bottom-0 z-50 w-60 bg-[#0e1b30] border-r border-[#1c2433] overflow-y-auto p-4 transition-transform duration-300 ease-in-out lg:translate-x-0 ${
           isOpenMobile ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
@@ -93,7 +93,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               {isOpenMobile && (
                 <button 
                   onClick={onCloseMobile}
-                  className="lg:hidden text-slate-400 hover:text-slate-700 p-1"
+                  className="lg:hidden text-slate-400 hover:text-slate-300 p-1"
                   aria-label="Chiudi menu"
                 >
                   <X className="w-5 h-5" />
@@ -119,7 +119,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 text-left cursor-pointer ${
                       isActive
                         ? 'bg-sky-600 text-white shadow-xs'
-                        : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'
+                        : 'text-slate-500 hover:text-white hover:bg-[#1a2230]'
                     }`}
                   >
                     <span className={isActive ? 'text-white' : 'text-slate-400'}>
@@ -129,10 +129,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     {item.badge !== undefined && (
                       <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${
                         isActive 
-                          ? 'bg-white/20 text-white' 
+                          ? 'bg-[#0e1b30]/20 text-white' 
                           : item.badgeColor 
                             ? item.badgeColor 
-                            : 'bg-sky-100 text-sky-700'
+                            : 'bg-sky-500/20 text-sky-300'
                       }`}>
                         {item.badge}
                       </span>
@@ -156,13 +156,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 className="w-full bg-teal-600 hover:bg-teal-500 border border-teal-600 text-white text-xs font-bold py-2.5 px-3 rounded-2xl transition-all flex items-center justify-between group text-left cursor-pointer"
               >
                 <div className="flex items-center gap-2.5">
-                  <div className="p-1.5 rounded-xl bg-white/15 text-white">
+                  <div className="p-1.5 rounded-xl bg-[#0e1b30]/15 text-white">
                     <RotateCw className="w-3.5 h-3.5" />
                   </div>
                   <div>
                     <span className="flex items-center gap-1.5 text-white text-xs font-bold">
                       {t('nav.quickReorder', 'Riordino Rapido')}
-                      <span className="text-[9px] font-bold bg-white/20 px-1.5 py-0.5 rounded-full">1-Click</span>
+                      <span className="text-[9px] font-bold bg-[#0e1b30]/20 px-1.5 py-0.5 rounded-full">1-Click</span>
                     </span>
                     <span className="block text-[10px] text-teal-100 font-medium mt-0.5">{t('nav.quickReorderSub', 'Fornitura ricorrente')}</span>
                   </div>
@@ -179,24 +179,24 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   onOpenAdminPanel();
                   if (onCloseMobile) onCloseMobile();
                 }}
-                className="w-full bg-amber-50 hover:bg-amber-100 border border-amber-200 text-left py-2.5 px-3 rounded-2xl transition-all flex items-center justify-between group cursor-pointer"
+                className="w-full bg-amber-500/15 hover:bg-amber-100 border border-amber-500/30 text-left py-2.5 px-3 rounded-2xl transition-all flex items-center justify-between group cursor-pointer"
               >
                 <div className="flex items-center gap-2.5">
-                  <div className="p-1.5 rounded-xl bg-amber-100 text-amber-700">
+                  <div className="p-1.5 rounded-xl bg-amber-100 text-amber-300">
                     <SlidersHorizontal className="w-3.5 h-3.5" />
                   </div>
                   <div>
-                    <span className="flex items-center gap-1.5 text-slate-900 text-xs font-bold">
+                    <span className="flex items-center gap-1.5 text-white text-xs font-bold">
                       Pannello Gestione
-                      <span className="text-[9px] font-bold bg-amber-200 text-amber-800 px-1.5 py-0.5 rounded-full">SUPERADMIN</span>
+                      <span className="text-[9px] font-bold bg-amber-200 text-amber-200 px-1.5 py-0.5 rounded-full">SUPERADMIN</span>
                     </span>
-                    <span className="flex items-center gap-1 text-[10px] text-amber-700 font-medium mt-0.5">
+                    <span className="flex items-center gap-1 text-[10px] text-amber-300 font-medium mt-0.5">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                       {currentUser?.name || 'Admin'} (Online)
                     </span>
                   </div>
                 </div>
-                <span className="text-amber-600 group-hover:translate-x-1 transition-transform text-xs font-bold">›</span>
+                <span className="text-amber-400 group-hover:translate-x-1 transition-transform text-xs font-bold">›</span>
               </button>
             )}
 
@@ -208,18 +208,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   onOpenLogin();
                   if (onCloseMobile) onCloseMobile();
                 }}
-                className="w-full bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 hover:text-slate-900 text-xs font-semibold py-2 px-3 rounded-xl transition-all flex items-center justify-between shadow-xs cursor-pointer"
+                className="w-full bg-[#0e1b30] hover:bg-[#111826] border border-[#1c2433] text-slate-300 hover:text-white text-xs font-semibold py-2 px-3 rounded-xl transition-all flex items-center justify-between shadow-xs cursor-pointer"
               >
                 <div className="flex items-center gap-2">
-                  <LogIn className="w-3.5 h-3.5 text-sky-600" />
+                  <LogIn className="w-3.5 h-3.5 text-sky-400" />
                   <span>{t('nav.login', 'Accedi / Registrati')}</span>
                 </div>
-                <span className="text-[10px] text-sky-700 font-mono bg-sky-100 px-1.5 py-0.5 rounded">ACCOUNT</span>
+                <span className="text-[10px] text-sky-300 font-mono bg-sky-500/20 px-1.5 py-0.5 rounded">ACCOUNT</span>
               </button>
             )}
 
-            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 text-left">
-              <h4 className="text-slate-900 text-xs font-semibold tracking-wide">
+            <div className="bg-[#0d1420] border border-[#1c2433] rounded-2xl p-4 text-left">
+              <h4 className="text-white text-xs font-semibold tracking-wide">
                 {t('nav.helpTitle', 'Hai bisogno di aiuto?')}
               </h4>
               <p className="text-slate-500 text-[11px] leading-relaxed mt-1">

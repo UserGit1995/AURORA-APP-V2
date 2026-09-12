@@ -120,11 +120,11 @@ export const OrderEditModal: React.FC<OrderEditModalProps> = ({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-xs overflow-y-auto">
       <div 
-        className="relative w-full max-w-4xl bg-slate-50 border border-amber-500/30 rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[92vh]"
+        className="relative w-full max-w-4xl bg-[#0d1420] border border-amber-500/30 rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[92vh]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="p-4 sm:p-5 border-b border-amber-500/20 bg-slate-50 flex items-center justify-between gap-3 shrink-0">
+        <div className="p-4 sm:p-5 border-b border-amber-500/20 bg-[#0d1420] flex items-center justify-between gap-3 shrink-0">
           <div className="flex items-center gap-2.5">
             <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-400 flex items-center justify-center font-bold">
               <FileText className="w-5 h-5" />
@@ -134,7 +134,7 @@ export const OrderEditModal: React.FC<OrderEditModalProps> = ({
                 <span className="text-xs font-mono uppercase tracking-wider px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
                   SuperAdmin Ordine
                 </span>
-                <h3 className="text-base sm:text-lg font-bold text-slate-900">
+                <h3 className="text-base sm:text-lg font-bold text-white">
                   Modifica Ordine #{order.id}
                 </h3>
               </div>
@@ -155,7 +155,7 @@ export const OrderEditModal: React.FC<OrderEditModalProps> = ({
             </button>
             <button
               onClick={onClose}
-              className="p-2 rounded-full bg-slate-50 text-slate-400 hover:text-white border border-slate-200 transition-colors"
+              className="p-2 rounded-full bg-[#0d1420] text-slate-400 hover:text-white border border-[#1c2433] transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
@@ -165,15 +165,15 @@ export const OrderEditModal: React.FC<OrderEditModalProps> = ({
         {/* Form Body */}
         <form onSubmit={handleSubmit} className="p-4 sm:p-6 overflow-y-auto space-y-6 text-left text-sm flex-1">
           {/* Status and Logistics Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-slate-50/60 p-4 rounded-2xl border border-slate-800">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-[#0d1420]/60 p-4 rounded-2xl border border-slate-800">
             <div>
-              <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">
                 Stato di Avanzamento
               </label>
               <select
                 value={formData.status || 'In elaborazione'}
                 onChange={(e) => handleStatusChange(e.target.value as Order['status'])}
-                className="w-full bg-slate-50 border border-amber-500/40 rounded-xl px-3 py-2 text-slate-900 font-bold text-sm outline-none"
+                className="w-full bg-[#0d1420] border border-amber-500/40 rounded-xl px-3 py-2 text-white font-bold text-sm outline-none"
               >
                 <option value="In elaborazione">In elaborazione</option>
                 <option value="Spedito">Spedito (In transito)</option>
@@ -183,7 +183,7 @@ export const OrderEditModal: React.FC<OrderEditModalProps> = ({
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">
                 Corriere Assegnato
               </label>
               <input
@@ -191,12 +191,12 @@ export const OrderEditModal: React.FC<OrderEditModalProps> = ({
                 value={formData.courier || ''}
                 onChange={(e) => setFormData({ ...formData, courier: e.target.value })}
                 placeholder="Es. BRT Express B2B"
-                className="w-full bg-slate-50 border border-slate-700 rounded-xl px-3 py-2 text-slate-900 text-sm outline-none"
+                className="w-full bg-[#0d1420] border border-slate-700 rounded-xl px-3 py-2 text-white text-sm outline-none"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">
                 Codice Tracking
               </label>
               <input
@@ -204,13 +204,13 @@ export const OrderEditModal: React.FC<OrderEditModalProps> = ({
                 value={formData.trackingNumber || ''}
                 onChange={(e) => setFormData({ ...formData, trackingNumber: e.target.value })}
                 placeholder="Es. BRT-8921-94812"
-                className="w-full bg-slate-50 border border-slate-700 rounded-xl px-3 py-2 text-slate-900 font-mono text-sm outline-none"
+                className="w-full bg-[#0d1420] border border-slate-700 rounded-xl px-3 py-2 text-white font-mono text-sm outline-none"
               />
             </div>
           </div>
 
           {/* Recipient & Shipping Information */}
-          <div className="bg-slate-50/40 p-4 rounded-2xl border border-slate-800 space-y-4">
+          <div className="bg-[#0d1420]/40 p-4 rounded-2xl border border-slate-800 space-y-4">
             <h4 className="text-xs font-bold text-amber-400 uppercase tracking-wider">
               Dati Intestatario & Destinazione Spedizione
             </h4>
@@ -232,7 +232,7 @@ export const OrderEditModal: React.FC<OrderEditModalProps> = ({
                       },
                     })
                   }
-                  className="w-full bg-slate-50 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-slate-900 outline-none"
+                  className="w-full bg-[#0d1420] border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white outline-none"
                 />
               </div>
 
@@ -249,7 +249,7 @@ export const OrderEditModal: React.FC<OrderEditModalProps> = ({
                       shippingAddress: { ...formData.shippingAddress!, vatNumber: e.target.value },
                     })
                   }
-                  className="w-full bg-slate-50 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-slate-900 font-mono outline-none"
+                  className="w-full bg-[#0d1420] border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white font-mono outline-none"
                 />
               </div>
 
@@ -266,7 +266,7 @@ export const OrderEditModal: React.FC<OrderEditModalProps> = ({
                       shippingAddress: { ...formData.shippingAddress!, sdiCode: e.target.value },
                     })
                   }
-                  className="w-full bg-slate-50 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-slate-900 font-mono outline-none"
+                  className="w-full bg-[#0d1420] border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white font-mono outline-none"
                 />
               </div>
 
@@ -283,7 +283,7 @@ export const OrderEditModal: React.FC<OrderEditModalProps> = ({
                       shippingAddress: { ...formData.shippingAddress!, street: e.target.value },
                     })
                   }
-                  className="w-full bg-slate-50 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-slate-900 outline-none"
+                  className="w-full bg-[#0d1420] border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white outline-none"
                 />
               </div>
 
@@ -302,7 +302,7 @@ export const OrderEditModal: React.FC<OrderEditModalProps> = ({
                       })
                     }
                     placeholder="Città"
-                    className="flex-1 bg-slate-50 border border-slate-700 rounded-xl px-2.5 py-1.5 text-xs text-slate-900 outline-none"
+                    className="flex-1 bg-[#0d1420] border border-slate-700 rounded-xl px-2.5 py-1.5 text-xs text-white outline-none"
                   />
                   <input
                     type="text"
@@ -314,7 +314,7 @@ export const OrderEditModal: React.FC<OrderEditModalProps> = ({
                       })
                     }
                     placeholder="PR"
-                    className="w-12 bg-slate-50 border border-slate-700 rounded-xl px-2 py-1.5 text-xs text-slate-900 font-mono uppercase text-center outline-none"
+                    className="w-12 bg-[#0d1420] border border-slate-700 rounded-xl px-2 py-1.5 text-xs text-white font-mono uppercase text-center outline-none"
                   />
                 </div>
               </div>
@@ -324,7 +324,7 @@ export const OrderEditModal: React.FC<OrderEditModalProps> = ({
           {/* Editable Order Items List */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <h4 className="text-xs font-bold text-slate-600 uppercase tracking-wider">
+              <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider">
                 Articoli nell'Ordine ({(formData.items || []).length})
               </h4>
             </div>
@@ -333,29 +333,29 @@ export const OrderEditModal: React.FC<OrderEditModalProps> = ({
               {(formData.items || []).map((item, idx) => (
                 <div
                   key={idx}
-                  className="flex items-center justify-between gap-3 p-3 rounded-xl bg-slate-50 border border-slate-800 text-xs"
+                  className="flex items-center justify-between gap-3 p-3 rounded-xl bg-[#0d1420] border border-slate-800 text-xs"
                 >
                   <div className="flex-1 min-w-0">
-                    <p className="font-bold text-slate-900 truncate">{item.productName}</p>
+                    <p className="font-bold text-white truncate">{item.productName}</p>
                     <p className="text-slate-400 text-[11px] font-mono">
                       € {item.price.toFixed(2)}/pz • {item.packageQty || 'Confezione Standard'}
                     </p>
                   </div>
 
                   <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-700 rounded-lg p-1">
+                    <div className="flex items-center gap-1.5 bg-[#0d1420] border border-slate-700 rounded-lg p-1">
                       <button
                         type="button"
                         onClick={() => handleItemQtyChange(idx, item.qty - 1)}
-                        className="p-1 hover:bg-slate-800 text-slate-600 rounded"
+                        className="p-1 hover:bg-slate-800 text-slate-400 rounded"
                       >
                         <Minus className="w-3 h-3" />
                       </button>
-                      <span className="w-8 text-center font-bold text-slate-900">{item.qty}</span>
+                      <span className="w-8 text-center font-bold text-white">{item.qty}</span>
                       <button
                         type="button"
                         onClick={() => handleItemQtyChange(idx, item.qty + 1)}
-                        className="p-1 hover:bg-slate-800 text-slate-600 rounded"
+                        className="p-1 hover:bg-slate-800 text-slate-400 rounded"
                       >
                         <Plus className="w-3 h-3" />
                       </button>
@@ -383,7 +383,7 @@ export const OrderEditModal: React.FC<OrderEditModalProps> = ({
               <select
                 value={selectedProductId}
                 onChange={(e) => setSelectedProductId(e.target.value)}
-                className="flex-1 bg-slate-50 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white outline-none"
+                className="flex-1 bg-[#0d1420] border border-slate-700 rounded-xl px-3 py-2 text-xs text-white outline-none"
               >
                 <option value="">+ Aggiungi un articolo dal catalogo all'ordine...</option>
                 {products.map((p) => (
@@ -397,7 +397,7 @@ export const OrderEditModal: React.FC<OrderEditModalProps> = ({
                 min="1"
                 value={addQty}
                 onChange={(e) => setAddQty(parseInt(e.target.value, 10) || 1)}
-                className="w-16 bg-slate-50 border border-slate-700 rounded-xl px-2 py-2 text-xs text-slate-900 text-center font-bold"
+                className="w-16 bg-[#0d1420] border border-slate-700 rounded-xl px-2 py-2 text-xs text-white text-center font-bold"
               />
               <button
                 type="button"
@@ -411,11 +411,11 @@ export const OrderEditModal: React.FC<OrderEditModalProps> = ({
           </div>
 
           {/* Financial Summary */}
-          <div className="bg-slate-50 p-4 rounded-2xl border border-slate-800 flex items-center justify-between">
+          <div className="bg-[#0d1420] p-4 rounded-2xl border border-slate-800 flex items-center justify-between">
             <div className="text-xs text-slate-400 space-y-0.5">
-              <p>Imponibile: <span className="text-slate-900 font-mono">€ {(formData.subtotal || 0).toFixed(2)}</span></p>
-              <p>IVA (22%): <span className="text-slate-900 font-mono">€ {(formData.vatAmount || 0).toFixed(2)}</span></p>
-              <p>Spedizione: <span className="text-slate-900 font-mono">€ {(formData.shippingCost || 0).toFixed(2)}</span></p>
+              <p>Imponibile: <span className="text-white font-mono">€ {(formData.subtotal || 0).toFixed(2)}</span></p>
+              <p>IVA (22%): <span className="text-white font-mono">€ {(formData.vatAmount || 0).toFixed(2)}</span></p>
+              <p>Spedizione: <span className="text-white font-mono">€ {(formData.shippingCost || 0).toFixed(2)}</span></p>
             </div>
             <div className="text-right">
               <span className="text-xs text-slate-400 uppercase font-bold">Totale Ordine Ricalcolato</span>
@@ -426,11 +426,11 @@ export const OrderEditModal: React.FC<OrderEditModalProps> = ({
           </div>
 
           {/* Action Buttons */}
-          <div className="pt-4 border-t border-slate-800 flex items-center justify-end gap-3 sticky bottom-0 bg-slate-50 py-2">
+          <div className="pt-4 border-t border-slate-800 flex items-center justify-end gap-3 sticky bottom-0 bg-[#0d1420] py-2">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2.5 rounded-xl border border-slate-700 text-slate-600 hover:bg-slate-800 text-xs font-bold transition-all"
+              className="px-4 py-2.5 rounded-xl border border-slate-700 text-slate-400 hover:bg-slate-800 text-xs font-bold transition-all"
             >
               Annulla
             </button>

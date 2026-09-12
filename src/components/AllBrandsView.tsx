@@ -37,13 +37,13 @@ export const AllBrandsView: React.FC<AllBrandsViewProps> = ({
       <div className="flex items-center gap-3">
         <button
           onClick={onBack}
-          className="p-2 rounded-full bg-white border border-slate-200 hover:bg-slate-100 text-slate-600 transition-colors"
+          className="p-2 rounded-full bg-[#0e1b30] border border-[#1c2433] hover:bg-[#1a2230] text-slate-400 transition-colors"
           aria-label="Torna alla home"
         >
           <ArrowLeft className="w-4 h-4" />
         </button>
         <div>
-          <h1 className="text-slate-900 text-xl sm:text-2xl font-bold tracking-tight">Tutte le marche</h1>
+          <h1 className="text-white text-xl sm:text-2xl font-bold tracking-tight">Tutte le marche</h1>
           <p className="text-slate-500 text-xs sm:text-sm">{brands.length} marche disponibili nel catalogo</p>
         </div>
       </div>
@@ -55,7 +55,7 @@ export const AllBrandsView: React.FC<AllBrandsViewProps> = ({
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Cerca una marca..."
-          className="w-full pl-10 pr-3.5 py-2.5 bg-white border border-slate-200 focus:border-sky-400 rounded-xl text-sm text-slate-900 placeholder-slate-400 outline-none transition-colors"
+          className="w-full pl-10 pr-3.5 py-2.5 bg-[#0e1b30] border border-[#1c2433] focus:border-sky-400 rounded-xl text-sm text-white placeholder-slate-500 outline-none transition-colors"
         />
       </div>
 

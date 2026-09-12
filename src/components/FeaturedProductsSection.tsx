@@ -35,17 +35,17 @@ export const FeaturedProductsSection: React.FC<FeaturedProductsSectionProps> = (
       {/* Section Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2.5">
-          <div className="p-1.5 rounded-lg bg-sky-500/15 text-sky-600">
+          <div className="p-1.5 rounded-lg bg-sky-500/15 text-sky-400">
             <Star className="w-4 h-4 fill-sky-400/30" />
           </div>
-          <h2 className="text-slate-900 text-base sm:text-lg font-bold tracking-tight">
+          <h2 className="text-white text-base sm:text-lg font-bold tracking-tight">
             {t('featured.sectionTitle', 'Prodotti in evidenza')}
           </h2>
         </div>
         <button
           id="view-all-featured-btn"
           onClick={onViewAll}
-          className="text-xs sm:text-sm font-semibold text-sky-600 hover:text-sky-700 transition-colors flex items-center gap-1 group"
+          className="text-xs sm:text-sm font-semibold text-sky-400 hover:text-sky-300 transition-colors flex items-center gap-1 group"
         >
           <span>{t('featured.viewAll', 'Vedi tutti')}</span>
           <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
@@ -66,10 +66,10 @@ export const FeaturedProductsSection: React.FC<FeaturedProductsSectionProps> = (
               key={product.id}
               id={`product-card-${product.id}`}
               onClick={() => onSelectProduct(product)}
-              className={`group relative cursor-pointer bg-slate-50 hover:bg-slate-100 border rounded-2xl p-3 flex flex-col justify-between transition-all duration-200 hover:translate-y-[-2px] shadow-sm hover:shadow-lg hover:shadow-sky-950/40 ${
+              className={`group relative cursor-pointer bg-[#0d1420] hover:bg-[#1a2230] border rounded-2xl p-3 flex flex-col justify-between transition-all duration-200 hover:translate-y-[-2px] shadow-sm hover:shadow-lg hover:shadow-sky-950/40 ${
                 isCompared
                   ? 'border-amber-500/50 ring-1 ring-amber-500/30 shadow-amber-500/5'
-                  : 'border-slate-200 hover:border-sky-300'
+                  : 'border-[#1c2433] hover:border-sky-500/50'
               }`}
             >
               {/* Top Bar: Discount, Low Stock Badge & Favorite + Compare Buttons */}
@@ -104,7 +104,7 @@ export const FeaturedProductsSection: React.FC<FeaturedProductsSectionProps> = (
                       className={`p-1.5 rounded-full backdrop-blur-xs transition-colors shrink-0 ${
                         isCompared
                           ? 'text-amber-300 bg-amber-500/20 border border-amber-500/40 shadow-xs'
-                          : 'text-slate-500 hover:text-slate-900 bg-slate-50/80 hover:bg-slate-100'
+                          : 'text-slate-500 hover:text-white bg-[#111826]/80 hover:bg-[#1a2230]'
                       }`}
                       title={isCompared ? t('featured.inCompare', 'Rimuovi dal confronto') : t('featured.compare', 'Aggiungi al confronto')}
                       aria-label="Confronta prodotto"
@@ -123,7 +123,7 @@ export const FeaturedProductsSection: React.FC<FeaturedProductsSectionProps> = (
                     className={`p-1.5 rounded-full backdrop-blur-xs transition-colors shrink-0 ${
                       isFav
                         ? 'text-rose-400 bg-rose-500/10'
-                        : 'text-slate-500 hover:text-slate-900 bg-slate-50/80 hover:bg-slate-100'
+                        : 'text-slate-500 hover:text-white bg-[#111826]/80 hover:bg-[#1a2230]'
                     }`}
                     aria-label="Aggiungi ai preferiti"
                     title={isFav ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'}
@@ -134,7 +134,7 @@ export const FeaturedProductsSection: React.FC<FeaturedProductsSectionProps> = (
               </div>
 
               {/* Product Image */}
-              <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-white border border-slate-200 shadow-xs flex items-center justify-center p-2 my-1">
+              <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-[#0e1b30] border border-[#1c2433] shadow-xs flex items-center justify-center p-2 my-1">
                 <img
                   src={product.image}
                   alt={product.name}
@@ -145,7 +145,7 @@ export const FeaturedProductsSection: React.FC<FeaturedProductsSectionProps> = (
 
               {/* Product Info */}
               <div className="mt-2 text-left">
-                <h3 className="text-slate-900 text-xs sm:text-sm font-bold truncate leading-tight group-hover:text-sky-700 transition-colors">
+                <h3 className="text-white text-xs sm:text-sm font-bold truncate leading-tight group-hover:text-sky-300 transition-colors">
                   {product.name}
                 </h3>
                 <div className="flex items-center justify-between gap-1 mt-0.5">
@@ -160,14 +160,14 @@ export const FeaturedProductsSection: React.FC<FeaturedProductsSectionProps> = (
                 </div>
 
                 {/* Price and B2B quick add */}
-                <div className="flex items-center justify-between mt-2.5 pt-1.5 border-t border-slate-200">
+                <div className="flex items-center justify-between mt-2.5 pt-1.5 border-t border-[#1c2433]">
                   <div>
                     {isBusinessCustomer ? (
-                      <span className="text-slate-900 text-xs font-bold">
+                      <span className="text-white text-xs font-bold">
                         €{(product.price * 1.22).toFixed(2)}
                       </span>
                     ) : (
-                      <span className="text-slate-900 text-xs font-bold">
+                      <span className="text-white text-xs font-bold">
                         €{product.price.toFixed(2)}
                       </span>
                     )}
@@ -178,7 +178,7 @@ export const FeaturedProductsSection: React.FC<FeaturedProductsSectionProps> = (
                     className={`p-1 rounded-lg transition-all ${
                       isJustAdded
                         ? 'bg-emerald-600 text-white'
-                        : 'bg-slate-50 hover:bg-[#0284c7] text-slate-600 hover:text-white'
+                        : 'bg-[#0d1420] hover:bg-[#0284c7] text-slate-400 hover:text-white'
                     }`}
                     title={t('featured.addToCart', 'Aggiungi')}
                   >

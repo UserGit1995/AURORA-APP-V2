@@ -93,7 +93,7 @@ export const SubcategoryManager: React.FC<SubcategoryManagerProps> = ({ onViewPr
     return (
     <div key={sub.id}>
       <div
-        className="flex items-center justify-between gap-2 p-2.5 rounded-xl bg-white border border-slate-200 text-xs"
+        className="flex items-center justify-between gap-2 p-2.5 rounded-xl bg-[#0e1b30] border border-[#1c2433] text-xs"
         style={{ marginLeft: depth * 20 }}
       >
         {editingId === sub.id ? (
@@ -102,12 +102,12 @@ export const SubcategoryManager: React.FC<SubcategoryManagerProps> = ({ onViewPr
               autoFocus
               value={editName}
               onChange={(e) => setEditName(e.target.value)}
-              className="flex-1 bg-white border border-amber-400 rounded-lg px-2 py-1 text-slate-900 text-xs"
+              className="flex-1 bg-[#0e1b30] border border-amber-400 rounded-lg px-2 py-1 text-white text-xs"
             />
             <button onClick={() => handleSaveEdit(sub)} className="px-2.5 py-1 bg-amber-500 text-slate-950 font-bold rounded-lg text-[11px]">
               Salva
             </button>
-            <button onClick={() => setEditingId(null)} className="px-2.5 py-1 bg-slate-100 text-slate-600 rounded-lg text-[11px]">
+            <button onClick={() => setEditingId(null)} className="px-2.5 py-1 bg-[#161f30] text-slate-400 rounded-lg text-[11px]">
               Annulla
             </button>
           </>
@@ -116,21 +116,21 @@ export const SubcategoryManager: React.FC<SubcategoryManagerProps> = ({ onViewPr
             <div className="flex items-center gap-1.5 min-w-0">
               {depth > 0 && <ChevronRight className="w-3 h-3 text-slate-400 shrink-0" />}
               {isBrand && (
-                <div className="w-6 h-6 rounded-full overflow-hidden bg-sky-50 border border-sky-200 flex items-center justify-center shrink-0">
+                <div className="w-6 h-6 rounded-full overflow-hidden bg-sky-500/15 border border-sky-500/30 flex items-center justify-center shrink-0">
                   {sub.image ? (
                     <img src={sub.image} alt={sub.name} className="w-full h-full object-contain" />
                   ) : (
-                    <span className="text-sky-600 font-bold text-[10px]">{sub.name.charAt(0).toUpperCase()}</span>
+                    <span className="text-sky-400 font-bold text-[10px]">{sub.name.charAt(0).toUpperCase()}</span>
                   )}
                 </div>
               )}
-              <span className="text-slate-900 font-semibold truncate">{sub.name}</span>
+              <span className="text-white font-semibold truncate">{sub.name}</span>
               {isBrand && childrenOf(sub.id).length > 0 && (
                 <span className="text-[10px] text-slate-400">({childrenOf(sub.id).length} sotto-sottocategorie)</span>
               )}
               <span
                 className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md shrink-0 ${
-                  count > 0 ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-100 text-slate-400'
+                  count > 0 ? 'bg-emerald-500/15 text-emerald-400' : 'bg-[#161f30] text-slate-400'
                 }`}
                 title={isBrand ? 'Totale articoli in questa marca (incluse le tipologie)' : 'Articoli assegnati qui'}
               >
@@ -141,7 +141,7 @@ export const SubcategoryManager: React.FC<SubcategoryManagerProps> = ({ onViewPr
               {isBrand && (
                 <button
                   onClick={() => setUploadingLogoFor(uploadingLogoFor === sub.id ? null : sub.id)}
-                  className="p-1.5 rounded-lg bg-amber-50 text-amber-600 hover:bg-amber-100"
+                  className="p-1.5 rounded-lg bg-amber-500/15 text-amber-400 hover:bg-amber-100"
                   title="Carica il logo originale di questa marca"
                 >
                   <ImagePlus className="w-3.5 h-3.5" />
@@ -150,7 +150,7 @@ export const SubcategoryManager: React.FC<SubcategoryManagerProps> = ({ onViewPr
               {count > 0 && onViewProducts && (
                 <button
                   onClick={() => onViewProducts(searchQuery)}
-                  className="p-1.5 rounded-lg bg-sky-50 text-sky-600 hover:bg-sky-100"
+                  className="p-1.5 rounded-lg bg-sky-500/15 text-sky-400 hover:bg-sky-500/20"
                   title="Vedi articoli di questa (sotto-)sottocategoria"
                 >
                   <PackageSearch className="w-3.5 h-3.5" />
@@ -161,7 +161,7 @@ export const SubcategoryManager: React.FC<SubcategoryManagerProps> = ({ onViewPr
                   setEditingId(sub.id);
                   setEditName(sub.name);
                 }}
-                className="p-1.5 rounded-lg bg-slate-100 text-slate-500 hover:text-slate-900"
+                className="p-1.5 rounded-lg bg-[#161f30] text-slate-500 hover:text-white"
                 title="Modifica"
               >
                 <Edit3 className="w-3.5 h-3.5" />
@@ -178,7 +178,7 @@ export const SubcategoryManager: React.FC<SubcategoryManagerProps> = ({ onViewPr
                     deleteSubcategory(sub.id);
                   }
                 }}
-                className="p-1.5 rounded-lg bg-rose-50 text-rose-500 hover:bg-rose-100"
+                className="p-1.5 rounded-lg bg-rose-500/15 text-rose-500 hover:bg-rose-100"
                 title="Elimina"
               >
                 <Trash2 className="w-3.5 h-3.5" />
@@ -189,10 +189,10 @@ export const SubcategoryManager: React.FC<SubcategoryManagerProps> = ({ onViewPr
       </div>
 
       {isBrand && uploadingLogoFor === sub.id && (
-        <div className="mt-2 mb-1 p-3 rounded-xl bg-white border border-amber-200" style={{ marginLeft: depth * 20 }}>
+        <div className="mt-2 mb-1 p-3 rounded-xl bg-[#0e1b30] border border-amber-500/30" style={{ marginLeft: depth * 20 }}>
           <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] font-semibold text-slate-600">Logo di "{sub.name}"</span>
-            <button onClick={() => setUploadingLogoFor(null)} className="text-slate-400 hover:text-slate-700">
+            <span className="text-[11px] font-semibold text-slate-400">Logo di "{sub.name}"</span>
+            <button onClick={() => setUploadingLogoFor(null)} className="text-slate-400 hover:text-slate-300">
               <X className="w-3.5 h-3.5" />
             </button>
           </div>
@@ -203,7 +203,7 @@ export const SubcategoryManager: React.FC<SubcategoryManagerProps> = ({ onViewPr
           {sub.image && (
             <button
               onClick={() => handleLogoChange(sub, '')}
-              className="mt-2 text-[11px] font-semibold text-rose-500 hover:text-rose-700"
+              className="mt-2 text-[11px] font-semibold text-rose-500 hover:text-rose-300"
             >
               Rimuovi logo e torna al badge con iniziale
             </button>
@@ -219,8 +219,8 @@ export const SubcategoryManager: React.FC<SubcategoryManagerProps> = ({ onViewPr
   return (
     <div className="p-4 sm:p-6 overflow-y-auto flex-1 space-y-5 text-left">
       <div className="flex items-center gap-2">
-        <FolderTree className="w-4 h-4 text-sky-600" />
-        <h3 className="text-sm font-bold text-slate-900">Sottocategorie e sotto-sottocategorie</h3>
+        <FolderTree className="w-4 h-4 text-sky-400" />
+        <h3 className="text-sm font-bold text-white">Sottocategorie e sotto-sottocategorie</h3>
       </div>
       <p className="text-[11px] text-slate-500 -mt-3">
         Il numero accanto a ogni nome è quanti articoli ci sono davvero dentro. Sulle marche, l'icona{' '}
@@ -233,7 +233,7 @@ export const SubcategoryManager: React.FC<SubcategoryManagerProps> = ({ onViewPr
         <select
           value={selectedCategoryId}
           onChange={(e) => setSelectedCategoryId(e.target.value)}
-          className="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-900 outline-none"
+          className="w-full bg-[#0e1b30] border border-[#1c2433] rounded-xl px-3.5 py-2 text-xs text-white outline-none"
         >
           {categoriesList.map((c) => (
             <option key={c.id} value={c.id}>{c.name}</option>
@@ -241,7 +241,7 @@ export const SubcategoryManager: React.FC<SubcategoryManagerProps> = ({ onViewPr
         </select>
       </label>
 
-      <form onSubmit={handleAdd} className="bg-white p-4 rounded-2xl border border-slate-200 space-y-3">
+      <form onSubmit={handleAdd} className="bg-[#0e1b30] p-4 rounded-2xl border border-[#1c2433] space-y-3">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <input
             type="text"
@@ -249,12 +249,12 @@ export const SubcategoryManager: React.FC<SubcategoryManagerProps> = ({ onViewPr
             placeholder="Nome (es. Ace, oppure Bicchieri)"
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
-            className="bg-white border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-900 outline-none"
+            className="bg-[#0e1b30] border border-[#1c2433] rounded-xl px-3.5 py-2 text-xs text-white outline-none"
           />
           <select
             value={newParentId}
             onChange={(e) => setNewParentId(e.target.value)}
-            className="bg-white border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-900 outline-none"
+            className="bg-[#0e1b30] border border-[#1c2433] rounded-xl px-3.5 py-2 text-xs text-white outline-none"
           >
             <option value="">— Sottocategoria diretta —</option>
             {topLevelSubs.map((s) => (

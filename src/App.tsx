@@ -338,7 +338,7 @@ export default function App() {
   }, [comparedProductIds, productsList]);
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 flex font-sans">
+    <div className="min-h-screen bg-[#0d1420] text-white flex font-sans">
       {/* Fixed Left Sidebar */}
       <Sidebar
         activeTab={activeTab}
@@ -459,25 +459,25 @@ export default function App() {
               <div
                 id="home-quick-reorder-banner"
                 onClick={() => setIsQuickReorderOpen(true)}
-                className="md:hidden w-full bg-gradient-to-r from-sky-50 via-white to-sky-50 border border-sky-200 hover:border-sky-400 rounded-2xl p-3.5 flex items-center justify-between cursor-pointer transition-all duration-200 shadow-sm group active:scale-[0.99]"
+                className="md:hidden w-full bg-gradient-to-r from-sky-50 via-white to-sky-50 border border-sky-200 hover:border-sky-500/60 rounded-2xl p-3.5 flex items-center justify-between cursor-pointer transition-all duration-200 shadow-sm group active:scale-[0.99]"
               >
                 <div className="flex items-center gap-3.5">
-                  <div className="w-10 h-10 rounded-full bg-sky-100 border border-sky-300 text-sky-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform shadow-xs">
+                  <div className="w-10 h-10 rounded-full bg-sky-500/20 border border-sky-300 text-sky-400 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform shadow-xs">
                     <RotateCcw className="w-4.5 h-4.5 stroke-[2.5]" />
                   </div>
                   <div>
-                    <h3 className="text-slate-900 text-xs sm:text-sm font-bold leading-tight flex items-center gap-1.5">
+                    <h3 className="text-white text-xs sm:text-sm font-bold leading-tight flex items-center gap-1.5">
                       <span>Riordino Rapido</span>
-                      <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-sky-100 text-sky-700 border border-sky-300">
+                      <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-sky-500/20 text-sky-300 border border-sky-300">
                         1-Click
                       </span>
                     </h3>
-                    <p className="text-sky-600 text-[11px] font-semibold mt-0.5">
+                    <p className="text-sky-400 text-[11px] font-semibold mt-0.5">
                       Forniture veloci • Senza carte • A 30gg
                     </p>
                   </div>
                 </div>
-                <div className="w-7 h-7 rounded-full bg-white border border-sky-200 text-slate-500 group-hover:text-sky-600 group-hover:border-sky-400 flex items-center justify-center transition-all">
+                <div className="w-7 h-7 rounded-full bg-[#0e1b30] border border-sky-200 text-slate-500 group-hover:text-sky-400 group-hover:border-sky-500/60 flex items-center justify-center transition-all">
                   <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
                 </div>
               </div>

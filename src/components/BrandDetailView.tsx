@@ -45,14 +45,14 @@ export const BrandDetailView: React.FC<BrandDetailViewProps> = ({
       <div className="flex items-center gap-3">
         <button
           onClick={onBack}
-          className="p-2 rounded-full bg-white border border-slate-200 hover:bg-slate-100 text-slate-600 transition-colors shrink-0"
+          className="p-2 rounded-full bg-[#0e1b30] border border-[#1c2433] hover:bg-[#1a2230] text-slate-400 transition-colors shrink-0"
           aria-label="Indietro"
         >
           <ArrowLeft className="w-4 h-4" />
         </button>
         <div
           className={`w-12 h-12 rounded-full flex items-center justify-center border overflow-hidden shrink-0 ${
-            brandImage ? 'bg-white border-slate-200' : colorForBrand(brandName)
+            brandImage ? 'bg-[#0e1b30] border-[#1c2433]' : colorForBrand(brandName)
           }`}
         >
           {brandImage ? (
@@ -62,7 +62,7 @@ export const BrandDetailView: React.FC<BrandDetailViewProps> = ({
           )}
         </div>
         <div>
-          <h1 className="text-slate-900 text-xl sm:text-2xl font-bold tracking-tight">{brandName}</h1>
+          <h1 className="text-white text-xl sm:text-2xl font-bold tracking-tight">{brandName}</h1>
           <p className="text-slate-500 text-xs sm:text-sm">
             {totalCount} prodott{totalCount === 1 ? 'o' : 'i'} in {groups.length} tipologi{groups.length === 1 ? 'a' : 'e'}
           </p>
@@ -75,7 +75,7 @@ export const BrandDetailView: React.FC<BrandDetailViewProps> = ({
 
       {groups.map((group) => (
         <section key={group.typeName}>
-          <h2 className="text-slate-900 text-base font-bold mb-3 flex items-center gap-2">
+          <h2 className="text-white text-base font-bold mb-3 flex items-center gap-2">
             {group.typeName}
             <span className="text-slate-400 text-xs font-medium">({group.products.length})</span>
           </h2>
