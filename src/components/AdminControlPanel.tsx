@@ -23,6 +23,7 @@ import { OrderEditModal } from './OrderEditModal';
 import { ProductImageUploader } from './ProductImageUploader';
 import { SubcategoryManager } from './SubcategoryManager';
 import { ImageImportTool } from './ImageImportTool';
+import { ImageAuditPanel } from './ImageAuditPanel';
 import { Product, Order } from '../types';
 
 interface AdminControlPanelProps {
@@ -537,7 +538,12 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({ isOpen, on
         )}
 
         {/* Tab: Importa immagini */}
-        {activeTab === 'images' && <ImageImportTool />}
+        {activeTab === 'images' && (
+          <>
+            <ImageAuditPanel />
+            <ImageImportTool />
+          </>
+        )}
 
         {/* Tab: Parametri */}
         {activeTab === 'settings' && (
