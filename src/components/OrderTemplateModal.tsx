@@ -468,7 +468,7 @@ export const OrderTemplateModal: React.FC<OrderTemplateModalProps> = ({
                               className="flex items-center justify-between gap-2 p-2 rounded-xl bg-[#0d1420] border border-[#1c2433] text-xs"
                             >
                               <div className="flex items-center gap-2 min-w-0">
-                                <div className="w-8 h-8 rounded-lg bg-[#0d1420] p-0.5 shrink-0 flex items-center justify-center">
+                                <div className="w-8 h-8 rounded-lg bg-white border border-slate-200 p-0.5 shrink-0 flex items-center justify-center">
                                   <img
                                     src={product.image}
                                     alt={product.name}

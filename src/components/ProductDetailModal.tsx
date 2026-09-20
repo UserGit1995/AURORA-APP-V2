@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { 
   X, 
+  ArrowLeft,
   Heart, 
   Plus, 
   Minus, 
@@ -66,6 +67,17 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
         className="relative w-full max-w-2xl sm:max-w-4xl max-h-[94vh] overflow-y-auto bg-[#0d1420] border border-[#1c2433] rounded-3xl shadow-2xl scrollbar-none flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
+        {/* Back Button */}
+        <button
+          id="back-from-product-modal"
+          onClick={onClose}
+          className="absolute top-4 left-4 z-10 inline-flex items-center gap-1.5 pl-2 pr-3 py-2 rounded-full bg-[#0d1420] text-slate-300 hover:text-white border border-[#1c2433] hover:border-sky-500/40 transition-colors text-xs font-semibold"
+          aria-label="Torna indietro"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span className="hidden sm:inline">Indietro</span>
+        </button>
+
         {/* Close Button */}
         <button
           id="close-product-modal"
@@ -77,7 +89,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
         </button>
 
         {/* Tab Navigation Header */}
-        <div className="px-5 sm:px-6 pt-5 pb-0 border-b border-[#1c2433] flex items-center gap-2">
+        <div className="px-5 sm:px-6 pt-16 sm:pt-5 sm:pl-28 pb-0 border-b border-[#1c2433] flex items-center gap-2">
           <button
             type="button"
             id="tab-product-overview"
@@ -113,7 +125,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
         {activeTab === 'overview' ? (
           <div className="grid grid-cols-1 md:grid-cols-12 flex-1">
             {/* Left: Product Image Showcase */}
-            <div className="md:col-span-5 relative bg-[#0e1b30] p-6 flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-[#1c2433]">
+            <div className="md:col-span-5 relative bg-white p-6 flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-[#1c2433]">
               {product.discountPercent && (
                 <div className="absolute top-4 left-4 bg-amber-500/20 border border-amber-500/30 text-amber-300 text-xs font-bold px-2.5 py-1 rounded-lg">
                   Sconto -{product.discountPercent}%

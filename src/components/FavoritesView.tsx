@@ -160,7 +160,7 @@ export const FavoritesView: React.FC<FavoritesViewProps> = ({
                   </div>
                 </div>
 
-                <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-[#0e1b30] border border-[#1c2433] shadow-xs flex items-center justify-center p-2 mb-2">
+                <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-white border border-slate-200 shadow-xs flex items-center justify-center p-2 mb-2">
                   <img
                     src={product.image}
                     alt={product.name}

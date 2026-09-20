@@ -53,7 +53,7 @@ export const BrandTile: React.FC<{ brand: BrandSummary; onClick: () => void }> =
       >
         <div
           className={`w-14 h-14 rounded-full flex items-center justify-center border overflow-hidden shrink-0 ${
-            brand.image ? 'bg-[#0e1b30] border-[#1c2433]' : colorForBrand(brand.name)
+            brand.image ? 'bg-white border-slate-200' : colorForBrand(brand.name)
           }`}
         >
           {brand.image ? (

@@ -411,7 +411,7 @@ export const RestockAnalysisModal: React.FC<RestockAnalysisModalProps> = ({
                           {/* Left: Product summary & Badges */}
                           <div className="flex items-start gap-3.5 flex-1">
                             {product && (
-                              <div className="w-14 h-14 rounded-xl bg-[#0d1420] border border-[#1c2433] p-1.5 shrink-0 flex items-center justify-center overflow-hidden">
+                              <div className="w-14 h-14 rounded-xl bg-white border border-slate-200 p-1.5 shrink-0 flex items-center justify-center overflow-hidden">
                                 <img
                                   src={product.image}
                                   alt={product.name}

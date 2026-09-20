@@ -52,7 +52,7 @@ export const BrandDetailView: React.FC<BrandDetailViewProps> = ({
         </button>
         <div
           className={`w-12 h-12 rounded-full flex items-center justify-center border overflow-hidden shrink-0 ${
-            brandImage ? 'bg-[#0e1b30] border-[#1c2433]' : colorForBrand(brandName)
+            brandImage ? 'bg-white border-slate-200' : colorForBrand(brandName)
           }`}
         >
           {brandImage ? (

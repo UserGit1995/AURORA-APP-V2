@@ -272,7 +272,7 @@ export const CompareView: React.FC<CompareViewProps> = ({
                           {/* Image */}
                           <div 
                             onClick={() => onSelectProduct(product)}
-                            className="cursor-pointer aspect-square w-full max-w-[140px] mx-auto rounded-2xl bg-[#0e1b30] border border-[#1c2433] shadow-xs p-3 mb-3 flex items-center justify-center hover:border-sky-500/60 transition-colors"
+                            className="cursor-pointer aspect-square w-full max-w-[140px] mx-auto rounded-2xl bg-white border border-slate-200 shadow-xs p-3 mb-3 flex items-center justify-center hover:border-sky-500/60 transition-colors"
                           >
                             <img
                               src={product.image}
@@ -702,7 +702,7 @@ export const CompareView: React.FC<CompareViewProps> = ({
                           src={product.image}
                           alt={product.name}
                           referrerPolicy="no-referrer"
-                          className="w-12 h-12 object-contain rounded-xl bg-[#0d1420] p-1 shrink-0"
+                          className="w-12 h-12 object-contain rounded-xl bg-white border border-slate-200 p-1 shrink-0"
                         />
                         <div className="min-w-0">
                           <span className="text-[10px] font-bold text-sky-400 uppercase tracking-wider block">
