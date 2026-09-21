@@ -24,6 +24,7 @@ import { ProductImageUploader } from './ProductImageUploader';
 import { SubcategoryManager } from './SubcategoryManager';
 import { ImageImportTool } from './ImageImportTool';
 import { ImageAuditPanel } from './ImageAuditPanel';
+import { ImageMigrationPanel } from './ImageMigrationPanel';
 import { Product, Order } from '../types';
 
 interface AdminControlPanelProps {
@@ -540,6 +541,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({ isOpen, on
         {/* Tab: Importa immagini */}
         {activeTab === 'images' && (
           <>
+            <ImageMigrationPanel />
             <ImageAuditPanel />
             <ImageImportTool />
           </>

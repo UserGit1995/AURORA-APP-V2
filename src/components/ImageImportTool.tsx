@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { Upload, FolderOpen, Image as ImageIcon, Check, X, AlertTriangle, Loader2 } from 'lucide-react';
 import { useAdmin } from '../context/AdminContext';
 import { Product } from '../types';
+import { getSupabase } from '../services/supabase';
 
 interface ParsedRow {
   sourceName: string;
@@ -161,16 +162,43 @@ export const ImageImportTool: React.FC = () => {
     setRows((prev) => prev.map((r, i) => (i === idx ? { ...r, matchedProductId: productId, confidence: 100, confirmed: true } : r)));
   };
 
-  const handleApply = () => {
+  // Se la foto viene dalla cartella del PC è un data URL (base64, pesante):
+  // la carichiamo come file vero nello Storage e usiamo il link leggero
+  // che torna indietro, invece di infilare tutto il testo dentro il prodotto.
+  const uploadIfNeeded = async (productId: string, imageUrl: string): Promise<string> => {
+    if (!imageUrl.startsWith('data:image')) return imageUrl; // già un link normale (da CSV)
+    const sb = getSupabase();
+    if (!sb) return imageUrl;
+    try {
+      const [header, base64] = imageUrl.split(',');
+      const mimeMatch = header.match(/data:(.*);base64/);
+      const mime = mimeMatch ? mimeMatch[1] : 'image/jpeg';
+      const ext = mime.split('/')[1]?.replace('jpeg', 'jpg') || 'jpg';
+      const binary = atob(base64);
+      const bytes = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+      const blob = new Blob([bytes], { type: mime });
+      const path = `imported/${productId}-${Date.now()}.${ext}`;
+      const { error } = await sb.storage.from('aurora-images').upload(path, blob, { upsert: true, contentType: mime });
+      if (error) return imageUrl; // in caso di problemi teniamo comunque la foto (base64) invece di perderla
+      const { data: pub } = sb.storage.from('aurora-images').getPublicUrl(path);
+      return pub.publicUrl;
+    } catch {
+      return imageUrl;
+    }
+  };
+
+  const handleApply = async () => {
     setApplying(true);
     let count = 0;
     for (const row of rows) {
       if (!row.confirmed || !row.matchedProductId) continue;
       const product = productById(row.matchedProductId);
       if (!product) continue;
+      const finalImageUrl = await uploadIfNeeded(product.id, row.imageUrl);
       // Aggiorna SOLO l'immagine: nome, prezzo, categoria e tutto il resto
       // del prodotto restano esattamente come sono, non vengono toccati.
-      updateProduct({ ...product, image: row.imageUrl });
+      updateProduct({ ...product, image: finalImageUrl });
       count++;
     }
     setApplied(count);
