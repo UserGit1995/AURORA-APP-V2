@@ -5,20 +5,24 @@ import { getSupabase } from '../services/supabase';
 
 interface FailRow {
   name: string;
-  error: string;
+  reason: string;
 }
 
+const OWN_DOMAIN = 'hkpqvggvqzvpkzeqmtga.supabase.co';
+
 /**
- * Le immagini caricate con "Importa immagini" vengono salvate come testo
- * (base64) dentro la riga del prodotto: con centinaia/migliaia di prodotti
- * così, il catalogo diventa pesantissimo da scaricare per il telefono
- * (spesso con RAM e rete più limitate di un PC), ed è la causa più probabile
- * per cui le immagini non compaiono da mobile.
- *
- * Questo strumento sposta ogni immagine base64 in un file vero nello
- * Storage di Supabase (bucket aurora-images) e lascia nel prodotto solo
- * il link leggero, com'è già per le immagini caricate in altri modi.
- * Non tocca in alcun modo prodotti che hanno già un link normale.
+ * Porta TUTTE le immagini prodotto dentro lo Storage di Supabase (dominio
+ * tuo), qualunque sia la loro origine attuale:
+ *  - immagini "pesanti" salvate come testo (base64) dentro la scheda del
+ *    prodotto: causa più probabile per cui il catalogo non si carica bene
+ *    da cellulare (RAM e rete più limitate rispetto a un PC);
+ *  - immagini che puntano a un link su un sito esterno (es. import in
+ *    blocco da un catalogo fornitore): finché restano lì, se quel sito
+ *    cambia, blocca l'accesso o va giù, la foto sparisce dal tuo negozio
+ *    per tutti, indipendentemente dal dispositivo.
+ * In entrambi i casi il prodotto finisce con un link leggero e affidabile
+ * sul tuo stesso dominio Supabase. Non tocca nome, prezzo, categoria, né
+ * le immagini già ospitate correttamente da te (quelle vengono saltate).
  */
 export const ImageMigrationPanel: React.FC = () => {
   const { productsList, updateProduct } = useAdmin();
@@ -27,7 +31,12 @@ export const ImageMigrationPanel: React.FC = () => {
   const [migrated, setMigrated] = useState(0);
   const [fails, setFails] = useState<FailRow[]>([]);
 
-  const candidates = productsList.filter((p) => p.image && p.image.startsWith('data:image'));
+  const candidates = productsList.filter((p) => {
+    if (!p.image) return false;
+    if (p.image.startsWith('data:image')) return true; // pesante, dentro la scheda
+    if (p.image.startsWith('http') && !p.image.includes(OWN_DOMAIN)) return true; // link esterno
+    return false;
+  });
 
   const dataUrlToBlob = (dataUrl: string): { blob: Blob; ext: string } => {
     const [header, base64] = dataUrl.split(',');
@@ -38,6 +47,17 @@ export const ImageMigrationPanel: React.FC = () => {
     const bytes = new Uint8Array(binary.length);
     for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
     return { blob: new Blob([bytes], { type: mime }), ext };
+  };
+
+  // Per un link esterno, lo scarica DAL BROWSER di chi lo usa (che ha
+  // accesso reale a internet) per poi ricaricarlo su Supabase.
+  const urlToBlob = async (url: string): Promise<{ blob: Blob; ext: string }> => {
+    const res = await fetch(url, { mode: 'cors' });
+    if (!res.ok) throw new Error(`link non raggiungibile (${res.status})`);
+    const blob = await res.blob();
+    const mime = blob.type || 'image/jpeg';
+    const ext = mime.split('/')[1]?.replace('jpeg', 'jpg') || 'jpg';
+    return { blob, ext };
   };
 
   const runMigration = async () => {
@@ -55,11 +75,14 @@ export const ImageMigrationPanel: React.FC = () => {
 
     for (const product of candidates) {
       try {
-        const { blob, ext } = dataUrlToBlob(product.image);
+        const { blob, ext } = product.image.startsWith('data:image')
+          ? dataUrlToBlob(product.image)
+          : await urlToBlob(product.image);
+
         const path = `migrated/${product.id}.${ext}`;
         const { error: uploadError } = await sb.storage
           .from('aurora-images')
-          .upload(path, blob, { upsert: true, contentType: blob.type });
+          .upload(path, blob, { upsert: true, contentType: blob.type || 'image/jpeg' });
 
         if (uploadError) throw uploadError;
 
@@ -67,7 +90,10 @@ export const ImageMigrationPanel: React.FC = () => {
         updateProduct({ ...product, image: pub.publicUrl });
         setMigrated((m) => m + 1);
       } catch (e: any) {
-        failList.push({ name: product.name, error: e?.message ?? 'errore sconosciuto' });
+        // Un link esterno può rifiutarsi di farsi scaricare dal browser
+        // (protezione del sito di origine): in quel caso lo lasciamo
+        // com'era, nessun dato viene perso, lo segnaliamo solo qui sotto.
+        failList.push({ name: product.name, reason: e?.message ?? 'errore sconosciuto' });
       }
       done += 1;
       setProgress(Math.round((done / total) * 100));
@@ -85,11 +111,11 @@ export const ImageMigrationPanel: React.FC = () => {
             <HardDriveDownload className="w-5 h-5" />
           </div>
           <div>
-            <h3 className="text-white font-bold text-sm">Alleggerisci immagini (fix caricamento da mobile)</h3>
+            <h3 className="text-white font-bold text-sm">Porta tutte le immagini sul tuo Storage (fix mobile)</h3>
             <p className="text-slate-400 text-xs mt-0.5">
               {candidates.length === 0
-                ? 'Nessuna immagine "pesante" trovata: il catalogo è già leggero.'
-                : `${candidates.length} prodotti hanno l'immagine salvata dentro la scheda (pesante) invece che come link.`}
+                ? 'Tutte le immagini sono già ospitate correttamente sul tuo Storage.'
+                : `${candidates.length} prodotti hanno un'immagine pesante o un link esterno da portare sul tuo Storage.`}
             </p>
           </div>
         </div>
@@ -101,7 +127,7 @@ export const ImageMigrationPanel: React.FC = () => {
             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold transition-colors shrink-0"
           >
             <PlayCircle className="w-4 h-4" />
-            {status === 'done' ? 'Rilancia' : 'Avvia alleggerimento'}
+            {status === 'done' ? 'Rilancia' : 'Avvia'}
           </button>
         )}
       </div>
@@ -124,18 +150,19 @@ export const ImageMigrationPanel: React.FC = () => {
         <div className="mt-4">
           <div className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-400">
             <CheckCircle2 className="w-3.5 h-3.5" />
-            {migrated} immagini alleggerite correttamente
+            {migrated} immagini portate sul tuo Storage correttamente
           </div>
           {fails.length > 0 && (
             <div className="mt-3">
               <div className="inline-flex items-center gap-1.5 text-xs font-bold text-rose-400 mb-2">
                 <AlertTriangle className="w-3.5 h-3.5" />
-                {fails.length} non riuscite (nessun dato perso, riprova più tardi su queste)
+                {fails.length} non riuscite (lasciate come erano, nessun dato perso) — spesso è il sito di
+                origine del link che blocca lo scaricamento dall'esterno
               </div>
               <div className="max-h-48 overflow-y-auto rounded-xl border border-[#1c2433] text-xs">
                 {fails.map((f, i) => (
                   <div key={i} className="px-3 py-1.5 border-t border-[#1c2433] first:border-t-0 text-slate-300">
-                    {f.name} — <span className="text-slate-500">{f.error}</span>
+                    {f.name} — <span className="text-slate-500">{f.reason}</span>
                   </div>
                 ))}
               </div>
