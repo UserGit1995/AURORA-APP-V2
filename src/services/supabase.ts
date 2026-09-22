@@ -7,7 +7,7 @@ import { CATEGORIES as LOCAL_CATEGORIES } from '../data/catalog';
 // li fissiamo per evitare che una variabile d'ambiente sbagliata su Vercel
 // blocchi il salvataggio senza che nessuno se ne accorga.
 const FALLBACK_URL = "https://hkpqvggvqzvpkzeqmtga.supabase.co";
-const FALLBACK_ANON_KEY = "sb_publishable_VsQKGL806R1Jkh9Q70zMLQ_BPiUa4g";
+const FALLBACK_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhrcHF2Z2d2cXp2cGt6ZXFtdGdhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ2ODc3MjUsImV4cCI6MjEwMDI2MzcyNX0.1Lgr756jgYTo-dKsrlAOQpRkwvyULbV5Dt-xnpPrxss";
 
 const supabaseUrl = (import.meta.env.VITE_SUPABASE_URL as string) || FALLBACK_URL;
 const supabaseAnonKey = (import.meta.env.VITE_SUPABASE_ANON_KEY as string) || FALLBACK_ANON_KEY;
