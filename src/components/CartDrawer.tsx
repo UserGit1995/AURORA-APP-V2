@@ -34,6 +34,7 @@ import { CartItem, Order, CustomerType, DeliveryOption, OrderTemplate } from '..
 import { OrderTemplateModal } from './OrderTemplateModal';
 import { getSavedTemplates } from '../data/orderTemplates';
 import { newOrderNumber } from '../services/supabase';
+import { OrderSendFallback } from './OrderSendFallback';
 import { useLanguage } from '../context/LanguageContext';
 import { useAdmin } from '../context/AdminContext';
 import { PLACEHOLDER_IMAGE } from '../utils/imageRepair';
@@ -69,6 +70,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
   const [lastSubmittedOrder, setLastSubmittedOrder] = useState<Order | null>(null);
   const [isSending, setIsSending] = useState(false);
   const [sendError, setSendError] = useState<string | null>(null);
+  const [failedOrder, setFailedOrder] = useState<Order | null>(null);
 
   // Template Modal State
   const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
@@ -168,7 +170,8 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
 
     const pickup = deliveryOption === 'ritiro_sede';
     const newOrder: Order = {
-      id: newOrderNumber(),
+      // Se è un nuovo tentativo dopo un errore, stesso numero ordine: niente doppioni
+      id: failedOrder?.id || newOrderNumber(),
       date: new Date().toLocaleDateString('it-IT'),
       status: 'In elaborazione',
       estimatedDelivery: pickup
@@ -216,12 +219,14 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
 
     if (!result.ok) {
       // L'ordine NON è partito: il carrello resta com'è così il cliente può riprovare.
+      setFailedOrder(newOrder);
       setSendError(
         'Non siamo riusciti a inviare l\'ordine (probabile problema di connessione). Il carrello è al sicuro: riprova tra un momento oppure contattaci per telefono.'
       );
       return;
     }
 
+    setFailedOrder(null);
     setLastSubmittedOrder(newOrder);
     setStep('success');
     if (onCheckoutSuccess) onCheckoutSuccess(newOrder);
@@ -939,6 +944,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                 {sendError && (
                   <div role="alert" className="p-3 rounded-xl bg-red-500/10 border border-red-500/40 text-red-200 text-xs leading-relaxed">
                     {sendError}
+                    {failedOrder && <OrderSendFallback order={failedOrder} />}
                   </div>
                 )}
                 <div className="flex justify-between items-center text-xs">

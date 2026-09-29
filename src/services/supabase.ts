@@ -357,9 +357,15 @@ export async function fetchSupabaseOrders(): Promise<Order[] | null> {
 }
 
 /**
- * Salva un NUOVO ordine (cliente registrato o ospite) su Supabase.
- * Non serve leggere la riga dopo l'inserimento (gli ospiti non hanno il
- * permesso di leggere): l'id lo generiamo noi.
+ * Salva un NUOVO ordine (cliente registrato o ospite NON registrato) su Supabase.
+ *
+ * 1) Prima prova la funzione "submit_order" del database (vedi la migrazione
+ *    20260929120000_submit_order_rpc.sql): salva ordine + articoli anche per chi
+ *    non ha un account.
+ * 2) Se la funzione non è ancora stata installata nel database, ripiega sul
+ *    salvataggio diretto (solo testata ordine: l'ordine completo è comunque
+ *    conservato per intero nel campo "notes").
+ * Ripetere lo stesso ordine (stesso numero) non crea doppioni.
  */
 export async function insertSupabaseOrder(order: Order): Promise<{ ok: boolean; error?: string }> {
   const sb = getSupabase();
@@ -373,22 +379,39 @@ export async function insertSupabaseOrder(order: Order): Promise<{ ok: boolean; 
       userId = null;
     }
 
+    const row = orderToRow(order, userId);
+    const items = order.items.map((it) => ({
+      product_id: it.productId && UUID_RE.test(it.productId) ? it.productId : null,
+      product_name: it.productName,
+      quantity: Math.max(1, Math.round(it.qty) || 1),
+      unit_price: Number(it.price) || 0,
+    }));
+
+    // --- 1) funzione del database (consigliata) ---
+    const { user_id: _u, ...orderForRpc } = row;
+    const rpc = await sb.rpc('submit_order', { p_order: orderForRpc, p_items: items });
+    if (!rpc.error) return { ok: true };
+    console.warn('submit_order non disponibile, uso il salvataggio diretto:', rpc.error.message);
+
+    // --- 2) salvataggio diretto (compatibile con il database com'era prima) ---
     const orderId = newDbId();
-    const { error } = await sb.from('orders').insert({ id: orderId, ...orderToRow(order, userId) });
+    const { error } = await sb.from('orders').insert({ id: orderId, ...row });
     if (error) {
+      // 23505 = numero ordine già presente: l'ordine è già stato salvato
+      if ((error as any).code === '23505') return { ok: true };
       console.error('Supabase insert order FAILED:', error.message);
       return { ok: false, error: error.message };
     }
 
     // Righe articolo (best effort: l'ordine è già salvato con tutti i dettagli in "notes")
     const buildItems = (withProductId: boolean) =>
-      order.items.map((it) => ({
+      items.map((it) => ({
         order_id: orderId,
-        product_id: withProductId && it.productId && UUID_RE.test(it.productId) ? it.productId : null,
-        product_name: it.productName,
-        quantity: Math.max(1, Math.round(it.qty) || 1),
-        unit_price: Number(it.price) || 0,
-        subtotal: +((Number(it.price) || 0) * (Math.max(1, Math.round(it.qty) || 1))).toFixed(2),
+        product_id: withProductId ? it.product_id : null,
+        product_name: it.product_name,
+        quantity: it.quantity,
+        unit_price: it.unit_price,
+        subtotal: +(it.unit_price * it.quantity).toFixed(2),
       }));
     let itemsRes = await sb.from('order_items').insert(buildItems(true));
     if (itemsRes.error) {

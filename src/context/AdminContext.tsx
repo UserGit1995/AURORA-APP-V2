@@ -97,7 +97,7 @@ const DEFAULT_ADMIN: UserProfile = {
 const DEFAULT_SETTINGS: SystemSettings = {
   companyName: 'AURORA',
   brandTitle: 'AURORA - Casalinghi & Detergenza',
-  contactEmail: 'ordini.aurorasrls@gmail.com',
+  contactEmail: 'gruppo.aurora.ordini@gmail.com',
   contactPhone: '',
   vatNumber: '',
   sdiCode: '',
@@ -117,7 +117,7 @@ const DEFAULT_SETTINGS: SystemSettings = {
 const DEMO_PRODUCT_IDS = new Set(DEMO_PRODUCTS.map((p) => p.id));
 const DEMO_ORDER_IDS = new Set(DEMO_ORDERS.map((o) => o.id));
 const DEMO_CATEGORY_IDS = new Set(DEMO_CATEGORIES.map((c) => c.id));
-const OLD_DEMO_EMAILS = new Set(['info@auroracasalinghi.it']);
+const OLD_DEMO_EMAILS = new Set(['info@auroracasalinghi.it', 'ordini.aurorasrls@gmail.com']);
 
 function loadSaved<T>(key: string, fallback: T): T {
   try {

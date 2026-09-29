@@ -8,7 +8,7 @@ interface ContactModalProps {
   onClose: () => void;
 }
 
-const SHOP_EMAIL = 'ordini.aurorasrls@gmail.com';
+const SHOP_EMAIL = 'gruppo.aurora.ordini@gmail.com';
 
 export const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) => {
   const { currentUser } = useAdmin();

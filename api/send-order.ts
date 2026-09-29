@@ -1,6 +1,6 @@
 /**
  * Funzione serverless Vercel: invia via email gli ordini (e i messaggi) dei
- * clienti a ordini.aurorasrls@gmail.com.
+ * clienti a gruppo.aurora.ordini@gmail.com.
  *
  * Il destinatario è FISSATO qui sul server (non arriva mai dal browser), così
  * nessuno può usare questo endpoint per spedire email a indirizzi a caso.
@@ -8,10 +8,10 @@
  * Configurazione (Vercel -> Settings -> Environment Variables), UNA delle due:
  *   A) Gmail (consigliato, gratis):  GMAIL_USER  +  GMAIL_APP_PASSWORD
  *   B) Resend:                       RESEND_API_KEY
- * Facoltativa: ORDERS_TO_EMAIL (default: ordini.aurorasrls@gmail.com)
+ * Facoltativa: ORDERS_TO_EMAIL (default: gruppo.aurora.ordini@gmail.com)
  */
 
-const DEFAULT_TO = 'ordini.aurorasrls@gmail.com';
+const DEFAULT_TO = 'gruppo.aurora.ordini@gmail.com';
 
 // ---- limitatore molto semplice (per istanza serverless "calda") -----------
 const hits = new Map<string, number[]>();

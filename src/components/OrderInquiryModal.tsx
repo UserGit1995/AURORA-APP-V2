@@ -47,7 +47,7 @@ export const OrderInquiryModal: React.FC<OrderInquiryModalProps> = ({
   if (!isOpen || !order) return null;
 
   // Indirizzo reale a cui arrivano le richieste (lo stesso degli ordini)
-  const logisticsEmail = 'ordini.aurorasrls@gmail.com';
+  const logisticsEmail = 'gruppo.aurora.ordini@gmail.com';
 
   // Available reason templates
   const reasons: { id: InquiryReason; title: string; subtitle: string; icon: React.ComponentType<{ className?: string }> }[] = [

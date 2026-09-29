@@ -25,6 +25,7 @@ import {
 import { motion, AnimatePresence } from 'motion/react';
 import { Product, Order, CustomerType, DeliveryOption } from '../types';
 import { newOrderNumber } from '../services/supabase';
+import { OrderSendFallback } from './OrderSendFallback';
 import { useAdmin } from '../context/AdminContext';
 import { PLACEHOLDER_IMAGE } from '../utils/imageRepair';
 
@@ -82,6 +83,7 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
   const [submittedOrder, setSubmittedOrder] = useState<Order | null>(null);
   const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [failedOrder, setFailedOrder] = useState<Order | null>(null);
 
   // Frequently ordered products (based on catalog top items)
   const frequentProducts = useMemo(() => {
@@ -210,7 +212,7 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
 
     const pickup = deliveryOption === 'ritiro_sede';
     const newOrder: Order = {
-      id: newOrderNumber(),
+      id: failedOrder?.id || newOrderNumber(),
       date: new Date().toLocaleDateString('it-IT'),
       status: 'In elaborazione',
       estimatedDelivery: pickup
@@ -252,10 +254,12 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
     setIsSubmitting(false);
 
     if (!result.ok) {
+      setFailedOrder(newOrder);
       setSubmitError("Non siamo riusciti a inviare il riordino (probabile problema di connessione). I prodotti scelti sono ancora qui: riprova tra un momento.");
       return;
     }
 
+    setFailedOrder(null);
     onOrderCreated(newOrder);
     setSubmittedOrder(newOrder);
     setSelectedItems([]);
@@ -744,6 +748,7 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
                 {submitError && (
                   <div role="alert" className="p-3 rounded-xl bg-red-500/10 border border-red-500/40 text-red-200 text-xs leading-relaxed">
                     {submitError}
+                    {failedOrder && <OrderSendFallback order={failedOrder} />}
                   </div>
                 )}
                 <button

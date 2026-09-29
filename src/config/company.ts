@@ -8,7 +8,7 @@ export const COMPANY = {
   vatNumber: '',             // partita IVA, es. 'IT01234567890'
   address: '',               // es. 'Via Roma 12, 00100 Roma (RM)'
   phone: '',                 // es. '+39 06 1234567'
-  email: 'ordini.aurorasrls@gmail.com',
+  email: 'gruppo.aurora.ordini@gmail.com',
 };
 
 /** Riga con i dati aziendali disponibili, es. "Via Roma 12 • P.IVA IT0123 • Tel: +39 06 123" */
