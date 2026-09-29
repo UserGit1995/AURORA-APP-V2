@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { 
   X, 
   Plus, 
@@ -32,10 +32,11 @@ import {
 import { motion, AnimatePresence } from 'motion/react';
 import { CartItem, Order, CustomerType, DeliveryOption, OrderTemplate } from '../types';
 import { OrderTemplateModal } from './OrderTemplateModal';
-import { PRESET_ORDER_TEMPLATES } from '../data/orderTemplates';
-import { PRODUCTS } from '../data/catalog';
+import { getSavedTemplates } from '../data/orderTemplates';
+import { newOrderNumber } from '../services/supabase';
 import { useLanguage } from '../context/LanguageContext';
 import { useAdmin } from '../context/AdminContext';
+import { PLACEHOLDER_IMAGE } from '../utils/imageRepair';
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -45,6 +46,7 @@ interface CartDrawerProps {
   onRemoveItem: (productId: string) => void;
   onClearCart: () => void;
   onCheckoutSuccess?: (order: Order) => void;
+  // Cliente che ha dimenticato di essere online / rete assente: ci pensa il pulsante Riprova
   onApplyTemplate?: (template: OrderTemplate, mode: 'replace' | 'merge') => void;
 }
 
@@ -60,11 +62,13 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
 }) => {
   const { language, t } = useLanguage();
   const isIt = language === 'it';
-  const { currentUser, isBusinessCustomer } = useAdmin();
+  const { currentUser, createOrder, productsList } = useAdmin();
 
   // Step in checkout: 'cart' -> 'form' -> 'success'
   const [step, setStep] = useState<'cart' | 'form' | 'success'>('cart');
   const [lastSubmittedOrder, setLastSubmittedOrder] = useState<Order | null>(null);
+  const [isSending, setIsSending] = useState(false);
+  const [sendError, setSendError] = useState<string | null>(null);
 
   // Template Modal State
   const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
@@ -81,25 +85,42 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
   const [deliveryOption, setDeliveryOption] = useState<DeliveryOption>('corriere');
 
   // Fields
-  const [companyName, setCompanyName] = useState(currentUser?.company || 'AURORA Retail & Facility Service S.r.l.');
-  const [vatNumber, setVatNumber] = useState(currentUser?.piva || 'IT09876543210');
-  const [sdiCode, setSdiCode] = useState(currentUser?.sdi || 'AUR789K');
+  const [companyName, setCompanyName] = useState(currentUser?.company || '');
+  const [vatNumber, setVatNumber] = useState(currentUser?.piva || '');
+  const [sdiCode, setSdiCode] = useState(currentUser?.sdi || '');
   
   // Private / Common Fields
-  const [fullName, setFullName] = useState(currentUser?.name || 'Simone Aricò');
-  const [fiscalCode, setFiscalCode] = useState('RCISMN85T10F205Z');
-  const [email, setEmail] = useState(currentUser?.email || 'simonearico10@gmail.com');
-  const [phone, setPhone] = useState(currentUser?.phone || '+39 340 1234567');
+  const [fullName, setFullName] = useState(currentUser?.name || '');
+  const [fiscalCode, setFiscalCode] = useState('');
+  const [email, setEmail] = useState(currentUser?.email || '');
+  const [phone, setPhone] = useState(currentUser?.phone || '');
   
   // Delivery Address
-  const [street, setStreet] = useState('Via dell\'Industria 45, Palazzina B');
-  const [city, setCity] = useState('Milano');
-  const [province, setProvince] = useState('MI');
-  const [postalCode, setPostalCode] = useState('20145');
-  const [deliveryNotes, setDeliveryNotes] = useState('Consegna standard con orario magazzino.');
+  const [street, setStreet] = useState(currentUser?.address || '');
+  const [city, setCity] = useState(currentUser?.city || '');
+  const [province, setProvince] = useState(currentUser?.province || '');
+  const [postalCode, setPostalCode] = useState(currentUser?.postalCode || '');
+  const [deliveryNotes, setDeliveryNotes] = useState('');
 
   // Form Validation Errors
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    if (!currentUser) return;
+    const fill = (setter: React.Dispatch<React.SetStateAction<string>>, value?: string) =>
+      value && setter((prev) => prev || value);
+    fill(setCompanyName, currentUser.company);
+    fill(setVatNumber, currentUser.piva);
+    fill(setSdiCode, currentUser.sdi);
+    fill(setFullName, currentUser.name);
+    fill(setEmail, currentUser.email);
+    fill(setPhone, currentUser.phone);
+    fill(setStreet, currentUser.address);
+    fill(setCity, currentUser.city);
+    fill(setProvince, currentUser.province);
+    fill(setPostalCode, currentUser.postalCode);
+    if (currentUser.customerType === 'attivita') setCustomerType('azienda');
+  }, [currentUser?.id]);
 
   if (!isOpen) return null;
 
@@ -139,45 +160,41 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
     setStep('form');
   };
 
-  const handleSendOrderRequest = (e: React.FormEvent) => {
+  const handleSendOrderRequest = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSending) return;
     if (!validateForm()) return;
+    if (items.length === 0) return;
 
-    const orderId = `ORD-2026-${Math.floor(1000 + Math.random() * 9000)}`;
+    const pickup = deliveryOption === 'ritiro_sede';
     const newOrder: Order = {
-      id: orderId,
-      date: 'Oggi',
+      id: newOrderNumber(),
+      date: new Date().toLocaleDateString('it-IT'),
       status: 'In elaborazione',
-      estimatedDelivery: deliveryOption === 'ritiro_sede' 
-        ? 'Pronto per il ritiro in sede (entro 24h)' 
-        : 'Spedizione programmata in 24/48h',
-      courier: deliveryOption === 'ritiro_sede' 
-        ? 'Ritiro diretto presso Magazzino Aurora' 
-        : 'GLS Logistics Express B2B',
-      trackingNumber: deliveryOption === 'ritiro_sede' 
-        ? 'RITIRO-SEDE' 
-        : `GLS-IT-${Math.floor(1000000 + Math.random() * 9000000)}`,
+      estimatedDelivery: pickup
+        ? 'Ritiro in sede: ti avviseremo quando è pronto'
+        : 'Spedizione da confermare (di norma 24/48h)',
+      courier: pickup ? 'Ritiro in sede' : 'Corriere da confermare',
+      trackingNumber: pickup ? 'RITIRO-SEDE' : undefined,
       total: total,
       subtotal: subtotal,
       vatAmount: vat,
-      shippingCost: 0.00,
-      paymentMethod: customerType === 'azienda' 
-        ? 'Fattura B2B con Bonifico 30/60 gg d.f. / Ri.Ba.' 
-        : 'Pagamento alla Consegna / Bonifico su Ricevuta',
+      shippingCost: 0.0,
+      paymentMethod: 'Pagamento alla consegna',
       shippingAddress: {
         customerType: customerType,
-        companyName: customerType === 'azienda' ? companyName : undefined,
-        recipient: fullName,
-        email: email,
-        phone: phone,
-        street: deliveryOption === 'ritiro_sede' ? 'Ritiro Sede Centrale Aurora - Via dell\'Industria 45' : street,
-        city: deliveryOption === 'ritiro_sede' ? 'Milano' : city,
-        province: deliveryOption === 'ritiro_sede' ? 'MI' : province,
-        postalCode: deliveryOption === 'ritiro_sede' ? '20145' : postalCode,
+        companyName: customerType === 'azienda' ? companyName.trim() : undefined,
+        recipient: fullName.trim(),
+        email: email.trim(),
+        phone: phone.trim(),
+        street: pickup ? 'Ritiro in sede' : street.trim(),
+        city: pickup ? '' : city.trim(),
+        province: pickup ? '' : province.trim(),
+        postalCode: pickup ? '' : postalCode.trim(),
         country: 'Italia',
-        vatNumber: customerType === 'azienda' ? vatNumber : undefined,
-        fiscalCode: customerType === 'privato' ? fiscalCode : undefined,
-        sdiCode: customerType === 'azienda' ? sdiCode : undefined,
+        vatNumber: customerType === 'azienda' ? vatNumber.trim() : undefined,
+        fiscalCode: customerType === 'privato' ? fiscalCode.trim() : undefined,
+        sdiCode: customerType === 'azienda' ? sdiCode.trim() || undefined : undefined,
         deliveryOption: deliveryOption,
         deliveryNotes: deliveryNotes.trim() || undefined,
       },
@@ -192,12 +209,22 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
       })),
     };
 
+    setIsSending(true);
+    setSendError(null);
+    const result = await createOrder(newOrder, 'carrello');
+    setIsSending(false);
+
+    if (!result.ok) {
+      // L'ordine NON è partito: il carrello resta com'è così il cliente può riprovare.
+      setSendError(
+        'Non siamo riusciti a inviare l\'ordine (probabile problema di connessione). Il carrello è al sicuro: riprova tra un momento oppure contattaci per telefono.'
+      );
+      return;
+    }
+
     setLastSubmittedOrder(newOrder);
     setStep('success');
-
-    if (onCheckoutSuccess) {
-      onCheckoutSuccess(newOrder);
-    }
+    if (onCheckoutSuccess) onCheckoutSuccess(newOrder);
   };
 
   const handleCompleteAndClose = () => {
@@ -230,9 +257,9 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                 </h3>
                 <p className="text-slate-400 text-xs">
                   {step === 'cart' 
-                    ? `${items.length} articoli da ordinare • Nessun pagamento con carta richiesto` 
+                    ? `${items.length} articoli da ordinare • Si paga alla consegna` 
                     : step === 'form'
-                    ? 'Aziende e Privati • Fattura / Ricevuta per consegna o ritiro'
+                    ? 'Aziende e Privati • Pagamento alla consegna'
                     : `Codice: ${lastSubmittedOrder?.id || 'ORD-2026'}`}
                 </p>
               </div>
@@ -415,11 +442,11 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                       </div>
 
                       <div className="space-y-2">
-                        {PRESET_ORDER_TEMPLATES.slice(0, 3).map((tpl) => {
+                        {getSavedTemplates().slice(0, 3).map((tpl) => {
                           let totalItems = 0;
                           let totalCost = 0;
                           tpl.items.forEach((item) => {
-                            const prod = PRODUCTS.find((p) => p.id === item.productId);
+                            const prod = productsList.find((p) => p.id === item.productId);
                             if (prod) {
                               totalItems += item.quantity;
                               totalCost += prod.price * item.quantity;
@@ -480,7 +507,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                     >
                       <div className="w-14 h-14 rounded-xl bg-[#0d1420] p-1 shrink-0 flex items-center justify-center">
                         <img 
-                          src={item.product.image} 
+                          src={item.product.image || PLACEHOLDER_IMAGE} 
                           alt={item.product.name} 
                           referrerPolicy="no-referrer"
                           className="w-full h-full object-contain"
@@ -607,7 +634,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
 
                   <div className="flex items-center justify-center gap-1.5 text-[11px] text-slate-400 pt-0.5">
                     <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                    <span>Nessun pagamento con carta • Ordine via E-mail / Consegna</span>
+                    <span>Nessun pagamento online • Si paga alla consegna</span>
                   </div>
                 </div>
               )}
@@ -655,8 +682,8 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                   </div>
                   <p className="text-[11px] text-slate-400 mt-2">
                     {customerType === 'azienda'
-                      ? '✓ Emette fattura elettronica B2B con Codice SDI / PEC'
-                      : '✓ Emette ricevuta fiscale / fattura a privato con Codice Fiscale'}
+                      ? '✓ Attività: prezzi con IVA 22% (P.IVA obbligatoria)'
+                      : '✓ Privato: prezzi senza IVA (codice fiscale obbligatorio)'}
                   </p>
                 </div>
 
@@ -676,7 +703,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                           id="company-name-input"
                           value={companyName}
                           onChange={(e) => setCompanyName(e.target.value)}
-                          placeholder="es. AURORA Retail & Facility Service S.r.l."
+                          placeholder="es. Rossi & Figli S.r.l."
                           className={`w-full bg-[#0d1420] border rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-sky-400 ${
                             formErrors.companyName ? 'border-rose-500' : 'border-[#1c2433]'
                           }`}
@@ -692,7 +719,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                             id="vat-number-input"
                             value={vatNumber}
                             onChange={(e) => setVatNumber(e.target.value)}
-                            placeholder="es. IT09876543210"
+                            placeholder="es. IT01234567890"
                             className={`w-full bg-[#0d1420] border rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-sky-400 ${
                               formErrors.vatNumber ? 'border-rose-500' : 'border-[#1c2433]'
                             }`}
@@ -705,7 +732,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                             id="sdi-code-input"
                             value={sdiCode}
                             onChange={(e) => setSdiCode(e.target.value)}
-                            placeholder="es. AUR789K o PEC"
+                            placeholder="es. codice SDI (7 caratteri) o PEC"
                             className="w-full bg-[#0d1420] border border-[#1c2433] rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-sky-400"
                           />
                         </div>
@@ -719,7 +746,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                         id="fiscal-code-input"
                         value={fiscalCode}
                         onChange={(e) => setFiscalCode(e.target.value.toUpperCase())}
-                        placeholder="es. RCISMN85T10F205Z"
+                        placeholder="es. RSSMRA80A01H501U"
                         className={`w-full bg-[#0d1420] border rounded-xl px-3 py-2 text-white uppercase placeholder-slate-500 focus:outline-none focus:border-emerald-400 ${
                           formErrors.fiscalCode ? 'border-rose-500' : 'border-[#1c2433]'
                         }`}
@@ -738,7 +765,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                       id="full-name-input"
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
-                      placeholder="es. Simone Aricò"
+                      placeholder="es. Mario Rossi"
                       className={`w-full bg-[#0d1420] border rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-sky-400 ${
                         formErrors.fullName ? 'border-rose-500' : 'border-[#1c2433]'
                       }`}
@@ -823,7 +850,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                           id="street-input"
                           value={street}
                           onChange={(e) => setStreet(e.target.value)}
-                          placeholder="es. Via dell'Industria 45, Palazzina B"
+                          placeholder="es. Via Roma 12"
                           className={`w-full bg-[#0d1420] border rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-sky-400 ${
                             formErrors.street ? 'border-rose-500' : 'border-[#1c2433]'
                           }`}
@@ -838,7 +865,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                             id="postal-code-input"
                             value={postalCode}
                             onChange={(e) => setPostalCode(e.target.value)}
-                            placeholder="20145"
+                            placeholder="00100"
                             className="w-full bg-[#0d1420] border border-[#1c2433] rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none"
                           />
                         </div>
@@ -849,7 +876,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                             id="city-input"
                             value={city}
                             onChange={(e) => setCity(e.target.value)}
-                            placeholder="Milano"
+                            placeholder="Roma"
                             className="w-full bg-[#0d1420] border border-[#1c2433] rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none"
                           />
                         </div>
@@ -860,7 +887,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                             id="province-input"
                             value={province}
                             onChange={(e) => setProvince(e.target.value.toUpperCase())}
-                            placeholder="MI"
+                            placeholder="RM"
                             maxLength={2}
                             className="w-full bg-[#0d1420] border border-[#1c2433] rounded-xl px-3 py-2 text-white uppercase placeholder-slate-500 focus:outline-none"
                           />
@@ -883,10 +910,10 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                     <div className="p-3 rounded-xl bg-[#0d1420] border border-amber-500/30 text-amber-200/90 text-xs space-y-1">
                       <p className="font-bold flex items-center gap-1.5 text-amber-300">
                         <Store className="w-3.5 h-3.5" />
-                        <span>Punto di Ritiro Magazzino Centrale Aurora</span>
+                        <span>Ritiro presso la sede Aurora</span>
                       </p>
                       <p className="text-[11px] text-slate-400">
-                        Via dell'Industria 45, 20145 Milano (MI) • Orari: Lun-Ven 08:00 - 18:00
+                        Ti confermeremo indirizzo e orari di ritiro via e-mail o telefono dopo aver ricevuto l'ordine.
                       </p>
                       <p className="text-[10px] text-slate-400 pt-1">
                         Riceverai un'e-mail appena la merce sarà preparata per il ritiro.
@@ -895,22 +922,25 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                   )}
                 </div>
 
-                {/* 4. MODALITA DI PAGAMENTO B2B (NO CARTE DI CREDITO) */}
+                {/* 4. MODALITA DI PAGAMENTO: SOLO ALLA CONSEGNA */}
                 <div className="bg-[#0d1420] border border-[#1c2433] rounded-2xl p-3 text-xs space-y-1.5">
                   <div className="flex items-center gap-2 text-sky-300 font-bold">
                     <FileText className="w-3.5 h-3.5" />
-                    <span>Modalità di Pagamento Convenzionata:</span>
+                    <span>Modalità di pagamento:</span>
                   </div>
                   <p className="text-slate-400 text-[11px]">
-                    {customerType === 'azienda'
-                      ? '✓ Fatturazione B2B differita (Bonifico Bancario 30/60 gg d.f. / Ri.Ba.) senza anticipo con carta.'
-                      : '✓ Pagamento alla consegna / Bonifico Bancario su ricevuta fornitura (Nessun addebito con carta online).'}
+                    ✓ Pagamento alla consegna. Nessun pagamento online e nessun addebito con carta.
                   </p>
                 </div>
               </div>
 
               {/* Form Footer */}
               <div className="p-4 sm:p-5 border-t border-[#1c2433] bg-[#0d1420] space-y-3">
+                {sendError && (
+                  <div role="alert" className="p-3 rounded-xl bg-red-500/10 border border-red-500/40 text-red-200 text-xs leading-relaxed">
+                    {sendError}
+                  </div>
+                )}
                 <div className="flex justify-between items-center text-xs">
                   <span className="text-slate-400">
                     {isAzienda ? 'Totale Fornitura (IVA 22% inc.):' : 'Totale Ordine (Senza IVA):'}
@@ -933,10 +963,11 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                   <button
                     type="submit"
                     id="confirm-send-order-email-btn"
-                    className="flex-1 bg-[#0284c7] hover:bg-[#0369a1] text-white font-bold py-3 px-4 rounded-xl text-xs sm:text-sm transition-all duration-150 flex items-center justify-center gap-2 shadow-lg shadow-sky-950/60"
+                    disabled={isSending}
+                    className="flex-1 bg-[#0284c7] hover:bg-[#0369a1] disabled:opacity-60 disabled:cursor-wait text-white font-bold py-3 px-4 rounded-xl text-xs sm:text-sm transition-all duration-150 flex items-center justify-center gap-2 shadow-lg shadow-sky-950/60"
                   >
                     <Send className="w-4 h-4" />
-                    <span>Invia Richiesta Ordine ({items.reduce((acc, i) => acc + i.quantity, 0)} colli)</span>
+                    <span>{isSending ? 'Invio in corso…' : `Invia Richiesta Ordine (${items.reduce((acc, i) => acc + i.quantity, 0)} colli)`}</span>
                   </button>
                 </div>
               </div>
@@ -951,7 +982,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
               </div>
               <h4 className="text-xl font-bold text-white mb-1.5">Richiesta Ordine Inviata!</h4>
               <p className="text-slate-400 text-xs leading-relaxed max-w-sm mb-3">
-                Il tuo ordine è stato registrato nel sistema logistico Aurora. Abbiamo inviato la copia di conferma via e-mail all'indirizzo <strong className="text-sky-300">{email}</strong>.
+                Il tuo ordine è stato inviato ad Aurora. Ti contatteremo presto al recapito indicato (<strong className="text-sky-300">{email}</strong>) per confermare consegna e pagamento.
               </p>
 
               <div className="bg-[#0d1420] border border-[#1c2433] rounded-2xl p-4 w-full text-left space-y-2 mb-4 text-xs">

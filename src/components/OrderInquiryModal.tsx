@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Order } from '../types';
+import { postToShop } from '../services/orderSubmit';
 
 interface OrderInquiryModalProps {
   order: Order | null;
@@ -36,15 +37,17 @@ export const OrderInquiryModal: React.FC<OrderInquiryModalProps> = ({
   isOpen,
   onClose
 }) => {
-  if (!isOpen || !order) return null;
-
   const [selectedReason, setSelectedReason] = useState<InquiryReason>('tracking');
   const [copied, setCopied] = useState(false);
   const [directSent, setDirectSent] = useState(false);
   const [customNotes, setCustomNotes] = useState('');
+  const [sending, setSending] = useState(false);
+  const [sendError, setSendError] = useState<string | null>(null);
 
-  const logisticsEmail = 'logistica@auroradistribuzione.it';
-  const ccEmail = 'ordini@auroradistribuzione.it';
+  if (!isOpen || !order) return null;
+
+  // Indirizzo reale a cui arrivano le richieste (lo stesso degli ordini)
+  const logisticsEmail = 'ordini.aurorasrls@gmail.com';
 
   // Available reason templates
   const reasons: { id: InquiryReason; title: string; subtitle: string; icon: React.ComponentType<{ className?: string }> }[] = [
@@ -130,7 +133,7 @@ export const OrderInquiryModal: React.FC<OrderInquiryModalProps> = ({
         subject = `[Istruzioni Scarico Merci] Indicazioni per Ordine #${order.id} - ${clientName}`;
         body = `Spettabile Ufficio Logistica AURORA Distribuzione,\n\n` +
           `In riferimento alla spedizione dell'ordine #${order.id}, desideriamo trasmettere le seguenti istruzioni operative per il corriere al momento dello scarico:\n\n` +
-          `• Indirizzo Fornitura: ${order.shippingAddress?.address || ''}, ${order.shippingAddress?.city || ''} (${order.shippingAddress?.province || ''})\n` +
+          `• Indirizzo Fornitura: ${order.shippingAddress?.street || ''}, ${order.shippingAddress?.city || ''} (${order.shippingAddress?.province || ''})\n` +
           `• Referente allo Scarico: ${order.shippingAddress?.recipient || clientName}\n` +
           `• Orari di Apertura Magazzino: Lun-Ven 08:30-12:30 / 14:00-17:30\n` +
           `• Accesso per Mezzi Pesanti: Consentito con sponda idraulica\n\n` +
@@ -172,22 +175,36 @@ export const OrderInquiryModal: React.FC<OrderInquiryModalProps> = ({
   const { subject, body } = generateEmailContent();
 
   const handleCopy = () => {
-    const fullText = `A: ${logisticsEmail}\nCC: ${ccEmail}\nOggetto: ${subject}\n\n${body}`;
+    const fullText = `A: ${logisticsEmail}\nOggetto: ${subject}\n\n${body}`;
     navigator.clipboard.writeText(fullText);
     setCopied(true);
     setTimeout(() => setCopied(false), 3000);
   };
 
   const handleMailto = () => {
-    const mailtoUrl = `mailto:${logisticsEmail}?cc=${encodeURIComponent(ccEmail)}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    const mailtoUrl = `mailto:${logisticsEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     window.location.href = mailtoUrl;
   };
 
-  const handleDirectTicketSend = () => {
-    setDirectSent(true);
-    setTimeout(() => {
-      // Keep confirmation visible briefly
-    }, 4000);
+  const handleDirectTicketSend = async () => {
+    if (sending) return;
+    setSending(true);
+    setSendError(null);
+    const result = await postToShop({
+      kind: 'inquiry',
+      orderId: order.id,
+      name: order.shippingAddress?.recipient || order.shippingAddress?.companyName || 'Cliente',
+      email: order.shippingAddress?.email || '',
+      phone: order.shippingAddress?.phone || '',
+      subject,
+      message: body,
+    });
+    setSending(false);
+    if (result.ok) {
+      setDirectSent(true);
+    } else {
+      setSendError(`Invio non riuscito. Riprova o usa "Apri nel Client E-mail" per scrivere a ${logisticsEmail}.`);
+    }
   };
 
   return (
@@ -326,10 +343,6 @@ export const OrderInquiryModal: React.FC<OrderInquiryModalProps> = ({
               <span className="text-slate-500 w-16 shrink-0">A:</span>
               <span className="text-sky-300 font-semibold">{logisticsEmail}</span>
             </div>
-            <div className="flex items-center gap-2 text-slate-400">
-              <span className="text-slate-500 w-16 shrink-0">CC:</span>
-              <span className="text-slate-400">{ccEmail}</span>
-            </div>
             <div className="flex items-start gap-2 text-slate-400 pt-1 border-t border-[#1c2433]">
               <span className="text-slate-500 w-16 shrink-0">Oggetto:</span>
               <span className="text-white font-sans font-semibold">{subject}</span>
@@ -356,9 +369,15 @@ export const OrderInquiryModal: React.FC<OrderInquiryModalProps> = ({
           >
             <Check className="w-4 h-4 text-emerald-400 shrink-0 stroke-[2.5]" />
             <span>
-              <strong>Ticket Logistico Registrato con Successo!</strong> La richiesta è stata inoltrata all'Ufficio Spedizioni AURORA (Ticket #LOG-{order.id.replace(/\D/g, '') || '992'}). Riceverai risposta entro 2 ore lavorative.
+              <strong>Richiesta inviata!</strong> Abbiamo ricevuto il tuo messaggio riguardo l'ordine {order.id}: ti risponderemo il prima possibile.
             </span>
           </motion.div>
+        )}
+
+        {sendError && (
+          <div role="alert" className="mb-4 bg-red-500/10 border border-red-500/40 rounded-xl p-3 text-xs text-red-200">
+            {sendError}
+          </div>
         )}
 
         {/* Modal Action Buttons */}
@@ -386,10 +405,11 @@ export const OrderInquiryModal: React.FC<OrderInquiryModalProps> = ({
               whileTap={{ scale: 0.97 }}
               type="button"
               onClick={handleDirectTicketSend}
-              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs font-semibold bg-[#0284c7] hover:bg-[#0369a1] text-white shadow-md shadow-sky-950/50 transition-all"
+              disabled={sending || directSent}
+              className="disabled:opacity-60 inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs font-semibold bg-[#0284c7] hover:bg-[#0369a1] text-white shadow-md shadow-sky-950/50 transition-all"
             >
               <Send className="w-3.5 h-3.5" />
-              <span>{directSent ? 'Richiesta Inviata ✓' : 'Invia Ticket a Reparto Logistica'}</span>
+              <span>{directSent ? 'Richiesta Inviata ✓' : sending ? 'Invio in corso…' : 'Invia richiesta ad Aurora'}</span>
             </motion.button>
           </div>
         </div>

@@ -3,6 +3,7 @@ import { Star, Heart, ArrowRight, Plus, Check, Scale } from 'lucide-react';
 import { Product } from '../types';
 import { useLanguage } from '../context/LanguageContext';
 import { useAdmin } from '../context/AdminContext';
+import { PLACEHOLDER_IMAGE } from '../utils/imageRepair';
 
 interface FeaturedProductsSectionProps {
   products: Product[];
@@ -136,7 +137,7 @@ export const FeaturedProductsSection: React.FC<FeaturedProductsSectionProps> = (
               {/* Product Image */}
               <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-white border border-slate-200 shadow-xs flex items-center justify-center p-2 my-1">
                 <img
-                  src={product.image}
+                  loading="lazy" decoding="async" src={product.image || PLACEHOLDER_IMAGE}
                   alt={product.name}
                   referrerPolicy="no-referrer"
                   className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"

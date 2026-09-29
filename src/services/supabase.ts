@@ -157,7 +157,7 @@ export function newDbId(): string {
  * dimensione richiesta, garantendo di leggere SEMPRE tutte le righe reali.
  */
 async function fetchAllRows<T>(
-  runPage: (from: number, to: number) => Promise<{ data: T[] | null; error: any }>,
+  runPage: (from: number, to: number) => PromiseLike<{ data: T[] | null; error: any }>,
   pageSize = 1000
 ): Promise<T[]> {
   let all: T[] = [];
@@ -234,29 +234,184 @@ export async function deleteSupabaseProduct(productId: string): Promise<boolean>
   }
 }
 
-/**
- * Fetch orders from Supabase table 'orders'
- */
-export async function fetchSupabaseOrders(): Promise<Order[] | null> {
-  const sb = getSupabase();
-  if (!sb) return null;
+// ---------------------------------------------------------------------------
+// ORDINI
+// La tabella "orders" del database ha colonne diverse dall'oggetto Order usato
+// dall'app (order_number, customer_name, customer_email, status "nuovo"...).
+// Prima l'app provava a salvare l'oggetto Order così com'era: il database lo
+// rifiutava e l'ordine spariva senza errori visibili. Ora si traduce in
+// entrambe le direzioni. L'ordine completo viene anche conservato (come JSON)
+// nel campo "notes", così niente si perde nel passaggio.
+// ---------------------------------------------------------------------------
+
+const ORDER_NOTES_MARK = '__aurora_order_v1__';
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/** Numero ordine leggibile e praticamente senza collisioni, es. ORD-260929-K7Q2 */
+export function newOrderNumber(): string {
+  const d = new Date();
+  const yy = String(d.getFullYear()).slice(2);
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let rand = '';
+  for (let i = 0; i < 4; i++) rand += alphabet[Math.floor(Math.random() * alphabet.length)];
+  return `ORD-${yy}${mm}${dd}-${rand}`;
+}
+
+function orderStatusToDb(status: Order['status']): string {
+  switch (status) {
+    case 'Annullato':
+      return 'annullato';
+    case 'Spedito':
+    case 'Consegnato':
+      return 'evaso';
+    default:
+      return 'nuovo';
+  }
+}
+
+function orderToRow(order: Order, userId: string | null) {
+  const a = order.shippingAddress;
+  const address = [a?.street, [a?.postalCode, a?.city].filter(Boolean).join(' ')].filter(Boolean).join(', ');
+  return {
+    order_number: order.id,
+    user_id: userId,
+    customer_name: a?.companyName || a?.recipient || 'Cliente',
+    customer_email: a?.email || '-',
+    customer_phone: a?.phone || '-',
+    customer_address: address || '-',
+    customer_province: a?.province || '-',
+    notes: ORDER_NOTES_MARK + JSON.stringify(order),
+    status: orderStatusToDb(order.status),
+    total: Number(order.total) || 0,
+  };
+}
+
+function rowToOrder(row: any): Order | null {
   try {
-    const { data, error } = await sb.from('orders').select('*, order_items(*)').order('created_at', { ascending: false });
-    if (error) return null;
-    return data && data.length > 0 ? (data as unknown as Order[]) : null;
+    const notes: string = row?.notes || '';
+    let base: Order | null = null;
+    if (notes.startsWith(ORDER_NOTES_MARK)) {
+      base = JSON.parse(notes.slice(ORDER_NOTES_MARK.length)) as Order;
+    }
+    if (!base) {
+      // Ordine inserito a mano nel database (senza JSON completo): ricostruiamo il minimo.
+      const items = (row.order_items ?? []).map((it: any) => ({
+        productId: it.product_id ?? undefined,
+        productName: it.product_name,
+        qty: it.quantity,
+        price: Number(it.unit_price),
+      }));
+      base = {
+        id: row.order_number || row.id,
+        date: row.created_at ? new Date(row.created_at).toLocaleDateString('it-IT') : '',
+        status: 'In elaborazione',
+        estimatedDelivery: '',
+        total: Number(row.total) || 0,
+        itemsCount: items.reduce((n: number, i: any) => n + (i.qty || 0), 0),
+        items,
+        shippingAddress: {
+          recipient: row.customer_name,
+          email: row.customer_email,
+          phone: row.customer_phone,
+          street: row.customer_address,
+          city: '',
+          province: row.customer_province,
+          postalCode: '',
+          country: 'Italia',
+        },
+      };
+    }
+    // Lo stato scritto nel database (es. cambiato da un admin) ha la precedenza
+    if (row.status === 'annullato') base.status = 'Annullato';
+    else if (row.status === 'evaso' && base.status === 'In elaborazione') base.status = 'Spedito';
+    if (row.created_at && (!base.date || base.date === 'Oggi' || base.date.startsWith('Oggi'))) {
+      base.date = new Date(row.created_at).toLocaleDateString('it-IT');
+    }
+    return base;
   } catch {
     return null;
   }
 }
 
 /**
- * Upsert order to Supabase
+ * Fetch orders from Supabase table 'orders'.
+ * Un cliente registrato vede solo i propri ordini, un admin tutti (regole RLS).
+ */
+export async function fetchSupabaseOrders(): Promise<Order[] | null> {
+  const sb = getSupabase();
+  if (!sb) return null;
+  try {
+    const { data, error } = await sb
+      .from('orders')
+      .select('*, order_items(*)')
+      .order('created_at', { ascending: false })
+      .limit(1000);
+    if (error) return null;
+    const mapped = (data ?? []).map(rowToOrder).filter(Boolean) as Order[];
+    return mapped.length > 0 ? mapped : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Salva un NUOVO ordine (cliente registrato o ospite) su Supabase.
+ * Non serve leggere la riga dopo l'inserimento (gli ospiti non hanno il
+ * permesso di leggere): l'id lo generiamo noi.
+ */
+export async function insertSupabaseOrder(order: Order): Promise<{ ok: boolean; error?: string }> {
+  const sb = getSupabase();
+  if (!sb) return { ok: false, error: 'Supabase non configurato' };
+  try {
+    let userId: string | null = null;
+    try {
+      const { data } = await sb.auth.getSession();
+      userId = data.session?.user?.id ?? null;
+    } catch {
+      userId = null;
+    }
+
+    const orderId = newDbId();
+    const { error } = await sb.from('orders').insert({ id: orderId, ...orderToRow(order, userId) });
+    if (error) {
+      console.error('Supabase insert order FAILED:', error.message);
+      return { ok: false, error: error.message };
+    }
+
+    // Righe articolo (best effort: l'ordine è già salvato con tutti i dettagli in "notes")
+    const buildItems = (withProductId: boolean) =>
+      order.items.map((it) => ({
+        order_id: orderId,
+        product_id: withProductId && it.productId && UUID_RE.test(it.productId) ? it.productId : null,
+        product_name: it.productName,
+        quantity: Math.max(1, Math.round(it.qty) || 1),
+        unit_price: Number(it.price) || 0,
+        subtotal: +((Number(it.price) || 0) * (Math.max(1, Math.round(it.qty) || 1))).toFixed(2),
+      }));
+    let itemsRes = await sb.from('order_items').insert(buildItems(true));
+    if (itemsRes.error) {
+      itemsRes = await sb.from('order_items').insert(buildItems(false));
+      if (itemsRes.error) console.warn('Supabase insert order_items notice:', itemsRes.error.message);
+    }
+    return { ok: true };
+  } catch (e: any) {
+    console.error('Supabase insert order error:', e);
+    return { ok: false, error: e?.message || 'errore' };
+  }
+}
+
+/**
+ * Aggiorna un ordine esistente (solo admin: stato, note, ecc.)
  */
 export async function syncSupabaseOrder(order: Order): Promise<boolean> {
   const sb = getSupabase();
   if (!sb) return false;
   try {
-    const { error } = await sb.from('orders').upsert(order as any);
+    const row = orderToRow(order, null);
+    const { user_id: _omit, order_number: _num, ...changes } = row;
+    const { error } = await sb.from('orders').update(changes).eq('order_number', order.id);
     if (error) {
       console.error('Supabase sync order FAILED:', error.message);
       return false;

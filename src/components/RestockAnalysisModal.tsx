@@ -24,6 +24,7 @@ import {
 import { motion, AnimatePresence } from 'motion/react';
 import { Order, Product, RestockAnalysisResult, RestockRecommendation } from '../types';
 import { fetchRestockAnalysis } from '../services/restockService';
+import { PLACEHOLDER_IMAGE } from '../utils/imageRepair';
 
 interface RestockAnalysisModalProps {
   isOpen: boolean;
@@ -413,7 +414,7 @@ export const RestockAnalysisModal: React.FC<RestockAnalysisModalProps> = ({
                             {product && (
                               <div className="w-14 h-14 rounded-xl bg-white border border-slate-200 p-1.5 shrink-0 flex items-center justify-center overflow-hidden">
                                 <img
-                                  src={product.image}
+                                  src={product.image || PLACEHOLDER_IMAGE}
                                   alt={product.name}
                                   referrerPolicy="no-referrer"
                                   className="w-full h-full object-contain"

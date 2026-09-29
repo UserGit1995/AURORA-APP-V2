@@ -1088,7 +1088,7 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
                       <div className="p-2 rounded-xl bg-[#0d1420] border border-[#1c2433] flex items-center justify-between text-xs">
                         <span className="text-slate-400 text-[11px]">Pagamento concordato:</span>
                         <span className="font-semibold text-sky-300 text-[11px] text-right">
-                          {selectedDetailOrder.paymentMethod || 'Bonifico Bancario B2B 30/60 gg'}
+                          {selectedDetailOrder.paymentMethod || 'Pagamento alla consegna'}
                         </span>
                       </div>
                     </div>
@@ -1323,15 +1323,21 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
                   >
                     Chiudi
                   </button>
-                  <button
-                    onClick={() => {
-                      alert(`Apertura tracking esterno ${currentTrackingOrder.trackingNumber} su portale corriere...`);
-                    }}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold bg-[#0284c7] hover:bg-[#0369a1] text-white transition-colors"
-                  >
-                    <span>Portale Corriere</span>
-                    <ExternalLink className="w-3.5 h-3.5" />
-                  </button>
+                  {currentTrackingOrder.trackingNumber && currentTrackingOrder.trackingNumber !== 'RITIRO-SEDE' && (
+                    <button
+                      onClick={() => {
+                        try {
+                          navigator.clipboard.writeText(currentTrackingOrder.trackingNumber || '');
+                        } catch {
+                          /* ignora: clipboard non disponibile */
+                        }
+                      }}
+                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold bg-[#0284c7] hover:bg-[#0369a1] text-white transition-colors"
+                    >
+                      <span>Copia codice tracking</span>
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </button>
+                  )}
                 </div>
               </div>
             </motion.div>

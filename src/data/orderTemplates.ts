@@ -1,64 +1,8 @@
 import { OrderTemplate } from '../types';
 
-export const PRESET_ORDER_TEMPLATES: OrderTemplate[] = [
-  {
-    id: 'tpl-settimanale-uffici',
-    name: 'Rifornimento Settimanale Uffici & Reception',
-    description: 'Kit essenziale per la sanificazione periodica di reception, scrivanie e aree comuni.',
-    tag: 'Settimanale',
-    isPreset: true,
-    createdAt: '2026-01-15',
-    items: [
-      { productId: 'p1', quantity: 2 }, // Detersivo Lavatrice 3L
-      { productId: 'p3', quantity: 3 }, // Sgrassatore Universale
-      { productId: 'p4', quantity: 4 }, // Sapone Liquido Dermoprotettivo
-      { productId: 'p5', quantity: 3 }, // Carta Igienica 2 Veli
-      { productId: 'p6', quantity: 2 }, // Profumatore Ambiente
-    ],
-  },
-  {
-    id: 'tpl-haccp-cucina',
-    name: 'Sanificazione Mensile HACCP Cucina & Mensa',
-    description: 'Formulati concentrati per sgrassaggio piani inox, igiene mani e rispetto protocolli alimentari.',
-    tag: 'Cucina & HACCP',
-    isPreset: true,
-    createdAt: '2026-02-01',
-    items: [
-      { productId: 'p3', quantity: 6 }, // Sgrassatore Universale (alta concentrazione)
-      { productId: 'p4', quantity: 4 }, // Sapone Mani Antibatterico
-      { productId: 'p5', quantity: 4 }, // Carta Monouso
-      { productId: 'p1', quantity: 2 }, // Detersivo Tessili
-    ],
-  },
-  {
-    id: 'tpl-bagni-servizi',
-    name: 'Scorta Igiene Bagni & Dispenser',
-    description: 'Pacco scorta ad alta densità per servizi igienici aziendali a medio-alto passaggio.',
-    tag: 'Bagni & Igiene',
-    isPreset: true,
-    createdAt: '2026-02-10',
-    items: [
-      { productId: 'p5', quantity: 6 }, // Carta Igienica Pura Cellulosa
-      { productId: 'p4', quantity: 6 }, // Sapone Liquido 500ml
-      { productId: 'p6', quantity: 3 }, // Profumatore Diffusore
-      { productId: 'p3', quantity: 2 }, // Sgrassatore Sanitizzante
-    ],
-  },
-  {
-    id: 'tpl-accoglienza-top',
-    name: 'Kit Accoglienza & Benessere Ospiti',
-    description: 'Linea profumazioni persistenti, saponi idratanti e finiture di cura per showroom e hospitality.',
-    tag: 'Reception & Hospitality',
-    isPreset: true,
-    createdAt: '2026-03-01',
-    items: [
-      { productId: 'p6', quantity: 4 }, // Profumatore Ambiente
-      { productId: 'p4', quantity: 4 }, // Sapone Mani Aloe Vera
-      { productId: 'p2', quantity: 2 }, // Ammorbidente Concentrato
-      { productId: 'p5', quantity: 2 }, // Carta Igienica
-    ],
-  },
-];
+// I "modelli preconfigurati" di esempio puntavano a prodotti finti (p1, p3...) che non
+// esistono nel catalogo vero: ora ci sono solo i modelli salvati dal cliente stesso.
+export const PRESET_ORDER_TEMPLATES: OrderTemplate[] = [];
 
 const STORAGE_KEY = 'aurora_b2b_order_templates';
 
@@ -68,18 +12,11 @@ const STORAGE_KEY = 'aurora_b2b_order_templates';
 export function getSavedTemplates(): OrderTemplate[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) {
-      // First time: store initial presets
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(PRESET_ORDER_TEMPLATES));
-      return PRESET_ORDER_TEMPLATES;
-    }
+    if (!raw) return [];
     const parsed: OrderTemplate[] = JSON.parse(raw);
-    
-    // Ensure presets are present if user deleted all
-    if (!Array.isArray(parsed) || parsed.length === 0) {
-      return PRESET_ORDER_TEMPLATES;
-    }
-    return parsed;
+    if (!Array.isArray(parsed)) return [];
+    // Scarta i vecchi modelli di esempio salvati da versioni precedenti
+    return parsed.filter((t) => !t.isPreset);
   } catch (err) {
     console.error('Error loading order templates:', err);
     return PRESET_ORDER_TEMPLATES;

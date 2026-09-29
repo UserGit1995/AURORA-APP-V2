@@ -696,7 +696,7 @@ export const CATEGORIES: Category[] = [
       },
     ],
   },
-];
+] as unknown as Category[];
 
 export const PRODUCTS: Product[] = [
   {

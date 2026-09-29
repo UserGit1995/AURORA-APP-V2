@@ -21,7 +21,6 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { CartItem, OrderTemplate, Product } from '../types';
-import { PRODUCTS } from '../data/catalog';
 import {
   getSavedTemplates,
   saveOrderTemplate,
@@ -29,6 +28,8 @@ import {
   PRESET_ORDER_TEMPLATES,
 } from '../data/orderTemplates';
 import { useLanguage } from '../context/LanguageContext';
+import { useAdmin } from '../context/AdminContext';
+import { PLACEHOLDER_IMAGE } from '../utils/imageRepair';
 
 interface OrderTemplateModalProps {
   isOpen: boolean;
@@ -57,6 +58,7 @@ export const OrderTemplateModal: React.FC<OrderTemplateModalProps> = ({
   onTemplateSaved,
 }) => {
   const { language, t } = useLanguage();
+  const { productsList } = useAdmin();
   const isIt = language === 'it';
 
   const [activeTab, setActiveTab] = useState<'load' | 'save'>(initialMode);
@@ -125,7 +127,7 @@ export const OrderTemplateModal: React.FC<OrderTemplateModalProps> = ({
     const resolvedProducts: { product: Product; quantity: number }[] = [];
 
     tpl.items.forEach((item) => {
-      const product = PRODUCTS.find((p) => p.id === item.productId);
+      const product = productsList.find((p) => p.id === item.productId);
       if (product) {
         totalItems += item.quantity;
         totalCost += product.price * item.quantity;
@@ -470,7 +472,7 @@ export const OrderTemplateModal: React.FC<OrderTemplateModalProps> = ({
                               <div className="flex items-center gap-2 min-w-0">
                                 <div className="w-8 h-8 rounded-lg bg-white border border-slate-200 p-0.5 shrink-0 flex items-center justify-center">
                                   <img
-                                    src={product.image}
+                                    src={product.image || PLACEHOLDER_IMAGE}
                                     alt={product.name}
                                     className="w-full h-full object-contain"
                                     referrerPolicy="no-referrer"

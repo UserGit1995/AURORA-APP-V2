@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { RotateCcw, ArrowRight } from 'lucide-react';
+import { RotateCcw, ArrowRight, Loader2, RefreshCw } from 'lucide-react';
 import { Sidebar, NavTab } from './components/Sidebar';
 import { Header } from './components/Header';
 import { HeroBanner } from './components/HeroBanner';
@@ -22,13 +22,8 @@ import { LoginModal } from './components/LoginModal';
 import { BrandsSection } from './components/BrandsSection';
 import { AllBrandsView } from './components/AllBrandsView';
 import { BrandDetailView } from './components/BrandDetailView';
+import { ScrollToTopButton } from './components/ScrollToTopButton';
 
-import { 
-  CATEGORIES, 
-  PRODUCTS, 
-  INITIAL_ORDERS, 
-  INITIAL_NOTIFICATIONS 
-} from './data/catalog';
 import { Product, CartItem, Order, NotificationItem, OrderTemplate } from './types';
 import { useAdmin } from './context/AdminContext';
 // Il pannello admin (e le sue schermate) pesa parecchio (grafici, editor
@@ -51,6 +46,8 @@ export default function App() {
     updateProduct, 
     isAdmin,
     loginAsUser,
+    catalogLoading,
+    refreshFromCloud,
   } = useAdmin();
 
   const [activeTab, setActiveTab] = useState<NavTab>('home');
@@ -65,14 +62,10 @@ export default function App() {
   const [isAdminPanelOpen, setIsAdminPanelOpen] = useState(false);
 
   // Cart state: Preloaded with items from productsList
-  const [cart, setCart] = useState<CartItem[]>([
-    { product: productsList[0] || PRODUCTS[0], quantity: 2 },
-    { product: productsList[2] || PRODUCTS[2], quantity: 3 },
-    { product: productsList[4] || PRODUCTS[4], quantity: 1 },
-  ]);
+  const [cart, setCart] = useState<CartItem[]>([]);
 
   // Favorites state
-  const [favorites, setFavorites] = useState<string[]>(['p1', 'p4']);
+  const [favorites, setFavorites] = useState<string[]>([]);
 
   // Comparison state
   const [comparedProductIds, setComparedProductIds] = useState<string[]>([]);
@@ -98,8 +91,8 @@ export default function App() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Notifications & Orders state
-  const [notifications, setNotifications] = useState<NotificationItem[]>(INITIAL_NOTIFICATIONS);
-  const [orders, setOrders] = useState<Order[]>(INITIAL_ORDERS);
+  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+  const [isRetrying, setIsRetrying] = useState(false);
   const [addedProductId, setAddedProductId] = useState<string | null>(null);
   const [isCartPulsing, setIsCartPulsing] = useState(false);
 
@@ -212,18 +205,15 @@ export default function App() {
       order.items.forEach((item) => {
         let product: Product | undefined;
         if (item.productId) {
-          product = PRODUCTS.find((p) => p.id === item.productId);
+          product = productsList.find((p) => p.id === item.productId);
         }
-        if (!product) {
-          product = PRODUCTS.find(
-            (p) =>
-              item.productName.toLowerCase().includes(p.name.toLowerCase()) ||
-              p.name.toLowerCase().includes(item.productName.toLowerCase())
-          );
+        if (!product && item.productName) {
+          const wanted = item.productName.toLowerCase();
+          product = productsList.find((p) => p.name.toLowerCase() === wanted);
         }
-        if (!product) {
-          product = PRODUCTS[0];
-        }
+        // Se il prodotto non esiste più nel catalogo lo saltiamo (prima veniva
+        // sostituito con un prodotto a caso: ordini sbagliati).
+        if (!product) return;
 
         const existingIndex = updatedCart.findIndex((ci) => ci.product.id === product!.id);
         if (existingIndex > -1) {
@@ -277,7 +267,7 @@ export default function App() {
   const handleApplyTemplate = (template: OrderTemplate, mode: 'replace' | 'merge' = 'replace') => {
     const loadedCartItems: CartItem[] = template.items
       .map((item) => {
-        const product = PRODUCTS.find((p) => p.id === item.productId);
+        const product = productsList.find((p) => p.id === item.productId);
         if (!product) return null;
         return {
           product,
@@ -374,13 +364,43 @@ export default function App() {
           onOpenContact={() => setIsContactOpen(true)}
           onToggleMobileMenu={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           unreadNotificationsCount={unreadNotificationsCount}
-          unreadInquiriesCount={5}
+          unreadInquiriesCount={0}
           isCartPulsing={isCartPulsing}
         />
 
         {/* Dynamic Page Views */}
         <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto pb-24">
-          {selectedBrandName ? (
+          {productsList.length === 0 ? (
+            /* Catalogo non ancora arrivato dal cloud (o connessione assente) */
+            <div className="py-24 flex flex-col items-center text-center text-slate-300 space-y-3">
+              {catalogLoading || isRetrying ? (
+                <>
+                  <Loader2 className="w-8 h-8 animate-spin text-sky-400" />
+                  <p className="text-sm font-semibold">Caricamento del catalogo in corso…</p>
+                  <p className="text-xs text-slate-500">Ci vuole solo qualche istante.</p>
+                </>
+              ) : (
+                <>
+                  <p className="text-sm font-semibold">Non riusciamo a caricare il catalogo.</p>
+                  <p className="text-xs text-slate-500 max-w-sm">
+                    Controlla la connessione a internet e riprova.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      setIsRetrying(true);
+                      await refreshFromCloud();
+                      setIsRetrying(false);
+                    }}
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#0284c7] hover:bg-[#0369a1] text-white text-xs font-bold"
+                  >
+                    <RefreshCw className="w-3.5 h-3.5" />
+                    <span>Riprova</span>
+                  </button>
+                </>
+              )}
+            </div>
+          ) : selectedBrandName ? (
             <BrandDetailView
               brandName={selectedBrandName}
               brandImage={subcategoriesList.find((s) => !s.parentSubcategoryId && s.name === selectedBrandName)?.image}
@@ -473,7 +493,7 @@ export default function App() {
                       </span>
                     </h3>
                     <p className="text-sky-400 text-[11px] font-semibold mt-0.5">
-                      Forniture veloci • Senza carte • A 30gg
+                      Riordini veloci • Si paga alla consegna
                     </p>
                   </div>
                 </div>
@@ -558,6 +578,8 @@ export default function App() {
         </main>
       </div>
 
+      <ScrollToTopButton />
+
       {/* Floating Compare Dock (shown when there are items to compare and not in compare view) */}
       {activeTab !== 'confronta' && (
         <CompareFloatingBar
@@ -600,7 +622,6 @@ export default function App() {
         onClearCart={handleClearCart}
         onApplyTemplate={handleApplyTemplate}
         onCheckoutSuccess={(newOrder) => {
-          setOrders((prev) => [newOrder, ...prev]);
           setNotifications((prev) => [
             {
               id: `notif-${Date.now()}`,
@@ -648,7 +669,7 @@ export default function App() {
                 : `Benvenuto ${userData.name}! Listino dedicato e promozioni attive.`,
               time: 'Adesso',
               read: false,
-              type: 'system',
+              type: 'info',
             },
             ...prev,
           ]);
@@ -661,7 +682,6 @@ export default function App() {
         onClose={() => setIsQuickReorderOpen(false)}
         orders={ordersList}
         onOrderCreated={(newOrder) => {
-          setOrders((prev) => [newOrder, ...prev]);
           setNotifications((prev) => [
             {
               id: `notif-${Date.now()}`,

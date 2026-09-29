@@ -62,7 +62,6 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({ isOpen, on
     updateCategory,
     addCategory,
     deleteCategory,
-    resetToDefaults,
     refreshFromCloud,
   } = useAdmin();
 
@@ -216,14 +215,6 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({ isOpen, on
                 <span className="hidden md:inline">{isRefreshing ? 'Sincronizzo…' : 'Aggiorna dati'}</span>
               </button>
             )}
-            <button
-              onClick={resetToDefaults}
-              className={BTN_SECONDARY}
-              title="Ripristina i valori originali del database di test"
-            >
-              <span className="hidden md:inline">Ripristina dati di test</span>
-              <span className="md:hidden">Ripristina</span>
-            </button>
             <button
               onClick={onClose}
               className="p-2 rounded-full bg-[#0d1420] text-slate-400 hover:text-white transition-colors"

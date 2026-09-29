@@ -24,8 +24,9 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Product, Order, CustomerType, DeliveryOption } from '../types';
-import { PRODUCTS } from '../data/catalog';
+import { newOrderNumber } from '../services/supabase';
 import { useAdmin } from '../context/AdminContext';
+import { PLACEHOLDER_IMAGE } from '../utils/imageRepair';
 
 interface QuickReorderModalProps {
   isOpen: boolean;
@@ -48,16 +49,13 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
   onOrderCreated,
   onSelectProduct
 }) => {
-  const { currentUser, isBusinessCustomer } = useAdmin();
+  const { currentUser, isBusinessCustomer, productsList, createOrder } = useAdmin();
 
   // Tabs: 'frequent' (Frequenti & Consumabili) | 'history' (Da Ordini Passati) | 'sku' (Inserimento Rapido Codice)
   const [activeTab, setActiveTab] = useState<'frequent' | 'history' | 'sku'>('frequent');
 
   // Quick items basket
-  const [selectedItems, setSelectedItems] = useState<QuickRowItem[]>([
-    { id: '1', product: PRODUCTS[0], quantity: 2 }, // Detersivo Lavatrice
-    { id: '2', product: PRODUCTS[2], quantity: 2 }, // Sgrassatore
-  ]);
+  const [selectedItems, setSelectedItems] = useState<QuickRowItem[]>([]);
 
   // Recipient / Shipping Info: Default to user profile type
   const [customerType, setCustomerType] = useState<CustomerType>(() => {
@@ -67,12 +65,12 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
     return 'privato';
   });
   const [deliveryOption, setDeliveryOption] = useState<DeliveryOption>('corriere');
-  const [companyOrName, setCompanyOrName] = useState(currentUser?.company || currentUser?.name || 'Simone Aricò');
-  const [contactPerson, setContactPerson] = useState(currentUser?.name || 'Simone Aricò');
-  const [email, setEmail] = useState(currentUser?.email || 'simonearico10@gmail.com');
-  const [phone, setPhone] = useState(currentUser?.phone || '+39 340 1234567');
-  const [deliveryAddress, setDeliveryAddress] = useState('Via dell\'Industria 45, Palazzina B, 20145 Milano (MI)');
-  const [notes, setNotes] = useState('Riordino periodico programmato - scarico colli magazzino.');
+  const [companyOrName, setCompanyOrName] = useState(currentUser?.company || currentUser?.name || '');
+  const [contactPerson, setContactPerson] = useState(currentUser?.name || '');
+  const [email, setEmail] = useState(currentUser?.email || '');
+  const [phone, setPhone] = useState(currentUser?.phone || '');
+  const [deliveryAddress, setDeliveryAddress] = useState([currentUser?.address, currentUser?.postalCode, currentUser?.city].filter(Boolean).join(', '));
+  const [notes, setNotes] = useState('');
 
   // SKU code input
   const [skuSearch, setSkuSearch] = useState('');
@@ -83,11 +81,12 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submittedOrder, setSubmittedOrder] = useState<Order | null>(null);
   const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   // Frequently ordered products (based on catalog top items)
   const frequentProducts = useMemo(() => {
-    return PRODUCTS.filter((p) => p.isFeatured || p.stock > 0).slice(0, 8);
-  }, []);
+    return productsList.filter((p) => p.isFeatured || p.stock > 0).slice(0, 8);
+  }, [productsList]);
 
   if (!isOpen) return null;
 
@@ -137,7 +136,7 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
   const handleLoadOrder = (order: Order) => {
     const newItems: QuickRowItem[] = [];
     order.items.forEach((ordItem) => {
-      const prod = PRODUCTS.find((p) => p.id === ordItem.productId || p.code === ordItem.code);
+      const prod = productsList.find((p) => p.id === ordItem.productId || (ordItem.code && p.code === ordItem.code));
       if (prod) {
         newItems.push({
           id: `${prod.id}-${Date.now()}`,
@@ -169,8 +168,8 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
     const cleanSku = skuSearch.trim().toLowerCase();
     if (!cleanSku) return;
 
-    const matched = PRODUCTS.find(
-      (p) => p.code.toLowerCase() === cleanSku || p.id.toLowerCase() === cleanSku || p.name.toLowerCase().includes(cleanSku)
+    const matched = productsList.find(
+      (p) => (p.code || '').toLowerCase() === cleanSku || p.id.toLowerCase() === cleanSku || p.name.toLowerCase().includes(cleanSku)
     );
 
     if (!matched) {
@@ -184,65 +183,82 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
   };
 
   // Submit direct reorder request (NO CARTE / NO CHECKOUT)
-  const handleSubmitReorder = (e: React.FormEvent) => {
+  const handleSubmitReorder = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (selectedItems.length === 0) return;
+    if (selectedItems.length === 0 || isSubmitting) return;
 
+    // Controlli minimi: senza questi dati non potremmo né contattare né consegnare
+    if (!(contactPerson || companyOrName).trim()) {
+      setSubmitError('Inserisci il nome del referente o della ditta.');
+      return;
+    }
+    if (!email.trim() || !email.includes('@')) {
+      setSubmitError('Inserisci un indirizzo e-mail valido.');
+      return;
+    }
+    if (!phone.trim()) {
+      setSubmitError('Inserisci un numero di telefono.');
+      return;
+    }
+    if (deliveryOption === 'corriere' && !deliveryAddress.trim()) {
+      setSubmitError("Inserisci l'indirizzo di consegna completo (via, CAP, città).");
+      return;
+    }
+
+    setSubmitError(null);
     setIsSubmitting(true);
 
-    setTimeout(() => {
-      const orderId = `ORD-QUICK-${Math.floor(1000 + Math.random() * 9000)}`;
-      const newOrder: Order = {
-        id: orderId,
-        date: 'Oggi (Riordino Rapido)',
-        status: 'In elaborazione',
-        estimatedDelivery: deliveryOption === 'ritiro_sede' 
-          ? 'Pronto per il ritiro in sede (entro 24h)' 
-          : 'Spedizione rapida in 24/48h',
-        courier: deliveryOption === 'ritiro_sede' 
-          ? 'Ritiro diretto presso Magazzino Aurora' 
-          : 'GLS Logistics Express B2B',
-        trackingNumber: deliveryOption === 'ritiro_sede' 
-          ? 'RITIRO-SEDE' 
-          : `GLS-QR-${Math.floor(1000000 + Math.random() * 9000000)}`,
-        total: total,
-        subtotal: subtotal,
-        vatAmount: vat,
-        shippingCost: 0.0,
-        paymentMethod: customerType === 'azienda' 
-          ? 'Fattura B2B con Bonifico 30/60 gg d.f. / Ri.Ba.' 
-          : 'Pagamento alla Consegna / Bonifico su Ricevuta',
-        shippingAddress: {
-          customerType,
-          companyName: customerType === 'azienda' ? companyOrName : undefined,
-          recipient: contactPerson || companyOrName,
-          email,
-          phone,
-          street: deliveryOption === 'ritiro_sede' ? 'Ritiro Magazzino Centrale - Via dell\'Industria 45' : deliveryAddress,
-          city: 'Milano',
-          province: 'MI',
-          postalCode: '20145',
-          country: 'Italia',
-          vatNumber: customerType === 'azienda' ? 'IT09876543210' : undefined,
-          fiscalCode: customerType === 'privato' ? 'RCISMN85T10F205Z' : undefined,
-          deliveryOption,
-          deliveryNotes: notes || undefined,
-        },
-        itemsCount: totalColli,
-        items: selectedItems.map((item) => ({
-          productId: item.product.id,
-          productName: item.product.name,
-          code: item.product.code,
-          packageQty: item.product.packageQty,
-          qty: item.quantity,
-          price: item.product.price,
-        })),
-      };
+    const pickup = deliveryOption === 'ritiro_sede';
+    const newOrder: Order = {
+      id: newOrderNumber(),
+      date: new Date().toLocaleDateString('it-IT'),
+      status: 'In elaborazione',
+      estimatedDelivery: pickup
+        ? 'Ritiro in sede: ti avviseremo quando è pronto'
+        : 'Spedizione da confermare (di norma 24/48h)',
+      courier: pickup ? 'Ritiro in sede' : 'Corriere da confermare',
+      trackingNumber: pickup ? 'RITIRO-SEDE' : undefined,
+      total: total,
+      subtotal: subtotal,
+      vatAmount: vat,
+      shippingCost: 0.0,
+      paymentMethod: 'Pagamento alla consegna',
+      shippingAddress: {
+        customerType,
+        companyName: customerType === 'azienda' ? companyOrName.trim() : undefined,
+        recipient: (contactPerson || companyOrName).trim(),
+        email: email.trim(),
+        phone: phone.trim(),
+        street: pickup ? 'Ritiro in sede' : deliveryAddress.trim(),
+        city: '',
+        province: '',
+        postalCode: '',
+        country: 'Italia',
+        deliveryOption,
+        deliveryNotes: notes.trim() || undefined,
+      },
+      itemsCount: totalColli,
+      items: selectedItems.map((item) => ({
+        productId: item.product.id,
+        productName: item.product.name,
+        code: item.product.code,
+        packageQty: item.product.packageQty,
+        qty: item.quantity,
+        price: item.product.price,
+      })),
+    };
 
-      onOrderCreated(newOrder);
-      setSubmittedOrder(newOrder);
-      setIsSubmitting(false);
-    }, 400);
+    const result = await createOrder(newOrder, 'riordino-rapido');
+    setIsSubmitting(false);
+
+    if (!result.ok) {
+      setSubmitError("Non siamo riusciti a inviare il riordino (probabile problema di connessione). I prodotti scelti sono ancora qui: riprova tra un momento.");
+      return;
+    }
+
+    onOrderCreated(newOrder);
+    setSubmittedOrder(newOrder);
+    setSelectedItems([]);
   };
 
   const handleDownloadPdf = async () => {
@@ -372,7 +388,7 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
                         >
                           <div className="w-11 h-11 rounded-xl bg-white border border-slate-200 p-1 shrink-0 flex items-center justify-center">
                             <img
-                              src={product.image}
+                              src={product.image || PLACEHOLDER_IMAGE}
                               alt={product.name}
                               referrerPolicy="no-referrer"
                               className="w-full h-full object-contain"
@@ -537,7 +553,7 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
                   <div className="p-3 bg-[#0d1420] border border-[#1c2433] rounded-2xl text-[11px] text-slate-400 space-y-1">
                     <p className="font-bold text-slate-400">Codici SKU rapidi frequenti:</p>
                     <div className="flex flex-wrap gap-1.5 pt-1">
-                      {PRODUCTS.slice(0, 6).map((p) => (
+                      {productsList.filter((p) => p.code).slice(0, 6).map((p) => (
                         <button
                           key={p.id}
                           type="button"
@@ -725,6 +741,11 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
 
               {/* Direct Submit Button (NO CHECKOUT / NO CART REDIRECT) */}
               <div className="space-y-2">
+                {submitError && (
+                  <div role="alert" className="p-3 rounded-xl bg-red-500/10 border border-red-500/40 text-red-200 text-xs leading-relaxed">
+                    {submitError}
+                  </div>
+                )}
                 <button
                   type="button"
                   id="submit-direct-reorder-btn"
@@ -746,7 +767,7 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
                 </button>
 
                 <p className="text-[10px] text-center text-slate-500">
-                  Nessun pagamento con carta • Fattura differita / Ricevuta alla consegna
+                  Nessun pagamento online • Si paga alla consegna
                 </p>
               </div>
 
@@ -763,7 +784,7 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
             <div>
               <h3 className="text-xl font-bold text-white">Riordino Inviato con Successo!</h3>
               <p className="text-slate-400 text-xs mt-1 max-w-md">
-                La fornitura è stata confermata e registrata nel sistema logistico per l'allestimento immediato.
+                Il riordino è stato inviato ad Aurora: ti contatteremo presto per confermare consegna e pagamento.
               </p>
             </div>
 
@@ -789,7 +810,7 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
               <div className="flex justify-between pt-1">
                 <span className="text-slate-400">Spedizione / Ricezione:</span>
                 <span className="text-emerald-300 font-medium">
-                  {submittedOrder.shippingAddress?.deliveryOption === 'ritiro_sede' ? 'Ritiro Sede Aurora' : 'GLS Express 24/48h'}
+                  {submittedOrder.shippingAddress?.deliveryOption === 'ritiro_sede' ? 'Ritiro in sede Aurora' : 'Spedizione con corriere'}
                 </span>
               </div>
             </div>

@@ -19,6 +19,7 @@ import { Product } from '../types';
 import { ProductTrendSparkline } from './ProductTrendSparkline';
 import { ProductUsageGuidelines } from './ProductUsageGuidelines';
 import { useAdmin } from '../context/AdminContext';
+import { PLACEHOLDER_IMAGE } from '../utils/imageRepair';
 
 interface ProductDetailModalProps {
   product: Product | null;
@@ -132,7 +133,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                 </div>
               )}
               <img
-                src={product.image}
+                src={product.image || PLACEHOLDER_IMAGE}
                 alt={product.name}
                 referrerPolicy="no-referrer"
                 className="w-48 h-48 sm:w-56 sm:h-56 object-contain filter drop-shadow-[0_10px_20px_rgba(0,0,0,0.6)]"

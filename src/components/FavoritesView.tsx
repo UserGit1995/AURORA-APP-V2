@@ -2,6 +2,7 @@ import React from 'react';
 import { Heart, Plus, ArrowLeft, Sparkles, PackageSearch, Bookmark, Scale } from 'lucide-react';
 import { Product } from '../types';
 import { useAdmin } from '../context/AdminContext';
+import { PLACEHOLDER_IMAGE } from '../utils/imageRepair';
 
 interface FavoritesViewProps {
   favoriteProducts: Product[];
@@ -162,7 +163,7 @@ export const FavoritesView: React.FC<FavoritesViewProps> = ({
 
                 <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-white border border-slate-200 shadow-xs flex items-center justify-center p-2 mb-2">
                   <img
-                    src={product.image}
+                    loading="lazy" decoding="async" src={product.image || PLACEHOLDER_IMAGE}
                     alt={product.name}
                     referrerPolicy="no-referrer"
                     className="w-full h-full object-contain group-hover:scale-105 transition-transform"

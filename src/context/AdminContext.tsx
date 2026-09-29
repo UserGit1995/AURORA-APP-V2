@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { UserProfile, SystemSettings, Product, Order, Category, Subcategory } from '../types';
-import { PRODUCTS, CATEGORIES, INITIAL_ORDERS } from '../data/catalog';
+import { PRODUCTS as DEMO_PRODUCTS, INITIAL_ORDERS as DEMO_ORDERS, CATEGORIES as DEMO_CATEGORIES } from '../data/catalog';
+import { submitOrder, SubmitResult } from '../services/orderSubmit';
 import { 
   isSupabaseConfigured, 
   fetchSupabaseProducts, 
@@ -25,6 +26,10 @@ interface AdminContextType {
   isAdmin: boolean;
   isSuperAdmin: boolean;
   isSupabaseConnected: boolean;
+  // true = cliente "attività" (o admin): vede i prezzi con IVA, coerente con il carrello
+  isBusinessCustomer: boolean;
+  // true finché il catalogo non è stato scaricato dal cloud almeno una volta
+  catalogLoading: boolean;
   loginAsAdmin: (customAdmin?: Partial<UserProfile>) => void;
   loginAsUser: (userData: UserProfile) => void;
   logout: () => void;
@@ -53,11 +58,11 @@ interface AdminContextType {
   // Order Management
   updateOrder: (updated: Order) => void;
   deleteOrder: (orderId: string) => void;
-  createOrder: (newOrder: Order) => void;
+  // Registra l'ordine: email al negozio + salvataggio su database. Restituisce l'esito reale.
+  createOrder: (newOrder: Order, source?: 'carrello' | 'riordino-rapido') => Promise<SubmitResult>;
   
   // System Settings Management
   updateSystemSettings: (settings: Partial<SystemSettings>) => void;
-  resetToDefaults: () => void;
   refreshFromCloud: () => Promise<void>;
 }
 
@@ -90,13 +95,13 @@ const DEFAULT_ADMIN: UserProfile = {
 };
 
 const DEFAULT_SETTINGS: SystemSettings = {
-  companyName: 'AURORA Distribuzione S.r.l.',
+  companyName: 'AURORA',
   brandTitle: 'AURORA - Casalinghi & Detergenza',
-  contactEmail: 'info@auroracasalinghi.it',
-  contactPhone: '+39 02 9876543',
-  vatNumber: 'IT09876543210',
-  sdiCode: 'AUR789K',
-  address: 'Via dell\'Industria 45, Palazzina B, 20145 Milano (MI)',
+  contactEmail: 'ordini.aurorasrls@gmail.com',
+  contactPhone: '',
+  vatNumber: '',
+  sdiCode: '',
+  address: '',
   minimumOrderEur: 50.00,
   freeShippingThresholdEur: 150.00,
   standardShippingEur: 9.90,
@@ -106,6 +111,22 @@ const DEFAULT_SETTINGS: SystemSettings = {
   announcementBannerText: '🔥 Spedizione Rapida • Casalinghi e Detergenza per Casa e Attività',
   enableAnnouncementBanner: true,
 };
+
+// Dati di esempio (prodotti "p1", ordini demo...) che una vecchia versione salvava
+// nel browser dei visitatori: li scartiamo, così nessun cliente vede roba finta.
+const DEMO_PRODUCT_IDS = new Set(DEMO_PRODUCTS.map((p) => p.id));
+const DEMO_ORDER_IDS = new Set(DEMO_ORDERS.map((o) => o.id));
+const DEMO_CATEGORY_IDS = new Set(DEMO_CATEGORIES.map((c) => c.id));
+const OLD_DEMO_EMAILS = new Set(['info@auroracasalinghi.it']);
+
+function loadSaved<T>(key: string, fallback: T): T {
+  try {
+    const saved = localStorage.getItem(key);
+    return saved ? (JSON.parse(saved) as T) : fallback;
+  } catch {
+    return fallback;
+  }
+}
 
 const AdminContext = createContext<AdminContextType | undefined>(undefined);
 
@@ -124,25 +145,14 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   });
 
-  const [productsList, setProductsList] = useState<Product[]>(() => {
-    try {
-      const saved = localStorage.getItem('aurora_admin_products');
-      if (saved) return JSON.parse(saved);
-      return PRODUCTS;
-    } catch {
-      return PRODUCTS;
-    }
-  });
+  const [productsList, setProductsList] = useState<Product[]>(() =>
+    loadSaved<Product[]>('aurora_admin_products', []).filter((p) => !DEMO_PRODUCT_IDS.has(p.id))
+  );
 
-  const [categoriesList, setCategoriesList] = useState<Category[]>(() => {
-    try {
-      const saved = localStorage.getItem('aurora_admin_categories');
-      if (saved) return JSON.parse(saved);
-      return CATEGORIES;
-    } catch {
-      return CATEGORIES;
-    }
-  });
+  const [categoriesList, setCategoriesList] = useState<Category[]>(() =>
+    // Le categorie d'esempio non compaiono più: si usano solo quelle vere del database
+    loadSaved<Category[]>('aurora_admin_categories', []).filter((c) => !DEMO_CATEGORY_IDS.has(c.id))
+  );
 
   const [subcategoriesList, setSubcategoriesList] = useState<Subcategory[]>(() => {
     try {
@@ -154,25 +164,18 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   });
 
-  const [ordersList, setOrdersList] = useState<Order[]>(() => {
-    try {
-      const saved = localStorage.getItem('aurora_admin_orders');
-      if (saved) return JSON.parse(saved);
-      return INITIAL_ORDERS;
-    } catch {
-      return INITIAL_ORDERS;
-    }
-  });
+  const [ordersList, setOrdersList] = useState<Order[]>(() =>
+    loadSaved<Order[]>('aurora_admin_orders', []).filter((o) => !DEMO_ORDER_IDS.has(o.id))
+  );
 
   const [systemSettings, setSystemSettings] = useState<SystemSettings>(() => {
-    try {
-      const saved = localStorage.getItem('aurora_admin_settings');
-      if (saved) return JSON.parse(saved);
-      return DEFAULT_SETTINGS;
-    } catch {
-      return DEFAULT_SETTINGS;
-    }
+    const saved = loadSaved<SystemSettings | null>('aurora_admin_settings', null);
+    if (!saved) return DEFAULT_SETTINGS;
+    return OLD_DEMO_EMAILS.has(saved.contactEmail)
+      ? { ...saved, contactEmail: DEFAULT_SETTINGS.contactEmail }
+      : saved;
   });
+  const [catalogLoading, setCatalogLoading] = useState(true);
 
   // Sync state to localStorage
   useEffect(() => {
@@ -229,12 +232,21 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const isSupabaseConnected = isSupabaseConfigured();
 
-  // On mount, if Supabase is configured, attempt to load cloud data seamlessly
+  // Al caricamento scarica il catalogo dal cloud. Se il primo tentativo non
+  // riesce (rete lenta, telefono in campagna...) riprova da solo fino a 3 volte.
   const refreshFromCloud = useCallback(async () => {
-    if (!isSupabaseConfigured()) return;
+    if (!isSupabaseConfigured()) {
+      setCatalogLoading(false);
+      return;
+    }
     try {
-      const [cloudProducts, cloudCategories, cloudSubcategories, cloudOrders] = await Promise.all([
-        fetchSupabaseProducts(),
+      let cloudProducts: Product[] | null = null;
+      for (let attempt = 0; attempt < 3; attempt++) {
+        cloudProducts = await fetchSupabaseProducts();
+        if (cloudProducts && cloudProducts.length > 0) break;
+        await new Promise((r) => setTimeout(r, 1200 * (attempt + 1)));
+      }
+      const [cloudCategories, cloudSubcategories, cloudOrders] = await Promise.all([
         fetchSupabaseCategories(),
         fetchSupabaseSubcategories(),
         fetchSupabaseOrders(),
@@ -256,10 +268,17 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         setSubcategoriesList(cloudSubcategories);
       }
       if (cloudOrders && cloudOrders.length > 0) {
-        setOrdersList(cloudOrders);
+        // Uniamo gli ordini del database con quelli rimasti solo su questo dispositivo
+        // (es. inviati via email quando il salvataggio online non era riuscito).
+        setOrdersList((prev) => {
+          const cloudIds = new Set(cloudOrders.map((o) => o.id));
+          return [...cloudOrders, ...prev.filter((o) => !cloudIds.has(o.id))];
+        });
       }
     } catch (err) {
       console.warn('Cloud data fetch notice:', err);
+    } finally {
+      setCatalogLoading(false);
     }
   }, []);
 
@@ -280,6 +299,8 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const isAdmin = currentUser?.role === 'admin' || currentUser?.role === 'superadmin';
   const isSuperAdmin = currentUser?.role === 'superadmin';
+  // Stessa regola del carrello: le attività (e gli admin) hanno l'IVA al 22%, i privati no.
+  const isBusinessCustomer = currentUser?.customerType === 'attivita' || isAdmin;
 
   const loginAsAdmin = (customAdmin?: Partial<UserProfile>) => {
     const adminUser: UserProfile = {
@@ -424,9 +445,17 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setOrdersList((prev) => prev.filter((o) => o.id !== orderId));
   };
 
-  const createOrder = (newOrder: Order) => {
-    setOrdersList((prev) => [newOrder, ...prev]);
-    syncSupabaseOrder(newOrder);
+  const createOrder = async (
+    newOrder: Order,
+    source: 'carrello' | 'riordino-rapido' = 'carrello'
+  ): Promise<SubmitResult> => {
+    // Prima il tentativo REALE di consegna (email al negozio + database)...
+    const result = await submitOrder(newOrder, source);
+    // ...e solo se l'ordine è davvero partito lo mostriamo nello storico.
+    if (result.ok) {
+      setOrdersList((prev) => [newOrder, ...prev.filter((o) => o.id !== newOrder.id)]);
+    }
+    return result;
   };
 
   // Settings
@@ -438,14 +467,6 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     });
   };
 
-  const resetToDefaults = () => {
-    setProductsList(PRODUCTS);
-    setCategoriesList(CATEGORIES);
-    setOrdersList(INITIAL_ORDERS);
-    setSystemSettings(DEFAULT_SETTINGS);
-    setCurrentUser(DEFAULT_ADMIN);
-  };
-
   return (
     <AdminContext.Provider
       value={{
@@ -453,6 +474,8 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         isAdmin,
         isSuperAdmin,
         isSupabaseConnected,
+        isBusinessCustomer,
+        catalogLoading,
         loginAsAdmin,
         loginAsUser,
         logout,
@@ -475,7 +498,6 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         deleteOrder,
         createOrder,
         updateSystemSettings,
-        resetToDefaults,
         refreshFromCloud,
       }}
     >

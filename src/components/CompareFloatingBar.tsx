@@ -2,6 +2,7 @@ import React from 'react';
 import { Scale, X, ArrowRight, Trash2, CheckCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Product } from '../types';
+import { PLACEHOLDER_IMAGE } from '../utils/imageRepair';
 
 interface CompareFloatingBarProps {
   comparedProducts: Product[];
@@ -62,7 +63,7 @@ export const CompareFloatingBar: React.FC<CompareFloatingBarProps> = ({
                   title={product.name}
                 >
                   <img
-                    src={product.image}
+                    src={product.image || PLACEHOLDER_IMAGE}
                     alt={product.name}
                     referrerPolicy="no-referrer"
                     className="w-full h-full object-contain"

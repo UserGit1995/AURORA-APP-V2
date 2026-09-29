@@ -26,6 +26,7 @@ import { Category, Product } from '../types';
 import { NavTab } from './Sidebar';
 import { exportProductsToCsv } from '../utils/catalogCsvExporter';
 import { useAdmin } from '../context/AdminContext';
+import { PLACEHOLDER_IMAGE } from '../utils/imageRepair';
 
 interface CatalogViewProps {
   viewType: NavTab;
@@ -62,7 +63,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
   searchQuery,
   onOpenRestockAnalysis,
 }) => {
-  const { isBusinessCustomer, formatProductPrice } = useAdmin();
+  const { isBusinessCustomer } = useAdmin();
   const [activeFilterCategory, setActiveFilterCategory] = useState<string | null>(selectedCategoryId);
   const [quickFilter, setQuickFilter] = useState<'tutti' | 'offerta' | 'bestseller' | 'eco' | 'medico'>('tutti');
   const [sortBy, setSortBy] = useState<'popolarita' | 'prezzo-asc' | 'prezzo-desc' | 'nome'>('popolarita');
@@ -831,7 +832,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
 
                 <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-white border border-slate-200 shadow-xs flex items-center justify-center p-2 my-1">
                   <img
-                    src={product.image}
+                    src={product.image || PLACEHOLDER_IMAGE}
                     alt={product.name}
                     referrerPolicy="no-referrer" loading="lazy" decoding="async"
                     className="w-full h-full object-contain transition-all duration-500 ease-out will-change-transform group-hover:scale-110 group-hover:brightness-105"

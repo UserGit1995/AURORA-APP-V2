@@ -24,6 +24,7 @@ import {
 import { motion, AnimatePresence } from 'motion/react';
 import { Product } from '../types';
 import { useAdmin } from '../context/AdminContext';
+import { PLACEHOLDER_IMAGE } from '../utils/imageRepair';
 
 interface CompareViewProps {
   comparedProducts: Product[];
@@ -172,7 +173,7 @@ export const CompareView: React.FC<CompareViewProps> = ({
                   className="bg-[#0d1420] border border-[#1c2433] rounded-2xl p-3 flex items-center justify-between gap-3 text-left"
                 >
                   <img
-                    src={prod.image}
+                    src={prod.image || PLACEHOLDER_IMAGE}
                     alt={prod.name}
                     referrerPolicy="no-referrer"
                     className="w-12 h-12 object-contain rounded-lg bg-[#0d1420] p-1 shrink-0"
@@ -275,7 +276,7 @@ export const CompareView: React.FC<CompareViewProps> = ({
                             className="cursor-pointer aspect-square w-full max-w-[140px] mx-auto rounded-2xl bg-white border border-slate-200 shadow-xs p-3 mb-3 flex items-center justify-center hover:border-sky-500/60 transition-colors"
                           >
                             <img
-                              src={product.image}
+                              src={product.image || PLACEHOLDER_IMAGE}
                               alt={product.name}
                               referrerPolicy="no-referrer"
                               className="w-full h-full object-contain filter drop-shadow-md group-hover:scale-105 transition-transform"
@@ -623,24 +624,6 @@ export const CompareView: React.FC<CompareViewProps> = ({
                     );
                   })()}
 
-                  {/* Scheda Tecnica di Sicurezza SDS */}
-                  <tr className="hover:bg-[#1a2230]/50">
-                    <td className="p-3.5 sm:p-4 font-semibold text-slate-400 bg-[#0d1420] border-r border-[#1c2433]">
-                      Documentazione Tecnica
-                    </td>
-                    {comparedProducts.map((p) => (
-                      <td key={p.id} className="p-3.5 sm:p-4 border-r last:border-r-0 border-[#1c2433]">
-                        <button
-                          onClick={() => alert(`Download Scheda Dati di Sicurezza (SDS) per ${p.name} (${p.code})`)}
-                          className="inline-flex items-center gap-1.5 text-xs text-sky-400 hover:text-sky-300 hover:underline font-medium"
-                        >
-                          <FileText className="w-3.5 h-3.5" />
-                          <span>Scarica Scheda SDS (PDF)</span>
-                        </button>
-                      </td>
-                    ))}
-                    {comparedProducts.length < 4 && <td className="bg-[#0d1420]/50" />}
-                  </tr>
                 </tbody>
               </table>
             </div>
@@ -699,7 +682,7 @@ export const CompareView: React.FC<CompareViewProps> = ({
                     >
                       <div className="flex items-center gap-3 min-w-0">
                         <img
-                          src={product.image}
+                          src={product.image || PLACEHOLDER_IMAGE}
                           alt={product.name}
                           referrerPolicy="no-referrer"
                           className="w-12 h-12 object-contain rounded-xl bg-white border border-slate-200 p-1 shrink-0"

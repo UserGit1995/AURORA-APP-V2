@@ -1,3 +1,4 @@
+import { COMPANY, companyInfoLine } from '../config/company';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { Order } from '../types';
@@ -26,19 +27,19 @@ export const generateOrderReceiptPdf = (order: Order): void => {
   doc.setTextColor(255, 255, 255);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(20);
-  doc.text('AURORA DISTRIBUZIONE', 14, 16);
+  doc.text(COMPANY.name.toUpperCase(), 14, 16);
 
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8.5);
   doc.setTextColor(186, 230, 253); // Sky-200
-  doc.text('Piattaforma E-commerce B2B • Forniture per Igiene & Sanificazione Professionale', 14, 22);
-  doc.text('Via dell\'Industria 45, 20145 Milano (MI) • P.IVA IT09876543210 • Tel: +39 02 8900123', 14, 27);
+  doc.text('Forniture per igiene, pulizia e casa', 14, 22);
+  doc.text(companyInfoLine(), 14, 27);
 
   // Document Title & ID on right
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(13);
   doc.setTextColor(255, 255, 255);
-  doc.text('RICEVUTA ORDINE / FATTURA', 196, 16, { align: 'right' });
+  doc.text('RIEPILOGO ORDINE', 196, 16, { align: 'right' });
 
   doc.setFont('courier', 'bold');
   doc.setFontSize(11);
@@ -68,7 +69,7 @@ export const generateOrderReceiptPdf = (order: Order): void => {
   doc.setTextColor(...slateText);
   const isCompany = !!order.shippingAddress?.companyName;
   const headerName = isCompany 
-    ? order.shippingAddress?.companyName || 'AURORA S.r.l.'
+    ? order.shippingAddress?.companyName || order.shippingAddress?.recipient || ''
     : order.shippingAddress?.recipient || 'Cliente Privato';
   doc.text(headerName, 18, startY + 12);
 
@@ -78,7 +79,7 @@ export const generateOrderReceiptPdf = (order: Order): void => {
     ? (order.shippingAddress?.recipient ? `C/A: ${order.shippingAddress.recipient}` : 'Ufficio Acquisti')
     : `Cliente: ${order.shippingAddress?.recipient || ''}`;
   const street = order.shippingAddress?.street || 'Via dell\'Industria 45';
-  const city = `${order.shippingAddress?.postalCode || '20145'} ${order.shippingAddress?.city || 'Milano'} (${order.shippingAddress?.province || 'MI'})`;
+  const city = [order.shippingAddress?.postalCode, order.shippingAddress?.city, order.shippingAddress?.province ? `(${order.shippingAddress.province})` : ''].filter(Boolean).join(' ');
   const fiscalId = order.shippingAddress?.vatNumber 
     ? `P.IVA: ${order.shippingAddress.vatNumber}` 
     : order.shippingAddress?.fiscalCode 
@@ -117,16 +118,16 @@ export const generateOrderReceiptPdf = (order: Order): void => {
 
   doc.setFont('helvetica', 'normal');
   doc.text('Corriere assegnato:', 112, startY + 22);
-  doc.text(order.courier || 'GLS Logistics B2B Express', 150, startY + 22);
+  doc.text(order.courier || 'Da confermare', 150, startY + 22);
 
   doc.text('Codice Tracking (AWB):', 112, startY + 27);
   doc.setFont('courier', 'bold');
-  doc.text(order.trackingNumber || 'GLS-IT-992019', 150, startY + 27);
+  doc.text(order.trackingNumber || '-', 150, startY + 27);
 
   doc.setFont('helvetica', 'normal');
   doc.text('Modalità Pagamento:', 112, startY + 34);
   doc.setFont('helvetica', 'bold');
-  doc.text(order.paymentMethod || 'Bonifico Bancario B2B 30/60 gg', 112, startY + 39);
+  doc.text(order.paymentMethod || 'Pagamento alla consegna', 112, startY + 39);
 
   // 3. Items Table using autoTable
   const tableData = order.items.map((item, index) => {
@@ -199,14 +200,14 @@ export const generateOrderReceiptPdf = (order: Order): void => {
   doc.setFontSize(7.5);
   doc.setTextColor(100, 116, 139);
   if (isBusinessOrder) {
-    doc.text('• Documento per ordine B2B con fatturazione elettronica.', 18, finalY + 10);
-    doc.text('• Fattura elettronica SDI trasmessa tramite canale accreditato.', 18, finalY + 15);
+    doc.text('• Riepilogo ordine per attività (IVA 22% inclusa nel totale).', 18, finalY + 10);
+    doc.text('• Pagamento alla consegna, nessun pagamento online.', 18, finalY + 15);
   } else {
-    doc.text('• Ricevuta ordine cliente privato (senza applicazione IVA).', 18, finalY + 10);
-    doc.text('• Valido ai fini di riepilogo acquisto e garanzia.', 18, finalY + 15);
+    doc.text('• Riepilogo ordine cliente privato (senza applicazione IVA).', 18, finalY + 10);
+    doc.text('• Pagamento alla consegna, nessun pagamento online.', 18, finalY + 15);
   }
-  doc.text('• Merce resa franco destino con imballaggio standard.', 18, finalY + 20);
-  doc.text('• Assistenza ordini & reclami: ordini@auroradistribuzione.it', 18, finalY + 25);
+  doc.text('• Consegna e orari da confermare con il cliente.', 18, finalY + 20);
+  doc.text(`• Assistenza ordini: ${COMPANY.email}`, 18, finalY + 25);
 
   // Financial Summary Box on the right
   const summaryX = 116;
@@ -262,7 +263,7 @@ export const generateOrderReceiptPdf = (order: Order): void => {
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(7.5);
   doc.setTextColor(148, 163, 184); // Slate-400
-  doc.text('Aurora Distribuzione S.r.l. - Registro Imprese Milano n. MI-2094182 - Capitale Sociale € 150.000,00 i.v.', 14, pageHeight - 9);
+  doc.text(`${COMPANY.name}${COMPANY.vatNumber ? ' - P.IVA ' + COMPANY.vatNumber : ''}`, 14, pageHeight - 9);
   doc.text(`Documento generato il ${new Date().toLocaleDateString('it-IT')} ore ${new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })}`, 196, pageHeight - 9, { align: 'right' });
 
   // Trigger browser download
@@ -351,7 +352,7 @@ export const generateOrderHistoryPdf = (
   doc.setTextColor(255, 255, 255);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(18);
-  doc.text('AURORA DISTRIBUZIONE', 14, 15);
+  doc.text(COMPANY.name.toUpperCase(), 14, 15);
 
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8);
@@ -363,7 +364,7 @@ export const generateOrderHistoryPdf = (
     14,
     21
   );
-  doc.text('Via dell\'Industria 45, 20145 Milano (MI) • P.IVA IT09876543210 • Tel: +39 02 8900123', 14, 26);
+  doc.text(companyInfoLine(), 14, 26);
 
   // Document Title & Reference on the right
   doc.setFont('helvetica', 'bold');
@@ -399,7 +400,7 @@ export const generateOrderHistoryPdf = (
   doc.setTextColor(...darkNavy);
   doc.text(isIt ? 'CONTO CLIENTE & AMBITO REPORT' : 'CLIENT ACCOUNT & REPORT SCOPE', 18, startY + 6);
 
-  const clientName = options?.customerName || orders[0]?.shippingAddress?.companyName || 'AURORA DISTRIBUZIONE S.r.l. - Account B2B';
+  const clientName = options?.customerName || orders[0]?.shippingAddress?.companyName || COMPANY.name;
   const vatNumber = options?.vatNumber || orders[0]?.shippingAddress?.vatNumber || 'IT08492040962';
 
   doc.setFont('helvetica', 'bold');
@@ -421,7 +422,7 @@ export const generateOrderHistoryPdf = (
     startY + 27
   );
   doc.text(
-    isIt ? `Canale acquisto: Portale Telematico B2B Aurora` : `Purchase channel: Aurora B2B Portal`,
+    isIt ? `Canale acquisto: Catalogo online Aurora` : `Purchase channel: Aurora B2B Portal`,
     18,
     startY + 32
   );
@@ -685,22 +686,22 @@ export const generateOrderHistoryPdf = (
   );
   doc.text(
     isIt 
-      ? '• Ciascun ordine ha una fattura elettronica SDI archiviata con relativo DDT.'
+      ? '• Riepilogo degli ordini inviati dal catalogo online.'
       : '• Each order is backed by an official electronic invoice and delivery note.',
     18,
     currentFinalY + 15
   );
   doc.text(
     isIt 
-      ? '• Modalità pagamento registrata: Bonifico B2B / Plafond commerciale.'
+      ? '• Modalità di pagamento: alla consegna.'
       : '• Payment terms: B2B Bank Transfer / Approved Corporate Credit.',
     18,
     currentFinalY + 20
   );
   doc.text(
     isIt 
-      ? '• Assistenza contabile: amministrazione@auroradistribuzione.it'
-      : '• Accounting support: amministrazione@auroradistribuzione.it',
+      ? `• Assistenza ordini: ${COMPANY.email}`
+      : `• Order support: ${COMPANY.email}`,
     18,
     currentFinalY + 25
   );
@@ -759,7 +760,7 @@ export const generateOrderHistoryPdf = (
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(8);
       doc.setTextColor(255, 255, 255);
-      doc.text('AURORA DISTRIBUZIONE • ESTRATTO STORICO FORNITURE B2B', 14, 9);
+      doc.text(`${COMPANY.name.toUpperCase()} • STORICO ORDINI`, 14, 9);
 
       doc.setFont('courier', 'bold');
       doc.setFontSize(7.5);
@@ -778,7 +779,7 @@ export const generateOrderHistoryPdf = (
     doc.setFontSize(7);
     doc.setTextColor(148, 163, 184); // Slate-400
     doc.text(
-      'Aurora Distribuzione S.r.l. - Registro Imprese Milano MI-2094182 - P.IVA IT09876543210 - Capitale Sociale € 150.000,00 i.v.',
+      `${COMPANY.name}${COMPANY.vatNumber ? ' - P.IVA ' + COMPANY.vatNumber : ''}`,
       14,
       pageHeight - 7
     );
