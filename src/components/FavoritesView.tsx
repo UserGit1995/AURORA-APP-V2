@@ -23,7 +23,7 @@ export const FavoritesView: React.FC<FavoritesViewProps> = ({
   onAddToCart,
   onBackToHome,
 }) => {
-  const { isBusinessCustomer } = useAdmin();
+  const { isBusinessCustomer, vatFactor } = useAdmin();
 
   return (
     <div className="w-full animate-in fade-in duration-200">
@@ -186,7 +186,7 @@ export const FavoritesView: React.FC<FavoritesViewProps> = ({
                   <div className="flex items-center justify-between mt-2.5 pt-1.5 border-t border-[#1c2433]">
                     <div>
                       {isBusinessCustomer ? (
-                        <span className="text-white text-xs font-bold">€{(product.price * 1.22).toFixed(2)}</span>
+                        <span className="text-white text-xs font-bold">€{(product.price * vatFactor).toFixed(2)}</span>
                       ) : (
                         <span className="text-white text-xs font-bold">€{product.price.toFixed(2)}</span>
                       )}

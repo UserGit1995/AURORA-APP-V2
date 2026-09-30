@@ -90,7 +90,10 @@ export const OrderEditModal: React.FC<OrderEditModalProps> = ({
   const recalculateTotals = (items: OrderItemDetail[]) => {
     const subtotal = items.reduce((acc, item) => acc + item.price * item.qty, 0);
     const shipping = subtotal > 150 ? 0 : 9.90;
-    const vat = subtotal * 0.22;
+    // L'IVA resta quella già presente nell'ordine (nessuna IVA automatica)
+    const prevSubtotal = formData.subtotal || 0;
+    const vatRate = prevSubtotal > 0 ? (formData.vatAmount || 0) / prevSubtotal : 0;
+    const vat = subtotal * vatRate;
     const total = subtotal + vat + shipping;
 
     setFormData((prev) => ({
@@ -414,7 +417,7 @@ export const OrderEditModal: React.FC<OrderEditModalProps> = ({
           <div className="bg-[#0d1420] p-4 rounded-2xl border border-slate-800 flex items-center justify-between">
             <div className="text-xs text-slate-400 space-y-0.5">
               <p>Imponibile: <span className="text-white font-mono">€ {(formData.subtotal || 0).toFixed(2)}</span></p>
-              <p>IVA (22%): <span className="text-white font-mono">€ {(formData.vatAmount || 0).toFixed(2)}</span></p>
+              <p>IVA: <span className="text-white font-mono">€ {(formData.vatAmount || 0).toFixed(2)}</span></p>
               <p>Spedizione: <span className="text-white font-mono">€ {(formData.shippingCost || 0).toFixed(2)}</span></p>
             </div>
             <div className="text-right">

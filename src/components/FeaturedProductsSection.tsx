@@ -29,7 +29,7 @@ export const FeaturedProductsSection: React.FC<FeaturedProductsSectionProps> = (
   addedProductId,
 }) => {
   const { t, language } = useLanguage();
-  const { isBusinessCustomer } = useAdmin();
+  const { isBusinessCustomer, vatFactor } = useAdmin();
 
   return (
     <section className="w-full mt-7 mb-12">
@@ -165,7 +165,7 @@ export const FeaturedProductsSection: React.FC<FeaturedProductsSectionProps> = (
                   <div>
                     {isBusinessCustomer ? (
                       <span className="text-white text-xs font-bold">
-                        €{(product.price * 1.22).toFixed(2)}
+                        €{(product.price * vatFactor).toFixed(2)}
                       </span>
                     ) : (
                       <span className="text-white text-xs font-bold">

@@ -47,7 +47,7 @@ export const CompareView: React.FC<CompareViewProps> = ({
   onSelectProduct,
   onBackToHome,
 }) => {
-  const { isBusinessCustomer } = useAdmin();
+  const { isBusinessCustomer, vatFactor, vatPercent } = useAdmin();
   const [highlightDifferences, setHighlightDifferences] = useState(false);
   const [isAddPickerOpen, setIsAddPickerOpen] = useState(false);
   const [addedProductId, setAddedProductId] = useState<string | null>(null);
@@ -302,10 +302,10 @@ export const CompareView: React.FC<CompareViewProps> = ({
                             {/* Price */}
                             <div className="mt-2.5 flex items-baseline gap-1.5">
                               <span className="text-lg font-extrabold text-white font-mono">
-                                €{isBusinessCustomer ? (product.price * 1.22).toFixed(2) : product.price.toFixed(2)}
+                                €{isBusinessCustomer ? (product.price * vatFactor).toFixed(2) : product.price.toFixed(2)}
                               </span>
                               <span className="text-[10px] text-slate-400">
-                                {isBusinessCustomer ? '+IVA (22%)' : 'senza IVA'} / {product.unit}
+                                {vatPercent === 0 ? '' : isBusinessCustomer ? `+IVA (${vatPercent}%)` : 'senza IVA'} / {product.unit}
                               </span>
                             </div>
 
@@ -399,18 +399,19 @@ export const CompareView: React.FC<CompareViewProps> = ({
 
                   {/* Prezzo con IVA */}
                   {(() => {
-                    const values = comparedProducts.map((p) => p.price * 1.22);
+                    if (vatPercent === 0) return null;
+                    const values = comparedProducts.map((p) => p.price * vatFactor);
                     const diff = isRowDifferent(values);
                     if (highlightDifferences && !diff) return null;
 
                     return (
                       <tr className={`hover:bg-[#1a2230]/50 ${diff && highlightDifferences ? 'bg-amber-500/10' : ''}`}>
                         <td className="p-3.5 sm:p-4 font-semibold text-slate-400 bg-[#0d1420] border-r border-[#1c2433]">
-                          Prezzo IVA 22% inclusa
+                          {`Prezzo IVA ${vatPercent}% inclusa`}
                         </td>
                         {comparedProducts.map((p) => (
                           <td key={p.id} className="p-3.5 sm:p-4 font-mono text-slate-400 border-r last:border-r-0 border-[#1c2433]">
-                            €{(p.price * 1.22).toFixed(2)}
+                            €{(p.price * vatFactor).toFixed(2)}
                           </td>
                         ))}
                         {comparedProducts.length < 4 && <td className="bg-[#0d1420]/50" />}

@@ -63,7 +63,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
 }) => {
   const { language, t } = useLanguage();
   const isIt = language === 'it';
-  const { currentUser, createOrder, productsList } = useAdmin();
+  const { currentUser, createOrder, productsList, vatFactor, vatPercent } = useAdmin();
 
   // Step in checkout: 'cart' -> 'form' -> 'success'
   const [step, setStep] = useState<'cart' | 'form' | 'success'>('cart');
@@ -128,8 +128,8 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
 
   const isAzienda = customerType === 'azienda';
   const subtotal = items.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
-  // Regola IVA: Utenti normali (privato) = 0 IVA; Aziende/Attività/Fornitori = 22% IVA
-  const vat = isAzienda ? subtotal * 0.22 : 0;
+  // IVA: solo se impostata dall'admin (default 0); i privati non la pagano mai
+  const vat = isAzienda ? subtotal * (vatPercent / 100) : 0;
   const total = subtotal + vat;
   const freeShippingThreshold = 250;
   const remainingForFreeShipping = Math.max(0, freeShippingThreshold - subtotal);
@@ -382,7 +382,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                       <span className="text-[11px] text-slate-400 font-medium">
                         Listino:{' '}
                         <strong className={isAzienda ? "text-sky-300" : "text-emerald-300"}>
-                          {isAzienda ? 'Attività / Fornitore (con IVA 22%)' : 'Cliente Privato (senza IVA)'}
+                          {isAzienda ? `Attività / Fornitore${vatPercent > 0 ? ` (con IVA ${vatPercent}%)` : ''}` : `Cliente Privato${vatPercent > 0 ? ' (senza IVA)' : ''}`}
                         </strong>
                       </span>
                     </div>
@@ -525,10 +525,10 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                         {isAzienda ? (
                           <div className="mt-1">
                             <span className="text-xs font-bold text-sky-400">
-                              €{((item.product.price * 1.22) * item.quantity).toFixed(2)}
+                              €{((item.product.price * vatFactor) * item.quantity).toFixed(2)}
                             </span>
                             <span className="text-[10px] text-slate-400 ml-1">
-                              (€{(item.product.price * 1.22).toFixed(2)} con IVA)
+                              (€{(item.product.price * vatFactor).toFixed(2)}{vatPercent > 0 ? ' con IVA' : ''})
                             </span>
                           </div>
                         ) : (
@@ -537,7 +537,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                               €{(item.product.price * item.quantity).toFixed(2)}
                             </span>
                             <span className="text-[10px] text-slate-400 ml-1">
-                              (€{item.product.price.toFixed(2)} senza IVA)
+                              (€{item.product.price.toFixed(2)}{vatPercent > 0 ? ' senza IVA' : ''})
                             </span>
                           </div>
                         )}
@@ -586,11 +586,11 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                           <span className="font-mono text-white font-medium">€{subtotal.toFixed(2)}</span>
                         </div>
                         <div className="flex justify-between">
-                          <span>IVA (22% per Attività/Aziende):</span>
+                          <span>{vatPercent > 0 ? `IVA (${vatPercent}% per Attività/Aziende):` : 'IVA (non applicata):'}</span>
                           <span className="font-mono text-white font-medium">€{vat.toFixed(2)}</span>
                         </div>
                         <div className="flex justify-between text-sm font-bold text-white pt-2 border-t border-[#1c2433]">
-                          <span>Totale Fornitura (IVA inclusa):</span>
+                          <span>{vatPercent > 0 ? 'Totale Fornitura (IVA inclusa):' : 'Totale Ordine:'}</span>
                           <span className="text-sky-400 font-mono">€{total.toFixed(2)}</span>
                         </div>
                       </>
@@ -687,7 +687,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                   </div>
                   <p className="text-[11px] text-slate-400 mt-2">
                     {customerType === 'azienda'
-                      ? '✓ Attività: prezzi con IVA 22% (P.IVA obbligatoria)'
+                      ? `✓ Attività: ${vatPercent > 0 ? `prezzi con IVA ${vatPercent}%` : 'prezzi senza IVA'} (P.IVA obbligatoria)`
                       : '✓ Privato: prezzi senza IVA (codice fiscale obbligatorio)'}
                   </p>
                 </div>
@@ -949,7 +949,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                 )}
                 <div className="flex justify-between items-center text-xs">
                   <span className="text-slate-400">
-                    {isAzienda ? 'Totale Fornitura (IVA 22% inc.):' : 'Totale Ordine (Senza IVA):'}
+                    {isAzienda && vatPercent > 0 ? `Totale Fornitura (IVA ${vatPercent}% inc.):` : 'Totale Ordine:'}
                   </span>
                   <span className={`text-base font-bold font-mono ${isAzienda ? 'text-sky-400' : 'text-emerald-400'}`}>
                     €{total.toFixed(2)}

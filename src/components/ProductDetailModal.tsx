@@ -44,7 +44,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
   onOpenRestockAnalysis,
   onEditProduct,
 }) => {
-  const { isBusinessCustomer } = useAdmin();
+  const { isBusinessCustomer, vatFactor, vatPercent } = useAdmin();
   const [activeTab, setActiveTab] = useState<'overview' | 'usage'>('overview');
   const [quantity, setQuantity] = useState(1);
   const [addedAnimation, setAddedAnimation] = useState(false);
@@ -59,7 +59,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
 
   const rawSubtotal = product.price * quantity;
   const totalPrice = rawSubtotal.toFixed(2);
-  const totalWithVat = (rawSubtotal * 1.22).toFixed(2);
+  const totalWithVat = (rawSubtotal * vatFactor).toFixed(2);
   const displayFinalPrice = isBusinessCustomer ? totalWithVat : totalPrice;
 
   return (
@@ -262,9 +262,9 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                 <div className="flex items-baseline justify-between mb-3">
                   <div>
                     <span className="text-2xl font-extrabold text-white">€{displayFinalPrice}</span>
-                    {isBusinessCustomer ? (
+                    {vatPercent === 0 ? null : isBusinessCustomer ? (
                       <span className="text-xs text-sky-400 ml-2 font-medium bg-sky-500/15 px-2 py-0.5 rounded border border-sky-500/25">
-                        con IVA 22% (Netto €{totalPrice})
+                        con IVA {vatPercent}% (Netto €{totalPrice})
                       </span>
                     ) : (
                       <span className="text-xs text-emerald-400 ml-2 font-medium bg-emerald-500/15 px-2 py-0.5 rounded border border-emerald-500/25">
@@ -274,16 +274,16 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                   </div>
                   {product.originalPrice && product.originalPrice > product.price && (
                     <span className="text-xs text-slate-500 line-through mr-2">
-                      €{(isBusinessCustomer ? product.originalPrice * 1.22 : product.originalPrice).toFixed(2)}
+                      €{(isBusinessCustomer ? product.originalPrice * vatFactor : product.originalPrice).toFixed(2)}
                     </span>
                   )}
                   {product.offerNote && (
                     <span className="block text-xs font-semibold text-amber-300 mb-1">Offerta: {product.offerNote}</span>
                   )}
                   <span className="text-xs text-slate-400">
-                    €{isBusinessCustomer ? (product.price * 1.22).toFixed(2) : product.price.toFixed(2)} / {product.unit}
+                    €{isBusinessCustomer ? (product.price * vatFactor).toFixed(2) : product.price.toFixed(2)} / {product.unit}
                     <span className="text-[10px] ml-1 text-slate-500">
-                      {isBusinessCustomer ? '(IVA inc.)' : '(senza IVA)'}
+                      {vatPercent === 0 ? '' : isBusinessCustomer ? '(IVA inc.)' : '(senza IVA)'}
                     </span>
                   </span>
                 </div>

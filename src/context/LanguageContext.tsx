@@ -151,7 +151,7 @@ const translations: Record<Language, Record<string, string>> = {
     // Cart
     'cart.title': 'Carrello Forniture B2B',
     'cart.subtotal': 'Subtotale Imponibile',
-    'cart.vat': 'IVA 22%',
+    'cart.vat': 'IVA',
     'cart.total': 'Totale Ordine',
     'cart.checkout': 'Procedi all\'Ordine',
     'cart.empty': 'Il carrello è vuoto',
@@ -315,7 +315,7 @@ const translations: Record<Language, Record<string, string>> = {
     // Cart
     'cart.title': 'B2B Supply Cart',
     'cart.subtotal': 'Taxable Subtotal',
-    'cart.vat': 'VAT 22%',
+    'cart.vat': 'VAT',
     'cart.total': 'Total Order',
     'cart.checkout': 'Proceed to Order Confirmation',
     'cart.empty': 'Your cart is empty',

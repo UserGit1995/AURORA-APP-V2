@@ -50,7 +50,7 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
   onOrderCreated,
   onSelectProduct
 }) => {
-  const { currentUser, isBusinessCustomer, productsList, createOrder } = useAdmin();
+  const { currentUser, isBusinessCustomer, productsList, createOrder, vatFactor, vatPercent } = useAdmin();
 
   // Tabs: 'frequent' (Frequenti & Consumabili) | 'history' (Da Ordini Passati) | 'sku' (Inserimento Rapido Codice)
   const [activeTab, setActiveTab] = useState<'frequent' | 'history' | 'sku'>('frequent');
@@ -93,9 +93,9 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
   if (!isOpen) return null;
 
   const isAzienda = customerType === 'azienda';
-  // Calculation: IVA 22% for business, 0% for private
+  // IVA solo se impostata dall'admin (default 0); i privati mai
   const subtotal = selectedItems.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
-  const vat = isAzienda ? subtotal * 0.22 : 0;
+  const vat = isAzienda ? subtotal * (vatPercent / 100) : 0;
   const total = subtotal + vat;
   const totalColli = selectedItems.reduce((acc, item) => acc + item.quantity, 0);
 
@@ -409,7 +409,7 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
                               <span>•</span>
                               {isBusinessCustomer ? (
                                 <span className="text-sky-400 font-bold font-mono">
-                                  €{(product.price * 1.22).toFixed(2)}
+                                  €{(product.price * vatFactor).toFixed(2)}
                                 </span>
                               ) : (
                                 <span className="text-emerald-400 font-bold font-mono">
@@ -614,11 +614,11 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
                           <p className="text-[10px] text-slate-400">
                             {isAzienda ? (
                               <>
-                                €{(item.product.price * 1.22).toFixed(2)}/cad (IVA inc.) • <span className="text-sky-300 font-bold font-mono">€{((item.product.price * 1.22) * item.quantity).toFixed(2)}</span>
+                                €{(item.product.price * vatFactor).toFixed(2)}/cad{vatPercent > 0 ? ' (IVA inc.)' : ''} • <span className="text-sky-300 font-bold font-mono">€{((item.product.price * vatFactor) * item.quantity).toFixed(2)}</span>
                               </>
                             ) : (
                               <>
-                                €{item.product.price.toFixed(2)}/cad (senza IVA) • <span className="text-emerald-300 font-bold font-mono">€{(item.product.price * item.quantity).toFixed(2)}</span>
+                                €{item.product.price.toFixed(2)}/cad{vatPercent > 0 ? ' (senza IVA)' : ''} • <span className="text-emerald-300 font-bold font-mono">€{(item.product.price * item.quantity).toFixed(2)}</span>
                               </>
                             )}
                           </p>
@@ -729,13 +729,13 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
                     <span className="font-mono text-white">€{subtotal.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-slate-400 text-[11px]">
-                    <span>{isAzienda ? 'IVA 22% (Attività/Aziende):' : 'IVA (0% - Listino Privati):'}</span>
+                    <span>{isAzienda ? (vatPercent > 0 ? `IVA ${vatPercent}% (Attività/Aziende):` : 'IVA (non applicata):') : 'IVA (0% - Listino Privati):'}</span>
                     <span className={`font-mono ${isAzienda ? 'text-white' : 'text-emerald-400'}`}>
                       {isAzienda ? `€${vat.toFixed(2)}` : '€0.00 (non applicata)'}
                     </span>
                   </div>
                   <div className="flex justify-between text-sm font-bold text-white pt-1">
-                    <span>{isAzienda ? 'Totale Documento (con IVA):' : 'Totale Documento (Senza IVA):'}</span>
+                    <span>{isAzienda && vatPercent > 0 ? 'Totale Documento (con IVA):' : 'Totale Documento:'}</span>
                     <span className={`font-mono ${isAzienda ? 'text-sky-400' : 'text-emerald-400'}`}>
                       €{total.toFixed(2)}
                     </span>

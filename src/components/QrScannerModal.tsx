@@ -47,7 +47,7 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({
   onAddToCart,
   onOpenCart,
 }) => {
-  const { isBusinessCustomer } = useAdmin();
+  const { isBusinessCustomer, vatFactor, vatPercent } = useAdmin();
   const [cameraActive, setCameraActive] = useState(false);
   const [cameraError, setCameraError] = useState<string | null>(null);
   const [lastScannedProduct, setLastScannedProduct] = useState<Product | null>(null);
@@ -493,11 +493,11 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({
                       </p>
                       <div className="flex items-baseline gap-2 mt-1">
                         <span className="text-sm font-bold text-white font-mono">
-                          €{isBusinessCustomer ? (lastScannedProduct.price * 1.22).toFixed(2) : lastScannedProduct.price.toFixed(2)}
+                          €{isBusinessCustomer ? (lastScannedProduct.price * vatFactor).toFixed(2) : lastScannedProduct.price.toFixed(2)}
                         </span>
                         <span className="text-[11px] text-slate-400">
-                          {isBusinessCustomer 
-                            ? `(con IVA 22% - Netto €${lastScannedProduct.price.toFixed(2)})` 
+                          {vatPercent === 0 ? '' : isBusinessCustomer 
+                            ? `(con IVA ${vatPercent}% - Netto €${lastScannedProduct.price.toFixed(2)})` 
                             : '(senza IVA)'}
                         </span>
                       </div>

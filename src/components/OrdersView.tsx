@@ -1046,8 +1046,8 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
 
                       {/* Cost Calculations */}
                       {(() => {
-                        const subtotal = selectedDetailOrder.subtotal ?? (selectedDetailOrder.total / 1.22);
-                        const vatAmount = selectedDetailOrder.vatAmount ?? (selectedDetailOrder.total - subtotal);
+                        const subtotal = selectedDetailOrder.subtotal ?? (selectedDetailOrder.total - (selectedDetailOrder.vatAmount ?? 0));
+                        const vatAmount = selectedDetailOrder.vatAmount ?? 0;
                         const shippingCost = selectedDetailOrder.shippingCost ?? 0;
 
                         return (
@@ -1065,7 +1065,7 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
                             </div>
 
                             <div className="flex justify-between text-slate-400">
-                              <span className="text-slate-400">IVA (22% ordinaria):</span>
+                              <span className="text-slate-400">{vatAmount > 0 && subtotal > 0 ? `IVA (${Math.round((vatAmount / subtotal) * 100)}%):` : 'IVA (non applicata):'}</span>
                               <span className="font-mono font-medium">€{vatAmount.toFixed(2)}</span>
                             </div>
 
@@ -1502,7 +1502,7 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
                   </div>
                   <div className="flex items-center gap-1.5">
                     <Check className="w-3 h-3 text-sky-400 shrink-0" />
-                    <span>{language === 'it' ? 'Riepilogo Imponibile & IVA 22%' : 'Taxable & VAT 22% Summary'}</span>
+                    <span>{language === 'it' ? 'Riepilogo Imponibile & IVA' : 'Taxable & VAT Summary'}</span>
                   </div>
                 </div>
               </div>

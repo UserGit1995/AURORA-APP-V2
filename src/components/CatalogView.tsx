@@ -67,7 +67,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
   searchQuery,
   onOpenRestockAnalysis,
 }) => {
-  const { isBusinessCustomer } = useAdmin();
+  const { isBusinessCustomer, vatFactor, vatPercent } = useAdmin();
   const [activeFilterCategory, setActiveFilterCategory] = useState<string | null>(selectedCategoryId);
   const [quickFilter, setQuickFilter] = useState<'tutti' | 'offerta' | 'bestseller' | 'eco' | 'medico'>('tutti');
   const [sortBy, setSortBy] = useState<'popolarita' | 'prezzo-asc' | 'prezzo-desc' | 'nome'>('popolarita');
@@ -270,7 +270,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
     if (selectedProducts.length === 0) return;
     setIsExportingCsv(true);
     try {
-      exportProductsToCsv(selectedProducts, 'aurora_inventario_prodotti');
+      exportProductsToCsv(selectedProducts, 'aurora_inventario_prodotti', vatPercent);
       const count = selectedProducts.length;
       setBulkFeedback({ type: 'csv', count });
       setTimeout(() => setBulkFeedback(null), 3500);
@@ -392,9 +392,9 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                   <strong className="text-sky-300">{selectedProductIds.length}</strong> selezionati
                   {selectedProductIds.length > 0 && (
                     <span className="text-slate-300 ml-1">
-                      (€ {isBusinessCustomer ? (totalSelectedPrice * 1.22).toFixed(2) : totalSelectedPrice.toFixed(2)}{' '}
+                      (€ {isBusinessCustomer ? (totalSelectedPrice * vatFactor).toFixed(2) : totalSelectedPrice.toFixed(2)}{' '}
                       <span className={isBusinessCustomer ? "text-sky-400" : "text-emerald-400"}>
-                        {isBusinessCustomer ? 'con IVA' : 'senza IVA'}
+                        {vatPercent === 0 ? '' : isBusinessCustomer ? 'con IVA' : 'senza IVA'}
                       </span>)
                     </span>
                   )}
@@ -872,11 +872,11 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                     <div>
                       {product.originalPrice && product.originalPrice > product.price && (
                         <span className="text-slate-500 text-[10px] line-through mr-1.5">
-                          €{(isBusinessCustomer ? product.originalPrice * 1.22 : product.originalPrice).toFixed(2)}
+                          €{(isBusinessCustomer ? product.originalPrice * vatFactor : product.originalPrice).toFixed(2)}
                         </span>
                       )}
                       {isBusinessCustomer ? (
-                        <span className="text-white text-xs font-bold">€{(product.price * 1.22).toFixed(2)}</span>
+                        <span className="text-white text-xs font-bold">€{(product.price * vatFactor).toFixed(2)}</span>
                       ) : (
                         <span className="text-white text-xs font-bold">€{product.price.toFixed(2)}</span>
                       )}
@@ -932,10 +932,10 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                 <div className="text-[11px] text-sky-300 font-mono">
                   Totale:{' '}
                   <strong>
-                    € {isBusinessCustomer ? (totalSelectedPrice * 1.22).toFixed(2) : totalSelectedPrice.toFixed(2)}
+                    € {isBusinessCustomer ? (totalSelectedPrice * vatFactor).toFixed(2) : totalSelectedPrice.toFixed(2)}
                   </strong>{' '}
                   <span className={`font-semibold ${isBusinessCustomer ? 'text-sky-400' : 'text-emerald-400'}`}>
-                    {isBusinessCustomer ? '(con IVA 22%)' : '(senza IVA)'}
+                    {vatPercent === 0 ? '' : isBusinessCustomer ? `(con IVA ${vatPercent}%)` : '(senza IVA)'}
                   </span>
                 </div>
               </div>

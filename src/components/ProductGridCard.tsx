@@ -33,7 +33,7 @@ export const ProductGridCard: React.FC<ProductGridCardProps> = ({
   isJustAdded = false,
 }) => {
   const { t, language } = useLanguage();
-  const { isBusinessCustomer } = useAdmin();
+  const { isBusinessCustomer, vatFactor } = useAdmin();
   const isLowStock = product.stock <= (product.lowStockThreshold ?? 100);
   const translatedCat = t(`cat.${product.categoryId}`, product.category);
 
@@ -134,11 +134,11 @@ export const ProductGridCard: React.FC<ProductGridCardProps> = ({
           <div>
             {product.originalPrice && product.originalPrice > product.price && (
               <span className="text-slate-500 text-[10px] line-through mr-1.5">
-                €{(isBusinessCustomer ? product.originalPrice * 1.22 : product.originalPrice).toFixed(2)}
+                €{(isBusinessCustomer ? product.originalPrice * vatFactor : product.originalPrice).toFixed(2)}
               </span>
             )}
             {isBusinessCustomer ? (
-              <span className="text-white text-xs font-bold">€{(product.price * 1.22).toFixed(2)}</span>
+              <span className="text-white text-xs font-bold">€{(product.price * vatFactor).toFixed(2)}</span>
             ) : (
               <span className="text-white text-xs font-bold">€{product.price.toFixed(2)}</span>
             )}

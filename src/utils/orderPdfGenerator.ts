@@ -182,8 +182,8 @@ export const generateOrderReceiptPdf = (order: Order): void => {
 
   // Subtotal, VAT, and Final Total Box based on customer type
   const isBusinessOrder = isCompany || order.shippingAddress?.customerType === 'azienda';
-  const subtotal = order.subtotal ?? (isBusinessOrder ? (order.total / 1.22) : order.total);
-  const vatAmount = order.vatAmount ?? (isBusinessOrder ? (order.total - subtotal) : 0);
+  const subtotal = order.subtotal ?? (order.total - (order.vatAmount ?? 0));
+  const vatAmount = order.vatAmount ?? 0;
   const shippingCost = order.shippingCost ?? 0;
 
   // Notes on the left
@@ -200,7 +200,7 @@ export const generateOrderReceiptPdf = (order: Order): void => {
   doc.setFontSize(7.5);
   doc.setTextColor(100, 116, 139);
   if (isBusinessOrder) {
-    doc.text('• Riepilogo ordine per attività (IVA 22% inclusa nel totale).', 18, finalY + 10);
+    doc.text((vatAmount > 0 ? '• Riepilogo ordine per attività (IVA inclusa nel totale).' : '• Riepilogo ordine per attività (IVA non applicata).'), 18, finalY + 10);
     doc.text('• Pagamento alla consegna, nessun pagamento online.', 18, finalY + 15);
   } else {
     doc.text('• Riepilogo ordine cliente privato (senza applicazione IVA).', 18, finalY + 10);
@@ -232,7 +232,7 @@ export const generateOrderReceiptPdf = (order: Order): void => {
 
   doc.setFont('helvetica', 'normal');
   if (isBusinessOrder) {
-    doc.text('IVA Ordinaria (22%):', summaryX + 4, finalY + 18);
+    doc.text((vatAmount > 0 ? `IVA (${Math.round((vatAmount / (subtotal || 1)) * 100)}%):` : 'IVA (non applicata):'), summaryX + 4, finalY + 18);
     doc.setFont('courier', 'normal');
     doc.text(`€ ${vatAmount.toFixed(2)}`, summaryX + summaryWidth - 4, finalY + 18, { align: 'right' });
   } else {
@@ -299,7 +299,7 @@ export const generateOrderHistoryPdf = (
   // Calculations & Aggregates
   const totalOrders = orders.length;
   const totalGross = orders.reduce((sum, o) => sum + (o.total || 0), 0);
-  const totalNet = orders.reduce((sum, o) => sum + (o.subtotal ?? (o.total / 1.22)), 0);
+  const totalNet = orders.reduce((sum, o) => sum + (o.subtotal ?? (o.total - (o.vatAmount ?? 0))), 0);
   const totalVat = totalGross - totalNet;
   const totalItems = orders.reduce((sum, o) => sum + (o.itemsCount || 0), 0);
 
@@ -502,7 +502,7 @@ export const generateOrderHistoryPdf = (
       .join(', ');
     const displayItems = itemsSummary.length > 55 ? `${itemsSummary.substring(0, 52)}...` : itemsSummary;
 
-    const netAmount = order.subtotal ?? (order.total / 1.22);
+    const netAmount = order.subtotal ?? (order.total - (order.vatAmount ?? 0));
     const courierInfo = order.courier 
       ? `${order.courier}${order.trackingNumber ? `\nAWB: ${order.trackingNumber}` : ''}`
       : 'Logistica Interna';
@@ -728,7 +728,7 @@ export const generateOrderHistoryPdf = (
   doc.text(isIt ? 'Incluse / Gratuite' : 'Free / Included', summaryX + summaryWidth - 4, currentFinalY + 12, { align: 'right' });
 
   doc.setFont('helvetica', 'normal');
-  doc.text(isIt ? 'Totale IVA Ordinaria (22%):' : 'Total VAT (22%):', summaryX + 4, currentFinalY + 18);
+  doc.text(isIt ? 'Totale IVA:' : 'Total VAT:', summaryX + 4, currentFinalY + 18);
   doc.setFont('courier', 'normal');
   doc.text(`€ ${totalVat.toFixed(2)}`, summaryX + summaryWidth - 4, currentFinalY + 18, { align: 'right' });
 
