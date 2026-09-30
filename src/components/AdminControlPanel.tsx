@@ -8,6 +8,8 @@ import {
   FolderTree,
   Image as ImageIcon,
   SlidersHorizontal,
+  Tag,
+  Palette,
   Plus,
   Edit3,
   Trash2,
@@ -25,6 +27,8 @@ import { SubcategoryManager } from './SubcategoryManager';
 import { ImageImportTool } from './ImageImportTool';
 import { ImageAuditPanel } from './ImageAuditPanel';
 import { ImageMigrationPanel } from './ImageMigrationPanel';
+import { CustomizationPricingPanel } from './CustomizationPricingPanel';
+import { CustomizationRequestsPanel } from './CustomizationRequestsPanel';
 import { Product, Order } from '../types';
 import { searchProducts } from '../utils/productSearch';
 
@@ -67,7 +71,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({ isOpen, on
   } = useAdmin();
 
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [activeTab, setActiveTab] = useState<'products' | 'orders' | 'categories' | 'subcategories' | 'images' | 'settings'>('products');
+  const [activeTab, setActiveTab] = useState<'products' | 'orders' | 'categories' | 'subcategories' | 'images' | 'requests' | 'packaging' | 'settings'>('products');
   const [productSearch, setProductSearch] = useState('');
   // Con ~3000 articoli, disegnarli tutti insieme blocca il pannello: mostriamo
   // un blocco alla volta, come nel catalogo pubblico.
@@ -86,6 +90,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({ isOpen, on
   }, [productSearch]);
 
   // Modals inside admin
+  const [newCustomizations, setNewCustomizations] = useState(0);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
   const [editingOrder, setEditingOrder] = useState<Order | null>(null);
@@ -238,6 +243,14 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({ isOpen, on
           <button type="button" onClick={() => setActiveTab('images')} className={TAB_BUTTON(activeTab === 'images')}>
             <ImageIcon className="w-4 h-4" />
             <span>Immagini</span>
+          </button>
+          <button type="button" onClick={() => setActiveTab('requests')} className={TAB_BUTTON(activeTab === 'requests')}>
+            <Palette className="w-4 h-4" />
+            <span>Personalizzazioni{newCustomizations > 0 ? ` (${newCustomizations} nuove)` : ''}</span>
+          </button>
+          <button type="button" onClick={() => setActiveTab('packaging')} className={TAB_BUTTON(activeTab === 'packaging')}>
+            <Tag className="w-4 h-4" />
+            <span>Prezzi Personalizzazione</span>
           </button>
           <button type="button" onClick={() => setActiveTab('settings')} className={TAB_BUTTON(activeTab === 'settings')}>
             <SlidersHorizontal className="w-4 h-4" />
@@ -532,6 +545,9 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({ isOpen, on
         )}
 
         {/* Tab: Parametri */}
+        {activeTab === 'requests' && <CustomizationRequestsPanel onNewCountChange={setNewCustomizations} />}
+        {activeTab === 'packaging' && <CustomizationPricingPanel />}
+
         {activeTab === 'settings' && (
           <form onSubmit={handleSaveSettings} className="p-4 sm:p-6 overflow-y-auto flex-1 space-y-5 text-left text-sm">
             <div className={`${PANEL_CARD} p-4 space-y-4`}>

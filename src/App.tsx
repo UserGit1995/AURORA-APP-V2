@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { RotateCcw, ArrowRight, Loader2, RefreshCw } from 'lucide-react';
 import { Sidebar, NavTab } from './components/Sidebar';
 import { Header } from './components/Header';
@@ -24,6 +24,10 @@ import { HorecaSection } from './components/HorecaSection';
 import { AllBrandsView } from './components/AllBrandsView';
 import { BrandDetailView } from './components/BrandDetailView';
 import { ScrollToTopButton } from './components/ScrollToTopButton';
+import { PersonalizzaView } from './components/PersonalizzaView';
+import { LegalView } from './components/LegalView';
+import { CustomizationTrackingView } from './components/CustomizationTrackingView';
+import { parseInitialRoute, syncUrlWithTab } from './utils/deepLinks';
 
 import { Product, CartItem, Order, NotificationItem, OrderTemplate } from './types';
 import { useAdmin } from './context/AdminContext';
@@ -51,7 +55,14 @@ export default function App() {
     refreshFromCloud,
   } = useAdmin();
 
-  const [activeTab, setActiveTab] = useState<NavTab>('home');
+  // Indirizzi "profondi": /personalizza, /privacy, /termini-vendita e i link di
+  // tracking /personalizzazione/<token> (quelli che arrivano nelle email ai clienti).
+  const [initialRoute] = useState(parseInitialRoute);
+  const [activeTab, setActiveTab] = useState<NavTab>(initialRoute.tab);
+  const [trackingToken] = useState<string | null>(initialRoute.trackingToken);
+  useEffect(() => {
+    syncUrlWithTab(activeTab, trackingToken);
+  }, [activeTab, trackingToken]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedBrandName, setSelectedBrandName] = useState<string | null>(null);
   const [showAllBrands, setShowAllBrands] = useState(false);
@@ -338,6 +349,13 @@ export default function App() {
         onSelectTab={(tab) => {
           setActiveTab(tab);
           if (tab === 'home') setSelectedCategoryId(null);
+          // Le pagine Personalizza / Privacy / Termini non devono restare
+          // coperte da una ricerca, un brand o una vista marchi ancora aperti.
+          if (tab === 'personalizza' || tab === 'privacy' || tab === 'termini') {
+            setSearchQuery('');
+            setSelectedBrandName(null);
+            setShowAllBrands(false);
+          }
         }}
         onOpenContact={() => setIsContactOpen(true)}
         onOpenQuickReorder={() => setIsQuickReorderOpen(true)}
@@ -373,7 +391,20 @@ export default function App() {
 
         {/* Dynamic Page Views */}
         <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto pb-24">
-          {productsList.length === 0 ? (
+          {activeTab === 'tracking' && trackingToken ? (
+            <CustomizationTrackingView token={trackingToken} onBackToHome={() => setActiveTab('home')} />
+          ) : activeTab === 'personalizza' ? (
+            <PersonalizzaView
+              onBackToHome={() => setActiveTab('home')}
+              onOpenLegal={(page) => setActiveTab(page)}
+            />
+          ) : activeTab === 'privacy' || activeTab === 'termini' ? (
+            <LegalView
+              page={activeTab}
+              onBack={() => setActiveTab('home')}
+              onOpenLegal={(page) => setActiveTab(page)}
+            />
+          ) : productsList.length === 0 ? (
             /* Catalogo non ancora arrivato dal cloud (o connessione assente) */
             <div className="py-24 flex flex-col items-center text-center text-slate-300 space-y-3">
               {catalogLoading || isRetrying ? (

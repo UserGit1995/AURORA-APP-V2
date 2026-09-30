@@ -9,6 +9,12 @@
  *   A) Gmail (consigliato, gratis):  GMAIL_USER  +  GMAIL_APP_PASSWORD
  *   B) Resend:                       RESEND_API_KEY
  * Facoltativa: ORDERS_TO_EMAIL (default: gruppo.aurora.ordini@gmail.com)
+ *
+ * Richieste di personalizzazione (kind: 'customization'): l'email di conferma al
+ * cliente legge i dati dal database, quindi servono anche VITE_SUPABASE_URL e
+ * VITE_SUPABASE_ANON_KEY (le stesse già usate dall'app) tra le variabili di Vercel.
+ * Facoltativa: APP_URL (es. https://appaurorav2updated.vercel.app) per il link di
+ * tracking nelle email; se assente si usa il dominio della richiesta.
  */
 
 const DEFAULT_TO = 'gruppo.aurora.ordini@gmail.com';
@@ -174,6 +180,104 @@ ${row('Oggetto', subject)}${row('Ordine', orderRef)}${row('Nome', name)}${row('E
   return { subject: `✉️ ${kind}: ${subject}${orderRef ? ` (${orderRef})` : ''}`, html, text, replyTo: isEmail(email) ? email : '' };
 }
 
+// ---- richieste di personalizzazione ---------------------------------------
+const PRODUCT_LABELS: Record<string, string> = {
+  bicchieri: 'Bicchieri',
+  tovagliette: 'Tovagliette',
+  bustine: 'Bustine / Sacchetti',
+  scatole: 'Scatole',
+};
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/**
+ * Legge la richiesta dal database (funzione SQL get_customization_for_notification).
+ * Il destinatario della conferma cliente arriva SEMPRE da qui, mai dal browser,
+ * e la funzione risponde solo per 30 minuti dopo la creazione e solo con il token.
+ */
+async function loadCustomization(token: string): Promise<any | null> {
+  const url = (process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || '').replace(/\/+$/, '');
+  const key = process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY || '';
+  if (!url || !key) throw new Error('SUPABASE_NOT_CONFIGURED');
+  const r = await fetch(`${url}/rest/v1/rpc/get_customization_for_notification`, {
+    method: 'POST',
+    headers: { apikey: key, Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ p_access_token: token }),
+  });
+  if (!r.ok) throw new Error(`SUPABASE_${r.status}`);
+  const data = await r.json();
+  return Array.isArray(data) ? data[0] ?? null : data ?? null;
+}
+
+function baseUrl(req: any): string {
+  if (process.env.APP_URL) return String(process.env.APP_URL).replace(/\/+$/, '');
+  const host = String(req.headers?.['x-forwarded-host'] || req.headers?.host || '').split(',')[0].trim();
+  return host ? `https://${host}` : '';
+}
+
+function buildCustomizationEmails(c: any, trackingUrl: string): { admin: Mail; customer: Mail } {
+  const product = PRODUCT_LABELS[String(c.product_type)] || str(c.product_type, 60);
+  const colors = num(c.print_colors);
+  const qty = num(c.quantity);
+  const name = str(c.customer_name, 120) || 'Cliente';
+  const company = str(c.customer_company, 120);
+  const email = str(c.customer_email, 120);
+  const phone = str(c.customer_phone, 40);
+  const notes = str(c.notes, 3000);
+  const logo = /^https:\/\//.test(String(c.logo_url)) ? String(c.logo_url) : '';
+  const summary = `${product} · ${qty} pz · ${colors} ${colors === 1 ? 'colore' : 'colori'}`;
+
+  const adminHtml = `<div style="font-family:Arial,Helvetica,sans-serif;max-width:640px;margin:auto;color:#0f172a">
+<h2 style="margin:0 0 4px">Nuova richiesta di personalizzazione</h2>
+<p style="margin:0 0 16px;color:#475569">${esc(new Date().toLocaleString('it-IT', { timeZone: 'Europe/Rome' }))}</p>
+<table style="border-collapse:collapse;font-size:14px">
+${row('Prodotto', product)}${row('Quantità', `${qty} pz`)}${row('Colori di stampa', String(colors))}
+${row('Nome', name)}${row('Azienda', company)}${row('Email', email)}${row('Telefono', phone)}
+</table>
+${logo ? `<p style="margin:16px 0 4px"><a href="${esc(logo)}">Apri il logo caricato</a></p><img src="${esc(logo)}" alt="Logo" style="max-height:140px;border:1px solid #e2e8f0;border-radius:8px;padding:6px">` : ''}
+${notes ? `<h3 style="margin:18px 0 6px">Configurazione e note</h3><pre style="white-space:pre-wrap;font-family:inherit;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:12px;margin:0">${esc(notes)}</pre>` : ''}
+<p style="margin-top:18px;color:#64748b;font-size:12px">Gestiscila dal Pannello Gestione &rarr; Personalizzazioni. Per rispondere al cliente premi "Rispondi".</p>
+</div>`;
+  const adminText = [
+    'NUOVA RICHIESTA DI PERSONALIZZAZIONE',
+    `Prodotto: ${summary}`,
+    `Cliente: ${name}${company ? ` (${company})` : ''}`,
+    email ? `Email: ${email}` : '',
+    phone ? `Telefono: ${phone}` : '',
+    logo ? `Logo: ${logo}` : '',
+    '',
+    notes,
+  ].filter((l) => l !== '').join('\n');
+
+  const customerHtml = `<div style="font-family:Arial,Helvetica,sans-serif;max-width:600px;margin:auto;color:#0f172a">
+<h2 style="margin:0 0 8px">Abbiamo ricevuto la tua richiesta</h2>
+<p>Ciao ${esc(name)}, grazie per aver scelto Aurora. Un nostro grafico ti ricontatterà a breve con la bozza e il preventivo definitivo (la cifra mostrata sul sito è solo una stima).</p>
+<p style="background:#f1f5f9;border-radius:8px;padding:10px 12px"><b>${esc(summary)}</b></p>
+${trackingUrl ? `<p>Puoi controllare lo stato della richiesta in qualsiasi momento da qui:<br><a href="${esc(trackingUrl)}">${esc(trackingUrl)}</a></p>` : ''}
+<p style="color:#64748b;font-size:12px">Se non hai inviato tu questa richiesta puoi ignorare questo messaggio.</p>
+</div>`;
+  const customerText = [
+    `Ciao ${name}, abbiamo ricevuto la tua richiesta di personalizzazione.`,
+    `Riepilogo: ${summary}`,
+    'Un nostro grafico ti ricontatterà a breve con la bozza e il preventivo definitivo.',
+    trackingUrl ? `Controlla lo stato qui: ${trackingUrl}` : '',
+  ].filter((l) => l !== '').join('\n');
+
+  return {
+    admin: {
+      subject: `🎨 Nuova personalizzazione - ${name} - ${summary}`,
+      html: adminHtml,
+      text: adminText,
+      replyTo: isEmail(email) ? email : '',
+    },
+    customer: {
+      subject: 'Abbiamo ricevuto la tua richiesta di personalizzazione - Aurora',
+      html: customerHtml,
+      text: customerText,
+      replyTo: process.env.ORDERS_TO_EMAIL || DEFAULT_TO,
+    },
+  };
+}
+
 // ---- invio -----------------------------------------------------------------
 type Mail = { subject: string; html: string; text: string; replyTo: string };
 
@@ -261,8 +365,43 @@ export default async function handler(req: any, res: any) {
       return;
     }
 
-    const mail = body.kind === 'contact' || body.kind === 'inquiry' ? buildMessageEmail(body) : buildOrderEmail(body);
     const to = process.env.ORDERS_TO_EMAIL || DEFAULT_TO;
+
+    // Richiesta di personalizzazione: avviso al negozio + conferma al cliente.
+    if (body.kind === 'customization') {
+      const token = str(body.token, 60);
+      if (!UUID_RE.test(token)) {
+        res.status(400).json({ ok: false, error: 'Token non valido' });
+        return;
+      }
+      if (!transportKind()) {
+        console.error('send-order: nessun servizio email configurato');
+        res.status(503).json({ ok: false, error: 'not_configured' });
+        return;
+      }
+      const c = await loadCustomization(token);
+      if (!c) {
+        // richiesta inesistente oppure oltre la finestra di 30 minuti
+        res.status(404).json({ ok: false, error: 'not_found' });
+        return;
+      }
+      const base = baseUrl(req);
+      const { admin, customer } = buildCustomizationEmails(c, base ? `${base}/personalizzazione/${token}` : '');
+      await deliver(admin, to); // se questa fallisce: errore (502) e il client lo segnala
+      let customerSent = false;
+      if (isEmail(str(c.customer_email, 120))) {
+        try {
+          await deliver(customer, str(c.customer_email, 120));
+          customerSent = true;
+        } catch (e: any) {
+          console.error('send-order: conferma cliente non inviata:', e?.message || e);
+        }
+      }
+      res.status(200).json({ ok: true, customerSent });
+      return;
+    }
+
+    const mail = body.kind === 'contact' || body.kind === 'inquiry' ? buildMessageEmail(body) : buildOrderEmail(body);
 
     if (!transportKind()) {
       console.error('send-order: nessun servizio email configurato (GMAIL_USER/GMAIL_APP_PASSWORD o RESEND_API_KEY)');
@@ -275,6 +414,10 @@ export default async function handler(req: any, res: any) {
   } catch (err: any) {
     console.error('send-order errore:', err?.message || err);
     const validation = /Ordine senza articoli|Messaggio vuoto|JSON/.test(String(err?.message));
+    if (/^SUPABASE_/.test(String(err?.message))) {
+      res.status(503).json({ ok: false, error: 'supabase_not_configured' });
+      return;
+    }
     res.status(validation ? 400 : 502).json({ ok: false, error: validation ? String(err.message) : 'send_failed' });
   }
 }
