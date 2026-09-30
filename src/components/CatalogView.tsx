@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Category, Product } from '../types';
+import { parseQuery, scoreProduct } from '../utils/productSearch';
 import { NavTab } from './Sidebar';
 import { exportProductsToCsv } from '../utils/catalogCsvExporter';
 import { useAdmin } from '../context/AdminContext';
@@ -34,6 +35,8 @@ interface CatalogViewProps {
   products: Product[];
   selectedCategoryId: string | null;
   onSelectCategory: (categoryId: string | null) => void;
+  // Se presente, all'apertura della categoria si parte già filtrando su questa sottocategoria
+  initialSubcategoryId?: string | null;
   favorites: string[];
   onToggleFavorite: (productId: string) => void;
   comparedProductIds?: string[];
@@ -52,6 +55,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
   products,
   selectedCategoryId,
   onSelectCategory,
+  initialSubcategoryId = null,
   favorites,
   onToggleFavorite,
   comparedProductIds = [],
@@ -81,9 +85,12 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
 
   React.useEffect(() => {
     setActiveFilterCategory(selectedCategoryId);
-    setActiveFilterSubCategory(null);
+    const belongs =
+      !!initialSubcategoryId &&
+      !!categories.find((c) => c.id === selectedCategoryId)?.subCategories?.some((s) => s.id === initialSubcategoryId);
+    setActiveFilterSubCategory(belongs ? initialSubcategoryId : null);
     setActiveFilterSubSubCategory(null);
-  }, [selectedCategoryId]);
+  }, [selectedCategoryId, initialSubcategoryId]);
 
   React.useEffect(() => {
     setVisibleCount(PAGE_SIZE);
@@ -129,6 +136,8 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
 
   const headerInfo = getHeaderInfo();
 
+  const searchTokens = useMemo(() => parseQuery(searchQuery), [searchQuery]);
+
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
       // Tab filter
@@ -160,21 +169,13 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
       if (activeFilterSubSubCategory && product.subSubCategoryId !== activeFilterSubSubCategory) {
         return false;
       }
-      // Search query
-      if (searchQuery.trim()) {
-        const q = searchQuery.toLowerCase();
-        const matchName = product.name.toLowerCase().includes(q);
-        const matchCategory = product.category.toLowerCase().includes(q);
-        const matchSubCategory = product.subCategoryName?.toLowerCase().includes(q);
-        const matchSubSubCategory = product.subSubCategoryName?.toLowerCase().includes(q);
-        const matchCode = product.code.toLowerCase().includes(q);
-        if (!matchName && !matchCategory && !matchSubCategory && !matchSubSubCategory && !matchCode) {
-          return false;
-        }
+      // Ricerca: tutte le parole devono comparire (singolare/plurale, accenti e maiuscole ignorati)
+      if (searchTokens.length > 0 && scoreProduct(product, searchTokens) === 0) {
+        return false;
       }
       return true;
     });
-  }, [products, viewType, activeFilterCategory, activeFilterSubCategory, activeFilterSubSubCategory, searchQuery, quickFilter]);
+  }, [products, viewType, activeFilterCategory, activeFilterSubCategory, activeFilterSubSubCategory, searchTokens, quickFilter]);
 
   const sortedProducts = useMemo(() => {
     const arr = [...filteredProducts];
@@ -187,13 +188,19 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
         return arr.sort((a, b) => a.name.localeCompare(b.name, 'it'));
       case 'popolarita':
       default:
-        // Popolarità: prima i più venduti, poi quelli in evidenza, poi il resto.
+        // Con una ricerca attiva: prima le corrispondenze migliori. Altrimenti popolarità:
+        // prima i più venduti, poi quelli in evidenza, poi il resto.
+        if (searchTokens.length > 0) {
+          const rel = new Map<string, number>();
+          arr.forEach((p) => rel.set(p.id, scoreProduct(p, searchTokens)));
+          return arr.sort((a, b) => (rel.get(b.id) || 0) - (rel.get(a.id) || 0));
+        }
         return arr.sort((a, b) => {
           const score = (p: typeof a) => (p.isBestseller ? 2 : 0) + (p.isFeatured ? 1 : 0);
           return score(b) - score(a);
         });
     }
-  }, [filteredProducts, sortBy]);
+  }, [filteredProducts, sortBy, searchTokens]);
 
   const selectedProducts = useMemo(() => {
     return products.filter((p) => selectedProductIds.includes(p.id));
@@ -863,10 +870,18 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
 
                   <div className="flex items-center justify-between mt-2.5 pt-1.5 border-t border-[#1c2433]">
                     <div>
+                      {product.originalPrice && product.originalPrice > product.price && (
+                        <span className="text-slate-500 text-[10px] line-through mr-1.5">
+                          €{(isBusinessCustomer ? product.originalPrice * 1.22 : product.originalPrice).toFixed(2)}
+                        </span>
+                      )}
                       {isBusinessCustomer ? (
                         <span className="text-white text-xs font-bold">€{(product.price * 1.22).toFixed(2)}</span>
                       ) : (
                         <span className="text-white text-xs font-bold">€{product.price.toFixed(2)}</span>
+                      )}
+                      {product.offerNote && (
+                        <span className="block text-[10px] font-semibold text-amber-300 leading-tight mt-0.5">{product.offerNote}</span>
                       )}
                     </div>
                     <button

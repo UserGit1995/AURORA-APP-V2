@@ -45,6 +45,10 @@ export interface Product {
   isMedicalDevice?: boolean;
   isBestseller?: boolean;
   discountPercent?: number;
+  // Offerta: `price` è già il prezzo in offerta; qui si conserva il prezzo di listino di prima
+  // (per mostrarlo barrato e per poter chiudere l'offerta) e una nota (es. prezzo a quantità).
+  originalPrice?: number;
+  offerNote?: string;
   stock: number;
   lowStockThreshold?: number;
   description: string;

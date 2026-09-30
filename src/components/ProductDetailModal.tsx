@@ -272,6 +272,14 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                       </span>
                     )}
                   </div>
+                  {product.originalPrice && product.originalPrice > product.price && (
+                    <span className="text-xs text-slate-500 line-through mr-2">
+                      €{(isBusinessCustomer ? product.originalPrice * 1.22 : product.originalPrice).toFixed(2)}
+                    </span>
+                  )}
+                  {product.offerNote && (
+                    <span className="block text-xs font-semibold text-amber-300 mb-1">Offerta: {product.offerNote}</span>
+                  )}
                   <span className="text-xs text-slate-400">
                     €{isBusinessCustomer ? (product.price * 1.22).toFixed(2) : product.price.toFixed(2)} / {product.unit}
                     <span className="text-[10px] ml-1 text-slate-500">

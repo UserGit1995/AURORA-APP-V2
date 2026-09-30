@@ -20,6 +20,7 @@ import { RestockAnalysisModal } from './components/RestockAnalysisModal';
 import { QuickReorderModal } from './components/QuickReorderModal';
 import { LoginModal } from './components/LoginModal';
 import { BrandsSection } from './components/BrandsSection';
+import { HorecaSection } from './components/HorecaSection';
 import { AllBrandsView } from './components/AllBrandsView';
 import { BrandDetailView } from './components/BrandDetailView';
 import { ScrollToTopButton } from './components/ScrollToTopButton';
@@ -55,6 +56,8 @@ export default function App() {
   const [selectedBrandName, setSelectedBrandName] = useState<string | null>(null);
   const [showAllBrands, setShowAllBrands] = useState(false);
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
+  // Badge Ho.Re.Ca cliccato dalla home: apre la categoria già filtrata su quella tipologia
+  const [initialSubcategoryId, setInitialSubcategoryId] = useState<string | null>(null);
 
   // Selected product for modal detail
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -426,12 +429,13 @@ export default function App() {
               onBack={() => setShowAllBrands(false)}
             />
           ) : searchQuery.trim() ? (
-            /* Search results mode */
+            /* Search results mode: la ricerca è sempre su TUTTO il catalogo (prima restava
+               limitata all'ultima categoria aperta, e "non trovava" i prodotti delle altre) */
             <CatalogView
               viewType="categorie"
               categories={categoriesList}
               products={productsList}
-              selectedCategoryId={selectedCategoryId}
+              selectedCategoryId={null}
               onSelectCategory={setSelectedCategoryId}
               favorites={favorites}
               onToggleFavorite={handleToggleFavorite}
@@ -473,6 +477,18 @@ export default function App() {
                 products={productsList}
                 onSelectBrand={(name) => setSelectedBrandName(name)}
                 onViewAllBrands={() => setShowAllBrands(true)}
+              />
+
+              {/* 2.2 Ho.Re.Ca - Monouso (categorie trasferite dall'app Ho.Re.Ca) */}
+              <HorecaSection
+                categories={categoriesList}
+                subcategories={subcategoriesList}
+                products={productsList}
+                onOpen={(categoryId, subcategoryId) => {
+                  setInitialSubcategoryId(subcategoryId);
+                  setSelectedCategoryId(categoryId);
+                  setActiveTab('categorie');
+                }}
               />
 
               {/* 2.5 Quick Reorder Highlight Banner Card (Mobile only, matches smartphone mockup) */}
@@ -563,6 +579,7 @@ export default function App() {
               products={productsList}
               selectedCategoryId={selectedCategoryId}
               onSelectCategory={setSelectedCategoryId}
+              initialSubcategoryId={initialSubcategoryId}
               favorites={favorites}
               onToggleFavorite={handleToggleFavorite}
               comparedProductIds={comparedProductIds}

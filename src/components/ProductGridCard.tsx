@@ -132,10 +132,18 @@ export const ProductGridCard: React.FC<ProductGridCardProps> = ({
 
         <div className="flex items-center justify-between mt-2.5 pt-1.5 border-t border-[#1c2433]">
           <div>
+            {product.originalPrice && product.originalPrice > product.price && (
+              <span className="text-slate-500 text-[10px] line-through mr-1.5">
+                €{(isBusinessCustomer ? product.originalPrice * 1.22 : product.originalPrice).toFixed(2)}
+              </span>
+            )}
             {isBusinessCustomer ? (
               <span className="text-white text-xs font-bold">€{(product.price * 1.22).toFixed(2)}</span>
             ) : (
               <span className="text-white text-xs font-bold">€{product.price.toFixed(2)}</span>
+            )}
+            {product.offerNote && (
+              <span className="block text-[10px] font-semibold text-amber-300 leading-tight mt-0.5">{product.offerNote}</span>
             )}
           </div>
           <button

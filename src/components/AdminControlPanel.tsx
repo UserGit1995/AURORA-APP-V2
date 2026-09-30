@@ -26,6 +26,7 @@ import { ImageImportTool } from './ImageImportTool';
 import { ImageAuditPanel } from './ImageAuditPanel';
 import { ImageMigrationPanel } from './ImageMigrationPanel';
 import { Product, Order } from '../types';
+import { searchProducts } from '../utils/productSearch';
 
 interface AdminControlPanelProps {
   isOpen: boolean;
@@ -73,20 +74,12 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({ isOpen, on
   const ADMIN_PAGE_SIZE = 80;
   const [adminVisibleCount, setAdminVisibleCount] = useState(ADMIN_PAGE_SIZE);
 
-  // Ricerca articoli nel pannello admin: nome, codice/SKU, categoria, marca/tipologia.
-  const filteredAdminProducts = useMemo(() => {
-    const q = productSearch.trim().toLowerCase();
-    if (!q) return productsList;
-    return productsList.filter((p) => {
-      return (
-        p.name?.toLowerCase().includes(q) ||
-        p.code?.toLowerCase().includes(q) ||
-        p.category?.toLowerCase().includes(q) ||
-        p.subCategoryName?.toLowerCase().includes(q) ||
-        p.subSubCategoryName?.toLowerCase().includes(q)
-      );
-    });
-  }, [productsList, productSearch]);
+  // Ricerca articoli nel pannello admin: stessa ricerca "intelligente" del catalogo
+  // (nome, codice/SKU, categoria, marca/tipologia; singolare/plurale; parole in qualsiasi ordine).
+  const filteredAdminProducts = useMemo(
+    () => searchProducts(productsList, productSearch),
+    [productsList, productSearch]
+  );
 
   React.useEffect(() => {
     setAdminVisibleCount(ADMIN_PAGE_SIZE);

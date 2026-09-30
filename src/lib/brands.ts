@@ -1,4 +1,5 @@
 import { Category, Product, Subcategory } from '../types';
+import { isHorecaCategory } from './horeca';
 
 export interface BrandSummary {
   name: string;
@@ -18,7 +19,7 @@ const EXCLUDED_BRAND_CATEGORY_NAMES = ['Accessori Pulizia'];
 function brandEligibleCategoryIds(categoriesList: Category[]): Set<string> {
   return new Set(
     categoriesList
-      .filter((c) => !EXCLUDED_BRAND_CATEGORY_NAMES.includes(c.name))
+      .filter((c) => !EXCLUDED_BRAND_CATEGORY_NAMES.includes(c.name) && !isHorecaCategory(c.id))
       .map((c) => c.id)
   );
 }
