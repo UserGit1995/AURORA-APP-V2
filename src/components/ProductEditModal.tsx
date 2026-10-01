@@ -11,11 +11,14 @@ import {
   Package, 
   ShieldAlert, 
   AlertCircle,
-  Plus
+  Plus,
+  Scissors
 } from 'lucide-react';
 import { Product, Category } from '../types';
 import { useAdmin } from '../context/AdminContext';
 import { ProductImageUploader } from './ProductImageUploader';
+import { RemoveBgStudio } from './RemoveBg/RemoveBgStudio';
+import { hasRealImage } from '../utils/bgRemoval/productImage';
 
 interface ProductEditModalProps {
   isOpen: boolean;
@@ -62,6 +65,7 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
 
   const [certInput, setCertInput] = useState('');
   const [successToast, setSuccessToast] = useState(false);
+  const [showBgTool, setShowBgTool] = useState(false);
 
   // Sync state if product changes
   React.useEffect(() => {
@@ -384,6 +388,19 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
             }))}
           />
 
+          {/* Rimozione sfondo AI sulla foto di questo articolo */}
+          <button
+            type="button"
+            onClick={() => setShowBgTool(true)}
+            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-sm font-bold transition-colors cursor-pointer"
+          >
+            <Scissors className="w-4 h-4" />
+            {hasRealImage(formData.image) ? 'Rimuovi / cambia sfondo della foto (AI)' : 'Carica e scontorna una foto (AI)'}
+          </button>
+          <p className="text-[11px] text-slate-500 -mt-3">
+            Dopo «Usa questa immagine» la nuova foto compare qui sopra: premi «Salva Modifiche» per renderla definitiva.
+          </p>
+
           {/* Flags & Toggles */}
           <div className="flex flex-wrap gap-4 pt-2 border-t border-[#1c2433]">
             <label className="flex items-center gap-2 cursor-pointer">
@@ -482,6 +499,35 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
           </div>
         </form>
       </div>
+
+      {showBgTool && (
+        <div className="fixed inset-0 z-[80] bg-[#101218] flex flex-col">
+          <div className="h-12 shrink-0 px-4 border-b border-[#242838] bg-[#161822] flex items-center justify-between gap-3">
+            <div className="min-w-0 text-sm text-slate-300 truncate">
+              <span className="text-slate-500">Foto di </span>
+              <span className="font-semibold text-white">{formData.name || 'nuovo articolo'}</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowBgTool(false)}
+              className="px-3 py-1.5 rounded-lg bg-[#202434] hover:bg-[#2a3044] text-slate-200 text-xs font-bold flex items-center gap-1.5 transition-colors"
+            >
+              <X className="w-4 h-4" />
+              Chiudi
+            </button>
+          </div>
+          <RemoveBgStudio
+            allowBatch={false}
+            className="flex-1 min-h-0"
+            initialImage={hasRealImage(formData.image) ? { url: formData.image as string, name: formData.name || 'prodotto' } : null}
+            productHint={{ id: product?.id || 'nuovo', name: formData.name || 'prodotto', code: formData.code }}
+            onApplyImage={(url) => {
+              setFormData((prev) => ({ ...prev, image: url }));
+              setShowBgTool(false);
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 };

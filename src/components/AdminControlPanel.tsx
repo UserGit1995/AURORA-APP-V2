@@ -18,6 +18,7 @@ import {
   Save,
   Search,
   XCircle,
+  Scissors,
 } from 'lucide-react';
 import { useAdmin } from '../context/AdminContext';
 import { ProductEditModal } from './ProductEditModal';
@@ -29,6 +30,7 @@ import { ImageAuditPanel } from './ImageAuditPanel';
 import { ImageMigrationPanel } from './ImageMigrationPanel';
 import { CustomizationPricingPanel } from './CustomizationPricingPanel';
 import { CustomizationRequestsPanel } from './CustomizationRequestsPanel';
+import { RemoveBgStudio } from './RemoveBg/RemoveBgStudio';
 import { Product, Order } from '../types';
 import { searchProducts } from '../utils/productSearch';
 
@@ -71,7 +73,19 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({ isOpen, on
   } = useAdmin();
 
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [activeTab, setActiveTab] = useState<'products' | 'orders' | 'categories' | 'subcategories' | 'images' | 'requests' | 'packaging' | 'settings'>('products');
+  const [activeTab, setActiveTab] = useState<'products' | 'orders' | 'categories' | 'subcategories' | 'images' | 'removebg' | 'requests' | 'packaging' | 'settings'>('products');
+  // Remove BG: lo studio resta montato dopo la prima apertura, così cambiando scheda non si perde il lavoro
+  const [removeBgMounted, setRemoveBgMounted] = useState(false);
+  const [removeBgProductId, setRemoveBgProductId] = useState<string | null>(null);
+  const [removeBgToken, setRemoveBgToken] = useState(0);
+  const openRemoveBg = (productId: string | null) => {
+    if (productId) {
+      setRemoveBgProductId(productId);
+      setRemoveBgToken((t) => t + 1);
+    }
+    setRemoveBgMounted(true);
+    setActiveTab('removebg');
+  };
   const [productSearch, setProductSearch] = useState('');
   // Con ~3000 articoli, disegnarli tutti insieme blocca il pannello: mostriamo
   // un blocco alla volta, come nel catalogo pubblico.
@@ -167,7 +181,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({ isOpen, on
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/70 backdrop-blur-sm overflow-y-auto">
       <div
-        className="relative w-full max-w-5xl bg-[#0d1420] border border-[#1c2433] rounded-2xl overflow-hidden shadow-2xl flex flex-col max-h-[94vh]"
+        className={`relative w-full ${activeTab === 'removebg' ? 'max-w-7xl' : 'max-w-5xl'} bg-[#0d1420] border border-[#1c2433] rounded-2xl overflow-hidden shadow-2xl flex flex-col max-h-[94vh] transition-[max-width] duration-200`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -243,6 +257,10 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({ isOpen, on
           <button type="button" onClick={() => setActiveTab('images')} className={TAB_BUTTON(activeTab === 'images')}>
             <ImageIcon className="w-4 h-4" />
             <span>Immagini</span>
+          </button>
+          <button type="button" onClick={() => openRemoveBg(null)} className={TAB_BUTTON(activeTab === 'removebg')}>
+            <Scissors className="w-4 h-4" />
+            <span>Rimuovi sfondo</span>
           </button>
           <button type="button" onClick={() => setActiveTab('requests')} className={TAB_BUTTON(activeTab === 'requests')}>
             <Palette className="w-4 h-4" />
@@ -337,6 +355,15 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({ isOpen, on
                       </span>
                     </div>
 
+                    <button
+                      type="button"
+                      onClick={() => openRemoveBg(prod.id)}
+                      className={BTN_SECONDARY}
+                      title="Rimuovi lo sfondo dalla foto di questo articolo"
+                    >
+                      <Scissors className="w-3.5 h-3.5 text-emerald-400" />
+                      <span className="hidden lg:inline">Sfondo</span>
+                    </button>
                     <button type="button" onClick={() => handleOpenEditProduct(prod)} className={BTN_SECONDARY}>
                       <Edit3 className="w-3.5 h-3.5" />
                       Modifica
@@ -542,6 +569,16 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({ isOpen, on
             <ImageAuditPanel />
             <ImageImportTool />
           </>
+        )}
+
+        {/* Tab: Rimuovi sfondo (AI) */}
+        {removeBgMounted && (
+          <div
+            className={activeTab === 'removebg' ? 'flex flex-col shrink-0 overflow-hidden' : 'hidden'}
+            style={{ height: 'calc(94vh - 9rem)' }}
+          >
+            <RemoveBgStudio initialProductId={removeBgProductId} openToken={removeBgToken} />
+          </div>
         )}
 
         {/* Tab: Parametri */}
