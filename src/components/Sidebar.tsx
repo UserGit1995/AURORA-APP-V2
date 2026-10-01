@@ -13,7 +13,9 @@ import {
   RotateCw,
   LogIn,
   SlidersHorizontal,
-  Palette
+  Palette,
+  ShieldCheck,
+  FileText
 } from 'lucide-react';
 import { AuroraLogo } from './AuroraLogo';
 import { useLanguage } from '../context/LanguageContext';
@@ -69,7 +71,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
       badge: comparedCount > 0 ? comparedCount : undefined,
       badgeColor: 'bg-amber-100 text-amber-300'
     },
-    { id: 'personalizza', label: t('nav.customize', 'Personalizza Packaging'), icon: <Palette className="w-[18px] h-[18px]" /> }
+    { id: 'personalizza', label: t('nav.customize', 'Personalizza Packaging'), icon: <Palette className="w-[18px] h-[18px]" /> },
+    { id: 'termini', label: t('nav.terms', 'Termini e Condizioni di Vendita'), icon: <FileText className="w-[18px] h-[18px]" /> },
+    { id: 'privacy', label: t('nav.privacy', 'Informativa sulla Privacy'), icon: <ShieldCheck className="w-[18px] h-[18px]" /> }
   ];
 
   return (
@@ -236,25 +240,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 {t('nav.contactUs', 'Contattaci')}
               </button>
             </div>
-
-            <div className="flex items-center justify-center gap-3 pt-1 text-[11px] text-slate-500">
-              <button
-                type="button"
-                onClick={() => { onSelectTab('privacy'); if (onCloseMobile) onCloseMobile(); }}
-                className="hover:text-sky-300 transition-colors cursor-pointer"
-              >
-                {t('nav.privacy', 'Privacy')}
-              </button>
-              <span aria-hidden="true">•</span>
-              <button
-                type="button"
-                onClick={() => { onSelectTab('termini'); if (onCloseMobile) onCloseMobile(); }}
-                className="hover:text-sky-300 transition-colors cursor-pointer"
-              >
-                {t('nav.terms', 'Termini di Vendita')}
-              </button>
-            </div>
           </div>
+          <p id="build-stamp" className="mt-4 text-center text-[10px] text-slate-600">Versione 01/10/2026 · build 4</p>
         </div>
       </aside>
     </>
