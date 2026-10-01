@@ -6,8 +6,7 @@ import { Product } from '../types';
  */
 export function exportProductsToCsv(
   products: Product[],
-  fileNamePrefix: string = 'aurora_inventario_prodotti',
-  vatPercent: number = 0
+  fileNamePrefix: string = 'aurora_inventario_prodotti'
 ): void {
   if (!products || products.length === 0) return;
 
@@ -40,7 +39,7 @@ export function exportProductsToCsv(
   const rows = products.map((product) => {
     const isLowStock = product.stock <= (product.lowStockThreshold ?? 100);
     const stockStatus = isLowStock ? 'SCORTA BASSA' : 'DISPONIBILE';
-    const grossPrice = (product.price * (1 + vatPercent / 100)).toFixed(2);
+    const grossPrice = (product.price * 1.22).toFixed(2);
     const discountInfo = product.discountPercent
       ? `Sconto ${product.discountPercent}%`
       : product.isOffer
@@ -57,7 +56,7 @@ export function exportProductsToCsv(
       escapeCsvValue(product.lowStockThreshold ?? 100),
       escapeCsvValue(stockStatus),
       escapeCsvValue(product.price.toFixed(2)),
-      escapeCsvValue(`${vatPercent}%`),
+      escapeCsvValue('22%'),
       escapeCsvValue(grossPrice),
       escapeCsvValue(discountInfo),
       escapeCsvValue(product.description || ''),
