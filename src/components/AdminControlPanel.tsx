@@ -610,6 +610,18 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({ isOpen, on
                     className={`w-full ${INPUT}`}
                   />
                 </div>
+                <div>
+                  <label className={LABEL}>IVA applicata ai prezzi (%)</label>
+                  <input
+                    type="number"
+                    step="1"
+                    min="0"
+                    value={settingsForm.vatPercent ?? 0}
+                    onChange={(e) => setSettingsForm({ ...settingsForm, vatPercent: Math.max(0, parseFloat(e.target.value) || 0) })}
+                    className={`w-full ${INPUT}`}
+                  />
+                  <p className="text-[11px] text-slate-400 mt-1">0 = nessuna IVA: i prezzi restano quelli caricati. Se metti un valore, viene aggiunta ai prezzi di attività e admin.</p>
+                </div>
                 <div className="sm:col-span-2">
                   <label className={LABEL}>Testo banner annunci in evidenza</label>
                   <input

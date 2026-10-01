@@ -28,6 +28,9 @@ interface AdminContextType {
   isSupabaseConnected: boolean;
   // true = cliente "attività" (o admin): vede i prezzi con IVA, coerente con il carrello
   isBusinessCustomer: boolean;
+  // IVA impostata dall'admin (0 = nessuna) e moltiplicatore pronto all'uso (1 + IVA/100)
+  vatPercent: number;
+  vatFactor: number;
   // true finché il catalogo non è stato scaricato dal cloud almeno una volta
   catalogLoading: boolean;
   loginAsAdmin: (customAdmin?: Partial<UserProfile>) => void;
@@ -106,6 +109,7 @@ const DEFAULT_SETTINGS: SystemSettings = {
   freeShippingThresholdEur: 150.00,
   standardShippingEur: 9.90,
   vatRatePercent: 22,
+  vatPercent: 0,
   allowDirectOrderEdit: true,
   allowPriceOverride: true,
   announcementBannerText: '🔥 Spedizione Rapida • Casalinghi e Detergenza per Casa e Attività',
@@ -299,8 +303,11 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const isAdmin = currentUser?.role === 'admin' || currentUser?.role === 'superadmin';
   const isSuperAdmin = currentUser?.role === 'superadmin';
-  // Stessa regola del carrello: le attività (e gli admin) hanno l'IVA al 22%, i privati no.
+  // Stessa regola del carrello: attività e admin vedono l'IVA solo se impostata, i privati mai.
   const isBusinessCustomer = currentUser?.customerType === 'attivita' || isAdmin;
+  // Nessuna IVA automatica: si applica solo se l'admin la imposta in Impostazioni.
+  const vatPercent = Math.max(0, Number(systemSettings.vatPercent ?? 0) || 0);
+  const vatFactor = 1 + vatPercent / 100;
 
   const loginAsAdmin = (customAdmin?: Partial<UserProfile>) => {
     const adminUser: UserProfile = {
@@ -485,6 +492,8 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         subcategoriesList,
         ordersList,
         systemSettings,
+        vatPercent,
+        vatFactor,
         updateProduct,
         addProduct,
         deleteProduct,

@@ -217,6 +217,8 @@ export interface SystemSettings {
   freeShippingThresholdEur: number;
   standardShippingEur: number;
   vatRatePercent: number;
+  // IVA applicata ai prezzi (%). 0 = nessuna IVA. La imposta l'admin da Impostazioni.
+  vatPercent?: number;
   allowDirectOrderEdit: boolean;
   allowPriceOverride: boolean;
   announcementBannerText: string;
