@@ -10,7 +10,6 @@ import {
   Scale, 
   Menu, 
   X, 
-  RotateCw,
   LogIn,
   LogOut,
   SlidersHorizontal,
@@ -41,7 +40,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
   activeTab,
   onSelectTab,
   onOpenContact,
-  onOpenQuickReorder,
   onOpenLogin,
   onOpenAdminPanel,
   favoritesCount,
@@ -150,34 +148,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </nav>
           </div>
 
-          {/* Quick Reorder, B2B Portal Login & Bottom Help Card */}
+          {/* Pannello Gestione (admin), scheda account / accesso e box aiuto */}
           <div className="pt-6 space-y-2.5 mt-auto">
-            {onOpenQuickReorder && (
-              <button
-                id="sidebar-quick-reorder-btn"
-                type="button"
-                onClick={() => {
-                  onOpenQuickReorder();
-                  if (onCloseMobile) onCloseMobile();
-                }}
-                className="w-full bg-teal-600 hover:bg-teal-500 border border-teal-600 text-white text-xs font-bold py-2.5 px-3 rounded-2xl transition-all flex items-center justify-between group text-left cursor-pointer"
-              >
-                <div className="flex items-center gap-2.5">
-                  <div className="p-1.5 rounded-xl bg-[#0e1b30]/15 text-white">
-                    <RotateCw className="w-3.5 h-3.5" />
-                  </div>
-                  <div>
-                    <span className="flex items-center gap-1.5 text-white text-xs font-bold">
-                      {t('nav.quickReorder', 'Riordino Rapido')}
-                      <span className="text-[9px] font-bold bg-[#0e1b30]/20 px-1.5 py-0.5 rounded-full">1-Click</span>
-                    </span>
-                    <span className="block text-[10px] text-teal-100 font-medium mt-0.5">{t('nav.quickReorderSub', 'Fornitura ricorrente')}</span>
-                  </div>
-                </div>
-                <span className="text-white group-hover:translate-x-1 transition-transform text-xs font-bold">›</span>
-              </button>
-            )}
-
             {isAdmin && onOpenAdminPanel && (
               <button
                 id="sidebar-superadmin-control-btn"
@@ -186,24 +158,24 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   onOpenAdminPanel();
                   if (onCloseMobile) onCloseMobile();
                 }}
-                className="w-full bg-amber-500/15 hover:bg-amber-100 border border-amber-500/30 text-left py-2.5 px-3 rounded-2xl transition-all flex items-center justify-between group cursor-pointer"
+                className="w-full bg-[#0e1b30] hover:bg-[#111826] border border-[#1c2433] text-left py-2 px-3 rounded-xl transition-all flex items-center justify-between gap-2 group shadow-xs cursor-pointer"
               >
-                <div className="flex items-center gap-2.5">
-                  <div className="p-1.5 rounded-xl bg-amber-100 text-amber-300">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="w-8 h-8 shrink-0 rounded-full bg-sky-500/20 text-sky-300 flex items-center justify-center">
                     <SlidersHorizontal className="w-3.5 h-3.5" />
                   </div>
-                  <div>
-                    <span className="flex items-center gap-1.5 text-white text-xs font-bold">
+                  <div className="min-w-0">
+                    <span className="flex items-center gap-1.5 text-white text-xs font-semibold">
                       Pannello Gestione
-                      <span className="text-[9px] font-bold bg-amber-200 text-amber-200 px-1.5 py-0.5 rounded-full">SUPERADMIN</span>
+                      <span className="text-[9px] font-bold bg-sky-500/20 text-sky-300 px-1.5 py-0.5 rounded-full">SUPERADMIN</span>
                     </span>
-                    <span className="flex items-center gap-1 text-[10px] text-amber-300 font-medium mt-0.5">
+                    <span className="flex items-center gap-1 text-[10px] text-slate-500 mt-0.5">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                       Sessione attiva
                     </span>
                   </div>
                 </div>
-                <span className="text-amber-400 group-hover:translate-x-1 transition-transform text-xs font-bold">›</span>
+                <span className="text-slate-400 group-hover:text-white group-hover:translate-x-1 transition-all text-xs font-bold">›</span>
               </button>
             )}
 
@@ -272,7 +244,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               </button>
             </div>
           </div>
-          <p id="build-stamp" className="mt-4 text-center text-[10px] text-slate-600">Versione 02/10/2026 · build 5</p>
+          <p id="build-stamp" className="mt-4 text-center text-[10px] text-slate-600">Versione 02/10/2026 · build 6</p>
         </div>
       </aside>
     </>
