@@ -1,9 +1,9 @@
 import React, { useMemo, useState } from 'react';
-import { Award, ArrowRight, Camera, X } from 'lucide-react';
+import { Award, ArrowRight, Camera } from 'lucide-react';
 import { Category, Subcategory, Product } from '../types';
 import { buildBrandSummaries, withProductCounts, BrandSummary } from '../lib/brands';
 import { useAdmin } from '../context/AdminContext';
-import { ProductImageUploader } from './ProductImageUploader';
+import { QuickManageModal } from './QuickManageModal';
 
 interface BrandsSectionProps {
   categories: Category[];
@@ -32,17 +32,8 @@ export const BrandTile: React.FC<{ brand: BrandSummary; onClick: () => void }> =
   // Solo l'amministratore vede il pulsantino per caricare il logo vero della
   // marca (foto dal PC, non un URL) direttamente da qui, senza dover passare
   // dal pannello Sottocategorie.
-  const { isAdmin, subcategoriesList, updateSubcategory } = useAdmin();
+  const { isAdmin } = useAdmin();
   const [isUploaderOpen, setIsUploaderOpen] = useState(false);
-
-  const handleLogoChange = (imageUri: string) => {
-    // La stessa marca puo' comparire come piu' righe (una per categoria):
-    // aggiorniamo il logo su tutte, cosi' resta coerente ovunque.
-    subcategoriesList
-      .filter((s) => brand.subcategoryIds.includes(s.id))
-      .forEach((row) => updateSubcategory({ ...row, image: imageUri }));
-    setIsUploaderOpen(false);
-  };
 
   return (
     <div className="relative">
@@ -76,41 +67,19 @@ export const BrandTile: React.FC<{ brand: BrandSummary; onClick: () => void }> =
             setIsUploaderOpen(true);
           }}
           className="absolute top-2 right-2 p-1.5 rounded-full bg-slate-900/80 hover:bg-slate-900 text-white shadow-sm transition-colors"
-          title={`Carica il logo di ${brand.name} (solo admin)`}
+          title={`Gestisci ${brand.name} (solo admin)`}
         >
           <Camera className="w-3 h-3" />
         </button>
       )}
 
       {isAdmin && isUploaderOpen && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
-          onClick={(e) => {
-            e.stopPropagation();
-            setIsUploaderOpen(false);
-          }}
-        >
-          <div
-            className="w-full max-w-xs bg-[#0e1b30] border border-[#1c2433] rounded-2xl shadow-xl p-4"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between mb-3">
-              <p className="text-sm font-bold text-white">Logo di {brand.name}</p>
-              <button onClick={() => setIsUploaderOpen(false)} className="text-slate-400 hover:text-slate-300">
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-            <ProductImageUploader currentImage={brand.image || ''} onImageChange={handleLogoChange} />
-            {brand.image && (
-              <button
-                onClick={() => handleLogoChange('')}
-                className="mt-2.5 text-xs font-semibold text-rose-500 hover:text-rose-300"
-              >
-                Rimuovi logo e torna al badge con iniziale
-              </button>
-            )}
-          </div>
-        </div>
+        <QuickManageModal
+          title={brand.name}
+          rootIds={brand.subcategoryIds}
+          currentImage={brand.image}
+          onClose={() => setIsUploaderOpen(false)}
+        />
       )}
     </div>
   );

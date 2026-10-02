@@ -1,8 +1,10 @@
 import React, { useMemo, useState } from 'react';
-import { ArrowRight, UtensilsCrossed } from 'lucide-react';
+import { ArrowRight, UtensilsCrossed, Camera } from 'lucide-react';
 import { Category, Subcategory, Product } from '../types';
 import { HORECA_CATEGORY_IDS } from '../lib/horeca';
 import { colorForBrand } from './BrandsSection';
+import { useAdmin } from '../context/AdminContext';
+import { QuickManageModal } from './QuickManageModal';
 
 interface HorecaSectionProps {
   categories: Category[];
@@ -28,6 +30,8 @@ interface Group {
  */
 export const HorecaSection: React.FC<HorecaSectionProps> = ({ categories, subcategories, products, onOpen }) => {
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+  const { isAdmin } = useAdmin();
+  const [managing, setManaging] = useState<Subcategory | null>(null);
 
   const groups = useMemo<Group[]>(() => {
     const countBySub = new Map<string, number>();
@@ -86,8 +90,8 @@ export const HorecaSection: React.FC<HorecaSectionProps> = ({ categories, subcat
 
               <div className="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-9 gap-3">
                 {shown.map(({ sub, count }) => (
+                  <div key={sub.id} className="relative">
                   <button
-                    key={sub.id}
                     type="button"
                     id={`horeca-badge-${sub.id}`}
                     onClick={() => onOpen(category.id, sub.id)}
@@ -109,6 +113,20 @@ export const HorecaSection: React.FC<HorecaSectionProps> = ({ categories, subcat
                       <p className="text-slate-400 text-[10.5px] mt-0.5">{count} prodotti</p>
                     </div>
                   </button>
+                  {isAdmin && (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setManaging(sub);
+                      }}
+                      className="absolute top-2 right-2 p-1.5 rounded-full bg-slate-900/80 hover:bg-slate-900 text-white shadow-sm transition-colors"
+                      title={`Gestisci ${sub.name} (solo admin)`}
+                    >
+                      <Camera className="w-3 h-3" />
+                    </button>
+                  )}
+                  </div>
                 ))}
               </div>
 
@@ -125,6 +143,15 @@ export const HorecaSection: React.FC<HorecaSectionProps> = ({ categories, subcat
           );
         })}
       </div>
+
+      {isAdmin && managing && (
+        <QuickManageModal
+          title={managing.name}
+          rootIds={[managing.id]}
+          currentImage={subcategories.find((x) => x.id === managing.id)?.image}
+          onClose={() => setManaging(null)}
+        />
+      )}
     </section>
   );
 };
