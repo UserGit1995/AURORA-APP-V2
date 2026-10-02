@@ -565,12 +565,12 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({ isOpen, on
 
         {/* Tab: Importa immagini */}
         {activeTab === 'images' && (
-          <>
+          <div className="flex-1 min-h-0 overflow-y-auto">
             <ImageFinderPanel />
             <ImageMigrationPanel />
             <ImageAuditPanel />
             <ImageImportTool />
-          </>
+          </div>
         )}
 
         {/* Tab: Rimuovi sfondo (AI) */}
