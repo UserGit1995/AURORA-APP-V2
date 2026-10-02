@@ -3,6 +3,7 @@ import { RotateCcw, ArrowRight, Loader2, RefreshCw, ShoppingBag } from 'lucide-r
 import { Sidebar, NavTab } from './components/Sidebar';
 import { Header } from './components/Header';
 import { HeroBanner } from './components/HeroBanner';
+import { BackgroundRotator } from './components/BackgroundRotator';
 import { CategorySection } from './components/CategorySection';
 import { PromoBanner } from './components/PromoBanner';
 import { FeaturedProductsSection } from './components/FeaturedProductsSection';
@@ -350,7 +351,8 @@ export default function App() {
   }, [comparedProductIds, productsList]);
 
   return (
-    <div className="min-h-screen bg-[#0d1420] text-white flex font-sans">
+    <div className="min-h-screen text-white flex font-sans">
+      <BackgroundRotator />
       {/* Fixed Left Sidebar */}
       <Sidebar
         activeTab={activeTab}
