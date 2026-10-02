@@ -3,6 +3,7 @@ import path from 'path';
 import dotenv from 'dotenv';
 import { GoogleGenAI, Type } from '@google/genai';
 import { createServer as createViteServer } from 'vite';
+import imageProxyHandler from './api/image-proxy';
 
 dotenv.config();
 
@@ -26,6 +27,9 @@ function getGenAI(): GoogleGenAI | null {
   }
   return aiInstance;
 }
+
+// Ponte per leggere le foto prodotto ospitate su altri siti (stessa funzione usata su Vercel)
+app.get('/api/image-proxy', (req, res) => imageProxyHandler(req, res));
 
 // Health check endpoint
 app.get('/api/health', (_req, res) => {

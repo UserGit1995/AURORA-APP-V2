@@ -25,22 +25,75 @@ export function pixelCtx(canvas: HTMLCanvasElement): CanvasRenderingContext2D {
   return canvas.getContext('2d', { willReadFrequently: true }) as CanvasRenderingContext2D;
 }
 
-export function loadImage(src: string): Promise<HTMLImageElement> {
+function loadPlain(src: string, cors: boolean): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const img = new Image();
-    // data: e blob: sono locali; per i link esterni serve CORS per poter leggere i pixel
-    if (!src.startsWith('data:') && !src.startsWith('blob:')) {
-      img.crossOrigin = 'anonymous';
-    }
+    // senza CORS il browser mostra la foto ma vieta di leggerne i pixel
+    if (cors) img.crossOrigin = 'anonymous';
     img.onload = () => resolve(img);
-    img.onerror = () =>
-      reject(
-        new Error(
-          "Impossibile leggere l'immagine. Se è un link di un altro sito, potrebbe bloccare l'accesso: scarica la foto e caricala con «Carica Foto»."
-        )
-      );
+    img.onerror = () => reject(new Error('immagine non caricabile'));
     img.src = src;
   });
+}
+
+/**
+ * Carica una foto per poterne leggere i pixel.
+ *  1) lettura diretta (file dell'app, Supabase, siti che consentono CORS);
+ *  2) se non basta, passa dal "ponte" /api/image-proxy dell'app, che scarica la foto dal server
+ *     (così funzionano anche le foto ospitate su siti che bloccano la lettura dal browser).
+ */
+export async function loadImage(src: string): Promise<HTMLImageElement> {
+  if (src.startsWith('data:') || src.startsWith('blob:')) return loadPlain(src, false);
+
+  try {
+    return await loadPlain(src, true);
+  } catch {
+    /* si prova il ponte */
+  }
+
+  let abs: URL | null = null;
+  try {
+    abs = new URL(src, window.location.href);
+  } catch {
+    /* indirizzo non valido */
+  }
+  if (!abs || abs.origin === window.location.origin) {
+    throw new Error(
+      "Non riesco ad aprire la foto: il file non esiste più a questo indirizzo. Caricala di nuovo con «Carica Foto»."
+    );
+  }
+
+  let res: Response;
+  try {
+    res = await fetch(`/api/image-proxy?url=${encodeURIComponent(abs.toString())}`);
+  } catch {
+    throw new Error('Connessione assente o instabile: non riesco a scaricare la foto. Riprova tra un momento.');
+  }
+
+  if (!res.ok) {
+    const isJson = (res.headers.get('content-type') || '').includes('application/json');
+    if (isJson) {
+      const data = await res.json().catch(() => null);
+      if (data?.error) throw new Error(String(data.error));
+    }
+    if (res.status === 404) {
+      throw new Error(
+        'Manca la funzione /api/image-proxy sul sito: carica il file api/image-proxy.ts su GitHub e attendi che Vercel finisca il deploy.'
+      );
+    }
+    throw new Error(`Non riesco a scaricare la foto (errore ${res.status}). Caricala con «Carica Foto».`);
+  }
+
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  try {
+    return await loadPlain(url, false);
+  } catch {
+    throw new Error("La foto scaricata non è un'immagine leggibile. Caricala con «Carica Foto».");
+  } finally {
+    // l'immagine è già decodificata: il link temporaneo si può liberare poco dopo
+    setTimeout(() => URL.revokeObjectURL(url), 60_000);
+  }
 }
 
 /** Disegna l'immagine su un canvas, riducendola se supera maxDim sul lato lungo. */
