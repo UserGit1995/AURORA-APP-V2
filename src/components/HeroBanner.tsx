@@ -1,15 +1,15 @@
 import React from 'react';
-import { ShieldCheck, Truck, Layers, ArrowRight, Zap } from 'lucide-react';
+import { ShieldCheck, Truck, Layers, ArrowRight, Package } from 'lucide-react';
 import { HERO_IMAGE } from '../data/catalog';
 import { useLanguage } from '../context/LanguageContext';
 import { AuroraLogo } from './AuroraLogo';
 
 interface HeroBannerProps {
   onExploreCatalog: () => void;
-  onQuickReorder?: () => void;
+  onPersonalizza?: () => void;
 }
 
-export const HeroBanner: React.FC<HeroBannerProps> = ({ onExploreCatalog, onQuickReorder }) => {
+export const HeroBanner: React.FC<HeroBannerProps> = ({ onExploreCatalog, onPersonalizza }) => {
   const { t, language } = useLanguage();
 
   return (
@@ -126,14 +126,14 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({ onExploreCatalog, onQuic
               <span>{t('hero.exploreBtn', 'Scopri il catalogo')}</span>
               <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
             </button>
-            {onQuickReorder && (
+            {onPersonalizza && (
               <button
-                id="hero-quick-reorder-btn"
-                onClick={onQuickReorder}
+                id="hero-personalizza-btn"
+                onClick={onPersonalizza}
                 className="inline-flex items-center gap-2 bg-[#0e1b30] hover:bg-[#111826] border border-[#1c2433] text-slate-300 text-xs sm:text-sm font-semibold px-5 py-2.5 rounded-full transition-all duration-200 shadow-xs"
               >
-                <Zap className="w-3.5 h-3.5 text-sky-400" />
-                <span>Riordino Rapido 1-Click</span>
+                <Package className="w-3.5 h-3.5 text-sky-400" />
+                <span>Personalizza Packaging</span>
               </button>
             )}
           </div>

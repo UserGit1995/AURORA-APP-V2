@@ -496,7 +496,13 @@ export default function App() {
                   setActiveTab('categorie');
                   setSelectedCategoryId(null);
                 }}
-                onQuickReorder={() => setIsQuickReorderOpen(true)}
+                onPersonalizza={() => {
+                  setActiveTab('personalizza');
+                  setSearchQuery('');
+                  setSelectedBrandName(null);
+                  setShowAllBrands(false);
+                  window.scrollTo({ top: 0 });
+                }}
               />
 
               {/* 2. Categorie principali */}
