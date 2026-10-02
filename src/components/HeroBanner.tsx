@@ -13,7 +13,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({ onExploreCatalog, onQuic
   const { t, language } = useLanguage();
 
   return (
-    <div className="relative w-full rounded-2xl md:rounded-3xl overflow-hidden bg-gradient-to-br from-white via-sky-50/60 to-slate-50 border border-[#1c2433] shadow-sm p-5 sm:p-7 md:p-8">
+    <div className="relative w-full rounded-2xl md:rounded-3xl overflow-hidden bg-gradient-to-br from-[#01203d] via-[#052848] to-[#0a2038] border border-[#1c2433] shadow-sm p-5 sm:p-7 md:p-8">
       {/* Background radial glow */}
       <div className="absolute top-0 right-1/4 w-96 h-96 bg-sky-400/10 rounded-full blur-3xl pointer-events-none" />
 
@@ -63,7 +63,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({ onExploreCatalog, onQuic
             </div>
 
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-teal-100 border border-teal-200 text-teal-600 flex items-center justify-center shrink-0">
+              <div className="w-8 h-8 rounded-lg bg-teal-500/20 border border-teal-500/30 text-teal-400 flex items-center justify-center shrink-0">
                 <Truck className="w-4 h-4" />
               </div>
               <div className="min-w-0">
@@ -73,7 +73,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({ onExploreCatalog, onQuic
             </div>
 
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-indigo-500/20 border border-indigo-200 text-indigo-400 flex items-center justify-center shrink-0">
+              <div className="w-8 h-8 rounded-lg bg-indigo-500/20 border border-indigo-500/30 text-indigo-400 flex items-center justify-center shrink-0">
                 <Layers className="w-4 h-4" />
               </div>
               <div className="min-w-0">
@@ -96,7 +96,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({ onExploreCatalog, onQuic
             </div>
 
             <div className="bg-[#111826]/80 backdrop-blur-xs border border-[#1c2433] rounded-xl p-2.5 flex items-center gap-2.5 transition-transform hover:-translate-y-0.5 shadow-xs">
-              <div className="p-1.5 rounded-lg bg-teal-100 text-teal-600 shrink-0">
+              <div className="p-1.5 rounded-lg bg-teal-500/20 text-teal-400 shrink-0">
                 <Truck className="w-4 h-4" />
               </div>
               <div className="min-w-0">

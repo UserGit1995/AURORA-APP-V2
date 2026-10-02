@@ -11,7 +11,7 @@ export const PromoBanner: React.FC<PromoBannerProps> = ({ onDiscoverOffers }) =>
   const { t, language } = useLanguage();
 
   return (
-    <div className="w-full mt-7 rounded-2xl overflow-hidden bg-gradient-to-r from-white via-slate-50 to-sky-50 border border-[#1c2433] shadow-xl relative">
+    <div className="w-full mt-7 rounded-2xl overflow-hidden bg-gradient-to-r from-[#051d41] via-[#052a5a] to-[#051836] border border-[#1c2433] shadow-xl relative">
       <div className="flex flex-col md:flex-row items-center justify-between p-4 sm:p-5 lg:px-8 gap-4">
         {/* Left info */}
         <div className="flex items-center gap-3.5 z-10">
