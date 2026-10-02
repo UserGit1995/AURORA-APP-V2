@@ -12,6 +12,7 @@ import {
   X, 
   RotateCw,
   LogIn,
+  LogOut,
   SlidersHorizontal,
   Palette,
   ShieldCheck,
@@ -49,7 +50,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onCloseMobile
 }) => {
   const { t } = useLanguage();
-  const { isAdmin, currentUser } = useAdmin();
+  const { isAdmin, currentUser, logout } = useAdmin();
 
   const navItems: { id: NavTab; label: string; icon: React.ReactNode; badge?: number; badgeColor?: string }[] = [
     { id: 'home', label: t('nav.home', 'Home'), icon: <Home className="w-[18px] h-[18px]" /> },
@@ -198,7 +199,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     </span>
                     <span className="flex items-center gap-1 text-[10px] text-amber-300 font-medium mt-0.5">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                      {currentUser?.name || 'Admin'} (Online)
+                      Sessione attiva
                     </span>
                   </div>
                 </div>
@@ -206,22 +207,52 @@ export const Sidebar: React.FC<SidebarProps> = ({
               </button>
             )}
 
-            {onOpenLogin && (
-              <button
-                id="sidebar-b2b-login-btn"
-                type="button"
-                onClick={() => {
-                  onOpenLogin();
-                  if (onCloseMobile) onCloseMobile();
-                }}
-                className="w-full bg-[#0e1b30] hover:bg-[#111826] border border-[#1c2433] text-slate-300 hover:text-white text-xs font-semibold py-2 px-3 rounded-xl transition-all flex items-center justify-between shadow-xs cursor-pointer"
+            {currentUser ? (
+              <div
+                id="sidebar-account-card"
+                className="w-full bg-[#0e1b30] border border-[#1c2433] rounded-xl py-2 px-3 flex items-center justify-between gap-2 shadow-xs"
               >
-                <div className="flex items-center gap-2">
-                  <LogIn className="w-3.5 h-3.5 text-sky-400" />
-                  <span>{t('nav.login', 'Accedi / Registrati')}</span>
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="w-8 h-8 shrink-0 rounded-full bg-sky-500/20 text-sky-300 text-[11px] font-bold flex items-center justify-center">
+                    {(currentUser.avatarInitials || currentUser.name || '?').slice(0, 2).toUpperCase()}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-white text-xs font-semibold truncate">{currentUser.name}</p>
+                    <p className="text-slate-500 text-[10px] truncate">{currentUser.email}</p>
+                  </div>
                 </div>
-                <span className="text-[10px] text-sky-300 font-mono bg-sky-500/20 px-1.5 py-0.5 rounded">ACCOUNT</span>
-              </button>
+                <button
+                  id="sidebar-logout-btn"
+                  type="button"
+                  title={t('nav.logout', 'Esci')}
+                  aria-label={t('nav.logout', 'Esci')}
+                  onClick={() => {
+                    logout();
+                    if (onCloseMobile) onCloseMobile();
+                  }}
+                  className="shrink-0 p-2 rounded-lg text-rose-300 hover:text-rose-200 hover:bg-rose-500/15 transition-colors cursor-pointer"
+                >
+                  <LogOut className="w-4 h-4" />
+                </button>
+              </div>
+            ) : (
+              onOpenLogin && (
+                <button
+                  id="sidebar-b2b-login-btn"
+                  type="button"
+                  onClick={() => {
+                    onOpenLogin();
+                    if (onCloseMobile) onCloseMobile();
+                  }}
+                  className="w-full bg-[#0e1b30] hover:bg-[#111826] border border-[#1c2433] text-slate-300 hover:text-white text-xs font-semibold py-2 px-3 rounded-xl transition-all flex items-center justify-between shadow-xs cursor-pointer"
+                >
+                  <div className="flex items-center gap-2">
+                    <LogIn className="w-3.5 h-3.5 text-sky-400" />
+                    <span>{t('nav.login', 'Accedi / Registrati')}</span>
+                  </div>
+                  <span className="text-[10px] text-sky-300 font-mono bg-sky-500/20 px-1.5 py-0.5 rounded">ACCOUNT</span>
+                </button>
+              )
             )}
 
             <div className="bg-[#0d1420] border border-[#1c2433] rounded-2xl p-4 text-left">
@@ -241,7 +272,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               </button>
             </div>
           </div>
-          <p id="build-stamp" className="mt-4 text-center text-[10px] text-slate-600">Versione 01/10/2026 · build 4</p>
+          <p id="build-stamp" className="mt-4 text-center text-[10px] text-slate-600">Versione 02/10/2026 · build 5</p>
         </div>
       </aside>
     </>
