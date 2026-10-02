@@ -7,8 +7,8 @@ const BACKGROUNDS = [
   { src: '/sfondi/sfondo-c.webp', position: 'center' },
 ];
 
-// Ogni quanto cambia lo sfondo (in millisecondi): 20 secondi
-const INTERVAL_MS = 20000;
+// Ogni quanto cambia lo sfondo (in millisecondi): 1 minuto
+const INTERVAL_MS = 60000;
 
 export const BackgroundRotator: React.FC = () => {
   const [active, setActive] = useState(0);
