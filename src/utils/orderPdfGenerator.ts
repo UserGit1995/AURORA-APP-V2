@@ -78,7 +78,7 @@ export const generateOrderReceiptPdf = (order: Order): void => {
   const recipient = isCompany 
     ? (order.shippingAddress?.recipient ? `C/A: ${order.shippingAddress.recipient}` : 'Ufficio Acquisti')
     : `Cliente: ${order.shippingAddress?.recipient || ''}`;
-  const street = order.shippingAddress?.street || 'Via dell\'Industria 45';
+  const street = order.shippingAddress?.street || '';
   const city = [order.shippingAddress?.postalCode, order.shippingAddress?.city, order.shippingAddress?.province ? `(${order.shippingAddress.province})` : ''].filter(Boolean).join(' ');
   const fiscalId = order.shippingAddress?.vatNumber 
     ? `P.IVA: ${order.shippingAddress.vatNumber}` 
@@ -401,7 +401,7 @@ export const generateOrderHistoryPdf = (
   doc.text(isIt ? 'CONTO CLIENTE & AMBITO REPORT' : 'CLIENT ACCOUNT & REPORT SCOPE', 18, startY + 6);
 
   const clientName = options?.customerName || orders[0]?.shippingAddress?.companyName || COMPANY.name;
-  const vatNumber = options?.vatNumber || orders[0]?.shippingAddress?.vatNumber || 'IT08492040962';
+  const vatNumber = options?.vatNumber || orders[0]?.shippingAddress?.vatNumber || '—';
 
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(8);

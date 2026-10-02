@@ -33,8 +33,8 @@ const PrivacyContent: React.FC = () => (
 
     <h2 className={H2}>Titolare del trattamento</h2>
     <p className={P}>
-      Il titolare del trattamento dei dati raccolti tramite questo sito è Aurora S.R.L.S. [inserire
-      indirizzo e dati di contatto completi].
+      Il titolare del trattamento dei dati raccolti tramite questo sito è Aurora S.r.l.s, con sede in
+      Via di Prato Lungo Casilino 128/130, 00132 Roma (RM), Partita IVA 15399421005, telefono 345 600 0865, email gruppo.aurora.ordini@gmail.com.
     </p>
 
     <h2 className={H2}>Quali dati raccogliamo</h2>
@@ -80,8 +80,8 @@ const TerminiContent: React.FC<{ onOpenLegal: (p: LegalPage) => void }> = ({ onO
 
     <h2 className={H2}>Chi vende</h2>
     <p className={P}>
-      Il venditore è Aurora S.R.L.S. [inserire sede legale, Partita IVA, PEC o email di contatto
-      completi]. Queste condizioni si applicano a tutti gli ordini effettuati tramite questo sito, sia
+      Il venditore è Aurora S.r.l.s, con sede in Via di Prato Lungo Casilino 128/130, 00132 Roma (RM), Partita IVA 15399421005, telefono
+      345 600 0865, email gruppo.aurora.ordini@gmail.com. Queste condizioni si applicano a tutti gli ordini effettuati tramite questo sito, sia
       da parte di attività con Partita IVA (bar, ristoranti, pizzerie e altre imprese) sia da parte di
       privati cittadini.
     </p>
@@ -151,8 +151,7 @@ const TerminiContent: React.FC<{ onOpenLegal: (p: LegalPage) => void }> = ({ onO
     <p className={P}>
       Per i clienti privati (consumatori), è sempre competente il foro del luogo di residenza del
       consumatore, secondo quanto previsto dalla legge, indipendentemente da ogni diversa indicazione.
-      Per i clienti con Partita IVA, salvo diverso accordo scritto, è competente il foro di [inserire
-      città sede legale Aurora S.R.L.S.].
+      Per i clienti con Partita IVA, salvo diverso accordo scritto, è competente il foro di Roma.
     </p>
 
     <h2 className={H2}>Modifiche</h2>

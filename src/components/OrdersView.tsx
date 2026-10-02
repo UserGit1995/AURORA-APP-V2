@@ -949,7 +949,7 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
                         <div>
                           <span className="text-slate-400 block text-[10.5px]">Intestatario / Ragione Sociale:</span>
                           <span className="font-bold text-white">
-                            {selectedDetailOrder.shippingAddress?.companyName || 'AURORA Retail & Facility Service S.r.l.'}
+                            {selectedDetailOrder.shippingAddress?.companyName || selectedDetailOrder.shippingAddress?.recipient || '—'}
                           </span>
                         </div>
 
@@ -963,10 +963,10 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
                         <div>
                           <span className="text-slate-400 block text-[10.5px]">Indirizzo di Consegna:</span>
                           <span className="text-slate-300">
-                            {selectedDetailOrder.shippingAddress?.street || 'Via dell\'Industria 45, Palazzina B, Ingresso Magazzino 3'}
+                            {selectedDetailOrder.shippingAddress?.street || '—'}
                           </span>
                           <span className="text-slate-400 block font-medium">
-                            {selectedDetailOrder.shippingAddress?.postalCode || '20145'} {selectedDetailOrder.shippingAddress?.city || 'Milano'} ({selectedDetailOrder.shippingAddress?.province || 'MI'}) - {selectedDetailOrder.shippingAddress?.country || 'Italia'}
+                            {[selectedDetailOrder.shippingAddress?.postalCode, selectedDetailOrder.shippingAddress?.city, selectedDetailOrder.shippingAddress?.province ? `(${selectedDetailOrder.shippingAddress.province})` : '', selectedDetailOrder.shippingAddress?.country || 'Italia'].filter(Boolean).join(' ')}
                           </span>
                         </div>
 

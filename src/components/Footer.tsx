@@ -260,14 +260,14 @@ export const Footer: React.FC<FooterProps> = ({
               </div>
               <div className="flex items-start gap-2">
                 <Phone className="w-4 h-4 text-sky-400 shrink-0 mt-0.5" />
-                <a href="tel:+390289457710" className="text-slate-300 hover:text-sky-300 font-mono transition-colors">
+                <a href="tel:+393456000865" className="text-slate-300 hover:text-sky-300 font-mono transition-colors">
                   {t('footer.phone')}
                 </a>
               </div>
               <div className="flex items-start gap-2">
                 <Mail className="w-4 h-4 text-sky-400 shrink-0 mt-0.5" />
-                <a href="mailto:logistica@auroradistribuzione.it" className="text-slate-300 hover:text-sky-300 transition-colors">
-                  logistica@auroradistribuzione.it
+                <a href="mailto:gruppo.aurora.ordini@gmail.com" className="text-slate-300 hover:text-sky-300 transition-colors">
+                  gruppo.aurora.ordini@gmail.com
                 </a>
               </div>
               <div className="flex items-start gap-2">
@@ -283,7 +283,7 @@ export const Footer: React.FC<FooterProps> = ({
       {/* Bottom Bar: Copyright & Legal Registry */}
       <div className="border-t border-[#1c2433] bg-[#0d1420] py-5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-slate-500">
-          <p>© {new Date().getFullYear()} AURORA Distribuzione S.r.l. — {t('footer.rights')}</p>
+          <p>© {new Date().getFullYear()} Aurora S.r.l.s — {t('footer.rights')}</p>
           <p className="text-center sm:text-right">{t('footer.companyInfo')}</p>
         </div>
       </div>

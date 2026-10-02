@@ -4,10 +4,10 @@
  * I campi lasciati vuoti ('') semplicemente NON vengono stampati.
  */
 export const COMPANY = {
-  name: 'AURORA',            // ragione sociale, es. 'Aurora S.r.l.'
-  vatNumber: '',             // partita IVA, es. 'IT01234567890'
-  address: '',               // es. 'Via Roma 12, 00100 Roma (RM)'
-  phone: '',                 // es. '+39 06 1234567'
+  name: 'Aurora S.r.l.s',
+  vatNumber: '15399421005',
+  address: 'Via di Prato Lungo Casilino 128/130, 00132 Roma (RM)',
+  phone: '345 600 0865',
   email: 'gruppo.aurora.ordini@gmail.com',
 };
 

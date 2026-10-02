@@ -92,7 +92,7 @@ export const OrderTrackingTimeline: React.FC<OrderTrackingTimelineProps> = ({
       label: t('orders.stepProcessing', 'Processing'),
       sublabel: t('orders.stepProcessingSub', 'In Elaborazione / Allestimento'),
       timestamp: `${order.date} • 11:45`,
-      location: language === 'it' ? 'Hub Logistica AURORA (Milano)' : 'AURORA Logistics Hub (Milan)',
+      location: language === 'it' ? 'Magazzino Aurora (Roma)' : 'Aurora Warehouse (Rome)',
       description: language === 'it'
         ? `Prelievo a scaffale di ${order.itemsCount} colli, confezionamento pallet e sigillatura di sicurezza.`
         : `Picking of ${order.itemsCount} package units, pallet wrapping, and security banding.`,
