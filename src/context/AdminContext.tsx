@@ -30,6 +30,8 @@ interface AdminContextType {
   isBusinessCustomer: boolean;
   // IVA impostata dall'admin (0 = nessuna) e moltiplicatore pronto all'uso (1 + IVA/100)
   vatPercent: number;
+  /** Importo minimo (imponibile, in €) sotto cui l'ordine non può partire. 0 = nessun minimo. */
+  minimumOrderEur: number;
   vatFactor: number;
   // true finché il catalogo non è stato scaricato dal cloud almeno una volta
   catalogLoading: boolean;
@@ -308,6 +310,9 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   // Nessuna IVA automatica: si applica solo se l'admin la imposta in Impostazioni.
   const vatPercent = Math.max(0, Number(systemSettings.vatPercent ?? 0) || 0);
   const vatFactor = 1 + vatPercent / 100;
+  // Ordine minimo (sull'imponibile): 50 € se non diversamente impostato
+  const rawMin = Number(systemSettings.minimumOrderEur);
+  const minimumOrderEur = Number.isFinite(rawMin) && rawMin >= 0 ? rawMin : 50;
 
   const loginAsAdmin = (customAdmin?: Partial<UserProfile>) => {
     const adminUser: UserProfile = {
@@ -456,6 +461,16 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     newOrder: Order,
     source: 'carrello' | 'riordino-rapido' = 'carrello'
   ): Promise<SubmitResult> => {
+    // Controllo di sicurezza comune a carrello e riordino rapido: sotto il minimo l'ordine non parte
+    const goods = Number(newOrder.subtotal ?? newOrder.total) || 0;
+    if (minimumOrderEur > 0 && Math.round(goods * 100) < Math.round(minimumOrderEur * 100)) {
+      return {
+        ok: false,
+        emailSent: false,
+        saved: false,
+        error: `Ordine minimo € ${minimumOrderEur.toFixed(2)}: mancano € ${(minimumOrderEur - goods).toFixed(2)}.`,
+      };
+    }
     // Prima il tentativo REALE di consegna (email al negozio + database)...
     const result = await submitOrder(newOrder, source);
     // ...e solo se l'ordine è davvero partito lo mostriamo nello storico.
@@ -493,6 +508,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         ordersList,
         systemSettings,
         vatPercent,
+        minimumOrderEur,
         vatFactor,
         updateProduct,
         addProduct,

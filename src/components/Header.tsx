@@ -37,6 +37,8 @@ interface HeaderProps {
   unreadNotificationsCount?: number;
   unreadInquiriesCount?: number;
   isCartPulsing?: boolean;
+  /** Imponibile del carrello in € (mostrato accanto al pulsante carrello) */
+  cartTotal?: number;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -55,6 +57,7 @@ export const Header: React.FC<HeaderProps> = ({
   unreadNotificationsCount = 3,
   unreadInquiriesCount = 5,
   isCartPulsing = false,
+  cartTotal = 0,
 }) => {
   const { t, language } = useLanguage();
   const { isAdmin, currentUser, logout } = useAdmin();
@@ -240,6 +243,25 @@ export const Header: React.FC<HeaderProps> = ({
               <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-sky-500 text-white text-[10px] font-extrabold rounded-full flex items-center justify-center px-1 border border-white shadow-sm">
                 {unreadNotificationsCount || 3}
               </span>
+            </button>
+
+            {/* Carrello (lista ordine) con numero di colli */}
+            <button
+              id="mobile-header-cart-btn"
+              onClick={onOpenCart}
+              className={`relative w-10 h-10 rounded-full flex items-center justify-center border active:scale-95 transition-transform ${
+                cartCount > 0 || isCartPulsing
+                  ? 'bg-sky-600 text-white border-sky-400/50'
+                  : 'bg-[#161f30] text-slate-300 border-[#1c2433]'
+              }`}
+              aria-label="Carrello"
+            >
+              <ShoppingBag className="w-4.5 h-4.5" />
+              {cartCount > 0 && (
+                <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-amber-400 text-slate-900 text-[10px] font-extrabold rounded-full flex items-center justify-center px-1 shadow-sm">
+                  {cartCount}
+                </span>
+              )}
             </button>
 
             {/* Inquiries / Mail / Cart with Badge */}
@@ -455,13 +477,13 @@ export const Header: React.FC<HeaderProps> = ({
             )}
           </button>
 
-          {/* Shopping Cart Button with Pulse Animation */}
+          {/* Carrello: pulsante ben visibile con numero di articoli e totale */}
           <div className="relative">
             <AnimatePresence>
               {isCartPulsing && (
                 <motion.span
                   initial={{ scale: 0.8, opacity: 0.8 }}
-                  animate={{ scale: 1.5, opacity: 0 }}
+                  animate={{ scale: 1.4, opacity: 0 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.7, ease: "easeOut" }}
                   className="absolute inset-0 rounded-full bg-sky-400/40 pointer-events-none"
@@ -472,38 +494,27 @@ export const Header: React.FC<HeaderProps> = ({
             <motion.button
               id="header-cart-button"
               onClick={onOpenCart}
-              animate={
-                isCartPulsing
-                  ? {
-                      scale: [1, 1.18, 0.94, 1.08, 1],
-                      borderColor: ['#e2e8f0', '#38bdf8', '#0284c7', '#e2e8f0'],
-                      backgroundColor: ['#f1f5f9', '#e0f2fe', '#f1f5f9'],
-                    }
-                  : { scale: 1 }
-              }
+              animate={isCartPulsing ? { scale: [1, 1.12, 0.96, 1.06, 1] } : { scale: 1 }}
               transition={{ duration: 0.6, ease: "easeInOut" }}
-              className={`relative p-2 rounded-full bg-[#161f30] hover:bg-slate-200 text-slate-500 hover:text-white border border-[#1c2433] transition-colors ${
-                isCartPulsing ? 'text-sky-300 shadow-[0_0_12px_rgba(56,189,248,0.4)]' : ''
-              }`}
-              aria-label="Carrello"
+              className="relative inline-flex items-center gap-2 pl-3 pr-3.5 py-1.5 rounded-full bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs border border-sky-400/40 shadow-lg shadow-sky-950/50 transition-colors cursor-pointer"
+              aria-label="Apri il carrello"
+              title="Apri il carrello"
             >
-              <motion.div
-                animate={isCartPulsing ? { rotate: [-8, 8, -4, 4, 0] } : { rotate: 0 }}
-                transition={{ duration: 0.5 }}
-              >
+              <span className="relative">
                 <ShoppingBag className="w-4 h-4" />
-              </motion.div>
-
-              {cartCount > 0 && (
-                <motion.span
-                  key={cartCount}
-                  initial={{ scale: 0.6 }}
-                  animate={{ scale: 1 }}
-                  className="absolute -top-1 -right-1 bg-[#0284c7] text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center border border-white shadow-xs"
-                >
-                  {cartCount}
-                </motion.span>
-              )}
+                {cartCount > 0 && (
+                  <motion.span
+                    key={cartCount}
+                    initial={{ scale: 0.6 }}
+                    animate={{ scale: 1 }}
+                    className="absolute -top-2 -right-2.5 min-w-[16px] h-4 px-1 bg-amber-400 text-slate-900 text-[10px] font-extrabold rounded-full flex items-center justify-center"
+                  >
+                    {cartCount}
+                  </motion.span>
+                )}
+              </span>
+              <span>Carrello</span>
+              {cartCount > 0 && <span className="font-mono">€{cartTotal.toFixed(2)}</span>}
             </motion.button>
           </div>
 

@@ -50,7 +50,7 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
   onOrderCreated,
   onSelectProduct
 }) => {
-  const { currentUser, isBusinessCustomer, productsList, createOrder, vatFactor, vatPercent } = useAdmin();
+  const { currentUser, isBusinessCustomer, productsList, createOrder, vatFactor, vatPercent, minimumOrderEur } = useAdmin();
 
   // Tabs: 'frequent' (Frequenti & Consumabili) | 'history' (Da Ordini Passati) | 'sku' (Inserimento Rapido Codice)
   const [activeTab, setActiveTab] = useState<'frequent' | 'history' | 'sku'>('frequent');
@@ -98,6 +98,9 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
   const vat = isAzienda ? subtotal * (vatPercent / 100) : 0;
   const total = subtotal + vat;
   const totalColli = selectedItems.reduce((acc, item) => acc + item.quantity, 0);
+  // Ordine minimo (sull'imponibile): sotto la soglia il riordino non può partire
+  const belowMinimum = minimumOrderEur > 0 && Math.round(subtotal * 100) < Math.round(minimumOrderEur * 100);
+  const missingForMinimum = Math.max(0, Math.round((minimumOrderEur - subtotal) * 100) / 100);
 
   // Update item quantity
   const handleUpdateQuantity = (productId: string, delta: number) => {
@@ -192,6 +195,10 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
     // Controlli minimi: senza questi dati non potremmo né contattare né consegnare
     if (!(contactPerson || companyOrName).trim()) {
       setSubmitError('Inserisci il nome del referente o della ditta.');
+      return;
+    }
+    if (belowMinimum) {
+      setSubmitError(`Ordine minimo € ${minimumOrderEur.toFixed(2)}: aggiungi ancora € ${missingForMinimum.toFixed(2)} di prodotti per poter inviare il riordino.`);
       return;
     }
     if (!email.trim() || !email.includes('@')) {
@@ -751,10 +758,16 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
                     {failedOrder && <OrderSendFallback order={failedOrder} />}
                   </div>
                 )}
+                {belowMinimum && selectedItems.length > 0 && (
+                  <div role="status" className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-200 text-xs leading-relaxed">
+                    <strong>Ordine minimo € {minimumOrderEur.toFixed(2)}.</strong> Mancano ancora{' '}
+                    <strong>€ {missingForMinimum.toFixed(2)}</strong> per poter inviare il riordino.
+                  </div>
+                )}
                 <button
                   type="button"
                   id="submit-direct-reorder-btn"
-                  disabled={selectedItems.length === 0 || isSubmitting}
+                  disabled={selectedItems.length === 0 || isSubmitting || belowMinimum}
                   onClick={handleSubmitReorder}
                   className="w-full bg-[#0284c7] hover:bg-[#0369a1] disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold py-3.5 px-4 rounded-2xl text-xs sm:text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-sky-950/80 hover:scale-[1.01] active:scale-[0.99]"
                 >

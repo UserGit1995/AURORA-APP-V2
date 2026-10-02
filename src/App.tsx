@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { RotateCcw, ArrowRight, Loader2, RefreshCw } from 'lucide-react';
+import { RotateCcw, ArrowRight, Loader2, RefreshCw, ShoppingBag } from 'lucide-react';
 import { Sidebar, NavTab } from './components/Sidebar';
 import { Header } from './components/Header';
 import { HeroBanner } from './components/HeroBanner';
@@ -53,6 +53,7 @@ export default function App() {
     loginAsUser,
     catalogLoading,
     refreshFromCloud,
+    minimumOrderEur,
   } = useAdmin();
 
   // Indirizzi "profondi": /personalizza, /privacy, /termini-vendita e i link di
@@ -114,6 +115,13 @@ export default function App() {
   const cartCount = useMemo(() => {
     return cart.length;
   }, [cart]);
+
+  // Totali del carrello (colli e imponibile) per pulsante, barra flottante e minimo d'ordine
+  const cartColli = useMemo(() => cart.reduce((acc, item) => acc + item.quantity, 0), [cart]);
+  const cartSubtotal = useMemo(
+    () => cart.reduce((acc, item) => acc + item.product.price * item.quantity, 0),
+    [cart]
+  );
 
   const unreadNotificationsCount = useMemo(() => {
     return notifications.filter((n) => !n.read).length;
@@ -387,6 +395,7 @@ export default function App() {
           unreadNotificationsCount={unreadNotificationsCount}
           unreadInquiriesCount={0}
           isCartPulsing={isCartPulsing}
+          cartTotal={cartSubtotal}
         />
 
         {/* Dynamic Page Views */}
@@ -627,6 +636,39 @@ export default function App() {
       </div>
 
       <ScrollToTopButton />
+
+      {/* Barra carrello flottante: sempre in vista quando ci sono articoli */}
+      {cartColli > 0 && !isCartOpen && (
+        <button
+          id="floating-cart-bar"
+          type="button"
+          onClick={() => setIsCartOpen(true)}
+          className="fixed z-40 right-4 bottom-40 sm:right-6 sm:bottom-24 flex items-center gap-3 pl-3.5 pr-3 py-2.5 rounded-2xl bg-[#0284c7] hover:bg-[#0369a1] text-white shadow-xl shadow-sky-950/70 border border-sky-300/30 active:scale-95 transition-all cursor-pointer"
+          aria-label="Apri il carrello"
+        >
+          <span className="relative">
+            <ShoppingBag className="w-5 h-5" />
+            <span className="absolute -top-2 -right-2.5 min-w-[18px] h-[18px] px-1 bg-amber-400 text-slate-900 text-[10px] font-extrabold rounded-full flex items-center justify-center">
+              {cartColli}
+            </span>
+          </span>
+          <span className="text-left leading-tight">
+            <span className="block text-[11px] font-semibold text-sky-100">Vedi carrello</span>
+            <span className="block text-sm font-extrabold font-mono">€{cartSubtotal.toFixed(2)}</span>
+          </span>
+          <span
+            className={`text-[10px] font-bold px-2 py-1 rounded-full whitespace-nowrap ${
+              minimumOrderEur > 0 && Math.round(cartSubtotal * 100) < Math.round(minimumOrderEur * 100)
+                ? 'bg-amber-400 text-slate-900'
+                : 'bg-emerald-400 text-slate-900'
+            }`}
+          >
+            {minimumOrderEur > 0 && Math.round(cartSubtotal * 100) < Math.round(minimumOrderEur * 100)
+              ? `Mancano €${(minimumOrderEur - cartSubtotal).toFixed(2)}`
+              : 'Pronto da inviare'}
+          </span>
+        </button>
+      )}
 
       {/* Floating Compare Dock (shown when there are items to compare and not in compare view) */}
       {activeTab !== 'confronta' && (

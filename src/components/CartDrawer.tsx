@@ -63,7 +63,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
 }) => {
   const { language, t } = useLanguage();
   const isIt = language === 'it';
-  const { currentUser, createOrder, productsList, vatFactor, vatPercent } = useAdmin();
+  const { currentUser, createOrder, productsList, vatFactor, vatPercent, minimumOrderEur } = useAdmin();
 
   // Step in checkout: 'cart' -> 'form' -> 'success'
   const [step, setStep] = useState<'cart' | 'form' | 'success'>('cart');
@@ -134,6 +134,11 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
   const freeShippingThreshold = 250;
   const remainingForFreeShipping = Math.max(0, freeShippingThreshold - subtotal);
 
+  // Ordine minimo (sull'imponibile): sotto la soglia la richiesta non può partire
+  const missingForMinimum = Math.max(0, Math.round((minimumOrderEur - subtotal) * 100) / 100);
+  const belowMinimum = minimumOrderEur > 0 && Math.round(subtotal * 100) < Math.round(minimumOrderEur * 100);
+  const minimumMessage = `Ordine minimo € ${minimumOrderEur.toFixed(2)}: aggiungi ancora € ${missingForMinimum.toFixed(2)} di prodotti per poter inviare l'ordine.`;
+
   const validateForm = () => {
     const errors: Record<string, string> = {};
     if (!fullName.trim()) errors.fullName = 'Nome e Cognome obbligatori';
@@ -159,12 +164,17 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
   };
 
   const handleProceedToForm = () => {
+    if (belowMinimum) return;
     setStep('form');
   };
 
   const handleSendOrderRequest = async (e: React.FormEvent) => {
     e.preventDefault();
     if (isSending) return;
+    if (belowMinimum) {
+      setSendError(minimumMessage);
+      return;
+    }
     if (!validateForm()) return;
     if (items.length === 0) return;
 
@@ -281,6 +291,36 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
           {/* STEP 1: CART LIST VIEW */}
           {step === 'cart' && (
             <>
+              {/* Ordine minimo: stato sempre visibile */}
+              {items.length > 0 && minimumOrderEur > 0 && (
+                <div
+                  id="cart-minimum-order-banner"
+                  className={`px-5 py-2.5 border-b text-xs flex items-start gap-2 ${
+                    belowMinimum
+                      ? 'bg-amber-500/10 border-amber-500/30 text-amber-200'
+                      : 'bg-emerald-500/10 border-emerald-500/30 text-emerald-200'
+                  }`}
+                >
+                  {belowMinimum ? (
+                    <AlertCircle className="w-4 h-4 shrink-0 mt-px text-amber-400" />
+                  ) : (
+                    <CheckCircle2 className="w-4 h-4 shrink-0 mt-px text-emerald-400" />
+                  )}
+                  <span className="leading-snug">
+                    {belowMinimum ? (
+                      <>
+                        <strong>Ordine minimo € {minimumOrderEur.toFixed(2)}.</strong> Mancano ancora{' '}
+                        <strong>€ {missingForMinimum.toFixed(2)}</strong> per poter inviare l'ordine.
+                      </>
+                    ) : (
+                      <>
+                        <strong>Minimo d'ordine raggiunto</strong> (€ {minimumOrderEur.toFixed(2)}): puoi inviare l'ordine.
+                      </>
+                    )}
+                  </span>
+                </div>
+              )}
+
               {/* Free shipping banner */}
               <div className="px-5 py-2.5 bg-[#0d1420] border-b border-[#1c2433]">
                 <div className="flex justify-between text-xs mb-1">
@@ -630,10 +670,14 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                     <button
                       id="proceed-to-order-form-btn"
                       onClick={handleProceedToForm}
-                      className="flex-1 bg-[#0284c7] hover:bg-[#0369a1] text-white font-bold py-3 px-4 rounded-xl text-sm transition-all duration-150 flex items-center justify-center gap-2 shadow-lg shadow-sky-950/60"
+                      disabled={belowMinimum}
+                      title={belowMinimum ? minimumMessage : undefined}
+                      className="flex-1 bg-[#0284c7] hover:bg-[#0369a1] disabled:bg-slate-700 disabled:text-slate-400 disabled:cursor-not-allowed disabled:shadow-none text-white font-bold py-3 px-4 rounded-xl text-sm transition-all duration-150 flex items-center justify-center gap-2 shadow-lg shadow-sky-950/60"
                     >
-                      <span>Compila Dati e Invia Ordine</span>
-                      <ArrowRight className="w-4 h-4" />
+                      <span>
+                        {belowMinimum ? `Mancano € ${missingForMinimum.toFixed(2)} al minimo` : 'Compila Dati e Invia Ordine'}
+                      </span>
+                      {!belowMinimum && <ArrowRight className="w-4 h-4" />}
                     </button>
                   </div>
 
@@ -941,6 +985,11 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
 
               {/* Form Footer */}
               <div className="p-4 sm:p-5 border-t border-[#1c2433] bg-[#0d1420] space-y-3">
+                {belowMinimum && (
+                  <div role="alert" className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-200 text-xs leading-relaxed">
+                    {minimumMessage}
+                  </div>
+                )}
                 {sendError && (
                   <div role="alert" className="p-3 rounded-xl bg-red-500/10 border border-red-500/40 text-red-200 text-xs leading-relaxed">
                     {sendError}
@@ -969,8 +1018,8 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                   <button
                     type="submit"
                     id="confirm-send-order-email-btn"
-                    disabled={isSending}
-                    className="flex-1 bg-[#0284c7] hover:bg-[#0369a1] disabled:opacity-60 disabled:cursor-wait text-white font-bold py-3 px-4 rounded-xl text-xs sm:text-sm transition-all duration-150 flex items-center justify-center gap-2 shadow-lg shadow-sky-950/60"
+                    disabled={isSending || belowMinimum}
+                    className="flex-1 bg-[#0284c7] hover:bg-[#0369a1] disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold py-3 px-4 rounded-xl text-xs sm:text-sm transition-all duration-150 flex items-center justify-center gap-2 shadow-lg shadow-sky-950/60"
                   >
                     <Send className="w-4 h-4" />
                     <span>{isSending ? 'Invio in corso…' : `Invia Richiesta Ordine (${items.reduce((acc, i) => acc + i.quantity, 0)} colli)`}</span>
