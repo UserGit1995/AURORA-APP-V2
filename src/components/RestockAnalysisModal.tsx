@@ -1,26 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { 
-  Sparkles, 
-  X, 
-  AlertTriangle, 
-  TrendingUp, 
-  Package, 
-  ShoppingCart, 
-  RotateCcw, 
-  Check, 
-  Info, 
-  Clock, 
-  Plus, 
-  Minus, 
-  ChevronRight, 
-  RefreshCw, 
-  ArrowRight,
-  ShieldAlert,
-  Calendar,
-  Layers,
-  Flame,
-  CheckCircle2
-} from 'lucide-react';
+import { Star, X, AlertTriangle, TrendingUp, Package, ShoppingCart, RotateCcw, Check, Info, Clock, Plus, Minus, ChevronRight, RefreshCw, ArrowRight, ShieldAlert, Calendar, Layers, Flame, CheckCircle2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Order, Product, RestockAnalysisResult, RestockRecommendation } from '../types';
 import { fetchRestockAnalysis } from '../services/restockService';
@@ -161,17 +140,13 @@ export const RestockAnalysisModal: React.FC<RestockAnalysisModalProps> = ({
         <div className="p-5 sm:p-6 border-b border-[#1c2433] bg-gradient-to-r from-white via-slate-50 to-sky-50 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3">
             <div className="p-2.5 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-sky-500/20 text-sky-300 border border-sky-500/30 shadow-inner">
-              <Sparkles className="w-6 h-6 text-sky-400 animate-pulse" />
+              <Star className="w-6 h-6 text-sky-400 animate-pulse" />
             </div>
             <div>
               <div className="flex items-center gap-2 flex-wrap">
                 <h3 className="text-lg sm:text-xl font-bold text-white tracking-tight">
-                  Analisi Riordino & Previsione Scorte AI
+                  Analisi Riordino & Previsione Scorte
                 </h3>
-                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10.5px] font-bold bg-sky-500/15 text-sky-300 border border-sky-500/30">
-                  <Sparkles className="w-3 h-3 text-sky-400" />
-                  <span>Gemini 3.7 Flash</span>
-                </span>
               </div>
               <p className="text-xs text-slate-400 mt-0.5">
                 Stima predittiva del fabbisogno di magazzino basata sui volumi storici d'acquisto e rotazione scorte.
@@ -185,7 +160,7 @@ export const RestockAnalysisModal: React.FC<RestockAnalysisModalProps> = ({
               onClick={loadAnalysis}
               disabled={loading}
               className="p-2 rounded-xl text-slate-400 hover:text-sky-300 hover:bg-[#1a2230] border border-[#1c2433] transition-colors disabled:opacity-50"
-              title="Ricalcola analisi con Gemini"
+              title="Ricalcola analisi"
             >
               <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin text-sky-400' : ''}`} />
             </button>
@@ -205,11 +180,11 @@ export const RestockAnalysisModal: React.FC<RestockAnalysisModalProps> = ({
             <div className="py-16 text-center flex flex-col items-center justify-center space-y-4">
               <div className="relative">
                 <div className="w-14 h-14 rounded-full border-3 border-sky-500/20 border-t-sky-400 animate-spin flex items-center justify-center" />
-                <Sparkles className="w-6 h-6 text-sky-400 absolute inset-0 m-auto animate-pulse" />
+                <Star className="w-6 h-6 text-sky-400 absolute inset-0 m-auto animate-pulse" />
               </div>
               <div className="max-w-md">
                 <h4 className="text-base font-bold text-white">
-                  Gemini sta analizzando lo storico acquisti e i livelli di magazzino...
+                  Analisi in corso dello storico acquisti e i livelli di magazzino...
                 </h4>
                 <p className="text-xs text-slate-400 mt-1">
                   Correlazione run-rate delle ultime settimane, stima giorni di copertura ed elaborazione quantità ottimali di riordino B2B.
@@ -235,8 +210,8 @@ export const RestockAnalysisModal: React.FC<RestockAnalysisModalProps> = ({
                   <div className="space-y-1.5 flex-1">
                     <div className="flex items-center gap-2">
                       <span className="text-[11px] font-bold uppercase tracking-wider text-sky-400 flex items-center gap-1.5">
-                        <Sparkles className="w-3.5 h-3.5" />
-                        <span>Sintesi Esecutiva AI</span>
+                        <Star className="w-3.5 h-3.5" />
+                        <span>Sintesi Esecutiva</span>
                       </span>
                       {analysisResult.criticalItemsCount > 0 && (
                         <span className="px-2 py-0.5 rounded-md text-[10.5px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30 flex items-center gap-1">
@@ -461,7 +436,7 @@ export const RestockAnalysisModal: React.FC<RestockAnalysisModalProps> = ({
 
                               {/* AI Rationale explanation */}
                               <div className="mt-2 text-xs text-slate-400 bg-[#0d1420] border border-[#1c2433] rounded-xl p-2.5 flex items-start gap-2">
-                                <Sparkles className="w-3.5 h-3.5 text-sky-400 shrink-0 mt-0.5" />
+                                <Star className="w-3.5 h-3.5 text-sky-400 shrink-0 mt-0.5" />
                                 <p className="leading-relaxed text-[11.5px] text-slate-400">
                                   {rec.rationale}
                                 </p>

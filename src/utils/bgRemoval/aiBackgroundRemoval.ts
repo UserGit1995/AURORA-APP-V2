@@ -29,7 +29,7 @@ export async function performAIBackgroundRemoval(
 ): Promise<CutoutResult> {
   const inputBlob = await canvasToBlob(source, 'image/png');
 
-  onProgress?.({ stage: 'Inizializzazione rete neurale AI...', percent: 12 });
+  onProgress?.({ stage: 'Inizializzazione...', percent: 12 });
 
   try {
     const { removeBackground } = await import('@imgly/background-removal');
@@ -41,7 +41,7 @@ export async function performAIBackgroundRemoval(
         const ratio = total > 0 ? Math.min(1, Math.max(0, current / total)) : 0.5;
         if (key.startsWith('fetch')) {
           onProgress?.({
-            stage: 'Caricamento modello AI (solo la prima volta)...',
+            stage: 'Caricamento modello (solo la prima volta)...',
             percent: Math.round(15 + ratio * 45),
           });
         } else {

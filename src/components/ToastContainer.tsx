@@ -1,16 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Truck, 
-  CheckCircle2, 
-  Package, 
-  AlertCircle, 
-  Info, 
-  X, 
-  ArrowRight, 
-  ExternalLink,
-  Sparkles,
-  ChevronRight
-} from 'lucide-react';
+import { Truck, CheckCircle2, Package, AlertCircle, Info, X, ArrowRight, ExternalLink, Star, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ToastNotification } from '../types';
 

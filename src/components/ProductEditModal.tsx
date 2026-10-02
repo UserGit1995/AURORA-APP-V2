@@ -1,19 +1,5 @@
 import React, { useState } from 'react';
-import { 
-  X, 
-  Save, 
-  Trash2, 
-  Image as ImageIcon, 
-  Sparkles, 
-  Check, 
-  Layers, 
-  Tag, 
-  Package, 
-  ShieldAlert, 
-  AlertCircle,
-  Plus,
-  Scissors
-} from 'lucide-react';
+import { X, Save, Trash2, Image as ImageIcon, Star, Check, Layers, Tag, Package, ShieldAlert, AlertCircle, Plus, Scissors } from 'lucide-react';
 import { Product, Category } from '../types';
 import { useAdmin } from '../context/AdminContext';
 import { ProductImageUploader } from './ProductImageUploader';
@@ -169,7 +155,7 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
         <div className="p-4 sm:p-5 border-b border-amber-500/20 bg-[#0d1420] flex items-center justify-between gap-3 shrink-0">
           <div className="flex items-center gap-2.5">
             <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-400 flex items-center justify-center font-bold">
-              <Sparkles className="w-5 h-5" />
+              <Star className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
@@ -395,7 +381,7 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
             className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-sm font-bold transition-colors cursor-pointer"
           >
             <Scissors className="w-4 h-4" />
-            {hasRealImage(formData.image) ? 'Rimuovi / cambia sfondo della foto (AI)' : 'Carica e scontorna una foto (AI)'}
+            {hasRealImage(formData.image) ? 'Rimuovi / cambia sfondo della foto' : 'Carica e scontorna una foto'}
           </button>
           <p className="text-[11px] text-slate-500 -mt-3">
             Dopo «Usa questa immagine» la nuova foto compare qui sopra: premi «Salva Modifiche» per renderla definitiva.

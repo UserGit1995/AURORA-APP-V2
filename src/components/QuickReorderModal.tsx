@@ -1,27 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { 
-  X, 
-  RotateCcw, 
-  RotateCw, 
-  Plus, 
-  Minus, 
-  Trash2, 
-  CheckCircle2, 
-  FileText, 
-  Download, 
-  Search, 
-  Building2, 
-  User, 
-  Truck, 
-  Store, 
-  AlertCircle,
-  Package,
-  Send,
-  Loader2,
-  Clock,
-  ChevronRight,
-  Sparkles
-} from 'lucide-react';
+import { X, RotateCcw, RotateCw, Plus, Minus, Trash2, CheckCircle2, FileText, Download, Search, Building2, User, Truck, Store, AlertCircle, Package, Send, Loader2, Clock, ChevronRight, Star } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Product, Order, CustomerType, DeliveryOption } from '../types';
 import { newOrderNumber } from '../services/supabase';
@@ -348,7 +326,7 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
                       : 'text-slate-400 hover:text-slate-300'
                   }`}
                 >
-                  <Sparkles className="w-3.5 h-3.5" />
+                  <Star className="w-3.5 h-3.5" />
                   <span>Consumabili Frequenti</span>
                 </button>
 

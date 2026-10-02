@@ -1,20 +1,5 @@
 import React, { useState } from 'react';
-import { 
-  Mail, 
-  Send, 
-  Copy, 
-  Check, 
-  X, 
-  AlertCircle, 
-  Clock, 
-  Building2, 
-  Truck, 
-  FileText, 
-  Sparkles,
-  ExternalLink,
-  MessageSquare,
-  ChevronDown
-} from 'lucide-react';
+import { Mail, Send, Copy, Check, X, AlertCircle, Clock, Building2, Truck, FileText, Star, ExternalLink, MessageSquare, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Order } from '../types';
 import { postToShop } from '../services/orderSubmit';
@@ -313,7 +298,7 @@ export const OrderInquiryModal: React.FC<OrderInquiryModalProps> = ({
         <div className="bg-[#0d1420] border border-[#1c2433] rounded-2xl p-4 mb-4 space-y-3 shadow-inner">
           <div className="flex items-center justify-between pb-2 border-b border-[#1c2433] text-xs">
             <span className="font-bold text-sky-400 uppercase tracking-wider flex items-center gap-1.5 text-[11px]">
-              <Sparkles className="w-3.5 h-3.5" />
+              <Star className="w-3.5 h-3.5" />
               Anteprima Bozza E-mail B2B
             </span>
             <div className="flex items-center gap-2">

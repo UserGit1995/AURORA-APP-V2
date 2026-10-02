@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { Folder, ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
+import { Folder, ChevronLeft, ChevronRight, Star } from 'lucide-react';
 import { Category } from '../types';
 import { useLanguage } from '../context/LanguageContext';
 
@@ -87,7 +87,7 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
           }`}
         >
           <span className="p-2 rounded-xl bg-[#0e1b30]/15 w-fit">
-            <Sparkles className="w-5 h-5" />
+            <Star className="w-5 h-5" />
           </span>
           <div>
             <div className="font-bold text-sm leading-tight">Catalogo completo</div>

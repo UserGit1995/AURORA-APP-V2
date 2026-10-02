@@ -1,34 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { 
-  X, 
-  Plus, 
-  Minus, 
-  Trash2, 
-  ShoppingBag, 
-  ArrowRight, 
-  CheckCircle2, 
-  ShieldCheck,
-  Building2,
-  User,
-  Truck,
-  Store,
-  Mail,
-  Phone,
-  MapPin,
-  FileText,
-  CreditCard,
-  Send,
-  AlertCircle,
-  Clock,
-  Bookmark,
-  BookmarkPlus,
-  BookmarkCheck,
-  Sparkles,
-  Layers,
-  RotateCw,
-  Check,
-  Package
-} from 'lucide-react';
+import { X, Plus, Minus, Trash2, ShoppingBag, ArrowRight, CheckCircle2, ShieldCheck, Building2, User, Truck, Store, Mail, Phone, MapPin, FileText, CreditCard, Send, AlertCircle, Clock, Bookmark, BookmarkPlus, BookmarkCheck, Star, Layers, RotateCw, Check, Package } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { CartItem, Order, CustomerType, DeliveryOption, OrderTemplate } from '../types';
 import { OrderTemplateModal } from './OrderTemplateModal';
@@ -472,7 +443,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                     <div className="space-y-2.5">
                       <div className="flex items-center justify-between">
                         <span className="text-xs font-bold uppercase tracking-wider text-sky-400 flex items-center gap-1.5">
-                          <Sparkles className="w-3.5 h-3.5" />
+                          <Star className="w-3.5 h-3.5" />
                           <span>{isIt ? 'Carica un Modello di Riordino Rapido:' : 'Load a Quick Restock Template:'}</span>
                         </span>
                         <button

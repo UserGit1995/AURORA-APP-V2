@@ -10,19 +10,7 @@ import {
   Legend,
   ReferenceLine,
 } from 'recharts';
-import {
-  TrendingUp,
-  Activity,
-  Calendar,
-  Layers,
-  ArrowUpRight,
-  ArrowDownRight,
-  Sparkles,
-  Zap,
-  RotateCw,
-  Info,
-  CheckCircle2,
-} from 'lucide-react';
+import { TrendingUp, Activity, Calendar, Layers, ArrowUpRight, ArrowDownRight, Star, Zap, RotateCw, Info, CheckCircle2 } from 'lucide-react';
 
 export interface CategoryVelocityData {
   id: string;
@@ -696,13 +684,13 @@ export const PurchaseVelocityChart: React.FC = () => {
       {/* AI Purchase Velocity Insights Note */}
       <div className="bg-[#0d1420] border border-sky-500/30 rounded-2xl p-3 px-4 flex items-start gap-3">
         <div className="p-1.5 rounded-xl bg-sky-500/20 text-sky-400 shrink-0 mt-0.5">
-          <Sparkles className="w-4 h-4" />
+          <Star className="w-4 h-4" />
         </div>
         <div className="text-xs">
           <h5 className="font-bold text-sky-200 flex items-center gap-1.5">
             <span>Analisi Predittiva Velocità & Consumi B2B</span>
             <span className="text-[10px] px-1.5 py-0.2 rounded bg-sky-500/20 text-sky-300 font-mono">
-              Algoritmo Aurora AI
+              Algoritmo Aurora
             </span>
           </h5>
           <p className="text-slate-400 mt-0.5 leading-relaxed">

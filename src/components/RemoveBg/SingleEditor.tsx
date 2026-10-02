@@ -1,24 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import {
-  Scissors,
-  Download,
-  Sparkles,
-  RefreshCw,
-  Eraser,
-  Paintbrush,
-  Check,
-  Crop,
-  Undo2,
-  Redo2,
-  Wand2,
-  Upload,
-  ZoomIn,
-  ZoomOut,
-  Save,
-  FolderOpen,
-  AlertTriangle,
-  Loader2,
-} from 'lucide-react';
+import { Scissors, Download, Star, RefreshCw, Eraser, Paintbrush, Check, Crop, Undo2, Redo2, Wand2, Upload, ZoomIn, ZoomOut, Save, FolderOpen, AlertTriangle, Loader2 } from 'lucide-react';
 import {
   createCanvas,
   pixelCtx,
@@ -112,7 +93,7 @@ export const SingleEditor: React.FC<SingleEditorProps> = ({
 
   // ---- stato interfaccia ----
   const [status, setStatus] = useState<Status>('empty');
-  const [progress, setProgress] = useState<CutoutProgress>({ stage: 'Inizializzazione AI...', percent: 10 });
+  const [progress, setProgress] = useState<CutoutProgress>({ stage: 'Inizializzazione...', percent: 10 });
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [usedFallback, setUsedFallback] = useState(false);
   const [sourceName, setSourceName] = useState('');
@@ -767,7 +748,7 @@ export const SingleEditor: React.FC<SingleEditorProps> = ({
 
             <div className="grid grid-cols-3 gap-1.5 text-xs font-semibold">
               {toolBtn('draw', 'Pennello', <Paintbrush className="w-3.5 h-3.5" />)}
-              {toolBtn('magic', 'Bacchetta', <Sparkles className="w-3.5 h-3.5" />)}
+              {toolBtn('magic', 'Bacchetta', <Star className="w-3.5 h-3.5" />)}
               {toolBtn('lasso', 'Lazo', <Scissors className="w-3.5 h-3.5" />)}
             </div>
 
@@ -884,7 +865,7 @@ export const SingleEditor: React.FC<SingleEditorProps> = ({
                   style={{ background: gradientCss(GRADIENTS.find((g) => g.id === scene.gradientId) ?? GRADIENTS[0]) }}
                 />
               )}
-              {backdropBtn('blur', 'Sfocatura Bokeh', <Sparkles className="w-4 h-4 text-emerald-400 shrink-0" />)}
+              {backdropBtn('blur', 'Sfocatura Bokeh', <Star className="w-4 h-4 text-emerald-400 shrink-0" />)}
             </div>
 
             {scene.backdropType === 'color' && (
@@ -1017,14 +998,14 @@ export const SingleEditor: React.FC<SingleEditorProps> = ({
               <div className="absolute top-3 left-1/2 -translate-x-1/2 z-20 max-w-md w-[calc(100%-2rem)] flex items-start gap-2 p-3 rounded-xl bg-amber-500/15 border border-amber-500/40 text-amber-200 text-xs shadow-xl backdrop-blur">
                 <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
                 <div className="flex-1">
-                  Il modello AI non è stato raggiunto (serve internet la prima volta): ho usato il metodo semplice,
+                  Il modello di scontorno non è stato raggiunto (serve internet la prima volta): ho usato il metodo semplice,
                   che funziona bene solo con sfondi uniformi. Rifinisci con Pennello e Bacchetta oppure riprova.
                   <button
                     type="button"
                     onClick={() => lastSourceRef.current && runCutout(lastSourceRef.current.url, lastSourceRef.current.name)}
                     className="ml-2 font-bold underline hover:text-white"
                   >
-                    Riprova con l'AI
+                    Riprova lo scontorno avanzato
                   </button>
                 </div>
               </div>
@@ -1056,7 +1037,7 @@ export const SingleEditor: React.FC<SingleEditorProps> = ({
                     {product ? `Nessuna foto per «${product.name}»` : 'Carica una foto da scontornare'}
                   </h4>
                   <p className="text-xs text-slate-400">
-                    Trascina qui un'immagine oppure scegli un file: l'AI toglie lo sfondo in pochi secondi.
+                    Trascina qui un'immagine oppure scegli un file: lo sfondo viene tolto in pochi secondi.
                   </p>
                 </div>
                 <div className="flex flex-wrap items-center justify-center gap-2">

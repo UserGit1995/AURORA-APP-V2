@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Search, SkipForward, Loader2, KeyRound, Check, AlertTriangle, Sparkles } from 'lucide-react';
+import { Search, SkipForward, Loader2, KeyRound, Check, AlertTriangle, Star } from 'lucide-react';
 import { useAdmin } from '../context/AdminContext';
 import { getSupabase } from '../services/supabase';
 
@@ -217,7 +217,7 @@ export const ImageFinderPanel: React.FC = () => {
   return (
     <div className="p-4 sm:p-6 space-y-4 text-left">
       <div className="flex items-center gap-2">
-        <Sparkles className="w-4 h-4 text-sky-400" />
+        <Star className="w-4 h-4 text-sky-400" />
         <h3 className="text-sm font-bold text-white">Trova immagini mancanti</h3>
       </div>
 

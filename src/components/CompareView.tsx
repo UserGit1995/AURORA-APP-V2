@@ -1,26 +1,5 @@
 import React, { useState } from 'react';
-import { 
-  Scale, 
-  X, 
-  Plus, 
-  Trash2, 
-  ShoppingBag, 
-  Check, 
-  ShieldCheck, 
-  Sparkles, 
-  ArrowLeft, 
-  FileText, 
-  CheckCircle2, 
-  AlertCircle, 
-  Layers, 
-  Boxes, 
-  Droplet, 
-  FileSpreadsheet, 
-  SlidersHorizontal,
-  Info,
-  ExternalLink,
-  Package
-} from 'lucide-react';
+import { Scale, X, Plus, Trash2, ShoppingBag, Check, ShieldCheck, Star, ArrowLeft, FileText, CheckCircle2, AlertCircle, Layers, Boxes, Droplet, FileSpreadsheet, SlidersHorizontal, Info, ExternalLink, Package } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Product } from '../types';
 import { useAdmin } from '../context/AdminContext';

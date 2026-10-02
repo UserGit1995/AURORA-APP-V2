@@ -1,26 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Html5Qrcode } from 'html5-qrcode';
-import { 
-  QrCode, 
-  X, 
-  Camera, 
-  RefreshCw, 
-  Check, 
-  AlertCircle, 
-  ShoppingCart, 
-  Plus, 
-  Minus, 
-  ArrowRight, 
-  Upload, 
-  Sparkles,
-  Volume2,
-  VolumeX,
-  Layers,
-  Search,
-  ExternalLink,
-  Zap,
-  Info
-} from 'lucide-react';
+import { QrCode, X, Camera, RefreshCw, Check, AlertCircle, ShoppingCart, Plus, Minus, ArrowRight, Upload, Star, Volume2, VolumeX, Layers, Search, ExternalLink, Zap, Info } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Product } from '../types';
 import { useAdmin } from '../context/AdminContext';
@@ -562,7 +542,7 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({
           <div className="bg-[#0d1420] border border-[#1c2433] rounded-2xl p-3.5 space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5 text-sky-400" />
+                <Star className="w-3.5 h-3.5 text-sky-400" />
                 <span>Oppure testa codici SKU rapidi</span>
               </span>
               <span className="text-[10px] text-slate-400">Clicca per simulare scansione</span>

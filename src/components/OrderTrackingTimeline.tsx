@@ -1,21 +1,5 @@
 import React, { useState } from 'react';
-import { 
-  FileCheck, 
-  PackageCheck, 
-  Truck, 
-  CheckCircle2, 
-  Clock, 
-  AlertCircle, 
-  MapPin, 
-  Calendar, 
-  ChevronDown, 
-  ChevronUp, 
-  Check, 
-  ShieldCheck,
-  Building2,
-  Info,
-  Sparkles
-} from 'lucide-react';
+import { FileCheck, PackageCheck, Truck, CheckCircle2, Clock, AlertCircle, MapPin, Calendar, ChevronDown, ChevronUp, Check, ShieldCheck, Building2, Info, Star } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Order } from '../types';
 import { useLanguage } from '../context/LanguageContext';

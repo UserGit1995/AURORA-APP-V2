@@ -1,22 +1,5 @@
 import React from 'react';
-import { 
-  Home, 
-  LayoutGrid, 
-  Tag, 
-  Sparkles, 
-  Flame, 
-  ClipboardList, 
-  Heart, 
-  Scale, 
-  Menu, 
-  X, 
-  LogIn,
-  LogOut,
-  SlidersHorizontal,
-  Palette,
-  ShieldCheck,
-  FileText
-} from 'lucide-react';
+import { Home, LayoutGrid, Tag, Star, Flame, ClipboardList, Heart, Scale, Menu, X, LogIn, LogOut, SlidersHorizontal, Palette, ShieldCheck, FileText } from 'lucide-react';
 import { AuroraLogo } from './AuroraLogo';
 import { useLanguage } from '../context/LanguageContext';
 import { useAdmin } from '../context/AdminContext';
@@ -54,7 +37,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: 'home', label: t('nav.home', 'Home'), icon: <Home className="w-[18px] h-[18px]" /> },
     { id: 'categorie', label: t('nav.categories', 'Categorie'), icon: <LayoutGrid className="w-[18px] h-[18px]" /> },
     { id: 'offerte', label: t('nav.deals', 'Offerte Speciali'), icon: <Tag className="w-[18px] h-[18px]" /> },
-    { id: 'novita', label: t('nav.news', 'Novità Eco & Bio'), icon: <Sparkles className="w-[18px] h-[18px]" /> },
+    { id: 'novita', label: t('nav.news', 'Novità Eco & Bio'), icon: <Star className="w-[18px] h-[18px]" /> },
     { id: 'piu-venduti', label: t('nav.bestsellers', 'I più venduti'), icon: <Flame className="w-[18px] h-[18px]" /> },
     { id: 'ordini', label: t('nav.orders', 'I miei Ordini'), icon: <ClipboardList className="w-[18px] h-[18px]" /> },
     { 

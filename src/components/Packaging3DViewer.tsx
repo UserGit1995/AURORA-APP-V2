@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
-import { RotateCw, ZoomIn, ZoomOut, RefreshCw, Camera, Eye, Sparkles } from "lucide-react";
+import { RotateCw, ZoomIn, ZoomOut, RefreshCw, Camera, Eye, Star } from "lucide-react";
 
 export interface Product3DConfig {
   category: "kraft_bags" | "pizza_boxes" | "pinsa_boxes" | "shoppers" | "napkins" | "cups";
@@ -309,7 +309,7 @@ export function Packaging3DViewer({ config, className = "", onTakeSnapshot }: Pa
       {/* Bottom Bar Controls & Info */}
       <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between pointer-events-none">
         <div className="pointer-events-auto bg-[#081326]/90 backdrop-blur-md px-3.5 py-2 rounded-xl border border-[#1c2433] shadow-sm flex items-center gap-2 text-xs font-semibold text-white">
-          <Sparkles className="w-4 h-4 text-sky-400 animate-pulse" />
+          <Star className="w-4 h-4 text-sky-400 animate-pulse" />
           <span>Anteprima 3D Reale Vetrina</span>
         </div>
 

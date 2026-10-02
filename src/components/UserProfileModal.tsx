@@ -1,25 +1,5 @@
 import React, { useState } from 'react';
-import { 
-  X, 
-  Building2, 
-  User, 
-  Mail, 
-  Phone, 
-  FileText, 
-  CheckCircle2, 
-  Shield, 
-  TrendingUp, 
-  Activity, 
-  CreditCard,
-  Download,
-  Calendar,
-  Layers,
-  ArrowUpRight,
-  LogIn,
-  LogOut,
-  ShoppingBag,
-  Sparkles
-} from 'lucide-react';
+import { X, Building2, User, Mail, Phone, FileText, CheckCircle2, Shield, TrendingUp, Activity, CreditCard, Download, Calendar, Layers, ArrowUpRight, LogIn, LogOut, ShoppingBag, Star } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { PurchaseVelocityChart } from './PurchaseVelocityChart';
 import { useAdmin } from '../context/AdminContext';

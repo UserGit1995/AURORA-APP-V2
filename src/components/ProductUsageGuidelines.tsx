@@ -1,22 +1,5 @@
 import React, { useState } from 'react';
-import { 
-  FlaskConical, 
-  ShieldAlert, 
-  Droplets, 
-  Clock, 
-  Thermometer, 
-  CheckCircle2, 
-  AlertTriangle, 
-  FileText, 
-  Sparkles, 
-  Calculator, 
-  Layers, 
-  Wind, 
-  Eye, 
-  Hand, 
-  Ban,
-  Info
-} from 'lucide-react';
+import { FlaskConical, ShieldAlert, Droplets, Clock, Thermometer, CheckCircle2, AlertTriangle, FileText, Star, Calculator, Layers, Wind, Eye, Hand, Ban, Info } from 'lucide-react';
 import { Product } from '../types';
 
 interface ProductUsageGuidelinesProps {

@@ -1,18 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import {
-  Scissors,
-  Download,
-  Sparkles,
-  RefreshCw,
-  Upload,
-  FileArchive,
-  FolderOpen,
-  Trash2,
-  Save,
-  Square,
-  CheckCircle2,
-  AlertTriangle,
-} from 'lucide-react';
+import { Scissors, Download, Star, RefreshCw, Upload, FileArchive, FolderOpen, Trash2, Save, Square, CheckCircle2, AlertTriangle } from 'lucide-react';
 import {
   createCanvas,
   loadImage,
@@ -170,7 +157,7 @@ export const BatchEditor: React.FC<BatchEditorProps> = ({ notify, onPickFromCata
       patchItem(item.id, { status: 'done', resultBlob: blob, resultUrl });
       work = null as unknown as HTMLCanvasElement;
       if (result.usedFallback) {
-        notify('err', 'Modello AI non raggiunto: per alcune foto è stato usato il metodo semplice.');
+        notify('err', 'Modello di scontorno non raggiunto: per alcune foto è stato usato il metodo semplice.');
       }
     } catch (err) {
       console.error('Errore elaborazione batch:', err);
@@ -367,7 +354,7 @@ export const BatchEditor: React.FC<BatchEditorProps> = ({ notify, onPickFromCata
               disabled={pending === 0}
               className="px-3 py-1 rounded bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold flex items-center gap-1 cursor-pointer transition shadow-sm disabled:opacity-50"
             >
-              <Sparkles className="w-3.5 h-3.5" />
+              <Star className="w-3.5 h-3.5" />
               <span>Scontorna Tutto ({pending})</span>
             </button>
           )}
@@ -410,13 +397,13 @@ export const BatchEditor: React.FC<BatchEditorProps> = ({ notify, onPickFromCata
         <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
           <div>
             <h3 className="text-lg font-bold text-white flex flex-wrap items-center gap-2">
-              <span>Batch Cutout AI — Elaborazione Multipla</span>
+              <span>Scontorno Multiplo — Elaborazione in blocco</span>
               <span className="text-xs px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-mono font-bold">
                 {items.length} foto in coda
               </span>
             </h3>
             <p className="text-xs text-slate-400 mt-0.5">
-              Aggiungi più foto (dal PC o dal catalogo): l'AI toglie lo sfondo a tutte. Poi scarichi un unico ZIP oppure
+              Aggiungi più foto (dal PC o dal catalogo): lo sfondo viene tolto a tutte. Poi scarichi un unico ZIP oppure
               sostituisci direttamente le foto dei prodotti.
             </p>
           </div>

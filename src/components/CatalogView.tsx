@@ -1,26 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { 
-  Folder, 
-  Tag, 
-  Sparkles, 
-  Flame, 
-  Filter, 
-  Heart, 
-  Plus, 
-  Check, 
-  Search, 
-  SlidersHorizontal, 
-  Scale, 
-  CheckSquare, 
-  Square, 
-  ShoppingBag, 
-  X, 
-  Layers, 
-  CheckCircle2,
-  FileSpreadsheet,
-  Download,
-  Loader2
-} from 'lucide-react';
+import { Folder, Tag, Star, Flame, Filter, Heart, Plus, Check, Search, SlidersHorizontal, Scale, CheckSquare, Square, ShoppingBag, X, Layers, CheckCircle2, FileSpreadsheet, Download, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Category, Product } from '../types';
 import { parseQuery, scoreAllProducts } from '../utils/productSearch';
@@ -116,7 +95,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
         return {
           title: 'Nuovi Arrivi e Nuove Formulazioni',
           description: 'Le ultime novità in catalogo per igiene professionale e sanificazione avanzata.',
-          icon: <Sparkles className="w-5 h-5 text-sky-400" />,
+          icon: <Star className="w-5 h-5 text-sky-400" />,
         };
       case 'piu-venduti':
         return {
@@ -339,10 +318,10 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
               id="catalog-restock-analysis-btn"
               onClick={() => onOpenRestockAnalysis()}
               className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 text-white text-xs font-bold shadow-md shadow-sky-950/40 transition-all hover:scale-[1.02] shrink-0"
-              title="Analisi previsionale del riordino merci con Gemini AI"
+              title="Analisi previsionale del riordino merci"
             >
-              <Sparkles className="w-3.5 h-3.5 text-sky-200 animate-pulse" />
-              <span>Analisi Riordino AI</span>
+              <Star className="w-3.5 h-3.5 text-sky-200 animate-pulse" />
+              <span>Analisi Riordino</span>
             </button>
           )}
         </div>
@@ -782,11 +761,11 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                           onOpenRestockAnalysis?.(product.id);
                         }}
                         className="inline-flex items-center gap-1 text-[9px] font-bold bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/35 px-1.5 py-0.5 rounded-md transition-colors cursor-pointer"
-                        title={`Scorte basse (${product.stock} colli). Clicca per analisi riordino Gemini AI`}
+                        title={`Scorte basse (${product.stock} colli). Clicca per analisi riordino`}
                       >
                         <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse" />
                         <span>Scorte basse</span>
-                        <Sparkles className="w-2.5 h-2.5 text-rose-300 ml-0.5" />
+                        <Star className="w-2.5 h-2.5 text-rose-300 ml-0.5" />
                       </button>
                     )}
                   </div>
@@ -800,9 +779,9 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                           onOpenRestockAnalysis(product.id);
                         }}
                         className="p-1.5 rounded-full backdrop-blur-xs transition-colors shrink-0 text-slate-400 hover:text-sky-300 bg-[#111826]/80 hover:bg-[#1a2230]"
-                        title="Analisi Riordino AI per questo prodotto"
+                        title="Analisi Riordino per questo prodotto"
                       >
-                        <Sparkles className="w-3.5 h-3.5" />
+                        <Star className="w-3.5 h-3.5" />
                       </button>
                     )}
                     {onToggleCompare && (

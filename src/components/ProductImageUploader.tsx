@@ -1,16 +1,5 @@
 import React, { useState, useRef, useCallback } from 'react';
-import { 
-  UploadCloud, 
-  Image as ImageIcon, 
-  Trash2, 
-  Check, 
-  Link2, 
-  Sparkles, 
-  Eye, 
-  AlertCircle,
-  RefreshCw,
-  FolderOpen
-} from 'lucide-react';
+import { UploadCloud, Image as ImageIcon, Trash2, Check, Link2, Star, Eye, AlertCircle, RefreshCw, FolderOpen } from 'lucide-react';
 
 interface ProductImageUploaderProps {
   currentImage?: string;
@@ -237,7 +226,7 @@ export const ProductImageUploader: React.FC<ProductImageUploaderProps> = ({
                 : 'text-slate-400 hover:text-white'
             }`}
           >
-            <Sparkles className="w-3.5 h-3.5" />
+            <Star className="w-3.5 h-3.5" />
             <span>Preset</span>
           </button>
         </div>

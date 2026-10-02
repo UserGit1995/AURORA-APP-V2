@@ -1,28 +1,6 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useState, type ReactNode } from "react";
-import {
-  Menu,
-  Bell,
-  Home as HomeIcon,
-  LayoutGrid,
-  Search,
-  ClipboardList,
-  Phone,
-  X,
-  Tag,
-  Sparkles,
-  Info,
-  MapPin,
-  FileText,
-  LogIn,
-  LogOut,
-  Shield,
-  ShoppingBag,
-  Heart,
-  Scale,
-  Zap,
-  Flame,
-} from "lucide-react";
+import { Menu, Bell, Home as HomeIcon, LayoutGrid, Search, ClipboardList, Phone, X, Tag, Star, Info, MapPin, FileText, LogIn, LogOut, Shield, ShoppingBag, Heart, Scale, Zap, Flame } from "lucide-react";
 import { AuroraLogo } from "./AuroraLogo";
 import { Footer } from "./Footer";
 import { useAuth } from "@/hooks/useAuth";
@@ -91,7 +69,7 @@ export function MobileShell({ children, onOpenCart, onOpenTemplates }: { childre
             <MenuLink to="/home" icon={<HomeIcon size={18} />} onClose={() => setMenuOpen(false)}>Home</MenuLink>
             <MenuLink to="/categorie" icon={<LayoutGrid size={18} />} onClose={() => setMenuOpen(false)}>Categorie</MenuLink>
             <MenuLink to="/offerte" icon={<Tag size={18} />} onClose={() => setMenuOpen(false)}>Offerte</MenuLink>
-            <MenuLink to="/novita" icon={<Sparkles size={18} />} onClose={() => setMenuOpen(false)}>Novità</MenuLink>
+            <MenuLink to="/novita" icon={<Star size={18} />} onClose={() => setMenuOpen(false)}>Novità</MenuLink>
             <MenuLink to="/piu-venduti" icon={<Flame size={18} />} onClose={() => setMenuOpen(false)}>I più venduti</MenuLink>
             <MenuLink to="/preferiti" icon={<Heart size={18} />} onClose={() => setMenuOpen(false)} badge={favorites.length}>Preferiti</MenuLink>
             <MenuLink to="/confronta" icon={<Scale size={18} />} onClose={() => setMenuOpen(false)} badge={comparedIds.length} badgeColor="bg-amber-500/20 text-amber-300">Confronta</MenuLink>

@@ -1,24 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import {
-  X,
-  Bookmark,
-  BookmarkPlus,
-  BookmarkCheck,
-  RotateCw,
-  Plus,
-  Trash2,
-  Check,
-  Search,
-  Sparkles,
-  Layers,
-  Calendar,
-  Building2,
-  ShoppingBag,
-  Info,
-  CheckCircle2,
-  ArrowRight,
-  Package,
-} from 'lucide-react';
+import { X, Bookmark, BookmarkPlus, BookmarkCheck, RotateCw, Plus, Trash2, Check, Search, Star, Layers, Calendar, Building2, ShoppingBag, Info, CheckCircle2, ArrowRight, Package } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { CartItem, OrderTemplate, Product } from '../types';
 import {

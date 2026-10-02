@@ -1,20 +1,5 @@
 import React, { useState } from 'react';
-import { 
-  X, 
-  Save, 
-  Trash2, 
-  ShoppingBag, 
-  Truck, 
-  User, 
-  Building2, 
-  Plus, 
-  Minus, 
-  CheckCircle2, 
-  AlertCircle,
-  FileText,
-  CreditCard,
-  Sparkles
-} from 'lucide-react';
+import { X, Save, Trash2, ShoppingBag, Truck, User, Building2, Plus, Minus, CheckCircle2, AlertCircle, FileText, CreditCard, Star } from 'lucide-react';
 import { Order, Product, OrderItemDetail } from '../types';
 import { useAdmin } from '../context/AdminContext';
 

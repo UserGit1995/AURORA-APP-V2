@@ -1,40 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { 
-  ClipboardList, 
-  RotateCcw, 
-  Clock, 
-  CheckCircle2, 
-  ChevronRight, 
-  FileText, 
-  ShoppingBag, 
-  Check, 
-  Package, 
-  ArrowRight,
-  Truck,
-  Calendar,
-  MapPin,
-  ExternalLink,
-  ShieldCheck,
-  AlertCircle,
-  X,
-  PackageCheck,
-  Search,
-  Filter,
-  Building2,
-  Phone,
-  CreditCard,
-  Receipt,
-  FileSpreadsheet,
-  Info,
-  Maximize2,
-  Sparkles,
-  TrendingUp,
-  Download,
-  Loader2,
-  RotateCw,
-  Mail,
-  Activity
-} from 'lucide-react';
+import { ClipboardList, RotateCcw, Clock, CheckCircle2, ChevronRight, FileText, ShoppingBag, Check, Package, ArrowRight, Truck, Calendar, MapPin, ExternalLink, ShieldCheck, AlertCircle, X, PackageCheck, Search, Filter, Building2, Phone, CreditCard, Receipt, FileSpreadsheet, Info, Maximize2, Star, TrendingUp, Download, Loader2, RotateCw, Mail, Activity } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Order, Product } from '../types';
 import { OrderTrackingTimeline } from './OrderTrackingTimeline';
@@ -315,10 +280,10 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
               id="orders-restock-analysis-btn"
               onClick={() => onOpenRestockAnalysis()}
               className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 text-white text-xs font-bold shadow-md shadow-sky-950/40 transition-all hover:scale-[1.02]"
-              title="Analisi previsionale del riordino merci con Gemini AI"
+              title="Analisi previsionale del riordino merci"
             >
-              <Sparkles className="w-3.5 h-3.5 text-sky-200 animate-pulse" />
-              <span>Analisi Riordino AI</span>
+              <Star className="w-3.5 h-3.5 text-sky-200 animate-pulse" />
+              <span>Analisi Riordino</span>
             </button>
           )}
 
@@ -343,16 +308,13 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex items-start gap-3.5">
               <div className="p-2.5 rounded-xl bg-sky-500/15 border border-sky-500/30 text-sky-400 shrink-0 mt-0.5">
-                <Sparkles className="w-5 h-5 text-sky-400" />
+                <Star className="w-5 h-5 text-sky-400" />
               </div>
               <div>
                 <div className="flex items-center gap-2 flex-wrap">
                   <h3 className="text-sm font-bold text-white">
                     Previsione Fabbisogno & Riassortimento Automatico
                   </h3>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-300 border border-sky-500/30">
-                    Gemini AI Powered
-                  </span>
                 </div>
                 <p className="text-xs text-slate-400 mt-1 max-w-2xl leading-relaxed">
                   L'algoritmo analizza i ritmi di consumo dai tuoi ordini storici e li incrocia con i livelli di giacenza a magazzino, stimando giorni di autonomia e consigliando quantità di reintegro per prevenire rotture di stock.
@@ -365,7 +327,7 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
               onClick={() => onOpenRestockAnalysis()}
               className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#0284c7] hover:bg-[#0369a1] active:bg-[#0d1420] text-white text-xs font-bold shadow-md shadow-sky-900/30 transition-all shrink-0 w-full sm:w-auto justify-center"
             >
-              <Sparkles className="w-4 h-4" />
+              <Star className="w-4 h-4" />
               <span>Avvia Analisi Riordino</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
@@ -1484,7 +1446,7 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
               {/* Document Features Included List */}
               <div className="bg-[#0d1420]/60 border border-sky-500/20 rounded-2xl p-3.5 mb-6 text-[11px] text-slate-400 space-y-1.5">
                 <p className="font-bold text-sky-200 flex items-center gap-1.5 mb-1">
-                  <Sparkles className="w-3.5 h-3.5 text-sky-400" />
+                  <Star className="w-3.5 h-3.5 text-sky-400" />
                   <span>{language === 'it' ? 'Contenuto del Documento PDF Formattato:' : 'Included in the Formatted PDF Document:'}</span>
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-3 gap-y-1 text-slate-400">

@@ -1,21 +1,5 @@
 import React, { useState } from 'react';
-import {
-  X,
-  Lock,
-  Mail,
-  Building2,
-  CheckCircle2,
-  User,
-  Eye,
-  EyeOff,
-  UserCheck,
-  UserPlus,
-  AlertTriangle,
-  Sparkles,
-  ShoppingBag,
-  Briefcase,
-  Phone,
-} from 'lucide-react';
+import { X, Lock, Mail, Building2, CheckCircle2, User, Eye, EyeOff, UserCheck, UserPlus, AlertTriangle, Star, ShoppingBag, Briefcase, Phone } from 'lucide-react';
 import { motion } from 'motion/react';
 import { AuroraLogo } from './AuroraLogo';
 import { useLanguage } from '../context/LanguageContext';
@@ -245,7 +229,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
             </div>
           ) : (
             <div className="mb-4 p-2.5 rounded-xl bg-sky-500/15 border border-sky-500/30 text-[11px] text-slate-400 flex items-center gap-2">
-              <Sparkles className="w-3.5 h-3.5 text-sky-400 shrink-0" />
+              <Star className="w-3.5 h-3.5 text-sky-400 shrink-0" />
               <span>Inserisci le tue credenziali per accedere al tuo account.</span>
             </div>
           )}

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Heart, Plus, ArrowLeft, Sparkles, PackageSearch, Bookmark, Scale } from 'lucide-react';
+import { Heart, Plus, ArrowLeft, Star, PackageSearch, Bookmark, Scale } from 'lucide-react';
 import { Product } from '../types';
 import { useAdmin } from '../context/AdminContext';
 import { PLACEHOLDER_IMAGE } from '../utils/imageRepair';
@@ -62,7 +62,7 @@ export const FavoritesView: React.FC<FavoritesViewProps> = ({
               <Heart className="w-3.5 h-3.5 fill-rose-400/80" />
             </div>
             <div className="absolute -bottom-1 -left-1 p-2 rounded-xl bg-[#0d1420] border border-[#1c2433] text-amber-400 shadow-md">
-              <Sparkles className="w-3.5 h-3.5" />
+              <Star className="w-3.5 h-3.5" />
             </div>
             <div className="absolute top-1/2 -right-4 -translate-y-1/2 p-1.5 rounded-lg bg-[#0d1420] border border-[#1c2433] text-sky-400 shadow-md">
               <Bookmark className="w-3 h-3" />

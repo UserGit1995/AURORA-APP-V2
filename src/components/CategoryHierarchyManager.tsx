@@ -1,21 +1,5 @@
 import React, { useState } from 'react';
-import { 
-  Folder, 
-  FolderPlus, 
-  ChevronRight, 
-  ChevronDown, 
-  Edit3, 
-  Trash2, 
-  Plus, 
-  UploadCloud, 
-  Image as ImageIcon, 
-  Check, 
-  Layers, 
-  Tag, 
-  Sparkles,
-  Info,
-  X
-} from 'lucide-react';
+import { Folder, FolderPlus, ChevronRight, ChevronDown, Edit3, Trash2, Plus, UploadCloud, Image as ImageIcon, Check, Layers, Tag, Star, Info, X } from 'lucide-react';
 import { useAdmin } from '../context/AdminContext';
 import { Category, SubCategory, SubSubCategory } from '../types';
 import { CategoryMediaUploader } from './CategoryMediaUploader';

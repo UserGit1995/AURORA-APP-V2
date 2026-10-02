@@ -1,20 +1,5 @@
 import React, { useState } from 'react';
-import { 
-  X, 
-  ArrowLeft,
-  Heart, 
-  Plus, 
-  Minus, 
-  ShoppingBag, 
-  ShieldCheck, 
-  Check, 
-  Package, 
-  Sparkles, 
-  Scale, 
-  BookOpen, 
-  FlaskConical,
-  Info
-} from 'lucide-react';
+import { X, ArrowLeft, Heart, Plus, Minus, ShoppingBag, ShieldCheck, Check, Package, Star, Scale, BookOpen, FlaskConical, Info } from 'lucide-react';
 import { Product } from '../types';
 import { ProductTrendSparkline } from './ProductTrendSparkline';
 import { ProductUsageGuidelines } from './ProductUsageGuidelines';
@@ -163,7 +148,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                         className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold border border-amber-500/40 bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 transition-colors shadow-xs"
                         title="Modifica questo prodotto (Privilegi SuperAdmin)"
                       >
-                        <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                        <Star className="w-3.5 h-3.5 text-amber-400" />
                         <span>Modifica (Admin)</span>
                       </button>
                     )}
@@ -176,9 +161,9 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                           onOpenRestockAnalysis(product.id);
                         }}
                         className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold border border-sky-500/30 bg-sky-500/15 text-sky-300 hover:bg-sky-500/25 transition-colors"
-                        title="Analisi Riordino Gemini AI per questo articolo"
+                        title="Analisi Riordino per questo articolo"
                       >
-                        <Sparkles className="w-3.5 h-3.5" />
+                        <Star className="w-3.5 h-3.5" />
                         <span>Previsione Riordino</span>
                       </button>
                     )}
