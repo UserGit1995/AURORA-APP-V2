@@ -443,6 +443,25 @@ export default function App() {
                 </>
               )}
             </div>
+          ) : searchQuery.trim() ? (
+            /* Search results mode: la ricerca è sempre su TUTTO il catalogo (prima restava
+               limitata all'ultima categoria aperta, e "non trovava" i prodotti delle altre) */
+            <CatalogView
+              viewType="categorie"
+              categories={categoriesList}
+              products={productsList}
+              selectedCategoryId={null}
+              onSelectCategory={setSelectedCategoryId}
+              favorites={favorites}
+              onToggleFavorite={handleToggleFavorite}
+              comparedProductIds={comparedProductIds}
+              onToggleCompare={handleToggleCompare}
+              onSelectProduct={setSelectedProduct}
+              onAddToCart={handleAddToCart}
+              onBulkAddToCart={handleBulkAddToCart}
+              onBulkAddToFavorites={handleBulkAddToFavorites}
+              searchQuery={searchQuery}
+            />
           ) : selectedBrandName ? (
             <BrandDetailView
               brandName={selectedBrandName}
@@ -467,25 +486,6 @@ export default function App() {
                 setSelectedBrandName(name);
               }}
               onBack={() => setShowAllBrands(false)}
-            />
-          ) : searchQuery.trim() ? (
-            /* Search results mode: la ricerca è sempre su TUTTO il catalogo (prima restava
-               limitata all'ultima categoria aperta, e "non trovava" i prodotti delle altre) */
-            <CatalogView
-              viewType="categorie"
-              categories={categoriesList}
-              products={productsList}
-              selectedCategoryId={null}
-              onSelectCategory={setSelectedCategoryId}
-              favorites={favorites}
-              onToggleFavorite={handleToggleFavorite}
-              comparedProductIds={comparedProductIds}
-              onToggleCompare={handleToggleCompare}
-              onSelectProduct={setSelectedProduct}
-              onAddToCart={handleAddToCart}
-              onBulkAddToCart={handleBulkAddToCart}
-              onBulkAddToFavorites={handleBulkAddToFavorites}
-              searchQuery={searchQuery}
             />
           ) : activeTab === 'home' ? (
             /* EXACT SCREENSHOT REPLICA: Home View */

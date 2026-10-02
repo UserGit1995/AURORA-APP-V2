@@ -23,7 +23,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Category, Product } from '../types';
-import { parseQuery, scoreProduct } from '../utils/productSearch';
+import { parseQuery, scoreAllProducts } from '../utils/productSearch';
 import { NavTab } from './Sidebar';
 import { exportProductsToCsv } from '../utils/catalogCsvExporter';
 import { useAdmin } from '../context/AdminContext';
@@ -137,6 +137,11 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
   const headerInfo = getHeaderInfo();
 
   const searchTokens = useMemo(() => parseQuery(searchQuery), [searchQuery]);
+  // Punteggio di pertinenza di ogni prodotto trovato (null = nessuna ricerca attiva)
+  const searchScores = useMemo(
+    () => (searchTokens.length > 0 ? scoreAllProducts(products, searchQuery) : null),
+    [products, searchQuery, searchTokens]
+  );
 
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
@@ -170,12 +175,12 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
         return false;
       }
       // Ricerca: tutte le parole devono comparire (singolare/plurale, accenti e maiuscole ignorati)
-      if (searchTokens.length > 0 && scoreProduct(product, searchTokens) === 0) {
+      if (searchScores && !searchScores.has(product)) {
         return false;
       }
       return true;
     });
-  }, [products, viewType, activeFilterCategory, activeFilterSubCategory, activeFilterSubSubCategory, searchTokens, quickFilter]);
+  }, [products, viewType, activeFilterCategory, activeFilterSubCategory, activeFilterSubSubCategory, searchScores, quickFilter]);
 
   const sortedProducts = useMemo(() => {
     const arr = [...filteredProducts];
@@ -190,17 +195,15 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
       default:
         // Con una ricerca attiva: prima le corrispondenze migliori. Altrimenti popolarità:
         // prima i più venduti, poi quelli in evidenza, poi il resto.
-        if (searchTokens.length > 0) {
-          const rel = new Map<string, number>();
-          arr.forEach((p) => rel.set(p.id, scoreProduct(p, searchTokens)));
-          return arr.sort((a, b) => (rel.get(b.id) || 0) - (rel.get(a.id) || 0));
+        if (searchScores) {
+          return arr.sort((a, b) => (searchScores.get(b) || 0) - (searchScores.get(a) || 0));
         }
         return arr.sort((a, b) => {
           const score = (p: typeof a) => (p.isBestseller ? 2 : 0) + (p.isFeatured ? 1 : 0);
           return score(b) - score(a);
         });
     }
-  }, [filteredProducts, sortBy, searchTokens]);
+  }, [filteredProducts, sortBy, searchScores]);
 
   const selectedProducts = useMemo(() => {
     return products.filter((p) => selectedProductIds.includes(p.id));
@@ -842,7 +845,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                     src={product.image || PLACEHOLDER_IMAGE}
                     alt={product.name}
                     referrerPolicy="no-referrer" loading="lazy" decoding="async"
-                    className="w-full h-full object-contain transition-all duration-500 ease-out will-change-transform group-hover:scale-110 group-hover:brightness-105"
+                    className="max-w-full max-h-full w-auto h-auto object-contain transition-all duration-500 ease-out will-change-transform group-hover:scale-105 group-hover:brightness-105"
                   />
                   {isSelected && (
                     <div className="absolute inset-0 bg-sky-600/15 backdrop-blur-[0.5px] flex items-center justify-center">

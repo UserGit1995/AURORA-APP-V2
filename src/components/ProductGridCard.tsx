@@ -113,7 +113,7 @@ export const ProductGridCard: React.FC<ProductGridCardProps> = ({
           loading="lazy" decoding="async" src={product.image || PLACEHOLDER_IMAGE}
           alt={product.name}
           referrerPolicy="no-referrer"
-          className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"
+          className="max-w-full max-h-full w-auto h-auto object-contain transition-transform duration-300 group-hover:scale-105"
         />
       </div>
 
