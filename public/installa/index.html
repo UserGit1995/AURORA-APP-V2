@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Installa l'app - Aurora</title>
+  <meta name="description" content="Installa Aurora sulla schermata home del tuo iPhone o Android, senza passare da nessuno store." />
+  <meta name="theme-color" content="#0d1420" />
+  <link rel="icon" type="image/png" href="/logo-login.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <script src="/install-banner.js" defer></script>
+  <style>
+    :root{--bg:#0d1420;--card:#0e1b30;--card2:#0a1220;--line:#1c2a42;--txt:#e2e8f0;--mut:#94a3b8;--sky:#0ea5e9;--skyd:#0284c7;--em:#10b981;--amb:#f59e0b}
+    *{box-sizing:border-box}
+    html,body{margin:0}
+    body{background:var(--bg);color:var(--txt);font-family:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.5;padding-bottom:48px}
+    a{color:inherit}
+    .wrap{max-width:1100px;margin:0 auto;padding:0 16px}
+    header{border-bottom:1px solid var(--line);background:rgba(13,20,32,.95)}
+    header .wrap{display:flex;align-items:center;justify-content:space-between;height:64px}
+    header img{height:36px;width:auto}
+    .back{font-size:13px;color:var(--mut);text-decoration:none}
+    .back:hover{color:var(--txt)}
+    .tabs{display:flex;flex-wrap:wrap;gap:8px;margin:20px 0;padding:8px;border:1px solid var(--line);border-radius:16px;background:var(--card)}
+    .tab{border:0;border-radius:12px;padding:9px 14px;background:transparent;color:var(--mut);font-weight:600;font-size:13px;font-family:inherit;cursor:pointer}
+    .tab.on{background:var(--skyd);color:#fff;box-shadow:0 6px 18px rgba(2,132,199,.35)}
+    .card{border:1px solid var(--line);border-radius:18px;background:var(--card);padding:22px;margin-bottom:18px}
+    .grid{display:grid;gap:22px;grid-template-columns:1fr}
+    @media(min-width:900px){.grid.hero{grid-template-columns:7fr 5fr;align-items:center}.grid.two{grid-template-columns:1fr 1fr}.grid.three{grid-template-columns:repeat(3,1fr)}}
+    .badge{display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(14,165,233,.3);background:rgba(14,165,233,.1);color:#7dd3fc;border-radius:999px;padding:4px 12px;font-size:12px;font-weight:700}
+    h1{font-size:28px;line-height:1.15;margin:14px 0 10px;font-weight:800}
+    h1 span,.sky{color:var(--sky)}
+    h2{font-size:19px;margin:0 0 4px}
+    h3{font-size:14px;margin:0}
+    p{margin:0 0 10px;color:var(--mut);font-size:14px}
+    .small{font-size:12px}
+    code{background:var(--card2);border-radius:6px;padding:1px 6px;font-size:12px;color:#7dd3fc}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:12px;padding:12px 18px;font-weight:700;font-size:14px;font-family:inherit;color:#fff;background:var(--skyd);text-decoration:none;cursor:pointer;box-shadow:0 8px 20px rgba(2,132,199,.3)}
+    .btn.em{background:var(--em);color:#04130d;box-shadow:0 8px 20px rgba(16,185,129,.25)}
+    .btn.ghost{background:var(--card2);color:var(--txt);border:1px solid var(--line);box-shadow:none}
+    .btn:disabled,.btn[aria-disabled=true]{opacity:.5;cursor:not-allowed}
+    .btn:active{transform:scale(.98)}
+    .row{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0}
+    .box{border:1px solid var(--line);border-radius:16px;background:var(--card2);padding:16px;margin-top:14px}
+    .box.sky{border-color:rgba(14,165,233,.35)}.box.em{border-color:rgba(16,185,129,.35)}
+    .ttl{display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px;margin-bottom:10px}
+    .note{border:1px solid var(--line);border-radius:12px;background:var(--card);padding:10px 12px;font-size:12px;color:var(--mut);margin-top:10px}
+    .warn{border-color:rgba(245,158,11,.3);background:rgba(245,158,11,.06)}
+    .ok{border-color:rgba(16,185,129,.4);background:rgba(16,185,129,.08);color:#a7f3d0}
+    .mini{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:12px;background:var(--card);padding:10px;margin-top:10px}
+    .mini i{flex:none;width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-style:normal;background:rgba(14,165,233,.15)}
+    .mini b{display:block;font-size:12px}.mini span{font-size:12px;color:var(--mut)}
+    .step{border:1px solid var(--line);border-radius:12px;background:var(--card);padding:12px}
+    .step b{display:block;font-size:12px;margin-bottom:4px}.step span{font-size:12px;color:var(--mut)}
+    ol,ul{margin:6px 0 0;padding-left:20px;color:var(--mut);font-size:13px}li{margin:3px 0}
+    .only{display:none}
+    html[data-dev=ios] .only.ios,html[data-dev=android] .only.android,html[data-dev=desktop] .only.desktop{display:block}
+    html[data-dev=ios] .only.ios.flex,html[data-dev=android] .only.android.flex,html[data-dev=desktop] .only.desktop.flex{display:flex}
+    .pane{display:none}.pane.on{display:block}
+    .seg{display:inline-flex;border:1px solid var(--line);border-radius:12px;background:var(--card2);padding:4px;gap:4px}
+    .seg button{border:0;border-radius:9px;padding:7px 12px;background:transparent;color:var(--mut);font-weight:600;font-size:12px;font-family:inherit;cursor:pointer}
+    .seg button.on{background:var(--skyd);color:#fff}
+    .frame{margin:18px auto 0;overflow:hidden;border:8px solid var(--line);background:var(--bg);box-shadow:0 20px 50px rgba(0,0,0,.5);width:375px;max-width:100%;height:720px;border-radius:2.5rem}
+    .frame.android{width:390px;border-radius:1.5rem}.frame.full{width:100%;border-width:2px;border-radius:12px}
+    .frame iframe{width:100%;height:100%;border:0}
+    .hl{animation:pulse 1.2s ease 3}@keyframes pulse{50%{box-shadow:0 0 0 4px rgba(16,185,129,.5)}}
+    .head{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);padding-bottom:14px;margin-bottom:16px}
+  </style>
+</head>
+<body>
+<header><div class="wrap"><a href="/home"><img src="/logo-login.png" alt="Aurora" /></a><a class="back" href="/home">← Torna al catalogo</a></div></header>
+
+<main class="wrap">
+  <div class="tabs" id="tabs">
+    <button class="tab on" data-p="hub">Centro Installazione</button>
+    <button class="tab" data-p="guide">Guida Passo-Passo</button>
+    <button class="tab" data-p="prev">Anteprima Live App</button>
+  </div>
+
+  <div id="installed" class="note ok" style="display:none">✔ Aurora è già installata su questo dispositivo.</div>
+  <div id="apkmsg" class="note warn" style="display:none"></div>
+
+  <!-- ============ CENTRO INSTALLAZIONE ============ -->
+  <section class="pane on" id="p-hub">
+    <div class="card"><div class="grid hero">
+      <div>
+        <span class="badge">🛡 Installazione senza App Store</span>
+        <h1>Installa l'App <span>Aurora</span> direttamente sul tuo smartphone</h1>
+        <p>Sia su <b>iPhone (iOS)</b> che su <b>Android</b> puoi installare Aurora sulla schermata home, a schermo intero e senza passare dagli store ufficiali.</p>
+
+        <div class="box sky only ios">
+          <div class="ttl sky">Procedura consigliata per il tuo iPhone:</div>
+          <button class="btn js-ios" type="button"> Scarica profilo iPhone (.mobileconfig)</button>
+          <div class="note warn" id="safariWarn" hidden>Per installare apri questa pagina in <b>Safari</b>: da altri browser iPhone non accetta il profilo.</div>
+          <div class="note">Il file <code>.mobileconfig</code> è il formato ufficiale Apple (WebClip): mette l'icona di Aurora sulla schermata home. Dopo il download apri <b>Impostazioni</b> → <b>Profilo scaricato</b> → <b>Installa</b>.</div>
+        </div>
+
+        <div class="box em only android">
+          <div class="ttl" style="color:#6ee7b7">Consigliato per il tuo dispositivo Android:</div>
+          <div class="row">
+            <button class="btn em js-pwa" type="button" disabled>Installa App Ora (PWA)</button>
+            <a class="btn ghost js-apk" href="#" aria-disabled="true">Scarica APK Android</a>
+          </div>
+          <p class="small js-pwa-hint">Il pulsante si attiva da solo quando questa pagina è aperta in Chrome su Android. Altrimenti: menu ⋮ del browser → «Installa app».</p>
+        </div>
+
+        <div class="row only desktop flex">
+          <button class="btn js-ios" type="button">Scarica File iOS (.mobileconfig)</button>
+          <a class="btn em js-apk" href="#" aria-disabled="true">Scarica APK Android</a>
+        </div>
+        <p class="small only desktop">Stai usando un computer: apri questa pagina dal telefono per installare l'app, oppure invia il link <b>appaurorav2updated.vercel.app/installa</b> al tuo smartphone.</p>
+      </div>
+
+      <div>
+        <div class="box" style="margin:0">
+          <div class="ttl" style="font-family:monospace;text-transform:uppercase;font-size:11px;color:var(--mut)">Metodi No-Store</div>
+          <div class="mini"><i>🍎</i><div><b>1. File Configurazione iOS</b><span>Scarica il file <code>.mobileconfig</code> ed eseguilo nelle Impostazioni del tuo iPhone.</span></div></div>
+          <div class="mini"><i style="background:rgba(16,185,129,.15)">🤖</i><div><b>2. WebAPK &amp; PWA Android</b><span>Installazione automatica via browser o pacchetto <code>.apk</code>.</span></div></div>
+          <div class="mini"><i style="background:#1c2a42">⬆️</i><div><b>3. Safari &amp; Chrome Home Screen</b><span>Menu Condividi → "Aggiungi alla schermata Home", senza registrazioni.</span></div></div>
+        </div>
+      </div>
+    </div></div>
+
+    <div class="card" id="android">
+      <div class="head"><div><h2>Installatore Android <code>WebAPK / .APK</code></h2><p class="small" style="margin:0">Installa Aurora direttamente da Chrome come PWA, oppure scarica il file .apk.</p></div>
+        <button class="btn em js-pwa" type="button" disabled>Installa Subito PWA</button></div>
+      <div class="grid two">
+        <div class="box em" style="margin:0">
+          <div class="ttl" style="color:#6ee7b7">Opzione A: WebAPK PWA (consigliata)</div>
+          <p>Chrome e i browser Android moderni creano da soli un pacchetto nativo (WebAPK) quando installi Aurora dal browser.</p>
+          <ul><li>Si comporta come un'app nativa Android</li><li>Aggiornamenti automatici, senza intervento</li></ul>
+          <div class="row"><button class="btn ghost js-pwa" type="button" disabled>Aggiungi alla Schermata Home</button></div>
+        </div>
+        <div class="box" id="apkbox" style="margin:0">
+          <div class="ttl sky">Opzione B: File .APK (sideloading)</div>
+          <p>Vuoi il file <code>.apk</code> da installare a mano o da inviare via WhatsApp, Telegram o Drive, senza Google Play?</p>
+          <ul><li>Si scarica da qui e si installa su qualsiasi Android</li><li>Serve consentire "Origini sconosciute" una sola volta</li></ul>
+          <div class="row"><a class="btn ghost js-apk" href="#" aria-disabled="true">Scarica APK Android</a></div>
+          <p class="small js-apk-note"></p>
+        </div>
+      </div>
+      <div class="note" style="margin-top:14px"><b>Come installare un file .apk su Android:</b>
+        <ol><li>Scarica il file <code>.apk</code> sul telefono.</li><li>Aprilo dalla barra delle notifiche o dalla cartella Download.</li><li>Se richiesto, consenti l'installazione da "Origini sconosciute".</li><li>Tocca <b>"Installa"</b> per completare.</li></ol></div>
+    </div>
+  </section>
+
+  <!-- ============ GUIDA ============ -->
+  <section class="pane" id="p-guide">
+    <div class="card">
+      <div class="head"><div><h2>Guida completa di installazione senza store</h2><p class="small" style="margin:0">Istruzioni dettagliate per iOS e Android.</p></div>
+        <div class="seg" id="gseg"><button class="on" data-g="ios">Guida iOS (iPhone)</button><button data-g="and">Guida Android</button></div></div>
+
+      <div id="g-ios">
+        <div class="box sky" style="margin-top:0"><div class="ttl">Metodo A: file di installazione iOS (<code>.mobileconfig</code>)</div>
+          <p class="small">Un file di configurazione Apple WebClip: mette l'icona direttamente sulla home, senza App Store.</p>
+          <div class="grid three">
+            <div class="step"><b>Passo 1: Scarica il file</b><span>Apri questa pagina in <b>Safari</b> su iPhone e tocca "Scarica profilo". Se richiesto, tocca <b>"Consenti"</b>.</span></div>
+            <div class="step"><b>Passo 2: Apri Impostazioni</b><span>Chiudi Safari e apri <b>Impostazioni</b>: in alto trovi <b>"Profilo scaricato"</b>.</span></div>
+            <div class="step"><b>Passo 3: Installa</b><span>Tocca <b>"Installa"</b> in alto a destra e conferma con il codice: l'icona compare subito.</span></div>
+          </div></div>
+        <div class="box"><div class="ttl">Metodo B: Aggiungi a Schermata Home da Safari (PWA)</div>
+          <div class="grid three">
+            <div class="step"><b>1. Icona Condividi</b><span>Apri Aurora su Safari e tocca <b>Condividi</b> (il quadrato con la freccia).</span></div>
+            <div class="step"><b>2. Aggiungi a Home</b><span>Scorri il menu e scegli <b>"Aggiungi alla schermata Home"</b>.</span></div>
+            <div class="step"><b>3. Conferma</b><span>Tocca <b>"Aggiungi"</b> in alto a destra: fatto, a schermo intero.</span></div>
+          </div></div>
+        <div class="note warn" style="margin-top:14px">⚠ Su iOS non è possibile installare un file <code>.ipa</code> da Safari senza un account Apple Developer: i due metodi qui sopra sono le uniche strade senza store.</div>
+      </div>
+
+      <div id="g-and" style="display:none">
+        <div class="box em" style="margin-top:0"><div class="ttl">Metodo A: PWA WebAPK (Chrome / Samsung Internet)</div>
+          <div class="grid three">
+            <div class="step"><b>1. Premi Installa App</b><span>Tocca <b>"Installa Subito PWA"</b> nella scheda Centro Installazione, o il banner di Chrome.</span></div>
+            <div class="step"><b>2. Conferma su Chrome</b><span>Nel popup di Chrome tocca <b>"Installa"</b>.</span></div>
+            <div class="step"><b>3. Pronta nel launcher</b><span>L'app compare nel menu app e sulla home con nome e icona di Aurora.</span></div>
+          </div></div>
+        <div class="box"><div class="ttl">Metodo B: file <code>.apk</code> (sideloading)</div>
+          <ol><li>Tocca <b>"Scarica APK Android"</b> nella scheda Centro Installazione.</li><li>Apri il file scaricato e, se richiesto, attiva <b>"Consenti installazione da sorgenti sconosciute"</b>.</li><li>Completa l'installazione!</li></ol></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ANTEPRIMA ============ -->
+  <section class="pane" id="p-prev">
+    <div class="card">
+      <div class="head"><div><h2>Anteprima live dell'applicazione Aurora</h2><p class="small" style="margin:0">Il sito vero, caricato dal vivo, dentro una cornice a forma di telefono.</p></div>
+        <div class="seg" id="pseg"><button class="on" data-m="">iPhone</button><button data-m="android">Android</button><button data-m="full">Full</button></div></div>
+      <div class="frame" id="frame"><iframe id="pframe" title="Anteprima Aurora"></iframe></div>
+    </div>
+  </section>
+</main>
+
+<script>
+(function () {
+  var AI = window.AuroraInstall || null;
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s) { return Array.prototype.slice.call(document.querySelectorAll(s)); };
+  var ua = navigator.userAgent || '';
+  var dev = (/iPhone|iPad|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) ? 'ios' : /Android/i.test(ua) ? 'android' : 'desktop';
+  document.documentElement.setAttribute('data-dev', dev);
+
+  /* schede */
+  function openPane(id) {
+    $$('.tab').forEach(function (t) { t.classList.toggle('on', t.getAttribute('data-p') === id); });
+    $$('.pane').forEach(function (p) { p.classList.toggle('on', p.id === 'p-' + id); });
+    if (id === 'prev' && !$('#pframe').getAttribute('src')) $('#pframe').setAttribute('src', '/home');
+  }
+  $$('.tab').forEach(function (t) { t.addEventListener('click', function () { openPane(t.getAttribute('data-p')); }); });
+  $$('#gseg button').forEach(function (b) { b.addEventListener('click', function () {
+    var ios = b.getAttribute('data-g') === 'ios';
+    $$('#gseg button').forEach(function (x) { x.classList.toggle('on', x === b); });
+    $('#g-ios').style.display = ios ? '' : 'none'; $('#g-and').style.display = ios ? 'none' : '';
+  }); });
+  $$('#pseg button').forEach(function (b) { b.addEventListener('click', function () {
+    $$('#pseg button').forEach(function (x) { x.classList.toggle('on', x === b); });
+    $('#frame').className = 'frame ' + b.getAttribute('data-m');
+  }); });
+
+  if (!AI) return;
+
+  /* già installata? */
+  if (AI.isStandalone()) $('#installed').style.display = '';
+  if (dev === 'ios' && !AI.isSafari) $('#safariWarn').hidden = false;
+
+  /* iPhone */
+  $$('.js-ios').forEach(function (b) { b.addEventListener('click', function () { AI.downloadMobileConfig(); }); });
+
+  /* Android PWA */
+  function syncPwa() {
+    var has = AI.hasPrompt();
+    $$('.js-pwa').forEach(function (b) { b.disabled = !has; });
+    $$('.js-pwa-hint').forEach(function (h) { h.style.display = has ? 'none' : ''; });
+  }
+  $$('.js-pwa').forEach(function (b) { b.addEventListener('click', function () { AI.promptInstall(); }); });
+  AI.onChange(syncPwa); syncPwa();
+
+  /* APK: se il file è stato caricato si scarica da qui, altrimenti si usa PWABuilder */
+  function setApk(ok) {
+    $$('.js-apk').forEach(function (a) {
+      a.setAttribute('aria-disabled', 'false');
+      if (ok) { a.href = AI.apkPath; a.setAttribute('download', 'Aurora.apk'); a.removeAttribute('target'); }
+      else { a.href = AI.pwaBuilderUrl(); a.target = '_blank'; a.rel = 'noopener'; a.textContent = 'Genera APK Android (PWABuilder)'; }
+    });
+    $$('.js-apk-note').forEach(function (n) {
+      n.textContent = ok ? 'File pronto: tocca il pulsante per scaricarlo.' : 'Il file .apk pronto non è ancora stato caricato: nel frattempo si può generare con PWABuilder.';
+    });
+  }
+  AI.apkAvailable().then(function (ok) {
+    setApk(ok);
+    if (/[?&]download=apk\b/.test(location.search)) {
+      openPane('hub');
+      var box = $('#apkbox'); if (box) { box.scrollIntoView({ behavior: 'smooth', block: 'center' }); box.classList.add('hl'); }
+      if (ok) { var a = $('.js-apk'); if (a) a.click(); }
+      else { var m = $('#apkmsg'); m.textContent = 'Il file APK di Aurora non è ancora disponibile: usa l\'installazione PWA oppure riprova più tardi.'; m.style.display = ''; }
+    }
+  });
+  if (location.hash === '#android') { var s = $('#android'); if (s) s.scrollIntoView(); }
+})();
+</script>
+</body>
+</html>
