@@ -2,9 +2,9 @@ import React, { useEffect, useState } from 'react';
 
 // Sfondi con il logo Aurora che si alternano da soli, con dissolvenza morbida.
 const BACKGROUNDS = [
-  { src: '/sfondi/sfondo-a.webp', position: 'right bottom' },
-  { src: '/sfondi/sfondo-b.webp', position: 'center' },
-  { src: '/sfondi/sfondo-c.webp', position: 'center' },
+  { src: '/sfondi/sfondo-a.svg', position: 'right bottom' },
+  { src: '/sfondi/sfondo-b.svg', position: 'center' },
+  { src: '/sfondi/sfondo-c.svg', position: 'center' },
 ];
 
 // Ogni quanto cambia lo sfondo (in millisecondi): 1 minuto
