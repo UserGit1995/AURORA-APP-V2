@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { AdminImageFinderButton } from './AdminImageFinderButton';
+import { AdminRemoveBgButton } from './AdminRemoveBgButton';
 import { Folder, Tag, Star, Flame, Filter, Heart, Plus, Check, Search, SlidersHorizontal, Scale, CheckSquare, Square, ShoppingBag, X, Layers, CheckCircle2, FileSpreadsheet, Download, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Category, Product } from '../types';
@@ -822,6 +823,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
 
                 <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-white border border-slate-200 shadow-xs flex items-center justify-center p-2 my-1">
                   <AdminImageFinderButton product={product} className="bottom-1.5 left-1.5" />
+                  <AdminRemoveBgButton product={product} className="bottom-1.5 right-1.5" />
                   <img
                     src={product.image || PLACEHOLDER_IMAGE}
                     alt={product.name}

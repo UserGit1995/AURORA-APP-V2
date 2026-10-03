@@ -30,6 +30,7 @@ import { ScrollToTopButton } from './components/ScrollToTopButton';
 import { PersonalizzaView } from './components/PersonalizzaView';
 import { LegalView } from './components/LegalView';
 import { CookieBanner } from './components/CookieBanner';
+import { OPEN_REMOVE_BG_EVENT } from './components/AdminRemoveBgButton';
 import { CustomizationTrackingView } from './components/CustomizationTrackingView';
 import { parseInitialRoute, syncUrlWithTab } from './utils/deepLinks';
 
@@ -79,6 +80,19 @@ export default function App() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [isAdminPanelOpen, setIsAdminPanelOpen] = useState(false);
+  // Forbici sulle schede prodotto: apre il pannello admin su "Rimuovi sfondo" con quel prodotto
+  const [removeBgRequest, setRemoveBgRequest] = useState<{ productId: string; token: number } | null>(null);
+  useEffect(() => {
+    const onOpen = (e: Event) => {
+      const productId = (e as CustomEvent).detail?.productId;
+      if (!productId) return;
+      setSelectedProduct(null);
+      setRemoveBgRequest({ productId, token: Date.now() });
+      setIsAdminPanelOpen(true);
+    };
+    window.addEventListener(OPEN_REMOVE_BG_EVENT, onOpen);
+    return () => window.removeEventListener(OPEN_REMOVE_BG_EVENT, onOpen);
+  }, []);
 
   // Cart state: Preloaded with items from productsList
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -848,6 +862,7 @@ export default function App() {
           <AdminControlPanel
             isOpen={isAdminPanelOpen}
             onClose={() => setIsAdminPanelOpen(false)}
+            removeBgRequest={removeBgRequest}
           />
         </React.Suspense>
       )}

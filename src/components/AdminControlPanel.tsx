@@ -42,6 +42,8 @@ import { searchProducts } from '../utils/productSearch';
 interface AdminControlPanelProps {
   isOpen: boolean;
   onClose: () => void;
+  /** Apertura diretta di "Rimuovi sfondo" su un prodotto (dalle schede prodotto) */
+  removeBgRequest?: { productId: string; token: number } | null;
 }
 
 // Stessa struttura/logica di sempre: qui cambia solo l'aspetto — via gradienti,
@@ -61,7 +63,7 @@ const BTN_SECONDARY = 'px-3 py-1.5 rounded-lg bg-[#0d1420] hover:bg-[#1a2230] te
 const ICON_BTN = 'p-1.5 rounded-lg bg-[#0d1420] text-slate-400 hover:text-white transition-colors';
 const ICON_BTN_DANGER = 'p-1.5 rounded-lg bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 transition-colors';
 
-export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({ isOpen, onClose }) => {
+export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({ isOpen, onClose, removeBgRequest }) => {
   const {
     currentUser,
     isSupabaseConnected,
@@ -91,6 +93,11 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({ isOpen, on
     setRemoveBgMounted(true);
     setActiveTab('removebg');
   };
+  // Arrivo dal pulsante forbici di una scheda prodotto
+  React.useEffect(() => {
+    if (removeBgRequest?.productId) openRemoveBg(removeBgRequest.productId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [removeBgRequest?.token]);
   const [productSearch, setProductSearch] = useState('');
   // Con ~3000 articoli, disegnarli tutti insieme blocca il pannello: mostriamo
   // un blocco alla volta, come nel catalogo pubblico.

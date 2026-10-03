@@ -1,5 +1,6 @@
 import React from 'react';
 import { AdminImageFinderButton } from './AdminImageFinderButton';
+import { AdminRemoveBgButton } from './AdminRemoveBgButton';
 import { Star, Heart, ArrowRight, Plus, Check, Scale } from 'lucide-react';
 import { Product } from '../types';
 import { useLanguage } from '../context/LanguageContext';
@@ -146,6 +147,7 @@ export const FeaturedProductsSection: React.FC<FeaturedProductsSectionProps> = (
               {/* Product Image */}
               <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-white border border-slate-200 shadow-xs flex items-center justify-center p-2 my-1">
                 <AdminImageFinderButton product={product} className="bottom-1.5 left-1.5" />
+                <AdminRemoveBgButton product={product} className="bottom-1.5 right-1.5" />
                 <img
                   loading="lazy" decoding="async" src={product.image || PLACEHOLDER_IMAGE}
                   alt={product.name}

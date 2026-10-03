@@ -1,5 +1,6 @@
 import React from 'react';
 import { AdminImageFinderButton } from './AdminImageFinderButton';
+import { AdminRemoveBgButton } from './AdminRemoveBgButton';
 import { Heart, Plus, ArrowLeft, Star, PackageSearch, Bookmark, Scale } from 'lucide-react';
 import { Product } from '../types';
 import { useAdmin } from '../context/AdminContext';
@@ -164,6 +165,7 @@ export const FavoritesView: React.FC<FavoritesViewProps> = ({
 
                 <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-white border border-slate-200 shadow-xs flex items-center justify-center p-2 mb-2">
                   <AdminImageFinderButton product={product} className="bottom-1.5 left-1.5" />
+                  <AdminRemoveBgButton product={product} className="bottom-1.5 right-1.5" />
                   <img
                     loading="lazy" decoding="async" src={product.image || PLACEHOLDER_IMAGE}
                     alt={product.name}

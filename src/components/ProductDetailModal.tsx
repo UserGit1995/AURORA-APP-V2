@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { AdminImageFinderButton } from './AdminImageFinderButton';
+import { AdminRemoveBgButton } from './AdminRemoveBgButton';
 import { X, ArrowLeft, Heart, Plus, Minus, ShoppingBag, ShieldCheck, Check, Package, Star, Scale, BookOpen, FlaskConical, Info } from 'lucide-react';
 import { Product } from '../types';
 import { ProductTrendSparkline } from './ProductTrendSparkline';
@@ -96,6 +97,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
             {/* Left: Product Image Showcase */}
             <div className="md:col-span-5 relative bg-white p-6 flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-[#1c2433]">
               <AdminImageFinderButton product={product} className="bottom-4 left-4" />
+              <AdminRemoveBgButton product={product} className="bottom-4 right-4" />
               {product.discountPercent && (
                 <div className="absolute top-4 left-4 bg-amber-500/20 border border-amber-500/30 text-amber-300 text-xs font-bold px-2.5 py-1 rounded-lg">
                   Sconto -{product.discountPercent}%
