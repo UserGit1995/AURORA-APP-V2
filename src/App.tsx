@@ -526,9 +526,6 @@ export default function App() {
                 }}
               />
 
-              {/* Volantino offerte sfogliabile */}
-              <FlyerSection />
-
               {/* 2. Categorie principali */}
               <CategorySection
                 categories={categoriesList}
@@ -539,6 +536,9 @@ export default function App() {
                   setSelectedCategoryId(null);
                 }}
               />
+
+              {/* Volantino offerte sfogliabile */}
+              <FlyerSection />
 
               {/* 2.1 Marche */}
               <BrandsSection
