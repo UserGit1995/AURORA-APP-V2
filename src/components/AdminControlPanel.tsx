@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import {
   X,
+  DatabaseBackup,
   Timer,
   BookOpen,
   Cloud,
@@ -34,6 +35,7 @@ import { ImageMigrationPanel } from './ImageMigrationPanel';
 import { CustomizationPricingPanel } from './CustomizationPricingPanel';
 import { FlashOffersPanel } from './FlashOffersPanel';
 import { FlyerAdminPanel } from './FlyerAdminPanel';
+import { BackupPanel, daysSinceLastBackup } from './BackupPanel';
 import { CustomizationRequestsPanel } from './CustomizationRequestsPanel';
 import { RemoveBgStudio } from './RemoveBg/RemoveBgStudio';
 import { Product, Order } from '../types';
@@ -80,7 +82,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({ isOpen, on
   } = useAdmin();
 
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [activeTab, setActiveTab] = useState<'products' | 'orders' | 'categories' | 'subcategories' | 'images' | 'removebg' | 'requests' | 'packaging' | 'flash' | 'flyer' | 'settings'>('products');
+  const [activeTab, setActiveTab] = useState<'products' | 'orders' | 'categories' | 'subcategories' | 'images' | 'removebg' | 'requests' | 'packaging' | 'flash' | 'flyer' | 'backup' | 'settings'>('products');
   // Remove BG: lo studio resta montato dopo la prima apertura, così cambiando scheda non si perde il lavoro
   const [removeBgMounted, setRemoveBgMounted] = useState(false);
   const [removeBgProductId, setRemoveBgProductId] = useState<string | null>(null);
@@ -234,7 +236,19 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({ isOpen, on
     },
     {
       title: 'Impostazioni',
-      items: [{ id: 'settings', label: 'Parametri', icon: SlidersHorizontal, desc: 'Dati aziendali, soglie commerciali e impostazioni generali.' }],
+      items: [
+        { id: 'settings', label: 'Parametri', icon: SlidersHorizontal, desc: 'Dati aziendali, soglie commerciali e impostazioni generali.' },
+        {
+          id: 'backup',
+          label: 'Backup e ripristino',
+          icon: DatabaseBackup,
+          badge: (() => {
+            const d = daysSinceLastBackup();
+            return d === null || d > 7 ? 'da fare' : undefined;
+          })(),
+          desc: 'Salva una copia di sicurezza di dati e immagini e ripristinala quando serve.',
+        },
+      ],
     },
   ];
   const allNav = NAV_GROUPS.flatMap((g) => g.items);
@@ -345,7 +359,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({ isOpen, on
                       {item.badge && (
                         <span
                           className={`text-[10.5px] font-semibold px-1.5 py-0.5 rounded-md ${
-                            item.id === 'requests' ? 'bg-amber-500/20 text-amber-300' : 'bg-[#16213a] text-slate-400'
+                            item.id === 'requests' || item.id === 'backup' ? 'bg-amber-500/20 text-amber-300' : 'bg-[#16213a] text-slate-400'
                           }`}
                         >
                           {item.badge}
@@ -683,6 +697,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({ isOpen, on
         {activeTab === 'packaging' && <CustomizationPricingPanel />}
         {activeTab === 'flash' && <FlashOffersPanel />}
         {activeTab === 'flyer' && <FlyerAdminPanel />}
+        {activeTab === 'backup' && <BackupPanel />}
 
         {activeTab === 'settings' && (
           <form onSubmit={handleSaveSettings} className="p-4 sm:p-6 overflow-y-auto flex-1 space-y-5 text-left text-sm">
