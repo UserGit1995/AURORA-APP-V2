@@ -67,6 +67,7 @@ function productToRow(p: Product) {
       discountPercent: p.discountPercent ?? null,
       originalPrice: p.originalPrice ?? null,
       offerNote: p.offerNote ?? null,
+      flashOffer: p.flashOffer ?? null,
       specs: p.specs ?? null,
       isEco: p.isEco ?? false,
       isMedicalDevice: p.isMedicalDevice ?? false,
@@ -96,6 +97,7 @@ function rowToProduct(row: any, categoryName?: string): Product {
     discountPercent: extra.discountPercent ?? undefined,
     originalPrice: extra.originalPrice != null ? Number(extra.originalPrice) : undefined,
     offerNote: extra.offerNote || undefined,
+    flashOffer: extra.flashOffer || undefined,
     stock: extra.stock ?? (row.in_stock ? 999 : 0),
     lowStockThreshold: extra.lowStockThreshold ?? undefined,
     description: row.description || '',
@@ -676,5 +678,21 @@ export async function syncSupabaseSettings(settings: SystemSettings): Promise<bo
   } catch (e) {
     console.error('Supabase sync settings error:', e);
     return false;
+  }
+}
+
+/**
+ * Legge una singola impostazione pubblica (leggibile anche dai clienti),
+ * es. l'interruttore generale delle offerte a tempo. null = non disponibile.
+ */
+export async function fetchSupabasePublicSetting(key: string): Promise<string | null> {
+  const sb = getSupabase();
+  if (!sb) return null;
+  try {
+    const { data, error } = await sb.from('settings').select('value').eq('key', key).maybeSingle();
+    if (error || !data) return null;
+    return data.value ?? null;
+  } catch {
+    return null;
   }
 }

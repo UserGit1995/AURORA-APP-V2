@@ -49,6 +49,8 @@ export interface Product {
   // (per mostrarlo barrato e per poter chiudere l'offerta) e una nota (es. prezzo a quantità).
   originalPrice?: number;
   offerNote?: string;
+  // Offerta a tempo programmata dall'admin (si attiva e si chiude da sola)
+  flashOffer?: FlashOffer;
   stock: number;
   lowStockThreshold?: number;
   description: string;
@@ -57,6 +59,16 @@ export interface Product {
     fragrance?: string;
     certifications?: string[];
   };
+}
+
+// Offerta a tempo su un singolo prodotto
+export interface FlashOffer {
+  price: number;        // prezzo in offerta (senza IVA, come `price`)
+  startAt: string;      // inizio (data e ora, formato ISO)
+  endAt: string;        // fine (data e ora, formato ISO)
+  dailyFrom?: string;   // facoltativo: valida solo in questa fascia oraria ogni giorno, es. '09:00'
+  dailyTo?: string;     // es. '17:00'
+  active: boolean;      // interruttore della singola offerta
 }
 
 export interface CartItem {
@@ -223,4 +235,6 @@ export interface SystemSettings {
   allowPriceOverride: boolean;
   announcementBannerText: string;
   enableAnnouncementBanner: boolean;
+  // Interruttore generale delle offerte a tempo
+  flashOffersEnabled?: boolean;
 }

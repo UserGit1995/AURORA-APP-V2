@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import {
   X,
+  Timer,
   Cloud,
   CloudOff,
   Package,
@@ -30,6 +31,7 @@ import { ImageFinderPanel } from './ImageFinderPanel';
 import { ImageAuditPanel } from './ImageAuditPanel';
 import { ImageMigrationPanel } from './ImageMigrationPanel';
 import { CustomizationPricingPanel } from './CustomizationPricingPanel';
+import { FlashOffersPanel } from './FlashOffersPanel';
 import { CustomizationRequestsPanel } from './CustomizationRequestsPanel';
 import { RemoveBgStudio } from './RemoveBg/RemoveBgStudio';
 import { Product, Order } from '../types';
@@ -74,7 +76,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({ isOpen, on
   } = useAdmin();
 
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [activeTab, setActiveTab] = useState<'products' | 'orders' | 'categories' | 'subcategories' | 'images' | 'removebg' | 'requests' | 'packaging' | 'settings'>('products');
+  const [activeTab, setActiveTab] = useState<'products' | 'orders' | 'categories' | 'subcategories' | 'images' | 'removebg' | 'requests' | 'packaging' | 'flash' | 'settings'>('products');
   // Remove BG: lo studio resta montato dopo la prima apertura, così cambiando scheda non si perde il lavoro
   const [removeBgMounted, setRemoveBgMounted] = useState(false);
   const [removeBgProductId, setRemoveBgProductId] = useState<string | null>(null);
@@ -270,6 +272,10 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({ isOpen, on
           <button type="button" onClick={() => setActiveTab('packaging')} className={TAB_BUTTON(activeTab === 'packaging')}>
             <Tag className="w-4 h-4" />
             <span>Prezzi Personalizzazione</span>
+          </button>
+          <button type="button" onClick={() => setActiveTab('flash')} className={TAB_BUTTON(activeTab === 'flash')}>
+            <Timer className="w-4 h-4" />
+            <span>Offerte a tempo</span>
           </button>
           <button type="button" onClick={() => setActiveTab('settings')} className={TAB_BUTTON(activeTab === 'settings')}>
             <SlidersHorizontal className="w-4 h-4" />
@@ -586,6 +592,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({ isOpen, on
         {/* Tab: Parametri */}
         {activeTab === 'requests' && <CustomizationRequestsPanel onNewCountChange={setNewCustomizations} />}
         {activeTab === 'packaging' && <CustomizationPricingPanel />}
+        {activeTab === 'flash' && <FlashOffersPanel />}
 
         {activeTab === 'settings' && (
           <form onSubmit={handleSaveSettings} className="p-4 sm:p-6 overflow-y-auto flex-1 space-y-5 text-left text-sm">

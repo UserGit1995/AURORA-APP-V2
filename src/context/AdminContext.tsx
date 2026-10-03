@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { UserProfile, SystemSettings, Product, Order, Category, Subcategory } from '../types';
 import { PRODUCTS as DEMO_PRODUCTS, INITIAL_ORDERS as DEMO_ORDERS, CATEGORIES as DEMO_CATEGORIES } from '../data/catalog';
 import { submitOrder, SubmitResult } from '../services/orderSubmit';
@@ -18,8 +18,10 @@ import {
   deleteSupabaseSubcategory,
   syncSupabaseOrder,
   syncSupabaseSettings,
+  fetchSupabasePublicSetting,
   newDbId
 } from '../services/supabase';
+import { applyFlashOffers, flashLiveKey, stripFlashFields } from '../utils/flashOffers';
 
 interface AdminContextType {
   currentUser: UserProfile | null;
@@ -68,6 +70,10 @@ interface AdminContextType {
   
   // System Settings Management
   updateSystemSettings: (settings: Partial<SystemSettings>) => void;
+  // Offerte a tempo: listino senza offerte applicate (per l'admin) e interruttore generale
+  baseProductsList: Product[];
+  flashOffersEnabled: boolean;
+  setFlashOffersEnabled: (enabled: boolean) => void;
   refreshFromCloud: () => Promise<void>;
 }
 
@@ -267,6 +273,11 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       if (cloudCategories && cloudCategories.length > 0) {
         setCategoriesList(subs.length > 0 ? buildCategoryTree(cloudCategories, subs) : cloudCategories);
       }
+      // Interruttore generale delle offerte a tempo (uguale per tutti i clienti)
+      const flashFlag = await fetchSupabasePublicSetting('flashOffersEnabled');
+      if (flashFlag !== null) {
+        setSystemSettings((prev) => ({ ...prev, flashOffersEnabled: flashFlag !== 'false' }));
+      }
       if (cloudProducts && cloudProducts.length > 0) {
         setProductsList(subs.length > 0 ? enrichProductsWithSubcategoryTree(cloudProducts, subs) : cloudProducts);
       }
@@ -383,7 +394,10 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const withSubcategoryTree = (p: Product): Product =>
     subcategoriesList.length > 0 ? enrichProductsWithSubcategoryTree([p], subcategoriesList)[0] : p;
 
-  const updateProduct = (updated: Product) => {
+  const updateProduct = (incoming: Product) => {
+    const base = productsList.find((p) => p.id === incoming.id);
+    const effective = effectiveProducts.find((p) => p.id === incoming.id);
+    const updated = base && effective && base !== effective ? stripFlashFields(incoming, base, effective) : incoming;
     const enriched = withSubcategoryTree(updated);
     setProductsList((prev) => prev.map((p) => (p.id === enriched.id ? enriched : p)));
     syncSupabaseProduct(enriched);
@@ -480,6 +494,25 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     return result;
   };
 
+  // ---------- Offerte a tempo ----------
+  const flashOffersEnabled = systemSettings.flashOffersEnabled !== false;
+  const [flashKey, setFlashKey] = useState(() => flashLiveKey(productsList, flashOffersEnabled, new Date()));
+  useEffect(() => {
+    const check = () => {
+      const key = flashLiveKey(productsList, flashOffersEnabled, new Date());
+      setFlashKey((prev) => (prev === key ? prev : key));
+    };
+    check();
+    // Controllo ogni 20 secondi: le offerte partono e si chiudono da sole all'orario stabilito
+    const timer = window.setInterval(check, 20000);
+    return () => window.clearInterval(timer);
+  }, [productsList, flashOffersEnabled]);
+  const effectiveProducts = useMemo(
+    () => applyFlashOffers(productsList, flashOffersEnabled, new Date()),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [productsList, flashOffersEnabled, flashKey]
+  );
+
   // Settings
   const updateSystemSettings = (settings: Partial<SystemSettings>) => {
     setSystemSettings((prev) => {
@@ -502,7 +535,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         loginAsUser,
         logout,
         toggleAdminMode,
-        productsList,
+        productsList: effectiveProducts,
         categoriesList,
         subcategoriesList,
         ordersList,
@@ -524,6 +557,9 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         createOrder,
         updateSystemSettings,
         refreshFromCloud,
+        baseProductsList: productsList,
+        flashOffersEnabled,
+        setFlashOffersEnabled: (enabled: boolean) => updateSystemSettings({ flashOffersEnabled: enabled }),
       }}
     >
       {children}

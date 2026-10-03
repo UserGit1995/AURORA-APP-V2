@@ -80,6 +80,24 @@ export default function App() {
   // Cart state: Preloaded with items from productsList
   const [cart, setCart] = useState<CartItem[]>([]);
 
+  // Il carrello segue sempre il prezzo attuale: quando un'offerta a tempo
+  // inizia o finisce, anche i prodotti già nel carrello si aggiornano.
+  useEffect(() => {
+    setCart((prev) => {
+      if (prev.length === 0) return prev;
+      let changed = false;
+      const next = prev.map((item) => {
+        const fresh = productsList.find((p) => p.id === item.product.id);
+        if (fresh && fresh !== item.product) {
+          changed = true;
+          return { ...item, product: fresh };
+        }
+        return item;
+      });
+      return changed ? next : prev;
+    });
+  }, [productsList]);
+
   // Favorites state
   const [favorites, setFavorites] = useState<string[]>([]);
 
