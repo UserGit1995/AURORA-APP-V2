@@ -15,6 +15,11 @@ interface FeaturedProductsSectionProps {
   onAddToCart: (product: Product, e: React.MouseEvent) => void;
   onViewAll: () => void;
   addedProductId?: string | null;
+  /** Titolo personalizzato (es. sezione Ho.Re.Ca) */
+  title?: string;
+  /** Identificativo della sezione, per distinguere più sezioni nella stessa pagina */
+  sectionId?: string;
+  className?: string;
 }
 
 export const FeaturedProductsSection: React.FC<FeaturedProductsSectionProps> = ({
@@ -27,12 +32,15 @@ export const FeaturedProductsSection: React.FC<FeaturedProductsSectionProps> = (
   onAddToCart,
   onViewAll,
   addedProductId,
+  title,
+  sectionId = 'featured',
+  className = 'w-full mt-7 mb-12',
 }) => {
   const { t, language } = useLanguage();
   const { isBusinessCustomer, vatFactor } = useAdmin();
 
   return (
-    <section className="w-full mt-7 mb-12">
+    <section className={className}>
       {/* Section Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2.5">
@@ -40,11 +48,11 @@ export const FeaturedProductsSection: React.FC<FeaturedProductsSectionProps> = (
             <Star className="w-4 h-4 fill-sky-400/30" />
           </div>
           <h2 className="text-white text-base sm:text-lg font-bold tracking-tight">
-            {t('featured.sectionTitle', 'Prodotti in evidenza')}
+            {title || t('featured.sectionTitle', 'Prodotti in evidenza')}
           </h2>
         </div>
         <button
-          id="view-all-featured-btn"
+          id={`view-all-${sectionId}-btn`}
           onClick={onViewAll}
           className="text-xs sm:text-sm font-semibold text-sky-400 hover:text-sky-300 transition-colors flex items-center gap-1 group"
         >
@@ -65,7 +73,7 @@ export const FeaturedProductsSection: React.FC<FeaturedProductsSectionProps> = (
           return (
             <div
               key={product.id}
-              id={`product-card-${product.id}`}
+              id={`${sectionId}-product-card-${product.id}`}
               onClick={() => onSelectProduct(product)}
               className={`group relative cursor-pointer bg-gradient-to-t from-slate-950/90 via-slate-950/55 to-slate-950/20 hover:from-slate-950/95 border rounded-2xl p-3 flex flex-col justify-between transition-all duration-200 hover:translate-y-[-2px] shadow-sm hover:shadow-lg hover:shadow-sky-950/40 ${
                 isCompared

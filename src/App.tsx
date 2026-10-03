@@ -8,6 +8,7 @@ import { FlyerSection } from './components/FlyerSection';
 import { CategorySection } from './components/CategorySection';
 import { PromoBanner } from './components/PromoBanner';
 import { FeaturedProductsSection } from './components/FeaturedProductsSection';
+import { HORECA_CATEGORY_IDS, isHorecaCategory } from './lib/horeca';
 import { ProductDetailModal } from './components/ProductDetailModal';
 import { CartDrawer } from './components/CartDrawer';
 import { ContactModal } from './components/ContactModal';
@@ -595,9 +596,10 @@ export default function App() {
                 }}
               />
 
-              {/* 4. Prodotti in evidenza */}
+              {/* 4. Prodotti in evidenza (marche, senza Ho.Re.Ca) */}
               <FeaturedProductsSection
-                products={productsList}
+                className="w-full mt-7"
+                products={productsList.filter((p) => !isHorecaCategory(p.categoryId))}
                 favorites={favorites}
                 onToggleFavorite={handleToggleFavorite}
                 comparedProductIds={comparedProductIds}
@@ -605,6 +607,25 @@ export default function App() {
                 onSelectProduct={setSelectedProduct}
                 onAddToCart={handleAddToCart}
                 onViewAll={() => {
+                  setActiveTab('categorie');
+                }}
+                addedProductId={addedProductId}
+              />
+
+              {/* 5. Prodotti in evidenza Ho.Re.Ca - Monouso */}
+              <FeaturedProductsSection
+                sectionId="featured-horeca"
+                title="Prodotti in evidenza Ho.Re.Ca - Monouso"
+                products={productsList.filter((p) => isHorecaCategory(p.categoryId))}
+                favorites={favorites}
+                onToggleFavorite={handleToggleFavorite}
+                comparedProductIds={comparedProductIds}
+                onToggleCompare={handleToggleCompare}
+                onSelectProduct={setSelectedProduct}
+                onAddToCart={handleAddToCart}
+                onViewAll={() => {
+                  setInitialSubcategoryId(null);
+                  setSelectedCategoryId(HORECA_CATEGORY_IDS[1]);
                   setActiveTab('categorie');
                 }}
                 addedProductId={addedProductId}
