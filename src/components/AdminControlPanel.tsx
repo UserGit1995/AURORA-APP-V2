@@ -132,6 +132,16 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({ isOpen, on
     setSettingsForm(systemSettings);
   }, [systemSettings]);
 
+  // Pagina a schermo intero: blocca lo scorrimento della home sotto
+  React.useEffect(() => {
+    if (!isOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   const handleOpenNewProduct = () => {
@@ -183,111 +193,177 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({ isOpen, on
     setTimeout(() => setSettingsSaved(false), 2000);
   };
 
+  type TabId = typeof activeTab;
+  const NAV_GROUPS: { title: string; items: { id: TabId; label: string; icon: React.ElementType; badge?: string; desc: string }[] }[] = [
+    {
+      title: 'Catalogo',
+      items: [
+        { id: 'products', label: 'Prodotti', icon: Package, badge: String(productsList.length), desc: 'Modifica prezzi, giacenze, schede tecniche e foto degli articoli.' },
+        { id: 'categories', label: 'Categorie', icon: FolderTree, badge: String(categoriesList.length), desc: 'Crea, rinomina e ordina le categorie principali del catalogo.' },
+        { id: 'subcategories', label: 'Sottocategorie', icon: FolderTree, badge: String(subcategoriesList.length), desc: 'Gestisci marche, tipologie e sottosezioni di ogni categoria.' },
+      ],
+    },
+    {
+      title: 'Vendite e promozioni',
+      items: [
+        { id: 'orders', label: 'Ordini', icon: ListOrdered, badge: String(ordersList.length), desc: 'Controlla e aggiorna lo stato degli ordini dei clienti.' },
+        { id: 'flash', label: 'Offerte a tempo', icon: Timer, desc: 'Programma prezzi in offerta con data e ora di inizio e fine.' },
+        { id: 'flyer', label: 'Volantino', icon: BookOpen, desc: 'Carica il volantino sfogliabile mostrato nella home.' },
+      ],
+    },
+    {
+      title: 'Personalizzazioni',
+      items: [
+        { id: 'requests', label: 'Richieste', icon: Palette, badge: newCustomizations > 0 ? `${newCustomizations} nuove` : undefined, desc: 'Richieste di packaging personalizzato inviate dai clienti.' },
+        { id: 'packaging', label: 'Prezzi personalizzazione', icon: Tag, desc: 'Listino e opzioni per il packaging personalizzato.' },
+      ],
+    },
+    {
+      title: 'Immagini',
+      items: [
+        { id: 'images', label: 'Immagini prodotti', icon: ImageIcon, desc: 'Importa, cerca e controlla le foto dei prodotti.' },
+        { id: 'removebg', label: 'Rimuovi sfondo', icon: Scissors, desc: 'Scontorna le foto dei prodotti, una alla volta o in blocco.' },
+      ],
+    },
+    {
+      title: 'Impostazioni',
+      items: [{ id: 'settings', label: 'Parametri', icon: SlidersHorizontal, desc: 'Dati aziendali, soglie commerciali e impostazioni generali.' }],
+    },
+  ];
+  const allNav = NAV_GROUPS.flatMap((g) => g.items);
+  const current = allNav.find((i) => i.id === activeTab) || allNav[0];
+  const goTo = (id: TabId) => (id === 'removebg' ? openRemoveBg(null) : setActiveTab(id));
+  const CurrentIcon = current.icon;
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/70 backdrop-blur-sm overflow-y-auto">
-      <div
-        className={`relative w-full ${activeTab === 'removebg' ? 'max-w-7xl' : 'max-w-5xl'} bg-[#0d1420] border border-[#1c2433] rounded-2xl overflow-hidden shadow-2xl flex flex-col max-h-[94vh] transition-[max-width] duration-200`}
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Header */}
-        <div className="p-4 sm:p-5 border-b border-[#1c2433] flex flex-wrap items-center justify-between gap-3 shrink-0">
-          <div className="flex items-center gap-3 min-w-0">
-            <div className="w-10 h-10 rounded-xl bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 flex items-center justify-center shrink-0">
-              <SlidersHorizontal className="w-5 h-5" />
+    <div className="fixed inset-0 z-50 flex flex-col bg-[#070f1d] text-left">
+      {/* Barra superiore */}
+      <header className="shrink-0 h-16 px-3 sm:px-6 flex items-center justify-between gap-3 border-b border-[#1c2433] bg-[#0b1526]">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="w-10 h-10 rounded-xl bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 flex items-center justify-center shrink-0">
+            <SlidersHorizontal className="w-5 h-5" />
+          </div>
+          <div className="min-w-0">
+            <h1 className="text-base sm:text-lg font-bold text-white leading-tight truncate">Pannello di gestione</h1>
+            <div className="flex items-center gap-2 text-xs text-slate-400">
+              <span className="truncate">{currentUser?.name} · {currentUser?.role}</span>
+              <span className="hidden sm:inline">•</span>
+              {isSupabaseConnected ? (
+                <span className="hidden sm:flex items-center gap-1 text-emerald-400">
+                  <Cloud className="w-3.5 h-3.5" /> Cloud connesso
+                </span>
+              ) : (
+                <span className="hidden sm:flex items-center gap-1 text-slate-500">
+                  <CloudOff className="w-3.5 h-3.5" /> Modalità locale
+                </span>
+              )}
             </div>
-            <div className="min-w-0">
-              <h2 className="text-base sm:text-lg font-bold text-white leading-tight">
-                Pannello di gestione
-              </h2>
-              <div className="flex items-center gap-2 text-xs text-slate-400 mt-0.5">
-                <span className="truncate">{currentUser?.name} · {currentUser?.role}</span>
-                <span className="text-slate-400">•</span>
-                {isSupabaseConnected ? (
-                  <span className="flex items-center gap-1 text-emerald-400">
-                    <Cloud className="w-3.5 h-3.5" /> Cloud connesso
-                  </span>
-                ) : (
-                  <span className="flex items-center gap-1 text-slate-500">
-                    <CloudOff className="w-3.5 h-3.5" /> Modalità locale
-                  </span>
-                )}
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 shrink-0">
+          {isSupabaseConnected && (
+            <button
+              type="button"
+              onClick={async () => {
+                setIsRefreshing(true);
+                await refreshFromCloud();
+                setTimeout(() => setIsRefreshing(false), 500);
+              }}
+              disabled={isRefreshing}
+              className={BTN_SECONDARY}
+              title="Sincronizza e scarica dati da Supabase"
+            >
+              <RotateCcw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin' : ''}`} />
+              <span className="hidden md:inline">{isRefreshing ? 'Sincronizzo…' : 'Aggiorna dati'}</span>
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={onClose}
+            title="Chiudi e torna alla home"
+            aria-label="Chiudi e torna alla home"
+            className="inline-flex items-center gap-2 pl-3 pr-2.5 py-2 rounded-xl bg-[#0d1420] border border-[#1c2433] text-slate-300 hover:text-white hover:border-rose-500/60 hover:bg-rose-500/10 transition-colors"
+          >
+            <span className="hidden sm:inline text-sm font-semibold">Torna alla home</span>
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+      </header>
+
+      {/* Menu sezioni su cellulare */}
+      <nav className="lg:hidden shrink-0 flex gap-1.5 overflow-x-auto no-scrollbar px-3 py-2 border-b border-[#1c2433] bg-[#0b1526]">
+        {allNav.map((item) => {
+          const Icon = item.icon;
+          const active = activeTab === item.id;
+          return (
+            <button
+              key={item.id}
+              type="button"
+              onClick={() => goTo(item.id)}
+              className={`shrink-0 inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold transition-colors ${
+                active ? 'bg-indigo-600 text-white' : 'bg-[#0d1420] text-slate-400 border border-[#1c2433]'
+              }`}
+            >
+              <Icon className="w-3.5 h-3.5" />
+              {item.label}
+            </button>
+          );
+        })}
+      </nav>
+
+      <div className="flex-1 min-h-0 flex">
+        {/* Menu laterale */}
+        <aside className="hidden lg:flex w-64 shrink-0 flex-col gap-5 overflow-y-auto border-r border-[#1c2433] bg-[#0b1526] px-3 py-5">
+          {NAV_GROUPS.map((group) => (
+            <div key={group.title}>
+              <p className="px-3 mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">{group.title}</p>
+              <div className="space-y-0.5">
+                {group.items.map((item) => {
+                  const Icon = item.icon;
+                  const active = activeTab === item.id;
+                  return (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => goTo(item.id)}
+                      className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                        active
+                          ? 'bg-indigo-500/15 text-white border border-indigo-500/30'
+                          : 'text-slate-400 hover:text-white hover:bg-[#121c2e] border border-transparent'
+                      }`}
+                    >
+                      <Icon className={`w-4 h-4 shrink-0 ${active ? 'text-indigo-300' : ''}`} />
+                      <span className="flex-1 text-left truncate">{item.label}</span>
+                      {item.badge && (
+                        <span
+                          className={`text-[10.5px] font-semibold px-1.5 py-0.5 rounded-md ${
+                            item.id === 'requests' ? 'bg-amber-500/20 text-amber-300' : 'bg-[#16213a] text-slate-400'
+                          }`}
+                        >
+                          {item.badge}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
               </div>
             </div>
-          </div>
+          ))}
+        </aside>
 
-          <div className="flex items-center gap-2 shrink-0">
-            {isSupabaseConnected && (
-              <button
-                type="button"
-                onClick={async () => {
-                  setIsRefreshing(true);
-                  await refreshFromCloud();
-                  setTimeout(() => setIsRefreshing(false), 500);
-                }}
-                disabled={isRefreshing}
-                className={BTN_SECONDARY}
-                title="Sincronizza e scarica dati da Supabase"
-              >
-                <RotateCcw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin' : ''}`} />
-                <span className="hidden md:inline">{isRefreshing ? 'Sincronizzo…' : 'Aggiorna dati'}</span>
-              </button>
-            )}
-            <button
-              onClick={onClose}
-              className="p-2 rounded-full bg-[#0d1420] text-slate-400 hover:text-white transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-        </div>
-
-        {/* Tab Selector Navigation */}
-        <div className="px-4 sm:px-6 border-b border-[#1c2433] bg-[#0d1420] flex items-center gap-1 overflow-x-auto no-scrollbar shrink-0">
-          <button type="button" onClick={() => setActiveTab('products')} className={TAB_BUTTON(activeTab === 'products')}>
-            <Package className="w-4 h-4" />
-            <span>Prodotti ({productsList.length})</span>
-          </button>
-          <button type="button" onClick={() => setActiveTab('orders')} className={TAB_BUTTON(activeTab === 'orders')}>
-            <ListOrdered className="w-4 h-4" />
-            <span>Ordini ({ordersList.length})</span>
-          </button>
-          <button type="button" onClick={() => setActiveTab('categories')} className={TAB_BUTTON(activeTab === 'categories')}>
-            <FolderTree className="w-4 h-4" />
-            <span>Categorie ({categoriesList.length})</span>
-          </button>
-          <button type="button" onClick={() => setActiveTab('subcategories')} className={TAB_BUTTON(activeTab === 'subcategories')}>
-            <FolderTree className="w-4 h-4" />
-            <span>Sottocategorie ({subcategoriesList.length})</span>
-          </button>
-          <button type="button" onClick={() => setActiveTab('images')} className={TAB_BUTTON(activeTab === 'images')}>
-            <ImageIcon className="w-4 h-4" />
-            <span>Immagini</span>
-          </button>
-          <button type="button" onClick={() => openRemoveBg(null)} className={TAB_BUTTON(activeTab === 'removebg')}>
-            <Scissors className="w-4 h-4" />
-            <span>Rimuovi sfondo</span>
-          </button>
-          <button type="button" onClick={() => setActiveTab('requests')} className={TAB_BUTTON(activeTab === 'requests')}>
-            <Palette className="w-4 h-4" />
-            <span>Personalizzazioni{newCustomizations > 0 ? ` (${newCustomizations} nuove)` : ''}</span>
-          </button>
-          <button type="button" onClick={() => setActiveTab('packaging')} className={TAB_BUTTON(activeTab === 'packaging')}>
-            <Tag className="w-4 h-4" />
-            <span>Prezzi Personalizzazione</span>
-          </button>
-          <button type="button" onClick={() => setActiveTab('flash')} className={TAB_BUTTON(activeTab === 'flash')}>
-            <Timer className="w-4 h-4" />
-            <span>Offerte a tempo</span>
-          </button>
-          <button type="button" onClick={() => setActiveTab('flyer')} className={TAB_BUTTON(activeTab === 'flyer')}>
-            <BookOpen className="w-4 h-4" />
-            <span>Volantino</span>
-          </button>
-          <button type="button" onClick={() => setActiveTab('settings')} className={TAB_BUTTON(activeTab === 'settings')}>
-            <SlidersHorizontal className="w-4 h-4" />
-            <span>Parametri</span>
-          </button>
-        </div>
+        {/* Contenuto della sezione */}
+        <main className="flex-1 min-w-0 overflow-y-auto">
+          <div className={`mx-auto w-full ${activeTab === 'removebg' ? 'max-w-7xl' : 'max-w-6xl'} flex flex-col pb-10`}>
+            <div className="px-4 sm:px-6 pt-5 sm:pt-6 pb-1 flex items-start gap-3">
+              <div className="w-9 h-9 rounded-lg bg-indigo-500/15 text-indigo-300 flex items-center justify-center shrink-0">
+                <CurrentIcon className="w-4.5 h-4.5" />
+              </div>
+              <div className="min-w-0">
+                <h2 className="text-lg sm:text-xl font-bold text-white leading-tight">{current.label}</h2>
+                <p className="text-xs sm:text-sm text-slate-400 mt-0.5">{current.desc}</p>
+              </div>
+            </div>
 
         {/* Tab: Prodotti */}
         {activeTab === 'products' && (
@@ -589,7 +665,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({ isOpen, on
         {removeBgMounted && (
           <div
             className={activeTab === 'removebg' ? 'flex flex-col shrink-0 overflow-hidden' : 'hidden'}
-            style={{ height: 'calc(94vh - 9rem)' }}
+            style={{ height: 'calc(100vh - 11rem)' }}
           >
             <RemoveBgStudio initialProductId={removeBgProductId} openToken={removeBgToken} />
           </div>
@@ -725,6 +801,8 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({ isOpen, on
             }}
           />
         )}
+          </div>
+        </main>
       </div>
     </div>
   );
