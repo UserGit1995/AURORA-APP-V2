@@ -1,5 +1,7 @@
 import React from 'react';
 import { ArrowLeft } from 'lucide-react';
+import { useAdmin } from '../context/AdminContext';
+import { isCookieBannerActive, openCookieSettings } from '../utils/cookieConsent';
 
 export type LegalPage = 'privacy' | 'termini';
 
@@ -12,16 +14,21 @@ interface LegalViewProps {
 const H2 = 'mb-2 mt-6 text-lg font-semibold text-white font-heading';
 const P = 'mb-4';
 
-const OwnerNote: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+// Promemoria visibile solo all'amministratore, mai ai clienti
+const OwnerNote: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { isAdmin } = useAdmin();
+  if (!isAdmin) return null;
+  return (
   <div className="mb-8 rounded-xl border border-dashed border-sky-500/40 bg-sky-500/5 p-4 text-slate-200">
     <strong>Nota per il titolare del sito:</strong> {children}
   </div>
-);
+  );
+};
 
 const PrivacyContent: React.FC = () => (
   <>
-    <h1 className="mb-2 text-2xl font-bold text-white font-heading">Informativa sulla Privacy</h1>
-    <p className="mb-6 text-xs">Ultimo aggiornamento: da completare a cura del titolare.</p>
+    <h1 className="mb-2 text-2xl font-bold text-white font-heading">Informativa sulla Privacy e sui Cookie</h1>
+    <p className="mb-6 text-xs">Ultimo aggiornamento: 3 ottobre 2026.</p>
 
     <OwnerNote>
       questo è un testo generico di partenza, utile a far comparire subito una pagina coerente con i
@@ -62,6 +69,37 @@ const PrivacyContent: React.FC = () => (
       Puoi chiedere in qualsiasi momento di accedere, correggere o cancellare i tuoi dati, scrivendo
       all'indirizzo email di contatto del sito.
     </p>
+
+    <h2 className={H2}>Cookie e strumenti simili</h2>
+    <p className={P}>
+      Questo sito usa esclusivamente <strong className="text-slate-200">strumenti tecnici</strong>, necessari al
+      suo funzionamento. Non usiamo cookie di profilazione, di marketing o di statistica di terze parti, e non
+      tracciamo la tua navigazione su altri siti. Per questo motivo, come previsto dalle linee guida del Garante
+      per la protezione dei dati personali, non ti chiediamo il consenso tramite banner.
+    </p>
+    <p className={P}>Gli strumenti tecnici che usiamo, salvati solo nel tuo browser, servono a:</p>
+    <ul className="mb-4 list-disc pl-5 space-y-1">
+      <li>mantenerti collegato al tuo account dopo l'accesso;</li>
+      <li>ricordare il contenuto del carrello, i prodotti preferiti e quelli da confrontare;</li>
+      <li>ricordare le tue preferenze (per esempio lingua e suono del volantino);</li>
+      <li>permettere di installare l'app sul telefono e di aprirla più velocemente.</li>
+    </ul>
+    <p className={P}>
+      I caratteri grafici del sito sono caricati direttamente dai nostri server: il tuo indirizzo IP non viene
+      trasmesso a fornitori esterni di caratteri. Il sito è ospitato su servizi tecnici professionali (hosting e
+      database) che trattano i dati solo per farlo funzionare.
+    </p>
+    <p className={P}>
+      Puoi cancellare in qualsiasi momento questi dati dalle impostazioni del tuo browser: in quel caso potrebbe
+      essere necessario accedere di nuovo e il carrello verrebbe svuotato.
+    </p>
+    {isCookieBannerActive() && (
+      <p className={P}>
+        <button type="button" onClick={openCookieSettings} className="text-sky-400 underline hover:text-sky-300">
+          Gestisci le tue preferenze sui cookie
+        </button>
+      </p>
+    )}
   </>
 );
 

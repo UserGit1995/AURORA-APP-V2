@@ -29,6 +29,7 @@ import { BrandDetailView } from './components/BrandDetailView';
 import { ScrollToTopButton } from './components/ScrollToTopButton';
 import { PersonalizzaView } from './components/PersonalizzaView';
 import { LegalView } from './components/LegalView';
+import { CookieBanner } from './components/CookieBanner';
 import { CustomizationTrackingView } from './components/CustomizationTrackingView';
 import { parseInitialRoute, syncUrlWithTab } from './utils/deepLinks';
 
@@ -837,6 +838,9 @@ export default function App() {
         }}
         onSelectProduct={setSelectedProduct}
       />
+
+      {/* Banner cookie: si attiva solo da src/config/cookies.ts (oggi spento, non serve) */}
+      <CookieBanner onOpenPrivacy={() => setActiveTab('privacy')} />
 
       {/* SuperAdmin Master Control Panel Modal - STRICTLY FOR AUTHENTICATED ADMIN ONLY */}
       {isAdmin && (
