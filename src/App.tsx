@@ -4,6 +4,7 @@ import { Sidebar, NavTab } from './components/Sidebar';
 import { Header } from './components/Header';
 import { HeroBanner } from './components/HeroBanner';
 import { BackgroundRotator } from './components/BackgroundRotator';
+import { FlyerSection } from './components/FlyerSection';
 import { CategorySection } from './components/CategorySection';
 import { PromoBanner } from './components/PromoBanner';
 import { FeaturedProductsSection } from './components/FeaturedProductsSection';
@@ -524,6 +525,9 @@ export default function App() {
                   window.scrollTo({ top: 0 });
                 }}
               />
+
+              {/* Volantino offerte sfogliabile */}
+              <FlyerSection />
 
               {/* 2. Categorie principali */}
               <CategorySection
