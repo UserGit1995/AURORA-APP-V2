@@ -1,5 +1,6 @@
 import React, { useEffect, useImperativeHandle, useRef, useState, forwardRef } from 'react';
 import { loadScript } from '../utils/loadScript';
+import { playFlipSound, unlockFlipSound } from '../utils/pageFlipSound';
 
 export interface FlipBookHandle {
   next: () => void;
@@ -82,7 +83,15 @@ export const FlipBook = forwardRef<FlipBookHandle, FlipBookProps>(
             startPage,
           });
           pf.loadFromImages(pages);
-          pf.on('flip', (e: any) => onPageChange?.(Number(e.data) || 0));
+          pf.on('flip', (e: any) => {
+            onPageChange?.(Number(e.data) || 0);
+            // pagina girata trascinando col mouse: suono se non è già partito
+            playFlipSound(1000);
+          });
+          // Suono quando la pagina inizia a girare (frecce o dito)
+          pf.on('changeState', (e: any) => {
+            if (e.data === 'flipping') playFlipSound();
+          });
           flipRef.current = pf;
           setLoading(false);
           onReady?.(pages.length);
@@ -115,7 +124,11 @@ export const FlipBook = forwardRef<FlipBookHandle, FlipBookProps>(
           </div>
         )}
         {error && <p className="text-sm text-rose-400 text-center py-10">{error}</p>}
-        <div ref={hostRef} className="w-full mx-auto" style={{ maxWidth: narrow ? maxWidth : maxWidth * 2 }} />
+        <div
+          ref={hostRef}
+          onPointerDown={unlockFlipSound}
+          onTouchStart={unlockFlipSound}
+          className="w-full mx-auto" style={{ maxWidth: narrow ? maxWidth : maxWidth * 2 }} />
       </div>
     );
   }

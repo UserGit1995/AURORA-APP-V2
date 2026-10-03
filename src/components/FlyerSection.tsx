@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { BookOpen, ChevronLeft, ChevronRight, Maximize2, X, ZoomIn, ZoomOut } from 'lucide-react';
+import { BookOpen, ChevronLeft, ChevronRight, Maximize2, X, ZoomIn, ZoomOut, Volume2, VolumeX } from 'lucide-react';
+import { isFlipSoundOn, setFlipSoundOn, unlockFlipSound } from '../utils/pageFlipSound';
 import { FlipBook, FlipBookHandle } from './FlipBook';
 import { Flyer, fetchActiveFlyer, shortDate } from '../services/flyers';
 
@@ -32,6 +33,24 @@ export const FlyerSection: React.FC = () => {
   const [page, setPage] = useState(0);
   const [fullscreen, setFullscreen] = useState(false);
   const [zoom, setZoom] = useState(1); // 1 = sfoglia; >1 = pagina ingrandita
+  const [soundOn, setSoundOn] = useState(isFlipSoundOn);
+  const toggleSound = () => {
+    const next = !soundOn;
+    setSoundOn(next);
+    setFlipSoundOn(next);
+    if (next) unlockFlipSound();
+  };
+  const SoundButton = () => (
+    <button
+      type="button"
+      onClick={toggleSound}
+      aria-label={soundOn ? 'Disattiva suono' : 'Attiva suono'}
+      title={soundOn ? 'Disattiva suono' : 'Attiva suono'}
+      className="p-2 rounded-xl bg-[#0e1b30] border border-[#1c2433] text-white hover:border-sky-500"
+    >
+      {soundOn ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+    </button>
+  );
   const bookRef = useRef<FlipBookHandle>(null);
   const bigBookRef = useRef<FlipBookHandle>(null);
 
@@ -71,6 +90,8 @@ export const FlyerSection: React.FC = () => {
             {validity && <p className="text-sky-300 text-xs font-semibold">{validity}</p>}
           </div>
         </div>
+        <div className="flex items-center gap-1.5 shrink-0">
+        <SoundButton />
         <button
           type="button"
           onClick={openFull}
@@ -80,6 +101,7 @@ export const FlyerSection: React.FC = () => {
           <span className="hidden sm:inline">Schermo intero</span>
           <span className="sm:hidden">Apri</span>
         </button>
+        </div>
       </div>
 
       <div className="rounded-2xl border border-[#1c2433] bg-[#0b1526]/70 p-3 sm:p-5">
@@ -107,6 +129,7 @@ export const FlyerSection: React.FC = () => {
               {validity && <p className="text-sky-300 text-[11px] font-semibold">{validity}</p>}
             </div>
             <div className="flex items-center gap-1.5 shrink-0">
+              <SoundButton />
               <button
                 type="button"
                 onClick={() => setZoom((z) => (z > 1 ? 1 : 2))}
