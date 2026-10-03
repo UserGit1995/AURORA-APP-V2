@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { X, ArrowLeft, Heart, Plus, Minus, ShoppingBag, ShieldCheck, Check, Package, Star, Scale, BookOpen, FlaskConical, Info } from 'lucide-react';
 import { Product } from '../types';
 import { ProductTrendSparkline } from './ProductTrendSparkline';
-import { ProductUsageGuidelines } from './ProductUsageGuidelines';
 import { useAdmin } from '../context/AdminContext';
 import { PLACEHOLDER_IMAGE } from '../utils/imageRepair';
 
@@ -89,26 +88,9 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
             <Info className="w-4 h-4" />
             <span>Panoramica Articolo</span>
           </button>
-
-          <button
-            type="button"
-            id="tab-product-usage-guidelines"
-            onClick={() => setActiveTab('usage')}
-            className={`inline-flex items-center gap-2 px-4 py-2.5 border-b-2 font-bold text-xs sm:text-sm transition-all ${
-              activeTab === 'usage'
-                ? 'border-sky-400 text-sky-400 bg-sky-500/10 rounded-t-xl'
-                : 'border-transparent text-slate-400 hover:text-slate-300 hover:bg-[#1a2230] rounded-t-xl'
-            }`}
-          >
-            <FlaskConical className="w-4 h-4" />
-            <span>Guida all'Uso & Sicurezza Chimica</span>
-            <span className="hidden sm:inline-block text-[10px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-sky-500/20 text-sky-300 border border-sky-400/30">
-              Diluizione & DPI
-            </span>
-          </button>
         </div>
 
-        {activeTab === 'overview' ? (
+        {(
           <div className="grid grid-cols-1 md:grid-cols-12 flex-1">
             {/* Left: Product Image Showcase */}
             <div className="md:col-span-5 relative bg-white p-6 flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-[#1c2433]">
@@ -318,66 +300,6 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                     )}
                   </button>
                 </div>
-              </div>
-            </div>
-          </div>
-        ) : (
-          /* Usage Guidelines Tab Content */
-          <div className="p-5 sm:p-6 space-y-6 flex-1">
-            {/* Header info in Tab */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-[#1c2433]">
-              <div>
-                <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                  <span>Guida all'Uso & Diluizione:</span>
-                  <span className="text-sky-400">{product.name}</span>
-                </h3>
-                <p className="text-xs text-slate-400 mt-0.5">
-                  Istruzioni operative certificate per il personale addetto alle pulizie e conformità HACCP.
-                </p>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setActiveTab('overview')}
-                  className="text-xs font-semibold text-slate-400 hover:text-white px-3 py-1.5 rounded-lg bg-[#0d1420] border border-[#1c2433] transition-colors"
-                >
-                  ← Torna alla Panoramica
-                </button>
-              </div>
-            </div>
-
-            {/* Generated Usage & Safety Card Component */}
-            <ProductUsageGuidelines product={product} />
-
-            {/* Bottom Quick Action Bar inside Usage tab */}
-            <div className="pt-4 border-t border-[#1c2433] flex flex-col sm:flex-row items-center justify-between gap-3">
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-slate-400">Prezzo unitario:</span>
-                <span className="text-base font-bold text-white">€{product.price.toFixed(2)}</span>
-                <span className="text-xs text-slate-400">/ {product.unit}</span>
-              </div>
-
-              <div className="flex items-center gap-3 w-full sm:w-auto">
-                <button
-                  onClick={handleAdd}
-                  className={`w-full sm:w-auto flex items-center justify-center gap-2 py-2.5 px-6 rounded-xl text-sm font-semibold transition-all duration-200 shadow-md ${
-                    addedAnimation
-                      ? 'bg-emerald-600 text-white'
-                      : 'bg-[#0284c7] hover:bg-[#0369a1] text-white shadow-sky-950/50'
-                  }`}
-                >
-                  {addedAnimation ? (
-                    <>
-                      <Check className="w-4 h-4" />
-                      <span>Aggiunto al carrello!</span>
-                    </>
-                  ) : (
-                    <>
-                      <ShoppingBag className="w-4 h-4" />
-                      <span>Aggiungi {quantity} conf. all'ordine</span>
-                    </>
-                  )}
-                </button>
               </div>
             </div>
           </div>
