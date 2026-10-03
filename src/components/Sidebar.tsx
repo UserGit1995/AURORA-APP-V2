@@ -36,7 +36,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
   // App già installata e aperta dall'icona: la voce "Scarica l'App" non serve
   const isInstalledApp =
     typeof window !== 'undefined' &&
-    (window.matchMedia?.('(display-mode: standalone)').matches || (window.navigator as any).standalone === true);
+    (window.matchMedia?.('(display-mode: standalone)').matches ||
+      (window.navigator as any).standalone === true ||
+      /AuroraApp\//.test(window.navigator.userAgent));
 
   const navItems: { id: NavTab | 'installa'; label: string; icon: React.ReactNode; badge?: number; badgeColor?: string }[] = [
     { id: 'home', label: t('nav.home', 'Home'), icon: <Home className="w-[18px] h-[18px]" /> },

@@ -24,7 +24,8 @@
     return (
       (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) ||
       window.navigator.standalone === true ||
-      (document.referrer || '').indexOf('android-app://') === 0
+      (document.referrer || '').indexOf('android-app://') === 0 ||
+      /AuroraApp\//.test(navigator.userAgent || '')
     );
   }
 
