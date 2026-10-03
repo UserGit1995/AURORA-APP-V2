@@ -237,4 +237,8 @@ export interface SystemSettings {
   enableAnnouncementBanner: boolean;
   // Interruttore generale delle offerte a tempo
   flashOffersEnabled?: boolean;
+  // Box "Offerte del mese" in home
+  promoBadgeLabel?: string;   // es. 'FINO AL'
+  promoBadgeValue?: string;   // es. '-30%'
+  promoBadgeAuto?: boolean;   // calcola lo sconto massimo dalle offerte a tempo in corso
 }

@@ -274,10 +274,19 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         setCategoriesList(subs.length > 0 ? buildCategoryTree(cloudCategories, subs) : cloudCategories);
       }
       // Interruttore generale delle offerte a tempo (uguale per tutti i clienti)
-      const flashFlag = await fetchSupabasePublicSetting('flashOffersEnabled');
-      if (flashFlag !== null) {
-        setSystemSettings((prev) => ({ ...prev, flashOffersEnabled: flashFlag !== 'false' }));
-      }
+      const [flashFlag, promoLabel, promoValue, promoAuto] = await Promise.all([
+        fetchSupabasePublicSetting('flashOffersEnabled'),
+        fetchSupabasePublicSetting('promoBadgeLabel'),
+        fetchSupabasePublicSetting('promoBadgeValue'),
+        fetchSupabasePublicSetting('promoBadgeAuto'),
+      ]);
+      setSystemSettings((prev) => ({
+        ...prev,
+        ...(flashFlag !== null ? { flashOffersEnabled: flashFlag !== 'false' } : {}),
+        ...(promoLabel !== null && promoLabel !== 'undefined' ? { promoBadgeLabel: promoLabel } : {}),
+        ...(promoValue !== null && promoValue !== 'undefined' ? { promoBadgeValue: promoValue } : {}),
+        ...(promoAuto !== null && promoAuto !== 'undefined' ? { promoBadgeAuto: promoAuto === 'true' } : {}),
+      }));
       if (cloudProducts && cloudProducts.length > 0) {
         setProductsList(subs.length > 0 ? enrichProductsWithSubcategoryTree(cloudProducts, subs) : cloudProducts);
       }

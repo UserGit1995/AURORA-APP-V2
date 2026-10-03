@@ -38,7 +38,18 @@ const labelCls = 'block text-xs font-semibold text-slate-400 mb-1';
 const cardCls = 'bg-[#111a2b] border border-[#1c2433] rounded-xl';
 
 export const FlashOffersPanel: React.FC = () => {
-  const { baseProductsList, updateProduct, flashOffersEnabled, setFlashOffersEnabled } = useAdmin();
+  const { baseProductsList, updateProduct, flashOffersEnabled, setFlashOffersEnabled, systemSettings, updateSystemSettings } = useAdmin();
+
+  // ---------- Box "Offerte del mese" in home ----------
+  const [promoLabel, setPromoLabel] = useState(systemSettings.promoBadgeLabel ?? 'FINO AL');
+  const [promoValue, setPromoValue] = useState(systemSettings.promoBadgeValue ?? '-30%');
+  const [promoAuto, setPromoAuto] = useState(!!systemSettings.promoBadgeAuto);
+  const [promoSaved, setPromoSaved] = useState(false);
+  const savePromo = () => {
+    updateSystemSettings({ promoBadgeLabel: promoLabel.trim(), promoBadgeValue: promoValue.trim(), promoBadgeAuto: promoAuto });
+    setPromoSaved(true);
+    setTimeout(() => setPromoSaved(false), 2500);
+  };
 
   const [now, setNow] = useState(() => new Date());
   useEffect(() => {
@@ -213,6 +224,52 @@ export const FlashOffersPanel: React.FC = () => {
           <Power className="w-4 h-4" />
           {flashOffersEnabled ? 'ATTIVE' : 'SPENTE'}
         </button>
+      </div>
+
+      {/* Box "Offerte del mese" in home */}
+      <div className={`${cardCls} p-4 space-y-3`}>
+        <div>
+          <h3 className="text-sm font-semibold text-white">Box "Offerte del mese" in home</h3>
+          <p className="text-xs text-slate-400 mt-1">
+            Il box mostra in automatico quante offerte a tempo sono in corso e quando termina la prima. Qui scegli il testo
+            del riquadro con lo sconto (lascia vuoto il valore per nasconderlo).
+          </p>
+        </div>
+        <div className="flex flex-col sm:flex-row gap-3 sm:items-end">
+          <div className="sm:w-40">
+            <label className={labelCls}>Scritta piccola</label>
+            <input value={promoLabel} onChange={(e) => setPromoLabel(e.target.value)} placeholder="FINO AL" className={inputCls} />
+          </div>
+          <div className="sm:w-40">
+            <label className={labelCls}>Sconto</label>
+            <input value={promoValue} onChange={(e) => setPromoValue(e.target.value)} placeholder="-30%" className={inputCls} />
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="text-xs text-slate-500">Anteprima</span>
+            <div className="bg-[#0d1420] border border-amber-500/30 px-3 py-1.5 rounded-lg text-center min-w-[64px]">
+              {promoLabel.trim() && (
+                <span className="block text-[9px] uppercase tracking-wider font-bold text-amber-300 leading-none">{promoLabel}</span>
+              )}
+              <span className="block text-amber-400 font-extrabold text-sm leading-none mt-0.5">{promoValue || '—'}</span>
+            </div>
+          </div>
+        </div>
+        <label className="flex items-center gap-2 cursor-pointer">
+          <input type="checkbox" checked={promoAuto} onChange={(e) => setPromoAuto(e.target.checked)} className="accent-sky-500" />
+          <span className="text-xs text-slate-300">
+            Quando ci sono offerte a tempo in corso, mostra in automatico lo sconto più alto (es. -45%)
+          </span>
+        </label>
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={savePromo}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-sm font-semibold"
+          >
+            Salva
+          </button>
+          {promoSaved && <span className="text-xs text-emerald-400">Salvato: è già visibile nella home.</span>}
+        </div>
       </div>
 
       {/* Nuova offerta */}
