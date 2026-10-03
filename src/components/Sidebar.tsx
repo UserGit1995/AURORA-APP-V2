@@ -1,5 +1,5 @@
 import React from 'react';
-import { Home, LayoutGrid, Tag, Star, Flame, ClipboardList, Heart, Scale, Menu, X, LogIn, LogOut, SlidersHorizontal, Palette, ShieldCheck, FileText } from 'lucide-react';
+import { Home, LayoutGrid, Tag, Star, Flame, ClipboardList, Heart, Scale, Menu, X, LogIn, LogOut, SlidersHorizontal, Palette, ShieldCheck, FileText, Download } from 'lucide-react';
 import { AuroraLogo } from './AuroraLogo';
 import { useLanguage } from '../context/LanguageContext';
 import { useAdmin } from '../context/AdminContext';
@@ -33,7 +33,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const { t } = useLanguage();
   const { isAdmin, currentUser, logout } = useAdmin();
 
-  const navItems: { id: NavTab; label: string; icon: React.ReactNode; badge?: number; badgeColor?: string }[] = [
+  // App già installata e aperta dall'icona: la voce "Scarica l'App" non serve
+  const isInstalledApp =
+    typeof window !== 'undefined' &&
+    (window.matchMedia?.('(display-mode: standalone)').matches || (window.navigator as any).standalone === true);
+
+  const navItems: { id: NavTab | 'installa'; label: string; icon: React.ReactNode; badge?: number; badgeColor?: string }[] = [
     { id: 'home', label: t('nav.home', 'Home'), icon: <Home className="w-[18px] h-[18px]" /> },
     { id: 'categorie', label: t('nav.categories', 'Categorie'), icon: <LayoutGrid className="w-[18px] h-[18px]" /> },
     { id: 'offerte', label: t('nav.deals', 'Offerte Speciali'), icon: <Tag className="w-[18px] h-[18px]" /> },
@@ -54,6 +59,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
       badgeColor: 'bg-amber-100 text-amber-300'
     },
     { id: 'personalizza', label: t('nav.customize', 'Personalizza Packaging'), icon: <Palette className="w-[18px] h-[18px]" /> },
+    ...(isInstalledApp
+      ? []
+      : [{ id: 'installa' as const, label: t('nav.install', "Scarica l'App"), icon: <Download className="w-[18px] h-[18px]" /> }]),
     { id: 'termini', label: t('nav.terms', 'Termini e Condizioni di Vendita'), icon: <FileText className="w-[18px] h-[18px]" /> },
     { id: 'privacy', label: t('nav.privacy', 'Informativa sulla Privacy'), icon: <ShieldCheck className="w-[18px] h-[18px]" /> }
   ];
@@ -101,6 +109,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     key={item.id}
                     id={`nav-item-${item.id}`}
                     onClick={() => {
+                      if (item.id === 'installa') {
+                        // Pagina con le istruzioni per installare l'app su telefono e computer
+                        window.location.href = '/installa';
+                        return;
+                      }
                       onSelectTab(item.id);
                       if (onCloseMobile) onCloseMobile();
                     }}
