@@ -84,7 +84,7 @@ export const FlyerSection: React.FC = () => {
 
       <div className="rounded-2xl border border-[#1c2433] bg-[#0b1526]/70 p-3 sm:p-5">
         {!fullscreen && (
-          <FlipBook ref={bookRef} pages={flyer.pages} maxWidth={460} startPage={page} onPageChange={setPage} />
+          <FlipBook ref={bookRef} pages={flyer.pages} maxWidth={280} startPage={page} onPageChange={setPage} />
         )}
         <div className="flex items-center justify-center gap-4 mt-3">
           <NavButton label="Pagina precedente" onClick={() => bookRef.current?.prev()} disabled={page === 0}>
@@ -97,9 +97,6 @@ export const FlyerSection: React.FC = () => {
             <ChevronRight className="w-4 h-4" />
           </NavButton>
         </div>
-        <p className="text-[11px] text-slate-500 text-center mt-2">
-          Sfoglia trascinando l'angolo della pagina o scorrendo con il dito
-        </p>
       </div>
 
       {fullscreen && (

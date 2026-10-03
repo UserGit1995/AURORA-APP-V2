@@ -32,6 +32,14 @@ export const FlipBook = forwardRef<FlipBookHandle, FlipBookProps>(
     const flipRef = useRef<any>(null);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(true);
+    // Su schermi stretti (cellulare) si vede una pagina alla volta: il riquadro va largo una pagina
+    const [narrow, setNarrow] = useState(() => typeof window !== 'undefined' && window.matchMedia('(max-width: 640px)').matches);
+    useEffect(() => {
+      const mq = window.matchMedia('(max-width: 640px)');
+      const onChange = () => setNarrow(mq.matches);
+      mq.addEventListener?.('change', onChange);
+      return () => mq.removeEventListener?.('change', onChange);
+    }, []);
 
     useImperativeHandle(ref, () => ({
       next: () => flipRef.current?.flipNext(),
@@ -107,7 +115,7 @@ export const FlipBook = forwardRef<FlipBookHandle, FlipBookProps>(
           </div>
         )}
         {error && <p className="text-sm text-rose-400 text-center py-10">{error}</p>}
-        <div ref={hostRef} className="w-full mx-auto" />
+        <div ref={hostRef} className="w-full mx-auto" style={{ maxWidth: narrow ? maxWidth : maxWidth * 2 }} />
       </div>
     );
   }
