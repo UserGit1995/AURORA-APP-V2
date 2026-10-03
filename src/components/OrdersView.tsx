@@ -336,7 +336,7 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
       )}
 
       {/* Filter and Search Bar */}
-      <div className="bg-[#0d1420] border border-[#1c2433] rounded-2xl p-3 sm:p-4 mb-6 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 shadow-md">
+      <div className="bg-gradient-to-t from-slate-950/90 via-slate-950/55 to-slate-950/20 border border-[#1c2433] rounded-2xl p-3 sm:p-4 mb-6 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 shadow-md">
         {/* Filter Pills */}
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
           <button
@@ -490,7 +490,7 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
 
       {/* Orders List */}
       {filteredOrders.length === 0 ? (
-        <div className="bg-[#0d1420] border border-[#1c2433] rounded-2xl p-12 text-center flex flex-col items-center justify-center">
+        <div className="bg-gradient-to-t from-slate-950/90 via-slate-950/55 to-slate-950/20 border border-[#1c2433] rounded-2xl p-12 text-center flex flex-col items-center justify-center">
           <div className="w-12 h-12 rounded-full bg-[#0d1420] flex items-center justify-center text-slate-500 mb-3">
             <ClipboardList className="w-6 h-6" />
           </div>
@@ -521,8 +521,8 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
                 onClick={() => setSelectedDetailOrder(order)}
                 className={`group relative cursor-pointer rounded-2xl p-4 sm:p-5 transition-all duration-200 shadow-md hover:shadow-xl ${
                   isActiveOrder 
-                    ? 'bg-[#0d1420] hover:bg-[#1a2230] border-2 border-sky-500/40 hover:border-sky-500/60/70 shadow-sky-950/40 ring-1 ring-sky-500/20' 
-                    : 'bg-[#0d1420] hover:bg-[#1a2230] border border-[#1c2433] hover:border-sky-500/40 hover:shadow-sky-950/30'
+                    ? 'bg-gradient-to-t from-slate-950/90 via-slate-950/55 to-slate-950/20 hover:from-slate-950/95 border-2 border-sky-500/40 hover:border-sky-500/60/70 shadow-sky-950/40 ring-1 ring-sky-500/20' 
+                    : 'bg-gradient-to-t from-slate-950/90 via-slate-950/55 to-slate-950/20 hover:from-slate-950/95 border border-[#1c2433] hover:border-sky-500/40 hover:shadow-sky-950/30'
                 }`}
               >
                 {/* Active Order Notice Banner */}

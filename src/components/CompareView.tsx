@@ -110,7 +110,7 @@ export const CompareView: React.FC<CompareViewProps> = ({
 
       {/* When Empty (0 products) */}
       {comparedProducts.length === 0 ? (
-        <div className="bg-[#0d1420] border border-[#1c2433] rounded-3xl p-8 sm:p-12 text-center flex flex-col items-center justify-center shadow-xl">
+        <div className="bg-gradient-to-t from-slate-950/90 via-slate-950/55 to-slate-950/20 border border-[#1c2433] rounded-3xl p-8 sm:p-12 text-center flex flex-col items-center justify-center shadow-xl">
           <div className="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/25 flex items-center justify-center text-amber-400 mb-4">
             <Scale className="w-8 h-8" />
           </div>
@@ -149,7 +149,7 @@ export const CompareView: React.FC<CompareViewProps> = ({
               {allProducts.slice(0, 3).map((prod) => (
                 <div
                   key={prod.id}
-                  className="bg-[#0d1420] border border-[#1c2433] rounded-2xl p-3 flex items-center justify-between gap-3 text-left"
+                  className="bg-gradient-to-t from-slate-950/90 via-slate-950/55 to-slate-950/20 border border-[#1c2433] rounded-2xl p-3 flex items-center justify-between gap-3 text-left"
                 >
                   <img
                     src={prod.image || PLACEHOLDER_IMAGE}
@@ -177,7 +177,7 @@ export const CompareView: React.FC<CompareViewProps> = ({
       ) : (
         <div className="space-y-6">
           {/* Controls Bar: Highlight Diff Toggle & Add slot */}
-          <div className="bg-[#0d1420] border border-[#1c2433] rounded-2xl p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-md">
+          <div className="bg-gradient-to-t from-slate-950/90 via-slate-950/55 to-slate-950/20 border border-[#1c2433] rounded-2xl p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-md">
             <div className="flex items-center gap-3">
               <label 
                 htmlFor="toggle-highlight-diff"
@@ -214,7 +214,7 @@ export const CompareView: React.FC<CompareViewProps> = ({
           </div>
 
           {/* Comparative Table Container */}
-          <div className="bg-[#0d1420] border border-[#1c2433] rounded-3xl overflow-hidden shadow-2xl">
+          <div className="bg-gradient-to-t from-slate-950/90 via-slate-950/55 to-slate-950/20 border border-[#1c2433] rounded-3xl overflow-hidden shadow-2xl">
             <div className="overflow-x-auto scrollbar-thin">
               <table className="w-full text-left border-collapse min-w-[640px]">
                 {/* 1. Header Row: Product Summaries & Action Cards */}
@@ -658,7 +658,7 @@ export const CompareView: React.FC<CompareViewProps> = ({
                   availableToAdd.map((product) => (
                     <div
                       key={product.id}
-                      className="bg-[#0d1420] hover:bg-[#1a2230] border border-[#1c2433] rounded-2xl p-3 flex items-center justify-between gap-3 transition-colors"
+                      className="bg-gradient-to-t from-slate-950/90 via-slate-950/55 to-slate-950/20 hover:from-slate-950/95 border border-[#1c2433] rounded-2xl p-3 flex items-center justify-between gap-3 transition-colors"
                     >
                       <div className="flex items-center gap-3 min-w-0">
                         <img

@@ -36,7 +36,7 @@ export function ProductCard({ product }: { product: ProductRow }) {
     <Link
       to="/prodotto/$id"
       params={{ id: product.id }}
-      className="group relative cursor-pointer bg-[#081326] hover:bg-[#0c1c36] border border-[#142646] hover:border-[#1e3966] rounded-2xl p-3 flex flex-col justify-between transition-all duration-200 hover:-translate-y-0.5 shadow-sm hover:shadow-lg hover:shadow-sky-950/40"
+      className="group relative cursor-pointer bg-gradient-to-t from-slate-950/90 via-slate-950/55 to-slate-950/20 hover:from-slate-950/95 border border-[#142646] hover:border-[#1e3966] rounded-2xl p-3 flex flex-col justify-between transition-all duration-200 hover:-translate-y-0.5 shadow-sm hover:shadow-lg hover:shadow-sky-950/40"
     >
       <div className="flex items-center justify-between w-full mb-1 z-10 gap-1">
         <div className="flex items-center gap-1 flex-wrap">

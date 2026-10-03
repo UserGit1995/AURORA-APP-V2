@@ -104,7 +104,7 @@ export const FlyerSection: React.FC = () => {
         </div>
       </div>
 
-      <div className="rounded-2xl border border-[#1c2433] bg-[#0b1526]/70 p-3 sm:p-5">
+      <div className="rounded-2xl border border-[#1c2433] bg-gradient-to-t from-slate-950/90 via-slate-950/55 to-slate-950/20 p-3 sm:p-5">
         {!fullscreen && (
           <FlipBook ref={bookRef} pages={flyer.pages} maxWidth={280} startPage={page} onPageChange={setPage} />
         )}

@@ -178,7 +178,7 @@ export const LegalView: React.FC<LegalViewProps> = ({ page, onBack, onOpenLegal 
     >
       <ArrowLeft className="w-3.5 h-3.5" /> Indietro
     </button>
-    <div className="bg-[#0d1420] border border-[#1c2433] rounded-3xl p-6 sm:p-8 text-sm leading-relaxed text-slate-400">
+    <div className="bg-gradient-to-t from-slate-950/90 via-slate-950/55 to-slate-950/20 border border-[#1c2433] rounded-3xl p-6 sm:p-8 text-sm leading-relaxed text-slate-400">
       {page === 'privacy' ? <PrivacyContent /> : <TerminiContent onOpenLegal={onOpenLegal} />}
     </div>
   </div>

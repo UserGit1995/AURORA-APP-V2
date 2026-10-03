@@ -32,7 +32,7 @@ const FINISHES: { id: Finish; label: string }[] = [
   { id: 'airlaid_linen', label: 'Effetto Tessuto TNT' },
 ];
 
-const CARD = 'bg-[#0d1420] border border-[#1c2433] rounded-3xl';
+const CARD = 'bg-gradient-to-t from-slate-950/90 via-slate-950/55 to-slate-950/20 border border-[#1c2433] rounded-3xl';
 const INPUT =
   'w-full bg-[#081326] border border-[#1c2433] focus:border-sky-500 focus:outline-none rounded-xl px-3 py-2 text-xs text-white placeholder:text-slate-500';
 const LABEL = 'block text-xs font-semibold text-slate-400 mb-1';
