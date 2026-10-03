@@ -67,7 +67,7 @@ export const FeaturedProductsSection: React.FC<FeaturedProductsSectionProps> = (
               key={product.id}
               id={`product-card-${product.id}`}
               onClick={() => onSelectProduct(product)}
-              className={`group relative cursor-pointer bg-[#0d1420] hover:bg-[#1a2230] border rounded-2xl p-3 flex flex-col justify-between transition-all duration-200 hover:translate-y-[-2px] shadow-sm hover:shadow-lg hover:shadow-sky-950/40 ${
+              className={`group relative cursor-pointer bg-gradient-to-t from-slate-950/90 via-slate-950/55 to-slate-950/20 hover:from-slate-950/95 border rounded-2xl p-3 flex flex-col justify-between transition-all duration-200 hover:translate-y-[-2px] shadow-sm hover:shadow-lg hover:shadow-sky-950/40 ${
                 isCompared
                   ? 'border-amber-500/50 ring-1 ring-amber-500/30 shadow-amber-500/5'
                   : 'border-[#1c2433] hover:border-sky-500/50'

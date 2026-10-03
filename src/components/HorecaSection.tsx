@@ -95,7 +95,7 @@ export const HorecaSection: React.FC<HorecaSectionProps> = ({ categories, subcat
                     type="button"
                     id={`horeca-badge-${sub.id}`}
                     onClick={() => onOpen(category.id, sub.id)}
-                    className="w-full bg-[#0e1b30] border border-[#1c2433] hover:border-sky-500/50 hover:shadow-md rounded-2xl p-3.5 flex flex-col items-center text-center gap-2 transition-all hover:-translate-y-0.5"
+                    className="w-full bg-gradient-to-t from-slate-950/90 via-slate-950/55 to-slate-950/20 hover:from-slate-950/95 border border-[#1c2433] hover:border-sky-500/50 hover:shadow-md rounded-2xl p-3.5 flex flex-col items-center text-center gap-2 transition-all hover:-translate-y-0.5"
                   >
                     <div
                       className={`w-14 h-14 rounded-full flex items-center justify-center border overflow-hidden shrink-0 ${
