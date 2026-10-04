@@ -618,11 +618,11 @@ export async function fetchSupabaseSubcategories(): Promise<Subcategory[] | null
   const sb = getSupabase();
   if (!sb) return null;
   try {
-    const { data, error } = await sb.from('subcategories').select('*').eq('active', true).order('sort_order');
-    if (error) {
-      console.warn('Supabase fetch subcategories notice:', error.message);
-      return null;
-    }
+    // Con più di 1000 sottocategorie Supabase ne restituisce solo 1000 per volta:
+    // le legge TUTTE a blocchi, altrimenti marche e tipologie nuove sparivano dall'app
+    const data = await fetchAllRows<any>((from, to) =>
+      sb.from('subcategories').select('*').eq('active', true).order('sort_order').order('id').range(from, to)
+    );
     return (data ?? []).map(rowToSubcategory);
   } catch (e) {
     console.warn('Supabase subcategories fetch failed:', e);
