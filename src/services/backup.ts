@@ -91,8 +91,10 @@ async function fetchAllRows(table: string): Promise<any[]> {
   const sb = sbOrThrow();
   const out: any[] = [];
   const size = 1000;
+  // ordine univoco per chiave: i blocchi da 1000 non si sovrappongono mai
+  const orderKey = BACKUP_TABLES.find((t) => t.name === table)?.key || 'id';
   for (let from = 0; ; from += size) {
-    const { data, error } = await sb.from(table).select('*').range(from, from + size - 1);
+    const { data, error } = await sb.from(table).select('*').order(orderKey).range(from, from + size - 1);
     if (error) throw new Error(error.message);
     out.push(...(data || []));
     if (!data || data.length < size) break;

@@ -193,10 +193,16 @@ export async function fetchSupabaseProducts(): Promise<Product[] | null> {
         .select('*, categories(name)')
         .eq('active', true)
         .order('created_at', { ascending: false })
+        // a parità di data (es. migliaia di prodotti importati insieme) serve un ordine
+        // univoco, altrimenti i blocchi da 1000 si sovrappongono e compaiono prodotti doppi
+        .order('id', { ascending: true })
         .range(from, to)
     );
     if (!rows || rows.length === 0) return null;
-    return rows.map((row: any) => rowToProduct(row, row.categories?.name));
+    // sicurezza in più: ogni prodotto una sola volta
+    const seen = new Set<string>();
+    const unique = rows.filter((row: any) => (seen.has(row.id) ? false : (seen.add(row.id), true)));
+    return unique.map((row: any) => rowToProduct(row, row.categories?.name));
   } catch (e) {
     console.warn('Supabase products fetch failed:', e);
     return null;
@@ -465,7 +471,7 @@ export async function fetchSupabaseCategories(): Promise<Category[] | null> {
     if (!data || data.length === 0) return null;
 
     const productRows = await fetchAllRows<any>((from, to) =>
-      sb.from('products').select('category_id').eq('active', true).range(from, to)
+      sb.from('products').select('id, category_id').eq('active', true).order('id').range(from, to)
     );
     const counts: Record<string, number> = {};
     for (const row of productRows ?? []) {
