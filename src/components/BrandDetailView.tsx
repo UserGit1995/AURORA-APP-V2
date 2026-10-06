@@ -74,13 +74,36 @@ export const BrandDetailView: React.FC<BrandDetailViewProps> = ({
       )}
 
       {groups.map((group) => (
-        <section key={group.typeName}>
+        <BrandGroup
+          key={group.typeName}
+          group={group}
+          favorites={favorites}
+          comparedProductIds={comparedProductIds}
+          onToggleFavorite={onToggleFavorite}
+          onToggleCompare={onToggleCompare}
+          onSelectProduct={onSelectProduct}
+          onAddToCart={onAddToCart}
+        />
+      ))}
+    </div>
+  );
+};
+
+// Ogni tipologia mostra al massimo 24 prodotti alla volta (con avanti/indietro):
+// le marche con centinaia di prodotti non bloccano più il telefono
+const GROUP_PAGE = 24;
+const BrandGroup: React.FC<any> = ({ group, favorites, comparedProductIds, onToggleFavorite, onToggleCompare, onSelectProduct, onAddToCart }) => {
+  const [page, setPage] = React.useState(0);
+  const pages = Math.ceil(group.products.length / GROUP_PAGE);
+  const shown = group.products.slice(page * GROUP_PAGE, page * GROUP_PAGE + GROUP_PAGE);
+  return (
+        <section>
           <h2 className="text-white text-base font-bold mb-3 flex items-center gap-2">
             {group.typeName}
             <span className="text-slate-400 text-xs font-medium">({group.products.length})</span>
           </h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
-            {group.products.map((product) => (
+            {shown.map((product: any) => (
               <ProductGridCard
                 key={product.id}
                 product={product}
@@ -93,8 +116,27 @@ export const BrandDetailView: React.FC<BrandDetailViewProps> = ({
               />
             ))}
           </div>
+          {pages > 1 && (
+            <div className="flex items-center justify-center gap-3 pt-3">
+              <button
+                onClick={() => setPage((x) => Math.max(0, x - 1))}
+                disabled={page === 0}
+                className="px-4 py-2 bg-[#0e1b30] border border-[#1c2433] text-slate-300 font-semibold text-xs rounded-full disabled:opacity-40"
+              >
+                ← Precedenti
+              </button>
+              <span className="text-xs text-slate-400 font-semibold">
+                {page + 1} di {pages}
+              </span>
+              <button
+                onClick={() => setPage((x) => Math.min(pages - 1, x + 1))}
+                disabled={page >= pages - 1}
+                className="px-4 py-2 bg-sky-600 text-white font-semibold text-xs rounded-full disabled:opacity-40"
+              >
+                Successivi →
+              </button>
+            </div>
+          )}
         </section>
-      ))}
-    </div>
   );
 };

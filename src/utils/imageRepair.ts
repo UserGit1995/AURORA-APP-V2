@@ -68,6 +68,12 @@ export function installImageRepair(): void {
         img.dataset.repairIdx = '0';
       }
       const orig = img.dataset.repairOrig || current;
+      // foto collegate al sito del fornitore: non si vedono, inutile riprovare (consuma rete e memoria)
+      if (/freex\.es\//i.test(orig)) {
+        img.dataset.repairSet = PLACEHOLDER_IMAGE;
+        img.src = PLACEHOLDER_IMAGE;
+        return;
+      }
       const list = candidates(orig);
       const idx = Number(img.dataset.repairIdx || '0');
 

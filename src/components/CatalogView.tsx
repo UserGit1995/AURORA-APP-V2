@@ -56,8 +56,15 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
   // Con migliaia di prodotti, disegnarli tutti insieme nella pagina manda in
   // tilt lo scroll su telefono. Mostriamo un blocco alla volta e carichiamo
   // il resto solo quando l'utente arriva in fondo o clicca "Carica altri".
-  const PAGE_SIZE = 60;
-  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  // A PAGINE: nella pagina restano sempre al massimo PAGE_SIZE prodotti (e foto).
+  // Prima con "Carica altri" si accumulavano centinaia di foto e i telefoni si bloccavano.
+  const PAGE_SIZE = 48;
+  const [page, setPage] = useState(0);
+  const listTopRef = React.useRef<HTMLDivElement>(null);
+  const goToPage = (n: number) => {
+    setPage(n);
+    listTopRef.current?.scrollIntoView({ behavior: 'auto', block: 'start' });
+  };
   const [activeFilterSubCategory, setActiveFilterSubCategory] = useState<string | null>(null);
   const [activeFilterSubSubCategory, setActiveFilterSubSubCategory] = useState<string | null>(null);
   const [isSelectionMode, setIsSelectionMode] = useState<boolean>(false);
@@ -75,7 +82,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
   }, [selectedCategoryId, initialSubcategoryId]);
 
   React.useEffect(() => {
-    setVisibleCount(PAGE_SIZE);
+    setPage(0);
   }, [activeFilterCategory, activeFilterSubCategory, activeFilterSubSubCategory, quickFilter, sortBy, searchQuery, viewType]);
 
   const currentSelectedCategory = useMemo(() => {
@@ -705,8 +712,8 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
           </div>
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3.5">
-          {sortedProducts.slice(0, visibleCount).map((product) => {
+        <div ref={listTopRef} className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3.5 scroll-mt-24">
+          {sortedProducts.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE).map((product) => {
             const isFav = favorites.includes(product.id);
             const isCompared = comparedProductIds.includes(product.id);
             const isLowStock = product.stock <= (product.lowStockThreshold ?? 100);
@@ -893,14 +900,25 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
         </div>
       )}
 
-      {/* Carica altri: evita di disegnare migliaia di prodotti insieme, che manda in tilt lo scroll */}
-      {visibleCount < sortedProducts.length && (
-        <div className="flex justify-center pt-2">
+      {/* Pagine: avanti / indietro (massimo 48 prodotti alla volta, telefono sempre fluido) */}
+      {sortedProducts.length > PAGE_SIZE && (
+        <div className="flex items-center justify-center gap-3 pt-2">
           <button
-            onClick={() => setVisibleCount((v) => v + PAGE_SIZE)}
-            className="px-6 py-2.5 bg-[#0e1b30] hover:bg-[#111826] border border-[#1c2433] text-slate-300 font-semibold text-sm rounded-full shadow-xs transition-colors"
+            onClick={() => goToPage(Math.max(0, page - 1))}
+            disabled={page === 0}
+            className="px-4 py-2.5 bg-[#0e1b30] hover:bg-[#111826] border border-[#1c2433] text-slate-300 font-semibold text-sm rounded-full disabled:opacity-40"
           >
-            Carica altri articoli ({sortedProducts.length - visibleCount} rimanenti)
+            ← Precedenti
+          </button>
+          <span className="text-xs text-slate-400 font-semibold">
+            Pagina {page + 1} di {Math.ceil(sortedProducts.length / PAGE_SIZE)}
+          </span>
+          <button
+            onClick={() => goToPage(Math.min(Math.ceil(sortedProducts.length / PAGE_SIZE) - 1, page + 1))}
+            disabled={(page + 1) * PAGE_SIZE >= sortedProducts.length}
+            className="px-4 py-2.5 bg-sky-600 hover:bg-sky-500 text-white font-semibold text-sm rounded-full disabled:opacity-40"
+          >
+            Successivi →
           </button>
         </div>
       )}

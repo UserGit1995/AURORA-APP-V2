@@ -51,6 +51,7 @@ export const SupplierPhotosPanel: React.FC = () => {
   const [done, setDone] = useState(0);
   const [failed, setFailed] = useState(0);
   const [status, setStatus] = useState('');
+  const [lastError, setLastError] = useState('');
   const stopRef = useRef(false);
 
   const todo = useMemo(() => baseProductsList.filter((p) => isSupplierImage(p.image)), [baseProductsList]);
@@ -66,8 +67,15 @@ export const SupplierPhotosPanel: React.FC = () => {
     }
     if (resp.status === 429) return 'retry';
     if (!resp.ok) {
-      // foto non scaricabile: tolgo il collegamento rotto, così non si vede un riquadro vuoto
-      updateProduct({ ...p, image: '' });
+      // foto non scaricabile: il collegamento resta com'è (niente viene cancellato)
+      let why = `errore ${resp.status}`;
+      try {
+        const j = await resp.json();
+        if (j?.error) why = `${why}: ${j.error}`;
+      } catch {
+        /* niente */
+      }
+      setLastError(why);
       return 'fail';
     }
     try {
@@ -78,8 +86,8 @@ export const SupplierPhotosPanel: React.FC = () => {
       const url = sb.storage.from('aurora-images').getPublicUrl(path).data.publicUrl;
       updateProduct({ ...p, image: url });
       return 'ok';
-    } catch {
-      updateProduct({ ...p, image: '' });
+    } catch (e: any) {
+      setLastError(`foto non leggibile (${e?.message || 'errore'})`);
       return 'fail';
     }
   };
@@ -125,7 +133,7 @@ export const SupplierPhotosPanel: React.FC = () => {
           Queste foto spesso non si vedono perché il sito del fornitore non le mostra fuori dal suo catalogo. Premendo
           "Avvia", l'app le scarica una per una, le salva nel tuo spazio e le collega al prodotto. Puoi lasciarla lavorare
           da sola con questa pagina aperta (meglio dal computer): se il server chiede una pausa, aspetta e riprende in
-          automatico. Se una foto non si può scaricare, il prodotto resta senza foto e lo sistemi con "Trova immagine".
+          automatico. Se una foto non si può scaricare, il prodotto resta com'è: non viene cancellato niente.
         </p>
 
         <div className="flex flex-wrap items-center gap-2">
@@ -165,6 +173,9 @@ export const SupplierPhotosPanel: React.FC = () => {
               <span>Rimaste: {todo.length}</span>
             </p>
           </div>
+        )}
+        {lastError && failed > 0 && (
+          <p className="text-xs text-amber-300">Motivo dell'ultimo errore: {lastError}</p>
         )}
         {status && (
           <p className="text-xs text-sky-300 flex items-center gap-2">
