@@ -1,5 +1,5 @@
 import React from 'react';
-import { imageFirst } from '../utils/imageFirst';
+import { imageFirst, hasProductImage } from '../utils/imageFirst';
 import { AdminImageFinderButton } from './AdminImageFinderButton';
 import { AdminRemoveBgButton } from './AdminRemoveBgButton';
 import { Star, Heart, ArrowRight, Plus, Check, Scale } from 'lucide-react';
@@ -66,7 +66,7 @@ export const FeaturedProductsSection: React.FC<FeaturedProductsSectionProps> = (
 
       {/* Products Grid (6 items matching the screenshot) */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
-        {imageFirst(products).slice(0, 6).map((product) => {
+        {(() => { const withImg = products.filter(hasProductImage); return withImg.length >= 6 ? withImg : imageFirst(products); })().slice(0, 6).map((product) => {
           const isFav = favorites.includes(product.id);
           const isCompared = comparedProductIds.includes(product.id);
           const isJustAdded = addedProductId === product.id;

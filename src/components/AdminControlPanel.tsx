@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import {
   X,
+  Download,
   DatabaseBackup,
   Timer,
   BookOpen,
@@ -36,6 +37,8 @@ import { CustomizationPricingPanel } from './CustomizationPricingPanel';
 import { FlashOffersPanel } from './FlashOffersPanel';
 import { FlyerAdminPanel } from './FlyerAdminPanel';
 import { BackupPanel, daysSinceLastBackup } from './BackupPanel';
+import { SupplierPhotosPanel } from './SupplierPhotosPanel';
+import { isSupplierImage } from '../utils/imageFirst';
 import { CustomizationRequestsPanel } from './CustomizationRequestsPanel';
 import { RemoveBgStudio } from './RemoveBg/RemoveBgStudio';
 import { Product, Order } from '../types';
@@ -82,7 +85,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({ isOpen, on
   } = useAdmin();
 
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [activeTab, setActiveTab] = useState<'products' | 'orders' | 'categories' | 'subcategories' | 'images' | 'removebg' | 'requests' | 'packaging' | 'flash' | 'flyer' | 'backup' | 'settings'>('products');
+  const [activeTab, setActiveTab] = useState<'products' | 'orders' | 'categories' | 'subcategories' | 'images' | 'removebg' | 'requests' | 'packaging' | 'flash' | 'flyer' | 'backup' | 'supplierphotos' | 'settings'>('products');
   // Remove BG: lo studio resta montato dopo la prima apertura, così cambiando scheda non si perde il lavoro
   const [removeBgMounted, setRemoveBgMounted] = useState(false);
   const [removeBgProductId, setRemoveBgProductId] = useState<string | null>(null);
@@ -231,6 +234,16 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({ isOpen, on
       title: 'Immagini',
       items: [
         { id: 'images', label: 'Immagini prodotti', icon: ImageIcon, desc: 'Importa, cerca e controlla le foto dei prodotti.' },
+        {
+          id: 'supplierphotos',
+          label: 'Copia foto fornitore',
+          icon: Download,
+          badge: (() => {
+            const n = productsList.filter((p) => isSupplierImage(p.image)).length;
+            return n > 0 ? String(n) : undefined;
+          })(),
+          desc: 'Salva nel tuo spazio le foto collegate al sito del fornitore, così si vedono sempre.',
+        },
         { id: 'removebg', label: 'Rimuovi sfondo', icon: Scissors, desc: 'Scontorna le foto dei prodotti, una alla volta o in blocco.' },
       ],
     },
@@ -698,6 +711,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({ isOpen, on
         {activeTab === 'flash' && <FlashOffersPanel />}
         {activeTab === 'flyer' && <FlyerAdminPanel />}
         {activeTab === 'backup' && <BackupPanel />}
+        {activeTab === 'supplierphotos' && <SupplierPhotosPanel />}
 
         {activeTab === 'settings' && (
           <form onSubmit={handleSaveSettings} className="p-4 sm:p-6 overflow-y-auto flex-1 space-y-5 text-left text-sm">
