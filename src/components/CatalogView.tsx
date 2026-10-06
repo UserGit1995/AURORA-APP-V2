@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { imageFirst } from '../utils/imageFirst';
 import { AdminImageFinderButton } from './AdminImageFinderButton';
 import { AdminRemoveBgButton } from './AdminRemoveBgButton';
 import { Folder, Tag, Star, Flame, Filter, Heart, Plus, Check, Search, SlidersHorizontal, Scale, CheckSquare, Square, ShoppingBag, X, Layers, CheckCircle2, FileSpreadsheet, Download, Loader2 } from 'lucide-react';
@@ -163,7 +164,10 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
     });
   }, [products, viewType, activeFilterCategory, activeFilterSubCategory, activeFilterSubSubCategory, searchScores, quickFilter]);
 
-  const sortedProducts = useMemo(() => {
+  // In ogni ordinamento i prodotti senza foto vanno sempre in fondo
+  const sortedProducts = useMemo(() => imageFirst(sortProducts()), [filteredProducts, sortBy, searchScores]);
+
+  function sortProducts() {
     const arr = [...filteredProducts];
     switch (sortBy) {
       case 'prezzo-asc':
@@ -184,7 +188,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
           return score(b) - score(a);
         });
     }
-  }, [filteredProducts, sortBy, searchScores]);
+  }
 
   const selectedProducts = useMemo(() => {
     return products.filter((p) => selectedProductIds.includes(p.id));

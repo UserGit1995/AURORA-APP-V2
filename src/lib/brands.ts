@@ -1,4 +1,5 @@
 import { Category, Product, Subcategory } from '../types';
+import { imageFirst } from '../utils/imageFirst';
 import { isHorecaCategory } from './horeca';
 
 export interface BrandSummary {
@@ -107,6 +108,7 @@ export function productsByBrandGroupedByType(
   }
 
   return Array.from(groups.entries())
-    .map(([typeName, products]) => ({ typeName, products }))
+    // dentro ogni tipologia: prima i prodotti con foto, in fondo quelli senza
+    .map(([typeName, products]) => ({ typeName, products: imageFirst(products) }))
     .sort((a, b) => b.products.length - a.products.length);
 }
