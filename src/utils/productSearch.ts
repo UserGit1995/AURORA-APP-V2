@@ -166,14 +166,25 @@ function indexOf(p: SearchableProduct): Indexed {
   return ix;
 }
 
+// Radice di ogni parola già calcolata una volta sola (le stesse parole si ripetono su migliaia di prodotti)
+const stemCache = new Map<string, string>();
+function stemOf(w: string): string {
+  let s = stemCache.get(w);
+  if (s === undefined) {
+    s = stemToken(w);
+    stemCache.set(w, s);
+  }
+  return s;
+}
+
 /** Quanto bene una parola cercata corrisponde a una parola del prodotto (0 = per niente). */
 function scoreWord(w: string, token: string, stem: string, family: string[]): number {
   if (w === token) return 6; // parola identica
-  if (stemToken(w) === stem) return 5; // singolare/plurale
+  if (stemOf(w) === stem) return 5; // singolare/plurale
   if (w.startsWith(stem)) return 4; // inizio parola ("sgrass")
   if (family.length > 0 && family.some((root) => w.startsWith(root))) return 3; // stessa famiglia
   if (stem.length >= 4 && w.includes(stem)) return 2; // dentro la parola
-  if (token.length >= 5 && w.length >= 5 && w[0] === token[0] && (withinOneEdit(w, token) || withinOneEdit(stemToken(w), stem))) {
+  if (token.length >= 5 && w.length >= 5 && w[0] === token[0] && (withinOneEdit(w, token) || withinOneEdit(stemOf(w), stem))) {
     return 1; // errore di battitura
   }
   return 0;
@@ -290,4 +301,25 @@ export function searchProducts<T extends SearchableProduct>(products: T[], query
   return Array.from(scores.keys()).sort(
     (a, b) => (scores.get(b) || 0) - (scores.get(a) || 0) || (order.get(a) || 0) - (order.get(b) || 0)
   );
+}
+
+/**
+ * Prepara l'indice di ricerca a piccoli blocchi nei momenti in cui il telefono è libero,
+ * così la prima ricerca è subito veloce. Si può chiamare più volte senza problemi.
+ */
+export function warmSearchIndex(products: SearchableProduct[]): () => void {
+  let i = 0;
+  let cancelled = false;
+  const w = window as any;
+  const schedule = (fn: () => void) => (w.requestIdleCallback ? w.requestIdleCallback(fn, { timeout: 2000 }) : setTimeout(fn, 50));
+  const step = () => {
+    if (cancelled) return;
+    const end = Math.min(products.length, i + 300);
+    for (; i < end; i++) indexOf(products[i]);
+    if (i < products.length) schedule(step);
+  };
+  schedule(step);
+  return () => {
+    cancelled = true;
+  };
 }

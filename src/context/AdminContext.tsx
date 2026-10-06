@@ -204,7 +204,13 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   useEffect(() => {
     try {
-      localStorage.setItem('aurora_admin_products', JSON.stringify(productsList));
+      // Con un catalogo grande la copia nel browser non entra (limite ~5 MB) e salvarla
+      // bloccava il telefono a ogni modifica: si tiene solo per cataloghi piccoli.
+      if (productsList.length <= 1500) {
+        localStorage.setItem('aurora_admin_products', JSON.stringify(productsList));
+      } else {
+        localStorage.removeItem('aurora_admin_products');
+      }
     } catch (e) {
       console.warn('Product sync failed', e);
     }

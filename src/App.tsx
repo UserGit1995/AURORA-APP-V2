@@ -30,6 +30,7 @@ import { ScrollToTopButton } from './components/ScrollToTopButton';
 import { PersonalizzaView } from './components/PersonalizzaView';
 import { LegalView } from './components/LegalView';
 import { CookieBanner } from './components/CookieBanner';
+import { warmSearchIndex } from './utils/productSearch';
 import { OPEN_REMOVE_BG_EVENT } from './components/AdminRemoveBgButton';
 import { CustomizationTrackingView } from './components/CustomizationTrackingView';
 import { parseInitialRoute, syncUrlWithTab } from './utils/deepLinks';
@@ -113,6 +114,12 @@ export default function App() {
       });
       return changed ? next : prev;
     });
+  }, [productsList]);
+
+  // Prepara la ricerca in sottofondo appena arriva il catalogo (prima ricerca subito veloce)
+  useEffect(() => {
+    if (productsList.length === 0) return;
+    return warmSearchIndex(productsList);
   }, [productsList]);
 
   // Favorites state
@@ -756,7 +763,7 @@ export default function App() {
         isCompared={selectedProduct ? comparedProductIds.includes(selectedProduct.id) : false}
         onToggleCompare={handleToggleCompare}
         onOpenRestockAnalysis={handleOpenRestockAnalysis}
-        onEditProduct={(p) => setEditingProduct(p)}
+        onEditProduct={isAdmin ? (p) => setEditingProduct(p) : undefined}
       />
 
       <RestockAnalysisModal

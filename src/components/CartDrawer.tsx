@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
+import { useCloseOnBack } from '../utils/useCloseOnBack';
 import { X, Plus, Minus, Trash2, ShoppingBag, ArrowRight, CheckCircle2, ShieldCheck, Building2, User, Truck, Store, Mail, Phone, MapPin, FileText, CreditCard, Send, AlertCircle, Clock, Bookmark, BookmarkPlus, BookmarkCheck, Star, Layers, RotateCw, Check, Package } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { CartItem, Order, CustomerType, DeliveryOption, OrderTemplate } from '../types';
@@ -94,6 +95,9 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
     fill(setPostalCode, currentUser.postalCode);
     if (currentUser.customerType === 'attivita') setCustomerType('azienda');
   }, [currentUser?.id]);
+
+  // Indietro del telefono / Esc chiudono il carrello
+  useCloseOnBack(isOpen, onClose);
 
   if (!isOpen) return null;
 

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useDeferredValue } from 'react';
 import { imageFirst } from '../utils/imageFirst';
 import { AdminImageFinderButton } from './AdminImageFinderButton';
 import { AdminRemoveBgButton } from './AdminRemoveBgButton';
@@ -118,11 +118,14 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
 
   const headerInfo = getHeaderInfo();
 
-  const searchTokens = useMemo(() => parseQuery(searchQuery), [searchQuery]);
+  // La ricerca su migliaia di prodotti viene calcolata "dietro le quinte":
+  // mentre si scrive la tastiera resta fluida anche sui telefoni meno potenti
+  const deferredQuery = useDeferredValue(searchQuery);
+  const searchTokens = useMemo(() => parseQuery(deferredQuery), [deferredQuery]);
   // Punteggio di pertinenza di ogni prodotto trovato (null = nessuna ricerca attiva)
   const searchScores = useMemo(
-    () => (searchTokens.length > 0 ? scoreAllProducts(products, searchQuery) : null),
-    [products, searchQuery, searchTokens]
+    () => (searchTokens.length > 0 ? scoreAllProducts(products, deferredQuery) : null),
+    [products, deferredQuery, searchTokens]
   );
 
   const filteredProducts = useMemo(() => {

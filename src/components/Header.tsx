@@ -54,8 +54,8 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenQrScanner,
   onOpenQuickReorder,
   onOpenContact,
-  unreadNotificationsCount = 3,
-  unreadInquiriesCount = 5,
+  unreadNotificationsCount = 0,
+  unreadInquiriesCount = 0,
   isCartPulsing = false,
   cartTotal = 0,
 }) => {
@@ -240,9 +240,11 @@ export const Header: React.FC<HeaderProps> = ({
               aria-label="Notifiche"
             >
               <Bell className="w-4.5 h-4.5" />
-              <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-sky-500 text-white text-[10px] font-extrabold rounded-full flex items-center justify-center px-1 border border-white shadow-sm">
-                {unreadNotificationsCount || 3}
-              </span>
+              {unreadNotificationsCount > 0 && (
+                <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-sky-500 text-white text-[10px] font-extrabold rounded-full flex items-center justify-center px-1 border border-white shadow-sm">
+                  {unreadNotificationsCount}
+                </span>
+              )}
             </button>
 
             {/* Carrello (lista ordine) con numero di colli */}
@@ -272,9 +274,11 @@ export const Header: React.FC<HeaderProps> = ({
               aria-label="Messaggi e Richieste"
             >
               <Mail className="w-4.5 h-4.5" />
-              <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-sky-500 text-white text-[10px] font-extrabold rounded-full flex items-center justify-center px-1 border border-white shadow-sm">
-                {unreadInquiriesCount || 5}
-              </span>
+              {unreadInquiriesCount > 0 && (
+                <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-sky-500 text-white text-[10px] font-extrabold rounded-full flex items-center justify-center px-1 border border-white shadow-sm">
+                  {unreadInquiriesCount}
+                </span>
+              )}
             </button>
           </div>
         </div>

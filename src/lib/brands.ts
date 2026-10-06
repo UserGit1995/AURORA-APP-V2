@@ -65,15 +65,28 @@ export function withProductCounts(
   subcategoriesList: Subcategory[],
   productsList: Product[]
 ): BrandSummary[] {
-  const childIdsOf = (brandId: string) =>
-    subcategoriesList.filter((s) => s.parentSubcategoryId === brandId).map((s) => s.id);
+  // Conteggi calcolati UNA volta sola (prima si rileggeva tutto il catalogo per ogni marca:
+  // con migliaia di prodotti e centinaia di marche bloccava i telefoni per qualche secondo)
+  const perSub = new Map<string, number>();
+  for (const p of productsList) {
+    if (p.subcategoryId) perSub.set(p.subcategoryId, (perSub.get(p.subcategoryId) || 0) + 1);
+  }
+  const childrenOf = new Map<string, string[]>();
+  for (const s of subcategoriesList) {
+    if (s.parentSubcategoryId) {
+      const arr = childrenOf.get(s.parentSubcategoryId) || [];
+      arr.push(s.id);
+      childrenOf.set(s.parentSubcategoryId, arr);
+    }
+  }
 
   return brands.map((b) => {
     const allIds = new Set<string>(b.subcategoryIds);
     for (const bid of b.subcategoryIds) {
-      for (const cid of childIdsOf(bid)) allIds.add(cid);
+      for (const cid of childrenOf.get(bid) || []) allIds.add(cid);
     }
-    const count = productsList.filter((p) => p.subcategoryId && allIds.has(p.subcategoryId)).length;
+    let count = 0;
+    allIds.forEach((id) => (count += perSub.get(id) || 0));
     return { ...b, productCount: count };
   });
 }

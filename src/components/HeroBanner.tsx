@@ -2,7 +2,7 @@ import React from 'react';
 import { ShieldCheck, Truck, Layers, ArrowRight, Package } from 'lucide-react';
 import { HERO_IMAGE } from '../data/catalog';
 import { useLanguage } from '../context/LanguageContext';
-import { AuroraLogo } from './AuroraLogo';
+import { useAdmin } from '../context/AdminContext';
 
 interface HeroBannerProps {
   onExploreCatalog: () => void;
@@ -11,16 +11,18 @@ interface HeroBannerProps {
 
 export const HeroBanner: React.FC<HeroBannerProps> = ({ onExploreCatalog, onPersonalizza }) => {
   const { t, language } = useLanguage();
+  const { productsList } = useAdmin();
+  // Numero di referenze sempre aggiornato (arrotondato per difetto alle centinaia)
+  const refCount = productsList.length >= 100 ? Math.floor(productsList.length / 100) * 100 : productsList.length;
+  const refText =
+    refCount > 0
+      ? `Oltre ${refCount.toLocaleString('it-IT')} referenze sempre in magazzino`
+      : 'Ampia scelta sempre in magazzino';
 
   return (
     <div className="relative w-full rounded-2xl md:rounded-3xl overflow-hidden bg-gradient-to-br from-[#01203d] via-[#052848] to-[#0a2038] border border-[#1c2433] shadow-sm p-5 sm:p-7 md:p-8">
       {/* Background radial glow */}
       <div className="absolute top-0 right-1/4 w-96 h-96 bg-sky-400/10 rounded-full blur-3xl pointer-events-none" />
-
-      {/* Top Right Mini Brand Logo on the Card (Mobile Only) */}
-      <div className="absolute top-4 right-4 z-20 flex items-center md:hidden">
-        <AuroraLogo size="xs" className="scale-90 opacity-90" />
-      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-12 min-h-[280px] lg:min-h-[340px] items-center">
         {/* Left Content */}
@@ -78,7 +80,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({ onExploreCatalog, onPers
               </div>
               <div className="min-w-0">
                 <p className="text-white text-xs font-bold leading-tight">{t('hero.choiceTitle', 'Ampia Scelta')}</p>
-                <p className="text-slate-500 text-[11px] leading-tight mt-0.5">{t('hero.choiceDesc', 'Oltre 1.200 referenze sempre in magazzino')}</p>
+                <p className="text-slate-500 text-[11px] leading-tight mt-0.5">{refText}</p>
               </div>
             </div>
           </div>
@@ -111,7 +113,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({ onExploreCatalog, onPers
               </div>
               <div className="min-w-0">
                 <p className="text-white text-xs font-bold truncate">{t('hero.choiceTitle', 'Ampia Scelta')}</p>
-                <p className="text-slate-500 text-[10.5px] truncate">{t('hero.choiceDesc', 'Oltre 1.200 referenze sempre in magazzino')}</p>
+                <p className="text-slate-500 text-[10.5px] truncate">{refText}</p>
               </div>
             </div>
           </div>

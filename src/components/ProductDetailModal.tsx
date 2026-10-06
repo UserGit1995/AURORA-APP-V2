@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
+import { useCloseOnBack } from '../utils/useCloseOnBack';
 import { AdminImageFinderButton } from './AdminImageFinderButton';
 import { AdminRemoveBgButton } from './AdminRemoveBgButton';
 import { X, ArrowLeft, Heart, Plus, Minus, ShoppingBag, ShieldCheck, Check, Package, Star, Scale, BookOpen, FlaskConical, Info } from 'lucide-react';
 import { Product } from '../types';
-import { ProductTrendSparkline } from './ProductTrendSparkline';
 import { useAdmin } from '../context/AdminContext';
 import { PLACEHOLDER_IMAGE } from '../utils/imageRepair';
 
@@ -31,6 +31,8 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
   onEditProduct,
 }) => {
   const { isBusinessCustomer, vatFactor, vatPercent } = useAdmin();
+  // Indietro del telefono / Esc chiudono la scheda prodotto
+  useCloseOnBack(true, onClose);
   const [activeTab, setActiveTab] = useState<'overview' | 'usage'>('overview');
   const [quantity, setQuantity] = useState(1);
   const [addedAnimation, setAddedAnimation] = useState(false);
@@ -198,10 +200,12 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
 
                 {/* Specs Box */}
                 <div className="mt-3.5 bg-[#0d1420] border border-[#1c2433] rounded-xl p-3 text-xs space-y-1.5">
-                  <div className="flex justify-between text-slate-400">
-                    <span>Formato:</span>
-                    <span className="text-slate-300 font-medium">{product.specs.format}</span>
-                  </div>
+                  {product.specs.format && (
+                    <div className="flex justify-between text-slate-400">
+                      <span>Formato:</span>
+                      <span className="text-slate-300 font-medium">{product.specs.format}</span>
+                    </div>
+                  )}
                   {product.specs.fragrance && (
                     <div className="flex justify-between text-slate-400">
                       <span>Fragranza:</span>
@@ -218,14 +222,12 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                     ) : (
                       <span className="text-emerald-400 font-medium flex items-center gap-1">
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                        {product.stock} colli a magazzino
+                        {product.stock >= 999 ? 'Disponibile' : `${product.stock} colli a magazzino`}
                       </span>
                     )}
                   </div>
                 </div>
 
-                {/* Mini Sparkline Chart for Price & Demand Trends */}
-                <ProductTrendSparkline product={product} />
               </div>
 
               {/* Bottom: Price & Quantity Controls */}
