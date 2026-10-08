@@ -8,6 +8,32 @@ import type { NavTab } from '../components/Sidebar';
 
 const UUID = '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}';
 const TRACKING_RE = new RegExp(`^/personalizzazione/(${UUID})/?$`);
+const PRODUCT_RE = /^\/prodotto\/([^/?#]+)\/?$/;
+const APP_ORIGIN = 'https://appaurorav2updated.vercel.app';
+
+/** Link da condividere che apre direttamente la scheda di un prodotto. */
+export function productShareUrl(productId: string): string {
+  const origin =
+    typeof window !== 'undefined' && /^https:\/\//.test(window.location.origin)
+      ? window.location.origin
+      : APP_ORIGIN;
+  return `${origin}/prodotto/${encodeURIComponent(productId)}`;
+}
+
+/** Id del prodotto se l'indirizzo è /prodotto/<id> (link condiviso), altrimenti null. */
+export function sharedProductIdFromUrl(): string | null {
+  if (typeof window === 'undefined') return null;
+  const m = PRODUCT_RE.exec(window.location.pathname);
+  return m ? decodeURIComponent(m[1]) : null;
+}
+
+/** Chiusa la scheda del prodotto condiviso, l'indirizzo torna /home (senza ricaricare). */
+export function clearSharedProductUrl(): void {
+  if (typeof window === 'undefined') return;
+  if (PRODUCT_RE.test(window.location.pathname)) {
+    window.history.replaceState(window.history.state, '', '/home');
+  }
+}
 
 export interface InitialRoute {
   tab: NavTab;

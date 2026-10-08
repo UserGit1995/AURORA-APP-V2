@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useCloseOnBack } from '../utils/useCloseOnBack';
 import { AdminImageFinderButton } from './AdminImageFinderButton';
 import { AdminRemoveBgButton } from './AdminRemoveBgButton';
+import { ShareProductButton } from './ShareProductButton';
 import { X, ArrowLeft, Heart, Plus, Minus, ShoppingBag, ShieldCheck, Check, Package, Star, Scale, BookOpen, FlaskConical, Info } from 'lucide-react';
 import { Product } from '../types';
 import { useAdmin } from '../context/AdminContext';
@@ -171,6 +172,8 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                         <span>{isCompared ? 'In confronto' : 'Confronta'}</span>
                       </button>
                     )}
+
+                    <ShareProductButton product={product} />
 
                     <button
                       id="modal-fav-toggle"

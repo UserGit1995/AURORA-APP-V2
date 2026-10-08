@@ -33,7 +33,7 @@ import { CookieBanner } from './components/CookieBanner';
 import { warmSearchIndex } from './utils/productSearch';
 import { OPEN_REMOVE_BG_EVENT } from './components/AdminRemoveBgButton';
 import { CustomizationTrackingView } from './components/CustomizationTrackingView';
-import { parseInitialRoute, syncUrlWithTab } from './utils/deepLinks';
+import { parseInitialRoute, syncUrlWithTab, sharedProductIdFromUrl, clearSharedProductUrl } from './utils/deepLinks';
 
 import { Product, CartItem, Order, NotificationItem, OrderTemplate } from './types';
 import { useAdmin } from './context/AdminContext';
@@ -79,6 +79,24 @@ export default function App() {
 
   // Selected product for modal detail
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+
+  // Link condiviso /prodotto/<id>: appena arriva il catalogo apre proprio quel prodotto
+  const [sharedProductId, setSharedProductId] = useState<string | null>(sharedProductIdFromUrl);
+  useEffect(() => {
+    if (!sharedProductId || productsList.length === 0) return;
+    const found = productsList.find((p) => p.id === sharedProductId);
+    if (found) {
+      setSelectedProduct(found);
+      setSharedProductId(null);
+    } else if (!catalogLoading) {
+      // prodotto non più in catalogo: resta la home
+      setSharedProductId(null);
+      clearSharedProductUrl();
+    }
+  }, [sharedProductId, productsList, catalogLoading]);
+  useEffect(() => {
+    if (!selectedProduct && !sharedProductId) clearSharedProductUrl();
+  }, [selectedProduct, sharedProductId]);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [isAdminPanelOpen, setIsAdminPanelOpen] = useState(false);
   // Forbici sulle schede prodotto: apre il pannello admin su "Rimuovi sfondo" con quel prodotto
