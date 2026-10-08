@@ -6,11 +6,13 @@ import { postToShop } from '../services/orderSubmit';
 interface ContactModalProps {
   isOpen: boolean;
   onClose: () => void;
+  /** apre la chat dentro l'app */
+  onOpenChat?: () => void;
 }
 
 const SHOP_EMAIL = 'gruppo.aurora.ordini@gmail.com';
 
-export const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) => {
+export const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose, onOpenChat }) => {
   const { currentUser } = useAdmin();
   const [submitted, setSubmitted] = useState(false);
   const [sending, setSending] = useState(false);
@@ -77,6 +79,22 @@ export const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) =
             Scrivici per listini, preventivi o assistenza: ti rispondiamo appena possibile.
           </p>
         </div>
+
+        {onOpenChat && !submitted && (
+          <button
+            id="contact-open-chat-btn"
+            type="button"
+            onClick={() => { onClose(); onOpenChat(); }}
+            className="w-full mb-4 flex items-center gap-3 rounded-2xl px-4 py-3 text-left text-white shadow-lg transition-transform active:scale-[0.99]"
+            style={{ background: 'linear-gradient(135deg, #0284c7, #0369a1)' }}
+          >
+            <MessageSquare className="w-6 h-6 shrink-0" />
+            <span className="flex-1">
+              <span className="block text-sm font-bold">Chatta con noi</span>
+              <span className="block text-[11px] text-white/85">Scrivici subito in chat, senza uscire dall'app</span>
+            </span>
+          </button>
+        )}
 
         {submitted ? (
           <div className="py-10 text-center flex flex-col items-center">

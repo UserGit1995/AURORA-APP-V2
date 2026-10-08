@@ -313,10 +313,10 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
 
                 <div className="bg-[#0d1420] border border-sky-500/30 p-4 rounded-2xl">
                   <span className="text-[10px] text-slate-400 uppercase tracking-wider block font-bold">
-                    Spedizione Gratuita
+                    Spedizione
                   </span>
-                  <div className="text-xl font-bold text-sky-300 mt-1">Da € 49,00</div>
-                  <span className="text-[11px] text-slate-400 block mt-0.5">Corriere espresso in tutta Italia</span>
+                  <div className="text-xl font-bold text-sky-300 mt-1">Lazio 24/48h</div>
+                  <span className="text-[11px] text-slate-400 block mt-0.5">Lazio € 3,50 / € 4,50 in base alla zona · Italia € 7,00 · esclusi sabato e domenica</span>
                 </div>
 
                 <div className="bg-[#0d1420] border border-purple-500/30 p-4 rounded-2xl">

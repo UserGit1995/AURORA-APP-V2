@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { RotateCcw, ArrowRight, Loader2, RefreshCw, ShoppingBag } from 'lucide-react';
+import { RotateCcw, ArrowRight, Loader2, RefreshCw, ShoppingBag, MessageCircle } from 'lucide-react';
 import { Sidebar, NavTab } from './components/Sidebar';
 import { Header } from './components/Header';
 import { HeroBanner } from './components/HeroBanner';
@@ -33,6 +33,8 @@ import { CookieBanner } from './components/CookieBanner';
 import { warmSearchIndex } from './utils/productSearch';
 import { OPEN_REMOVE_BG_EVENT } from './components/AdminRemoveBgButton';
 import { CustomizationTrackingView } from './components/CustomizationTrackingView';
+import { ChatView } from './components/chat/ChatView';
+import { loadChatSession, fetchClientUnread, adminUnreadCount } from './services/chat';
 import { parseInitialRoute, syncUrlWithTab, sharedProductIdFromUrl, clearSharedProductUrl } from './utils/deepLinks';
 
 import { Product, CartItem, Order, NotificationItem, OrderTemplate } from './types';
@@ -79,6 +81,29 @@ export default function App() {
 
   // Selected product for modal detail
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+
+  // Chat: risposte non lette per il cliente, messaggi nuovi per l'admin
+  const [chatUnread, setChatUnread] = useState(0);
+  const [adminChatUnread, setAdminChatUnread] = useState(0);
+  const [chatAdminRequest, setChatAdminRequest] = useState(0);
+  useEffect(() => {
+    let alive = true;
+    const check = async () => {
+      if (document.visibilityState !== 'visible') return;
+      if (isAdmin) {
+        const n = await adminUnreadCount();
+        if (alive) setAdminChatUnread(n);
+      }
+      const s = loadChatSession();
+      if (s && activeTab !== 'chat') {
+        const n = await fetchClientUnread(s);
+        if (alive) setChatUnread(n);
+      } else if (alive) setChatUnread(0);
+    };
+    check();
+    const t = window.setInterval(check, 20000);
+    return () => { alive = false; window.clearInterval(t); };
+  }, [isAdmin, activeTab]);
 
   // Link condiviso /prodotto/<id>: appena arriva il catalogo apre proprio quel prodotto
   const [sharedProductId, setSharedProductId] = useState<string | null>(sharedProductIdFromUrl);
@@ -421,7 +446,7 @@ export default function App() {
           if (tab === 'home') setSelectedCategoryId(null);
           // Le pagine Personalizza / Privacy / Termini non devono restare
           // coperte da una ricerca, un brand o una vista marchi ancora aperti.
-          if (tab === 'personalizza' || tab === 'privacy' || tab === 'termini') {
+          if (tab === 'personalizza' || tab === 'privacy' || tab === 'termini' || tab === 'chat') {
             setSearchQuery('');
             setSelectedBrandName(null);
             setShowAllBrands(false);
@@ -435,6 +460,7 @@ export default function App() {
         comparedCount={comparedProductIds.length}
         isOpenMobile={isMobileMenuOpen}
         onCloseMobile={() => setIsMobileMenuOpen(false)}
+        chatUnread={chatUnread}
       />
 
       {/* Main Content Area */}
@@ -455,7 +481,7 @@ export default function App() {
           onOpenContact={() => setIsContactOpen(true)}
           onToggleMobileMenu={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           unreadNotificationsCount={unreadNotificationsCount}
-          unreadInquiriesCount={0}
+          unreadInquiriesCount={chatUnread}
           isCartPulsing={isCartPulsing}
           cartTotal={cartSubtotal}
         />
@@ -469,6 +495,8 @@ export default function App() {
               onBackToHome={() => setActiveTab('home')}
               onOpenLegal={(page) => setActiveTab(page)}
             />
+          ) : activeTab === 'chat' ? (
+            <ChatView onBack={() => setActiveTab('home')} onOpenPrivacy={() => setActiveTab('privacy')} />
           ) : activeTab === 'privacy' || activeTab === 'termini' ? (
             <LegalView
               page={activeTab}
@@ -820,7 +848,21 @@ export default function App() {
       <ContactModal
         isOpen={isContactOpen}
         onClose={() => setIsContactOpen(false)}
+        onOpenChat={() => { setSelectedProduct(null); setActiveTab('chat'); }}
       />
+
+      {/* Admin: avviso messaggi nuovi dei clienti */}
+      {isAdmin && adminChatUnread > 0 && !isAdminPanelOpen && (
+        <button
+          id="admin-chat-alert"
+          onClick={() => { setChatAdminRequest(Date.now()); setIsAdminPanelOpen(true); }}
+          className="fixed left-4 bottom-24 lg:bottom-6 lg:left-64 z-40 flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-bold text-white shadow-2xl animate-in fade-in"
+          style={{ background: 'linear-gradient(135deg, #0284c7, #0369a1)' }}
+        >
+          <MessageCircle className="w-4 h-4" />
+          {adminChatUnread === 1 ? '1 nuovo messaggio' : `${adminChatUnread} nuovi messaggi`}
+        </button>
+      )}
 
       <NotificationsModal
         isOpen={isNotificationsOpen}
@@ -888,6 +930,8 @@ export default function App() {
             isOpen={isAdminPanelOpen}
             onClose={() => setIsAdminPanelOpen(false)}
             removeBgRequest={removeBgRequest}
+            chatRequest={chatAdminRequest}
+            onChatUnreadChange={setAdminChatUnread}
           />
         </React.Suspense>
       )}

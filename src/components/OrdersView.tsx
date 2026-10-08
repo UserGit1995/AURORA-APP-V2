@@ -5,6 +5,7 @@ import { Order, Product } from '../types';
 import { OrderTrackingTimeline } from './OrderTrackingTimeline';
 import { OrderInquiryModal } from './OrderInquiryModal';
 import { useLanguage } from '../context/LanguageContext';
+import { shippingCostLabel } from '../config/shipping';
 
 interface OrdersViewProps {
   orders: Order[];
@@ -1021,8 +1022,10 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
 
                             <div className="flex justify-between text-slate-400">
                               <span className="text-slate-400">Spese di Spedizione / Logistica:</span>
-                              <span className="font-mono text-emerald-400 font-medium">
-                                {shippingCost === 0 ? 'Gratuite (B2B Express)' : `€${shippingCost.toFixed(2)}`}
+                              <span className="font-mono text-slate-300 font-medium">
+                                {shippingCost === 0
+                                  ? (selectedDetailOrder.shippingAddress?.deliveryOption === 'ritiro_sede' ? 'Ritiro in sede' : shippingCostLabel(selectedDetailOrder.shippingAddress?.province))
+                                  : `€${shippingCost.toFixed(2)}`}
                               </span>
                             </div>
 

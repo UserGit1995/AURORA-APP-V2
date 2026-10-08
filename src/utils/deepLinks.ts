@@ -44,12 +44,14 @@ const PATH_BY_TAB: Partial<Record<NavTab, string>> = {
   personalizza: '/personalizza',
   privacy: '/privacy',
   termini: '/termini-vendita',
+  chat: '/chat',
 };
 
 const TAB_BY_PATH: Record<string, NavTab> = {
   '/personalizza': 'personalizza',
   '/privacy': 'privacy',
   '/termini-vendita': 'termini',
+  '/chat': 'chat',
 };
 
 export function parseInitialRoute(): InitialRoute {

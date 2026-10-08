@@ -10,6 +10,7 @@ import { OrderSendFallback } from './OrderSendFallback';
 import { useLanguage } from '../context/LanguageContext';
 import { useAdmin } from '../context/AdminContext';
 import { PLACEHOLDER_IMAGE } from '../utils/imageRepair';
+import { shippingCostLabel, shippingTimeLabel, SHIPPING_LAZIO_TEXT, SHIPPING_ITALIA_TEXT, SHIPPING_DAYS_TEXT } from '../config/shipping';
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -106,8 +107,6 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
   // IVA: solo se impostata dall'admin (default 0); i privati non la pagano mai
   const vat = isAzienda ? subtotal * (vatPercent / 100) : 0;
   const total = subtotal + vat;
-  const freeShippingThreshold = 250;
-  const remainingForFreeShipping = Math.max(0, freeShippingThreshold - subtotal);
 
   // Ordine minimo (sull'imponibile): sotto la soglia la richiesta non può partire
   const missingForMinimum = Math.max(0, Math.round((minimumOrderEur - subtotal) * 100) / 100);
@@ -161,7 +160,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
       status: 'In elaborazione',
       estimatedDelivery: pickup
         ? 'Ritiro in sede: ti avviseremo quando è pronto'
-        : 'Spedizione da confermare (di norma 24/48h)',
+        : `${shippingTimeLabel(province)} · Costo: ${shippingCostLabel(province)}`,
       courier: pickup ? 'Ritiro in sede' : 'Corriere da confermare',
       trackingNumber: pickup ? 'RITIRO-SEDE' : undefined,
       total: total,
@@ -295,26 +294,6 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                   </span>
                 </div>
               )}
-
-              {/* Free shipping banner */}
-              <div className="px-5 py-2.5 bg-[#0d1420] border-b border-[#1c2433]">
-                <div className="flex justify-between text-xs mb-1">
-                  <span className="text-slate-400">
-                    {remainingForFreeShipping === 0 
-                      ? '🎉 Consegna Gratuita inclusa!' 
-                      : `Aggiungi €${remainingForFreeShipping.toFixed(2)} per la spedizione gratuita`}
-                  </span>
-                  <span className="text-sky-400 font-bold">
-                    {Math.min(100, Math.round((subtotal / freeShippingThreshold) * 100))}%
-                  </span>
-                </div>
-                <div className="w-full h-1.5 bg-[#0d1420] rounded-full overflow-hidden">
-                  <div 
-                    className="h-full bg-gradient-to-r from-sky-500 to-cyan-400 rounded-full transition-all duration-300"
-                    style={{ width: `${Math.min(100, (subtotal / freeShippingThreshold) * 100)}%` }}
-                  />
-                </div>
-              </div>
 
               {/* Template Quick Toolbar */}
               <div className="px-4 py-2.5 bg-[#0d1420] border-b border-[#1c2433] flex items-center justify-between gap-2 flex-wrap">
@@ -916,6 +895,23 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                             className="w-full bg-[#0d1420] border border-[#1c2433] rounded-xl px-3 py-2 text-white uppercase placeholder-slate-500 focus:outline-none"
                           />
                         </div>
+                      </div>
+
+                      {/* Costi e tempi di consegna in base alla provincia */}
+                      <div className="p-3 rounded-xl bg-[#0d1420] border border-sky-500/30 text-[11px] text-slate-300 space-y-1">
+                        <p className="font-bold text-sky-300">
+                          Consegna: {shippingCostLabel(province)}
+                        </p>
+                        {province.trim() ? (
+                          <p className="text-slate-400">{shippingTimeLabel(province)}</p>
+                        ) : (
+                          <>
+                            <p className="text-slate-400">{SHIPPING_LAZIO_TEXT}</p>
+                            <p className="text-slate-400">{SHIPPING_ITALIA_TEXT}</p>
+                            <p className="text-slate-400">{SHIPPING_DAYS_TEXT}</p>
+                          </>
+                        )}
+                        <p className="text-[10px] text-slate-500">Il costo esatto ti viene confermato insieme all'ordine.</p>
                       </div>
 
                       <div>

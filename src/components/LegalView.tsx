@@ -29,6 +29,10 @@ const PrivacyContent: React.FC = () => (
       raccogliamo: nome e cognome, email, numero di telefono, indirizzo di consegna, eventuale nome
       azienda, e — solo per le richieste di personalizzazione — il file grafico (logo) che carichi.
     </p>
+    <p className={P}>
+      Se ci scrivi dalla chat dell'app raccogliamo il nome, il numero di telefono e i messaggi che
+      invii: li usiamo solo per risponderti e restano visibili soltanto a te (sul tuo dispositivo) e a noi.
+    </p>
 
     <h2 className={H2}>Perché li usiamo</h2>
     <p className={P}>
@@ -110,6 +114,11 @@ const TerminiContent: React.FC<{ onOpenLegal: (p: LegalPage) => void }> = ({ onO
     </p>
 
     <h2 className={H2}>Consegna</h2>
+    <ul className="mb-4 list-disc space-y-1 pl-5">
+      <li><strong className="text-white">Lazio:</strong> consegna entro 24/48 ore lavorative, al costo di € 3,50 o € 4,50 in base alla zona di consegna.</li>
+      <li><strong className="text-white">Resto d'Italia:</strong> spedizione al costo di € 7,00.</li>
+      <li>Consegne e spedizioni avvengono nei giorni lavorativi, esclusi sabato e domenica.</li>
+    </ul>
     <p className={P}>
       I tempi di consegna indicati sono stimati e possono variare in base alla zona, alla quantità
       ordinata e alla disponibilità dei prodotti. Eventuali ritardi verranno comunicati appena

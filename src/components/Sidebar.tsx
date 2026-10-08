@@ -1,10 +1,10 @@
 import React from 'react';
-import { Home, LayoutGrid, Tag, Star, Flame, ClipboardList, Heart, Scale, Menu, X, LogIn, LogOut, SlidersHorizontal, Palette, ShieldCheck, FileText, Download } from 'lucide-react';
+import { Home, LayoutGrid, Tag, Star, Flame, ClipboardList, Heart, Scale, Menu, X, LogIn, LogOut, SlidersHorizontal, Palette, ShieldCheck, FileText, Download, MessageCircle } from 'lucide-react';
 import { AuroraLogo } from './AuroraLogo';
 import { useLanguage } from '../context/LanguageContext';
 import { useAdmin } from '../context/AdminContext';
 
-export type NavTab = 'home' | 'categorie' | 'offerte' | 'novita' | 'piu-venduti' | 'ordini' | 'preferiti' | 'confronta' | 'personalizza' | 'privacy' | 'termini' | 'tracking';
+export type NavTab = 'home' | 'categorie' | 'offerte' | 'novita' | 'piu-venduti' | 'ordini' | 'preferiti' | 'confronta' | 'personalizza' | 'privacy' | 'termini' | 'tracking' | 'chat';
 
 interface SidebarProps {
   activeTab: NavTab;
@@ -17,6 +17,8 @@ interface SidebarProps {
   comparedCount?: number;
   isOpenMobile?: boolean;
   onCloseMobile?: () => void;
+  /** risposte non lette nella chat del cliente */
+  chatUnread?: number;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -28,7 +30,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   favoritesCount,
   comparedCount = 0,
   isOpenMobile,
-  onCloseMobile
+  onCloseMobile,
+  chatUnread = 0
 }) => {
   const { t } = useLanguage();
   const { isAdmin, currentUser, logout } = useAdmin();
@@ -47,6 +50,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: 'novita', label: t('nav.news', 'Novità Eco & Bio'), icon: <Star className="w-[18px] h-[18px]" /> },
     { id: 'piu-venduti', label: t('nav.bestsellers', 'I più venduti'), icon: <Flame className="w-[18px] h-[18px]" /> },
     { id: 'ordini', label: t('nav.orders', 'I miei Ordini'), icon: <ClipboardList className="w-[18px] h-[18px]" /> },
+    { id: 'chat', label: 'Chat con noi', icon: <MessageCircle className="w-[18px] h-[18px]" />, badge: chatUnread > 0 ? chatUnread : undefined },
     { 
       id: 'preferiti', 
       label: t('nav.favorites', 'Preferiti'), 

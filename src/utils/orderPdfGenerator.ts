@@ -2,6 +2,7 @@ import { COMPANY, companyInfoLine } from '../config/company';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { Order } from '../types';
+import { shippingCostLabel } from '../config/shipping';
 
 export const generateOrderReceiptPdf = (order: Order): void => {
   const doc = new jsPDF({
@@ -228,7 +229,7 @@ export const generateOrderReceiptPdf = (order: Order): void => {
   doc.setFont('helvetica', 'normal');
   doc.text('Spese di Spedizione:', summaryX + 4, finalY + 12);
   doc.setFont('courier', 'normal');
-  doc.text(shippingCost === 0 ? 'Gratuite' : `€ ${shippingCost.toFixed(2)}`, summaryX + summaryWidth - 4, finalY + 12, { align: 'right' });
+  doc.text(shippingCost === 0 ? (order.shippingAddress?.deliveryOption === 'ritiro_sede' ? 'Ritiro in sede' : shippingCostLabel(order.shippingAddress?.province)) : `€ ${shippingCost.toFixed(2)}`, summaryX + summaryWidth - 4, finalY + 12, { align: 'right' });
 
   doc.setFont('helvetica', 'normal');
   if (isBusinessOrder) {
@@ -725,7 +726,7 @@ export const generateOrderHistoryPdf = (
   doc.setFont('helvetica', 'normal');
   doc.text(isIt ? 'Spese Trasporto B2B:' : 'B2B Transport Freight:', summaryX + 4, currentFinalY + 12);
   doc.setFont('courier', 'normal');
-  doc.text(isIt ? 'Incluse / Gratuite' : 'Free / Included', summaryX + summaryWidth - 4, currentFinalY + 12, { align: 'right' });
+  doc.text(isIt ? 'Da concordare' : 'To be agreed', summaryX + summaryWidth - 4, currentFinalY + 12, { align: 'right' });
 
   doc.setFont('helvetica', 'normal');
   doc.text(isIt ? 'Totale IVA:' : 'Total VAT:', summaryX + 4, currentFinalY + 18);

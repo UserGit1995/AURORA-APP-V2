@@ -23,6 +23,7 @@ import {
   Search,
   XCircle,
   Scissors,
+  MessageCircle,
 } from 'lucide-react';
 import { useAdmin } from '../context/AdminContext';
 import { ProductEditModal } from './ProductEditModal';
@@ -40,6 +41,7 @@ import { BackupPanel, daysSinceLastBackup } from './BackupPanel';
 import { SupplierPhotosPanel } from './SupplierPhotosPanel';
 import { isSupplierImage } from '../utils/imageFirst';
 import { CustomizationRequestsPanel } from './CustomizationRequestsPanel';
+import { ChatAdminPanel } from './chat/ChatAdminPanel';
 import { RemoveBgStudio } from './RemoveBg/RemoveBgStudio';
 import { Product, Order } from '../types';
 import { searchProducts } from '../utils/productSearch';
@@ -49,6 +51,9 @@ interface AdminControlPanelProps {
   onClose: () => void;
   /** Apertura diretta di "Rimuovi sfondo" su un prodotto (dalle schede prodotto) */
   removeBgRequest?: { productId: string; token: number } | null;
+  /** Apertura diretta della chat clienti (dall'avviso "nuovi messaggi") */
+  chatRequest?: number;
+  onChatUnreadChange?: (n: number) => void;
 }
 
 // Stessa struttura/logica di sempre: qui cambia solo l'aspetto — via gradienti,
@@ -68,7 +73,7 @@ const BTN_SECONDARY = 'px-3 py-1.5 rounded-lg bg-[#0d1420] hover:bg-[#1a2230] te
 const ICON_BTN = 'p-1.5 rounded-lg bg-[#0d1420] text-slate-400 hover:text-white transition-colors';
 const ICON_BTN_DANGER = 'p-1.5 rounded-lg bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 transition-colors';
 
-export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({ isOpen, onClose, removeBgRequest }) => {
+export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({ isOpen, onClose, removeBgRequest, chatRequest, onChatUnreadChange }) => {
   const {
     currentUser,
     isSupabaseConnected,
@@ -85,7 +90,10 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({ isOpen, on
   } = useAdmin();
 
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [activeTab, setActiveTab] = useState<'products' | 'orders' | 'categories' | 'subcategories' | 'images' | 'removebg' | 'requests' | 'packaging' | 'flash' | 'flyer' | 'backup' | 'supplierphotos' | 'settings'>('products');
+  const [activeTab, setActiveTab] = useState<'products' | 'orders' | 'categories' | 'subcategories' | 'images' | 'removebg' | 'requests' | 'packaging' | 'flash' | 'flyer' | 'backup' | 'supplierphotos' | 'settings' | 'chat'>(chatRequest ? 'chat' : 'products');
+  const [chatUnread, setChatUnreadLocal] = useState(0);
+  const setChatUnread = React.useCallback((n: number) => { setChatUnreadLocal(n); onChatUnreadChange?.(n); }, [onChatUnreadChange]);
+  React.useEffect(() => { if (chatRequest) setActiveTab('chat'); }, [chatRequest]);
   // Remove BG: lo studio resta montato dopo la prima apertura, così cambiando scheda non si perde il lavoro
   const [removeBgMounted, setRemoveBgMounted] = useState(false);
   const [removeBgProductId, setRemoveBgProductId] = useState<string | null>(null);
@@ -221,6 +229,12 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({ isOpen, on
         { id: 'orders', label: 'Ordini', icon: ListOrdered, badge: String(ordersList.length), desc: 'Controlla e aggiorna lo stato degli ordini dei clienti.' },
         { id: 'flash', label: 'Offerte a tempo', icon: Timer, desc: 'Programma prezzi in offerta con data e ora di inizio e fine.' },
         { id: 'flyer', label: 'Volantino', icon: BookOpen, desc: 'Carica il volantino sfogliabile mostrato nella home.' },
+      ],
+    },
+    {
+      title: 'Clienti',
+      items: [
+        { id: 'chat', label: 'Chat clienti', icon: MessageCircle, badge: chatUnread > 0 ? `${chatUnread} nuovi` : undefined, desc: 'Leggi i messaggi che ti scrivono i clienti dall\'app e rispondi.' },
       ],
     },
     {
@@ -707,6 +721,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({ isOpen, on
 
         {/* Tab: Parametri */}
         {activeTab === 'requests' && <CustomizationRequestsPanel onNewCountChange={setNewCustomizations} />}
+        {activeTab === 'chat' && <ChatAdminPanel onUnreadChange={setChatUnread} />}
         {activeTab === 'packaging' && <CustomizationPricingPanel />}
         {activeTab === 'flash' && <FlashOffersPanel />}
         {activeTab === 'flyer' && <FlyerAdminPanel />}
