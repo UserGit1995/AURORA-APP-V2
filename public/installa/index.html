@@ -91,8 +91,9 @@
 
         <div class="box sky only ios">
           <div class="ttl sky">Procedura consigliata per il tuo iPhone:</div>
-          <button class="btn js-ios" type="button"> Scarica profilo iPhone (.mobileconfig)</button>
-          <div class="note warn" id="safariWarn" hidden>Per installare apri questa pagina in <b>Safari</b>: da altri browser iPhone non accetta il profilo.</div>
+          <a class="btn js-ios" href="/aurora.mobileconfig">Scarica profilo iPhone</a>
+          <div class="note warn" id="safariWarn" hidden>Stai usando un browser diverso da Safari (es. WhatsApp, Instagram, Chrome): da qui iPhone <b>non</b> installa il profilo. Copia il link e aprilo in <b>Safari</b>.
+            <div class="row"><button class="btn ghost" type="button" id="copyLink">Copia link</button></div></div>
           <div class="note">Il file <code>.mobileconfig</code> è il formato ufficiale Apple (WebClip): mette l'icona di Aurora sulla schermata home. Dopo il download apri <b>Impostazioni</b> → <b>Profilo scaricato</b> → <b>Installa</b>.</div>
         </div>
 
@@ -100,14 +101,14 @@
           <div class="ttl" style="color:#6ee7b7">Consigliato per il tuo dispositivo Android:</div>
           <div class="row">
             <button class="btn em js-pwa" type="button" disabled>Installa App Ora (PWA)</button>
-            <a class="btn ghost js-apk" href="#" aria-disabled="true">Scarica APK Android</a>
+            <a class="btn ghost js-apk" href="/aurora-v2.apk" download="Aurora.apk">Scarica APK Android</a>
           </div>
           <p class="small js-pwa-hint">Il pulsante si attiva da solo quando questa pagina è aperta in Chrome su Android. Altrimenti: menu ⋮ del browser → «Installa app».</p>
         </div>
 
         <div class="row only desktop flex">
-          <button class="btn js-ios" type="button">Scarica File iOS (.mobileconfig)</button>
-          <a class="btn em js-apk" href="#" aria-disabled="true">Scarica APK Android</a>
+          <a class="btn js-ios" href="/aurora.mobileconfig">Scarica profilo iPhone</a>
+          <a class="btn em js-apk" href="/aurora-v2.apk" download="Aurora.apk">Scarica APK Android</a>
         </div>
         <p class="small only desktop">Stai usando un computer: apri questa pagina dal telefono per installare l'app, oppure invia il link <b>appaurorav2updated.vercel.app/installa</b> al tuo smartphone.</p>
       </div>
@@ -136,7 +137,7 @@
           <div class="ttl sky">Opzione B: File .APK (sideloading)</div>
           <p>Vuoi il file <code>.apk</code> da installare a mano o da inviare via WhatsApp, Telegram o Drive, senza Google Play?</p>
           <ul><li>Si scarica da qui e si installa su qualsiasi Android</li><li>Serve consentire "Origini sconosciute" una sola volta</li></ul>
-          <div class="row"><a class="btn ghost js-apk" href="#" aria-disabled="true">Scarica APK Android</a></div>
+          <div class="row"><a class="btn ghost js-apk" href="/aurora-v2.apk" download="Aurora.apk">Scarica APK Android</a></div>
           <p class="small js-apk-note"></p>
         </div>
       </div>
@@ -192,7 +193,8 @@
 </main>
 
 <script>
-(function () {
+// Parte dopo install-banner.js (che è "defer"): prima window.AuroraInstall non esiste ancora
+document.addEventListener('DOMContentLoaded', function () {
   var AI = window.AuroraInstall || null;
   var $ = function (s, r) { return (r || document).querySelector(s); };
   var $$ = function (s) { return Array.prototype.slice.call(document.querySelectorAll(s)); };
@@ -223,8 +225,14 @@
   if (AI.isStandalone()) $('#installed').style.display = '';
   if (dev === 'ios' && !AI.isSafari) $('#safariWarn').hidden = false;
 
-  /* iPhone */
-  $$('.js-ios').forEach(function (b) { b.addEventListener('click', function () { AI.downloadMobileConfig(); }); });
+  /* iPhone: i pulsanti sono link diretti al file /aurora.mobileconfig */
+  var cp = $('#copyLink');
+  if (cp) cp.addEventListener('click', function () {
+    var link = location.origin + '/installa';
+    var done = function () { cp.textContent = 'Link copiato ✔ ora incollalo in Safari'; };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(link).then(done, function () { prompt('Copia questo link e aprilo in Safari:', link); });
+    else prompt('Copia questo link e aprilo in Safari:', link);
+  });
 
   /* Android PWA */
   function syncPwa() {
@@ -256,7 +264,7 @@
     }
   });
   if (location.hash === '#android') { var s = $('#android'); if (s) s.scrollIntoView(); }
-})();
+});
 </script>
 </body>
 </html>

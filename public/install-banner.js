@@ -106,17 +106,12 @@
 '    <key>PayloadUUID</key>\n    <string>B908CC0B-F261-43E1-AEC7-B0AFBBAC4B99</string>\n' +
 '    <key>PayloadVersion</key>\n    <integer>1</integer>\n</dict>\n</plist>\n';
   }
+  // iPhone installa il profilo solo se arriva come file vero dal sito
+  // (non creato nel browser) e solo da Safari.
+  var PROFILE_PATH = '/aurora.mobileconfig';
   function downloadMobileConfig() {
-    return iconBase64().then(function (b64) {
-      var blob = new Blob([buildProfile(b64)], { type: 'application/x-apple-aspen-config' });
-      var url = URL.createObjectURL(blob);
-      var a = document.createElement('a');
-      a.href = url;
-      a.download = 'aurora.mobileconfig';
-      document.body.appendChild(a);
-      a.click();
-      setTimeout(function () { document.body.removeChild(a); URL.revokeObjectURL(url); }, 2000);
-    });
+    window.location.href = PROFILE_PATH;
+    return Promise.resolve();
   }
 
   /* ---------- file APK Android ---------- */
@@ -143,6 +138,7 @@
     promptInstall: promptInstall,
     onChange: function (cb) { listeners.push(cb); },
     downloadMobileConfig: downloadMobileConfig,
+    profilePath: PROFILE_PATH,
     apkAvailable: apkAvailable,
     pwaBuilderUrl: function () {
       return 'https://www.pwabuilder.com/reportcard?site=' + encodeURIComponent(APP_URL.replace(/\/home$/, ''));
