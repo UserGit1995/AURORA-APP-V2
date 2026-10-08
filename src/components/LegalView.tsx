@@ -1,6 +1,5 @@
 import React from 'react';
 import { ArrowLeft } from 'lucide-react';
-import { useAdmin } from '../context/AdminContext';
 import { isCookieBannerActive, openCookieSettings } from '../utils/cookieConsent';
 
 export type LegalPage = 'privacy' | 'termini';
@@ -14,29 +13,9 @@ interface LegalViewProps {
 const H2 = 'mb-2 mt-6 text-lg font-semibold text-white font-heading';
 const P = 'mb-4';
 
-// Promemoria visibile solo all'amministratore, mai ai clienti
-const OwnerNote: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { isAdmin } = useAdmin();
-  if (!isAdmin) return null;
-  return (
-  <div className="mb-8 rounded-xl border border-dashed border-sky-500/40 bg-sky-500/5 p-4 text-slate-200">
-    <strong>Nota per il titolare del sito:</strong> {children}
-  </div>
-  );
-};
-
 const PrivacyContent: React.FC = () => (
   <>
     <h1 className="mb-2 text-2xl font-bold text-white font-heading">Informativa sulla Privacy e sui Cookie</h1>
-    <p className="mb-6 text-xs">Ultimo aggiornamento: 3 ottobre 2026.</p>
-
-    <OwnerNote>
-      questo è un testo generico di partenza, utile a far comparire subito una pagina coerente con i
-      dati che raccogli oggi (nome, email, telefono, indirizzo, logo caricato). Non sostituisce una
-      consulenza legale: prima di pubblicarlo in modo definitivo, fallo rivedere da un consulente
-      privacy/legale, che potrà adattarlo esattamente alla tua attività (titolare del trattamento con
-      dati reali, eventuale responsabile esterno per l'invio email, tempi di conservazione, ecc.).
-    </OwnerNote>
 
     <h2 className={H2}>Titolare del trattamento</h2>
     <p className={P}>
@@ -106,15 +85,6 @@ const PrivacyContent: React.FC = () => (
 const TerminiContent: React.FC<{ onOpenLegal: (p: LegalPage) => void }> = ({ onOpenLegal }) => (
   <>
     <h1 className="mb-2 text-2xl font-bold text-white font-heading">Termini e Condizioni di Vendita</h1>
-    <p className="mb-6 text-xs">Ultimo aggiornamento: da completare a cura del titolare.</p>
-
-    <OwnerNote>
-      questo è un testo generico di partenza, scritto tenendo conto che vendi sia ad altre attività
-      (bar, ristoranti, pizzerie) sia a privati cittadini. Non sostituisce una consulenza legale:
-      prima di pubblicarlo in modo definitivo, fallo rivedere da un commercialista o legale, che potrà
-      verificarlo con i tuoi dati reali (indirizzo sede legale, PEC, eventuali condizioni di pagamento
-      specifiche) e con la situazione esatta della tua attività.
-    </OwnerNote>
 
     <h2 className={H2}>Chi vende</h2>
     <p className={P}>
