@@ -31,7 +31,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
   onOpenRestockAnalysis,
   onEditProduct,
 }) => {
-  const { isBusinessCustomer, vatFactor, vatPercent } = useAdmin();
+  const { isBusinessCustomer, vatFactor, vatPercent, minimumOrderEur } = useAdmin();
   // Indietro del telefono / Esc chiudono la scheda prodotto
   useCloseOnBack(true, onClose);
   const [activeTab, setActiveTab] = useState<'overview' | 'usage'>('overview');
@@ -314,6 +314,12 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                     )}
                   </button>
                 </div>
+                {minimumOrderEur > 0 && (
+                  <p id="modal-min-order" className="mt-3 flex items-center justify-center gap-1.5 rounded-xl border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs font-semibold text-amber-200">
+                    <ShoppingBag className="w-3.5 h-3.5 shrink-0" />
+                    Ordine minimo € {minimumOrderEur.toFixed(0)} · consegna gratuita su Roma (RM)
+                  </p>
+                )}
               </div>
             </div>
           </div>

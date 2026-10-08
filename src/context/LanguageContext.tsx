@@ -47,7 +47,7 @@ const translations: Record<Language, Record<string, string>> = {
     'hero.qualityTitle': 'Qualità Premium',
     'hero.qualityDesc': 'Prodotti selezionati',
     'hero.deliveryTitle': 'Consegna Veloce',
-    'hero.deliveryDesc': 'Lazio 24/48h · Italia € 7',
+    'hero.deliveryDesc': 'Gratis su Roma · 24/48h',
     'hero.choiceTitle': 'Ampia Scelta',
     'hero.choiceDesc': 'Sempre disponibili',
     'hero.exploreBtn': 'Scopri il catalogo',

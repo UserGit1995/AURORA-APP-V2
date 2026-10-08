@@ -10,7 +10,7 @@ import { OrderSendFallback } from './OrderSendFallback';
 import { useLanguage } from '../context/LanguageContext';
 import { useAdmin } from '../context/AdminContext';
 import { PLACEHOLDER_IMAGE } from '../utils/imageRepair';
-import { shippingCostLabel, shippingTimeLabel, SHIPPING_LAZIO_TEXT, SHIPPING_ITALIA_TEXT, SHIPPING_DAYS_TEXT } from '../config/shipping';
+import { shippingCostLabel, shippingTimeLabel, SHIPPING_ROMA_TEXT, SHIPPING_LAZIO_TEXT, SHIPPING_ITALIA_TEXT, SHIPPING_DAYS_TEXT } from '../config/shipping';
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -906,6 +906,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                           <p className="text-slate-400">{shippingTimeLabel(province)}</p>
                         ) : (
                           <>
+                            <p className="text-slate-400">{SHIPPING_ROMA_TEXT}</p>
                             <p className="text-slate-400">{SHIPPING_LAZIO_TEXT}</p>
                             <p className="text-slate-400">{SHIPPING_ITALIA_TEXT}</p>
                             <p className="text-slate-400">{SHIPPING_DAYS_TEXT}</p>

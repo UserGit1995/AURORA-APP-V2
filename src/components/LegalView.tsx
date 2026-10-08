@@ -106,6 +106,12 @@ const TerminiContent: React.FC<{ onOpenLegal: (p: LegalPage) => void }> = ({ onO
       momento della conferma, e non tramite il sito.
     </p>
 
+    <h2 className={H2}>Ordine minimo</h2>
+    <p className={P}>
+      L'importo minimo per ogni ordine è di <strong className="text-white">€ 50,00</strong> di prodotti
+      (spese di consegna escluse). Sotto questa soglia l'ordine non può essere inviato.
+    </p>
+
     <h2 className={H2}>Prezzi</h2>
     <p className={P}>
       I prezzi mostrati sul sito sono indicativi e possono variare in base a quantità, personalizzazioni
@@ -115,7 +121,8 @@ const TerminiContent: React.FC<{ onOpenLegal: (p: LegalPage) => void }> = ({ onO
 
     <h2 className={H2}>Consegna</h2>
     <ul className="mb-4 list-disc space-y-1 pl-5">
-      <li><strong className="text-white">Lazio:</strong> consegna entro 24/48 ore lavorative, al costo di € 3,50 o € 4,50 in base alla zona di consegna.</li>
+      <li><strong className="text-white">Roma e provincia (RM):</strong> consegna gratuita entro 24/48 ore lavorative.</li>
+      <li><strong className="text-white">Resto del Lazio:</strong> consegna entro 24/48 ore lavorative, al costo di € 3,50 o € 4,50 in base alla zona di consegna.</li>
       <li><strong className="text-white">Resto d'Italia:</strong> spedizione al costo di € 7,00.</li>
       <li>Consegne e spedizioni avvengono nei giorni lavorativi, esclusi sabato e domenica.</li>
     </ul>

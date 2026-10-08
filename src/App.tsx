@@ -34,6 +34,7 @@ import { warmSearchIndex } from './utils/productSearch';
 import { OPEN_REMOVE_BG_EVENT } from './components/AdminRemoveBgButton';
 import { CustomizationTrackingView } from './components/CustomizationTrackingView';
 import { ChatView } from './components/chat/ChatView';
+import { InfoStrip } from './components/InfoStrip';
 import { loadChatSession, fetchClientUnread, adminUnreadCount } from './services/chat';
 import { parseInitialRoute, syncUrlWithTab, sharedProductIdFromUrl, clearSharedProductUrl } from './utils/deepLinks';
 
@@ -465,6 +466,8 @@ export default function App() {
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0 lg:pl-60">
+        {/* Ordine minimo e consegna, sempre visibili */}
+        <InfoStrip />
         {/* Sticky Header */}
         <Header
           searchQuery={searchQuery}
