@@ -10,7 +10,7 @@ import { productShareUrl } from '../utils/deepLinks';
  *   Telegram, Facebook, Email e "Copia link" (da incollare su Instagram o dove si vuole).
  * Chi apre il link vede subito la scheda di questo prodotto.
  */
-export const ShareProductButton: React.FC<{ product: Product }> = ({ product }) => {
+export const ShareProductButton: React.FC<{ product: Product; buttonClassName?: string }> = ({ product, buttonClassName }) => {
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const boxRef = useRef<HTMLDivElement>(null);
@@ -71,15 +71,18 @@ export const ShareProductButton: React.FC<{ product: Product }> = ({ product }) 
         id="modal-share-product"
         type="button"
         onClick={onShare}
-        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold border border-[#1c2433] bg-[#0d1420] text-slate-400 hover:text-white hover:border-sky-500/40 transition-colors"
+        className={
+          buttonClassName ??
+          'inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold border border-[#1c2433] bg-[#0d1420] text-slate-400 hover:text-white hover:border-sky-500/40 transition-colors'
+        }
         title="Condividi questo prodotto"
       >
-        <Share2 className="w-3.5 h-3.5" />
+        <Share2 className="w-3.5 h-3.5 shrink-0" />
         <span>Condividi</span>
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full mt-2 z-30 w-56 rounded-2xl border border-[#1c2433] bg-[#0b121d] p-1.5 shadow-2xl">
+        <div className="absolute right-0 top-full mt-2 z-30 w-56 max-w-[80vw] rounded-2xl border border-[#1c2433] bg-[#0b121d] p-1.5 shadow-2xl">
           {links.map((l) => (
             <a
               key={l.label}
