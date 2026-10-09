@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { BookOpen, Upload, Trash2, Eye, EyeOff, Loader2, FileText, Pencil, Check, X } from 'lucide-react';
+import { BookOpen, Upload, Trash2, Eye, EyeOff, Loader2, FileText, Pencil, Check, X, Download } from 'lucide-react';
 import { loadScript } from '../utils/loadScript';
 import {
   Flyer,
@@ -67,6 +67,41 @@ async function imageToJpeg(file: File): Promise<Blob> {
   }
 }
 
+/** Ricompone il volantino in un PDF (una pagina per immagine) e lo scarica */
+async function downloadFlyerPdf(f: Flyer, onProgress: (done: number, total: number) => void) {
+  const { jsPDF } = await import('jspdf');
+  let doc: any = null;
+  for (let i = 0; i < f.pages.length; i++) {
+    onProgress(i + 1, f.pages.length);
+    const res = await fetch(f.pages[i], { cache: 'no-store' });
+    if (!res.ok) throw new Error(`pagina ${i + 1} non disponibile`);
+    const blob = await res.blob();
+    const dataUrl = await new Promise<string>((resolve, reject) => {
+      const r = new FileReader();
+      r.onload = () => resolve(r.result as string);
+      r.onerror = () => reject(new Error(`pagina ${i + 1} non leggibile`));
+      r.readAsDataURL(blob);
+    });
+    const size = await new Promise<{ w: number; h: number }>((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve({ w: img.naturalWidth, h: img.naturalHeight });
+      img.onerror = () => reject(new Error(`pagina ${i + 1} non leggibile`));
+      img.src = dataUrl;
+    });
+    // larghezza A4 (210 mm), altezza in proporzione all'immagine
+    const w = 210;
+    const h = (size.h / size.w) * w;
+    const orientation = h >= w ? 'p' : 'l';
+    if (!doc) doc = new jsPDF({ orientation, unit: 'mm', format: [w, h] });
+    else doc.addPage([w, h], orientation);
+    const fmt = blob.type.includes('png') ? 'PNG' : 'JPEG';
+    doc.addImage(dataUrl, fmt, 0, 0, w, h, undefined, 'FAST');
+  }
+  if (!doc) throw new Error('il volantino non ha pagine');
+  const name = (f.title || 'Volantino').replace(/[^\w\-]+/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
+  doc.save(`${name || 'Volantino'}.pdf`);
+}
+
 const newId = () =>
   (crypto as any).randomUUID?.() ||
   'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
@@ -88,6 +123,19 @@ export const FlyerAdminPanel: React.FC = () => {
   const [okMsg, setOkMsg] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [edit, setEdit] = useState({ title: '', validFrom: '', validTo: '' });
+  const [downloading, setDownloading] = useState<{ id: string; text: string } | null>(null);
+
+  const download = async (f: Flyer) => {
+    if (downloading) return;
+    setDownloading({ id: f.id, text: 'Preparazione PDF…' });
+    try {
+      await downloadFlyerPdf(f, (d, t) => setDownloading({ id: f.id, text: `Preparazione PDF: pagina ${d} di ${t}` }));
+    } catch (e: any) {
+      alert(`Download non riuscito: ${e?.message || e}`);
+    } finally {
+      setDownloading(null);
+    }
+  };
 
   const reload = async () => {
     const res = await fetchAllFlyers();
@@ -326,6 +374,7 @@ export const FlyerAdminPanel: React.FC = () => {
                         ? ` · valido ${f.validFrom ? `dal ${shortDate(f.validFrom)} ` : ''}${f.validTo ? `al ${shortDate(f.validTo)}` : ''}`
                         : ''}
                     </p>
+                    {downloading?.id === f.id && <p className="text-xs text-sky-300 mt-1">{downloading.text}</p>}
                   </>
                 )}
               </div>
@@ -348,6 +397,16 @@ export const FlyerAdminPanel: React.FC = () => {
                       className={`p-2 rounded-lg ${f.active ? 'bg-emerald-500/15 text-emerald-400' : 'bg-slate-500/15 text-slate-400'}`}
                     >
                       {f.active ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => download(f)}
+                      disabled={!!downloading || f.pages.length === 0}
+                      title="Scarica il volantino in PDF"
+                      className="inline-flex items-center gap-1.5 px-2.5 py-2 rounded-lg bg-sky-500/15 text-sky-300 hover:text-white disabled:opacity-40 text-xs font-semibold"
+                    >
+                      {downloading?.id === f.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+                      PDF
                     </button>
                     <button type="button" onClick={() => startEdit(f)} title="Modifica titolo e date" className="p-2 rounded-lg bg-[#161f30] text-slate-300 hover:text-white">
                       <Pencil className="w-4 h-4" />
