@@ -52,19 +52,17 @@ export const PromoBanner: React.FC<PromoBannerProps> = ({ onDiscoverOffers }) =>
 
   return (
     <div className="w-full mt-7 rounded-2xl overflow-hidden isolate bg-[#051d41] border border-[#1c2433] shadow-xl relative">
-      {/* Foto come SFONDO del riquadro: sfuma dolcemente nel blu verso i testi */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#06224a] via-[#041a3a] to-[#030f24] pointer-events-none" />
+      {/* Foto come SFONDO di TUTTO il riquadro (da bordo a bordo, tagliata dagli angoli arrotondati del box) */}
       <img
         src={BANNER_BOTTLES_IMAGE}
         alt=""
         aria-hidden="true"
         referrerPolicy="no-referrer"
-        className="absolute inset-y-3 left-3 right-3 md:left-auto md:right-6 md:inset-y-2 w-[calc(100%-1.5rem)] md:w-[64%] h-[calc(100%-1.5rem)] md:h-[calc(100%-1rem)] object-cover object-center rounded-xl opacity-70 md:opacity-80 pointer-events-none select-none [mask-image:linear-gradient(to_top,transparent_0%,black_45%,black_70%,transparent_100%)] md:[mask-image:linear-gradient(to_right,transparent_0%,black_35%,black_70%,transparent_100%)]"
+        className="absolute inset-0 w-full h-full object-cover object-center pointer-events-none select-none"
       />
-      {/* luce morbida e bordi sfumati */}
-      <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(120%_140%_at_70%_50%,rgba(56,189,248,0.10)_0%,rgba(3,15,36,0)_45%)]" />
-      <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-[#030f24]/50 via-transparent to-[#030f24]/60" />
-      <div className="absolute inset-0 pointer-events-none md:bg-gradient-to-r md:from-[#041a3a] md:via-[#041a3a]/40 md:to-transparent bg-gradient-to-b from-[#041a3a]/85 via-[#041a3a]/55 to-[#041a3a]/30" />
+      {/* sfumature per leggere bene testi e pulsante */}
+      <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-[#041a3a]/85 via-[#041a3a]/55 to-[#041a3a]/75 md:bg-gradient-to-r md:from-[#041a3a]/95 md:via-[#041a3a]/35 md:to-[#041a3a]/80" />
+      <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(120%_140%_at_60%_50%,rgba(56,189,248,0.12)_0%,rgba(3,15,36,0)_55%)]" />
       <div className="relative flex flex-col md:flex-row items-center justify-between p-4 sm:p-5 lg:px-8 gap-4">
         {/* Left info */}
         <div className="flex items-center gap-3.5 z-10">
