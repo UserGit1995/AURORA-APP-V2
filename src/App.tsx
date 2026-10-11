@@ -596,6 +596,10 @@ export default function App() {
                   setShowAllBrands(false);
                   window.scrollTo({ top: 0 });
                 }}
+                onChat={() => {
+                  setActiveTab('chat');
+                  window.scrollTo({ top: 0 });
+                }}
               />
 
               {/* 2. Categorie principali */}
