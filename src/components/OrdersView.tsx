@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { ClipboardList, RotateCcw, Clock, CheckCircle2, ChevronRight, FileText, ShoppingBag, Check, Package, ArrowRight, Truck, Calendar, MapPin, ExternalLink, ShieldCheck, AlertCircle, X, PackageCheck, Search, Filter, Building2, Phone, CreditCard, Receipt, FileSpreadsheet, Info, Maximize2, Star, TrendingUp, Download, Loader2, RotateCw, Mail, Activity } from 'lucide-react';
+import { isAuroraDelivery, hasRealTracking, trackingLink } from '../config/couriers';
 import { motion, AnimatePresence } from 'motion/react';
 import { Order, Product } from '../types';
 import { OrderTrackingTimeline } from './OrderTrackingTimeline';
@@ -621,10 +622,10 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
                     {order.courier && (
                       <div className="flex items-center gap-2 text-xs">
                         <div className="bg-[#0d1420] border border-[#1c2433] px-2.5 py-1.5 rounded-lg text-slate-400">
-                          <span className="text-slate-400">{language === 'it' ? 'Corriere:' : 'Courier:'} </span>
+                          <span className="text-slate-400">{isAuroraDelivery(order.courier) ? 'Consegna:' : 'Corriere:'} </span>
                           <span className="text-sky-300 font-semibold">{order.courier}</span>
                         </div>
-                        {order.trackingNumber && (
+                        {hasRealTracking(order) && (
                           <button
                             id={`tracking-btn-${order.id}`}
                             onClick={(e) => {
@@ -701,10 +702,7 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
                         type="button"
                         onClick={(e) => {
                           e.stopPropagation();
-                          onUpdateOrderStatus(order.id, 'Spedito', {
-                            courier: order.courier || 'BRT Corriere Espresso B2B',
-                            trackingNumber: order.trackingNumber || `BRT-${Math.floor(1000000 + Math.random() * 9000000)}-B2B`
-                          });
+                          onUpdateOrderStatus(order.id, 'Spedito');
                         }}
                         className="font-semibold flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-sky-400/40 bg-gradient-to-r from-sky-500/20 to-indigo-500/20 hover:from-sky-500/35 hover:to-indigo-500/35 text-sky-200 hover:text-white transition-all shadow-xs"
                         title="Simula passaggio a Spedito ed emetti notifica toast in tempo reale"
@@ -1217,7 +1215,7 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
                     <Truck className="w-5 h-5" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-bold text-white">Dettaglio Spedizione B2B</h3>
+                    <h3 className="text-lg font-bold text-white">Dettaglio spedizione</h3>
                     <p className="text-xs text-slate-400 font-mono">Ordine {currentTrackingOrder.id}</p>
                   </div>
                 </div>
@@ -1239,16 +1237,23 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
                   <span className="text-slate-400">Consegna prevista:</span>
                   <span className="text-white font-bold">{currentTrackingOrder.estimatedDelivery}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-400">Vettore logistico:</span>
-                  <span className="text-sky-300 font-medium">{currentTrackingOrder.courier || 'GLS B2B'}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-400">Numero di tracciamento (AWB):</span>
-                  <span className="text-white font-mono font-bold bg-[#0d1420] px-2 py-0.5 rounded border border-[#1c2433]">
-                    {currentTrackingOrder.trackingNumber || 'GLS-IT-992019'}
-                  </span>
-                </div>
+                {currentTrackingOrder.courier && (
+                  <div className="flex justify-between gap-3">
+                    <span className="text-slate-400">{isAuroraDelivery(currentTrackingOrder.courier) ? 'Consegna:' : 'Corriere:'}</span>
+                    <span className="text-sky-300 font-medium text-right">{currentTrackingOrder.courier}</span>
+                  </div>
+                )}
+                {hasRealTracking(currentTrackingOrder) && (
+                  <div className="flex justify-between gap-3">
+                    <span className="text-slate-400">Codice di tracciamento:</span>
+                    <span className="text-white font-mono font-bold bg-[#0d1420] px-2 py-0.5 rounded border border-[#1c2433] break-all text-right">
+                      {currentTrackingOrder.trackingNumber}
+                    </span>
+                  </div>
+                )}
+                {!currentTrackingOrder.courier && currentTrackingOrder.status === 'In elaborazione' && (
+                  <p className="text-slate-500">Appena l'ordine parte trovi qui il corriere e il codice per seguirlo.</p>
+                )}
               </div>
 
               {/* Order Tracking Progress-Stepper & Timeline */}
@@ -1288,20 +1293,23 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
                   >
                     Chiudi
                   </button>
-                  {currentTrackingOrder.trackingNumber && currentTrackingOrder.trackingNumber !== 'RITIRO-SEDE' && (
-                    <button
+                  {trackingLink(currentTrackingOrder) && (
+                    <a
+                      href={trackingLink(currentTrackingOrder)!}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       onClick={() => {
                         try {
-                          navigator.clipboard.writeText(currentTrackingOrder.trackingNumber || '');
+                          if (currentTrackingOrder.trackingNumber) navigator.clipboard.writeText(currentTrackingOrder.trackingNumber);
                         } catch {
                           /* ignora: clipboard non disponibile */
                         }
                       }}
                       className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold bg-[#0284c7] hover:bg-[#0369a1] text-white transition-colors"
                     >
-                      <span>Copia codice tracking</span>
+                      <span>Traccia spedizione</span>
                       <ExternalLink className="w-3.5 h-3.5" />
-                    </button>
+                    </a>
                   )}
                 </div>
               </div>

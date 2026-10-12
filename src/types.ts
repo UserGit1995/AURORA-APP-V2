@@ -113,6 +113,8 @@ export interface Order {
   estimatedDelivery: string;
   courier?: string;
   trackingNumber?: string;
+  /** link di tracciamento dato dal corriere (facoltativo) */
+  trackingUrl?: string;
   total: number;
   subtotal?: number;
   vatAmount?: number;

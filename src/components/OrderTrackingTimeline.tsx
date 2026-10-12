@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { FileCheck, PackageCheck, Truck, CheckCircle2, Clock, AlertCircle, MapPin, Calendar, ChevronDown, ChevronUp, Check, ShieldCheck, Building2, Info, Star } from 'lucide-react';
+import { isAuroraDelivery, hasRealTracking } from '../config/couriers';
 import { motion, AnimatePresence } from 'motion/react';
 import { Order } from '../types';
 import { useLanguage } from '../context/LanguageContext';
@@ -48,7 +49,8 @@ export const OrderTrackingTimeline: React.FC<OrderTrackingTimelineProps> = ({
     if (order.status === 'Spedito') return 3;
     
     // In elaborazione: check if packed or initial pending
-    if (order.trackingNumber || order.id.includes('8512') || order.itemsCount > 40) {
+    // In elaborazione: se hai già assegnato corriere o codice, la merce è in preparazione
+    if (order.courier || order.trackingNumber) {
       return 2;
     }
     return 1;
@@ -58,108 +60,72 @@ export const OrderTrackingTimeline: React.FC<OrderTrackingTimelineProps> = ({
   const isCancelled = order.status === 'Annullato';
   const isActive = currentStage > 0 && currentStage < 4;
 
-  // Build timeline steps with realistic timestamps based on order date and delivery date
+  // Tappe dell'ordine: solo informazioni vere (date e dati inseriti nell'ordine)
+  const aurora = isAuroraDelivery(order.courier);
+  const code = order.trackingNumber && order.trackingNumber !== 'RITIRO-SEDE' ? order.trackingNumber : '';
+  const statusOf = (n: number): TrackingStepStatus =>
+    isCancelled ? 'cancelled' : currentStage > n ? 'completed' : currentStage === n ? 'current' : 'upcoming';
   const steps: TimelineStepItem[] = [
     {
       id: 'pending',
       key: 'step-pending',
       stepNumber: 1,
-      label: t('orders.stepPending', 'Pending'),
-      sublabel: t('orders.stepPendingSub', 'Ricevuto & Convalidato'),
-      timestamp: `${order.date} • 08:30`,
-      location: language === 'it' ? 'Sede Commerciale AURORA' : 'AURORA HQ Sales Desk',
-      description: language === 'it' 
-        ? 'Ordine telematico registrato, P.IVA e plafond commerciale verificati con successo.'
-        : 'Electronic order registered, VAT ID and trade credit limits successfully verified.',
+      label: 'Ricevuto',
+      sublabel: 'Ordine ricevuto',
+      timestamp: order.date,
+      location: 'Aurora S.r.l.s',
+      description: 'Abbiamo ricevuto il tuo ordine.',
       icon: FileCheck,
-      status: isCancelled
-        ? 'cancelled'
-        : currentStage > 1
-        ? 'completed'
-        : currentStage === 1
-        ? 'current'
-        : 'upcoming',
-      detailsList: [
-        language === 'it' ? 'Convalida anagrafica aziendale & P.IVA' : 'Enterprise registration & VAT verification',
-        language === 'it' ? 'Verifica disponibilità stock a scaffale' : 'Warehouse stock level check',
-        language === 'it' ? 'Generazione distinta di prelievo (Picking list)' : 'Picking list generated for warehouse'
-      ]
+      status: statusOf(1),
+      detailsList: [`Ordine n. ${order.id}`, `${order.itemsCount} articoli`],
     },
     {
       id: 'processing',
       key: 'step-processing',
       stepNumber: 2,
-      label: t('orders.stepProcessing', 'Processing'),
-      sublabel: t('orders.stepProcessingSub', 'In Elaborazione / Allestimento'),
-      timestamp: `${order.date} • 11:45`,
-      location: language === 'it' ? 'Magazzino Aurora (Roma)' : 'Aurora Warehouse (Rome)',
-      description: language === 'it'
-        ? `Prelievo a scaffale di ${order.itemsCount} colli, confezionamento pallet e sigillatura di sicurezza.`
-        : `Picking of ${order.itemsCount} package units, pallet wrapping, and security banding.`,
+      label: 'In preparazione',
+      sublabel: 'Prepariamo la merce',
+      timestamp: '',
+      location: 'Magazzino Aurora (Roma)',
+      description: 'Stiamo preparando la merce del tuo ordine.',
       icon: PackageCheck,
-      status: isCancelled
-        ? 'cancelled'
-        : currentStage > 2
-        ? 'completed'
-        : currentStage === 2
-        ? 'current'
-        : 'upcoming',
-      detailsList: [
-        language === 'it' ? `Controllo qualità lotti su ${order.itemsCount} colli` : `Lot quality control on ${order.itemsCount} units`,
-        language === 'it' ? 'Imballaggio protettivo per trasporto B2B' : 'Heavy-duty B2B transport packaging',
-        language === 'it' ? `Lettera di Vettura generata: ${order.trackingNumber || 'AWB-STD-B2B'}` : `Waybill generated: ${order.trackingNumber || 'AWB-STD-B2B'}`
-      ]
+      status: statusOf(2),
+      detailsList: [],
     },
     {
       id: 'shipped',
       key: 'step-shipped',
       stepNumber: 3,
-      label: t('orders.stepShipped', 'Shipped'),
-      sublabel: t('orders.stepShippedSub', 'Spedito / In Transito'),
-      timestamp: currentStage >= 3 ? `${order.date} • 17:15` : `${language === 'it' ? 'Previsto' : 'Est.'}: ${order.date}`,
-      location: order.courier ? `${order.courier} Express Logistics` : (language === 'it' ? 'Corriere Espresso B2B' : 'B2B Express Courier'),
-      description: language === 'it'
-        ? 'Pallet e colli affidati al corriere logistico. In viaggio verso la destinazione.'
-        : 'Pallets handed over to freight carrier. In transit toward destination warehouse.',
+      label: aurora ? 'In consegna' : 'Spedito',
+      sublabel: aurora ? 'Con i nostri mezzi' : order.courier ? `Con ${order.courier}` : 'Affidato al corriere',
+      timestamp: '',
+      location: aurora ? 'Consegna Aurora' : order.courier || 'Corriere',
+      description: aurora
+        ? 'La merce è in viaggio con i nostri mezzi.'
+        : 'La merce è stata affidata al corriere ed è in viaggio.',
       icon: Truck,
-      status: isCancelled
-        ? 'cancelled'
-        : currentStage > 3
-        ? 'completed'
-        : currentStage === 3
-        ? 'current'
-        : 'upcoming',
+      status: statusOf(3),
       detailsList: [
-        language === 'it' ? `Preso in carico da ${order.courier || 'Vettore Nazionale'}` : `Dispatched via ${order.courier || 'National Carrier'}`,
-        language === 'it' ? 'Smistamento presso Hub logistico regionale' : 'Regional freight hub routing',
-        language === 'it' ? `Stima arrivo: ${order.estimatedDelivery}` : `Estimated arrival: ${order.estimatedDelivery}`
-      ]
+        ...(order.courier ? [`${aurora ? 'Consegna' : 'Corriere'}: ${order.courier}`] : []),
+        ...(code && !aurora ? [`Codice di tracciamento: ${code}`] : []),
+        ...(order.estimatedDelivery ? [`Consegna prevista: ${order.estimatedDelivery}`] : []),
+      ],
     },
     {
       id: 'delivered',
       key: 'step-delivered',
       stepNumber: 4,
-      label: t('orders.stepDelivered', 'Delivered'),
-      sublabel: t('orders.stepDeliveredSub', 'Consegnato & Firmato'),
-      timestamp: currentStage === 4 ? `${order.estimatedDelivery}` : `${language === 'it' ? 'Stima' : 'Est.'}: ${order.estimatedDelivery}`,
-      location: order.shippingAddress?.city 
-        ? `${order.shippingAddress.city} (${order.shippingAddress.province || 'IT'})`
-        : (language === 'it' ? 'Indirizzo fornitura' : 'Destination facility'),
-      description: language === 'it'
-        ? 'Fornitura recapitata con successo e firmata al magazzino/sede del cliente.'
-        : 'Supply delivered and signed at client\'s receiving facility.',
+      label: 'Consegnato',
+      sublabel: 'Ordine consegnato',
+      timestamp: currentStage === 4 ? order.estimatedDelivery || '' : order.estimatedDelivery ? `Prevista: ${order.estimatedDelivery}` : '',
+      location: order.shippingAddress?.city
+        ? `${order.shippingAddress.city}${order.shippingAddress.province ? ` (${order.shippingAddress.province})` : ''}`
+        : 'Indirizzo di consegna',
+      description: 'Ordine consegnato.',
       icon: CheckCircle2,
-      status: isCancelled
-        ? 'cancelled'
-        : currentStage === 4
-        ? 'completed'
-        : 'upcoming',
-      detailsList: [
-        language === 'it' ? `Consegna a: ${order.shippingAddress?.recipient || 'Logistica Ricevimento'}` : `Delivered to: ${order.shippingAddress?.recipient || 'Receiving Logistics'}`,
-        language === 'it' ? 'Firma POD (Proof of Delivery) archiviata' : 'POD (Proof of Delivery) signature archived',
-        language === 'it' ? 'Documento di trasporto (DDT) validato' : 'Transport document (DDT) signed & closed'
-      ]
-    }
+      status: isCancelled ? 'cancelled' : currentStage === 4 ? 'completed' : 'upcoming',
+      detailsList: order.shippingAddress?.recipient ? [`Consegna a: ${order.shippingAddress.recipient}`] : [],
+    },
   ];
 
   // Calculate filled progress line width percentage (25%, 50%, 75%, 100%)
@@ -202,23 +168,11 @@ export const OrderTrackingTimeline: React.FC<OrderTrackingTimelineProps> = ({
             <div>
               <div className="flex items-center gap-2 flex-wrap">
                 <span className="text-xs sm:text-sm font-bold text-white block">
-                  {isActive 
-                    ? t('orders.activeProgress', 'Avanzamento Ordine Attivo')
-                    : currentStage === 4 
-                    ? t('orders.completedProgress', 'Fornitura Completata con Successo')
-                    : 'Order Tracking Lifecycle'}
+                  {isCancelled ? 'Ordine annullato' : currentStage === 4 ? 'Ordine consegnato' : 'Stato del tuo ordine'}
                 </span>
-                {isActive && (
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-sky-500/25 text-sky-200 border border-sky-400/40 animate-pulse">
-                    <span className="w-1.5 h-1.5 rounded-full bg-sky-400" />
-                    <span>LIVE</span>
-                  </span>
-                )}
               </div>
               <span className="text-[11px] text-slate-400 block mt-0.5">
-                {language === 'it' 
-                  ? 'Tracciamento tappe operative della fornitura (Pending • Processing • Shipped • Delivered)' 
-                  : 'Supply lifecycle steps: Pending • Processing • Shipped • Delivered'}
+                Ricevuto • In preparazione • {isAuroraDelivery(order.courier) ? 'In consegna' : 'Spedito'} • Consegnato
               </span>
             </div>
           </div>
@@ -405,13 +359,13 @@ export const OrderTrackingTimeline: React.FC<OrderTrackingTimelineProps> = ({
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs bg-[#0d1420] p-3 rounded-xl border border-[#1c2433]">
                       <div>
                         <span className="text-slate-400 block text-[10px] uppercase font-bold tracking-wider">
-                          {language === 'it' ? 'Posizione / Hub:' : 'Location / Hub:'}
+                          {language === 'it' ? 'Dove:' : 'Location:'}
                         </span>
                         <span className="font-semibold text-white mt-0.5 block">{activeStep.location}</span>
                       </div>
                       <div>
                         <span className="text-slate-400 block text-[10px] uppercase font-bold tracking-wider">
-                          {language === 'it' ? 'Stato Operativo:' : 'Operational Status:'}
+                          {language === 'it' ? 'Stato:' : 'Status:'}
                         </span>
                         <span className={`font-bold mt-0.5 block ${
                           activeStep.status === 'completed' 
@@ -457,11 +411,11 @@ export const OrderTrackingTimeline: React.FC<OrderTrackingTimelineProps> = ({
               }}
               className="inline-flex items-center gap-1.5 text-xs font-semibold text-sky-400 hover:text-sky-300 transition-colors"
             >
-              <span>{isExpanded ? (language === 'it' ? 'Nascondi cronologia tappe' : 'Hide milestone history') : (language === 'it' ? 'Mostra cronologia dettagliata & log logistici' : 'Show detailed logistics timeline')}</span>
+              <span>{isExpanded ? (language === 'it' ? 'Nascondi cronologia tappe' : 'Hide milestone history') : (language === 'it' ? 'Mostra dettagli delle tappe' : 'Show step details')}</span>
               {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
             </button>
 
-            {order.courier && order.trackingNumber && onOpenCarrierTracking && (
+            {hasRealTracking(order) && onOpenCarrierTracking && (
               <button
                 type="button"
                 onClick={(e) => {
@@ -471,7 +425,7 @@ export const OrderTrackingTimeline: React.FC<OrderTrackingTimelineProps> = ({
                 className="text-xs font-semibold text-slate-300 hover:text-white px-3 py-1.5 rounded-xl bg-[#0d1420] hover:bg-[#1a2230] border border-sky-500/30 transition-colors inline-flex items-center gap-1.5 shadow-xs"
               >
                 <Truck className="w-3.5 h-3.5 text-sky-400" />
-                <span>{language === 'it' ? `Traccia con ${order.courier}` : `Track via ${order.courier}`}</span>
+                <span>{`Traccia con ${order.courier}`}</span>
               </button>
             )}
           </div>

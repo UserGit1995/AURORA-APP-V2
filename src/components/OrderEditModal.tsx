@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { X, Save, Trash2, ShoppingBag, Truck, User, Building2, Plus, Minus, CheckCircle2, AlertCircle, FileText, CreditCard, Star } from 'lucide-react';
+import { AURORA_DELIVERY, COURIER_SUGGESTIONS, isAuroraDelivery } from '../config/couriers';
 import { Order, Product, OrderItemDetail } from '../types';
 import { useAdmin } from '../context/AdminContext';
 
@@ -176,11 +177,24 @@ export const OrderEditModal: React.FC<OrderEditModalProps> = ({
               </label>
               <input
                 type="text"
+                list="aurora-corrieri"
                 value={formData.courier || ''}
                 onChange={(e) => setFormData({ ...formData, courier: e.target.value })}
-                placeholder="Es. BRT Express B2B"
+                placeholder="Scegli o scrivi il corriere"
                 className="w-full bg-[#0d1420] border border-slate-700 rounded-xl px-3 py-2 text-white text-sm outline-none"
               />
+              <datalist id="aurora-corrieri">
+                {COURIER_SUGGESTIONS.map((c) => (
+                  <option key={c} value={c} />
+                ))}
+              </datalist>
+              <button
+                type="button"
+                onClick={() => setFormData({ ...formData, courier: AURORA_DELIVERY, trackingNumber: '', trackingUrl: '' })}
+                className="mt-1.5 text-[11px] font-semibold text-sky-300 hover:text-white"
+              >
+                Roma: consegna con i nostri mezzi
+              </button>
             </div>
 
             <div>
@@ -191,10 +205,29 @@ export const OrderEditModal: React.FC<OrderEditModalProps> = ({
                 type="text"
                 value={formData.trackingNumber || ''}
                 onChange={(e) => setFormData({ ...formData, trackingNumber: e.target.value })}
-                placeholder="Es. BRT-8921-94812"
-                className="w-full bg-[#0d1420] border border-slate-700 rounded-xl px-3 py-2 text-white font-mono text-sm outline-none"
+                placeholder={isAuroraDelivery(formData.courier) ? 'Non serve per le nostre consegne' : 'Incolla il codice del corriere'}
+                disabled={isAuroraDelivery(formData.courier)}
+                className="w-full bg-[#0d1420] border border-slate-700 rounded-xl px-3 py-2 text-white font-mono text-sm outline-none disabled:opacity-40"
               />
             </div>
+
+            {!isAuroraDelivery(formData.courier) && (
+              <div className="sm:col-span-3">
+                <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">
+                  Link di tracciamento del corriere (facoltativo)
+                </label>
+                <input
+                  type="url"
+                  value={formData.trackingUrl || ''}
+                  onChange={(e) => setFormData({ ...formData, trackingUrl: e.target.value })}
+                  placeholder="Se il corriere ti dà un link per seguire il pacco, incollalo qui"
+                  className="w-full bg-[#0d1420] border border-slate-700 rounded-xl px-3 py-2 text-white text-sm outline-none"
+                />
+                <p className="mt-1 text-[11px] text-slate-500">
+                  Senza link, il pulsante "Traccia spedizione" del cliente apre una pagina gratuita che riconosce il corriere dal codice.
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Recipient & Shipping Information */}
