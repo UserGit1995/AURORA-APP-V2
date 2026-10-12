@@ -527,23 +527,6 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
                     : 'bg-gradient-to-t from-slate-950/90 via-slate-950/55 to-slate-950/20 hover:from-slate-950/95 border border-[#1c2433] hover:border-sky-500/40 hover:shadow-sky-950/30'
                 }`}
               >
-                {/* Active Order Notice Banner */}
-                {isActiveOrder && (
-                  <div className="mb-3 px-3 py-1.5 rounded-xl bg-gradient-to-r from-sky-500/20 via-sky-500/10 to-transparent border border-sky-500/30 flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-2">
-                      <span className="w-2 h-2 rounded-full bg-sky-400 animate-ping" />
-                      <span className="text-xs font-bold text-sky-200 uppercase tracking-wide">
-                        {language === 'it' ? '⚡ Fornitura Attiva in Gestione Operativa' : '⚡ Active Supply in Fulfillment'}
-                      </span>
-                    </div>
-                    <span className="text-[11px] font-semibold text-sky-300">
-                      {order.status === 'Spedito' 
-                        ? (language === 'it' ? 'Fase 3/4: Spedito & in Viaggio' : 'Step 3/4: Shipped & in Transit') 
-                        : (language === 'it' ? 'Fase 2/4: Processing & Allestimento' : 'Step 2/4: Processing & Picking')}
-                    </span>
-                  </div>
-                )}
-
                 {/* Header Row: ID, Status Badge, Price & Reorder */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3.5 border-b border-[#1c2433]">
                   <div>
