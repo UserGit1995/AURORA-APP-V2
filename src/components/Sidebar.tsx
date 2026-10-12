@@ -4,7 +4,7 @@ import { AuroraLogo } from './AuroraLogo';
 import { useLanguage } from '../context/LanguageContext';
 import { useAdmin } from '../context/AdminContext';
 
-export type NavTab = 'home' | 'categorie' | 'offerte' | 'novita' | 'piu-venduti' | 'ordini' | 'preferiti' | 'confronta' | 'personalizza' | 'privacy' | 'termini' | 'tracking' | 'chat';
+export type NavTab = 'home' | 'categorie' | 'offerte' | 'novita' | 'piu-venduti' | 'ordini' | 'preferiti' | 'confronta' | 'personalizza' | 'privacy' | 'termini' | 'tracking' | 'chat' | 'creatore';
 
 interface SidebarProps {
   activeTab: NavTab;
@@ -246,7 +246,26 @@ export const Sidebar: React.FC<SidebarProps> = ({
               </button>
             </div>
           </div>
-          <p id="build-stamp" className="mt-4 text-center text-[10px] text-slate-600">Versione 02/10/2026 · build 6</p>
+
+          {/* Firma del creatore: apre la pagina profilo con il modulo richieste */}
+          <button
+            id="sidebar-creator-btn"
+            type="button"
+            onClick={() => {
+              onSelectTab('creatore');
+              if (onCloseMobile) onCloseMobile();
+            }}
+            className="mt-4 w-full flex items-center gap-3 rounded-2xl border border-[#1c2433] bg-gradient-to-r from-[#0e1b30] to-[#0d1420] hover:border-sky-500/50 px-3 py-2.5 text-left transition-colors cursor-pointer"
+          >
+            <span className="w-9 h-9 rounded-full p-[2px] bg-gradient-to-br from-sky-400 to-indigo-600 shrink-0">
+              <span className="w-full h-full rounded-full bg-[#0d1420] flex items-center justify-center text-[11px] font-bold text-white">SA</span>
+            </span>
+            <span className="min-w-0">
+              <span className="block text-[10px] text-slate-500 leading-tight">App ideata e sviluppata da</span>
+              <span className="block text-xs font-semibold text-white leading-tight">Simone Aricò</span>
+              <span className="block text-[10px] text-sky-300 leading-tight mt-0.5">Grafica, siti e app su richiesta →</span>
+            </span>
+          </button>
         </div>
       </aside>
     </>

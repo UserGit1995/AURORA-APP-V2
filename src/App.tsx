@@ -3,6 +3,7 @@ import { RotateCcw, ArrowRight, Loader2, RefreshCw, ShoppingBag, MessageCircle }
 import { Sidebar, NavTab } from './components/Sidebar';
 import { Header } from './components/Header';
 import { HeroBanner } from './components/HeroBanner';
+import { DeveloperProfileView } from './components/DeveloperProfileView';
 import { BackgroundRotator } from './components/BackgroundRotator';
 import { FlyerSection } from './components/FlyerSection';
 import { CategorySection } from './components/CategorySection';
@@ -447,7 +448,7 @@ export default function App() {
           if (tab === 'home') setSelectedCategoryId(null);
           // Le pagine Personalizza / Privacy / Termini non devono restare
           // coperte da una ricerca, un brand o una vista marchi ancora aperti.
-          if (tab === 'personalizza' || tab === 'privacy' || tab === 'termini' || tab === 'chat') {
+          if (tab === 'personalizza' || tab === 'privacy' || tab === 'termini' || tab === 'chat' || tab === 'creatore') {
             setSearchQuery('');
             setSelectedBrandName(null);
             setShowAllBrands(false);
@@ -498,6 +499,8 @@ export default function App() {
               onBackToHome={() => setActiveTab('home')}
               onOpenLegal={(page) => setActiveTab(page)}
             />
+          ) : activeTab === 'creatore' ? (
+            <DeveloperProfileView onBack={() => setActiveTab('home')} onOpenPrivacy={() => setActiveTab('privacy')} />
           ) : activeTab === 'chat' ? (
             <ChatView onBack={() => setActiveTab('home')} onOpenPrivacy={() => setActiveTab('privacy')} />
           ) : activeTab === 'privacy' || activeTab === 'termini' ? (

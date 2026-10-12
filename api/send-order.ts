@@ -9,6 +9,8 @@
  *   A) Gmail (consigliato, gratis):  GMAIL_USER  +  GMAIL_APP_PASSWORD
  *   B) Resend:                       RESEND_API_KEY
  * Facoltativa: ORDERS_TO_EMAIL (default: gruppo.aurora.ordini@gmail.com)
+ * Richieste di lavori grafici (kind: 'design', pagina "Simone Aricò"): vanno all'indirizzo
+ * scritto in DESIGN_TO_EMAIL (solo su Vercel, mai nel codice); se manca, a ORDERS_TO_EMAIL.
  *
  * Richieste di personalizzazione (kind: 'customization'): l'email di conferma al
  * cliente legge i dati dal database, quindi servono anche VITE_SUPABASE_URL e
@@ -278,6 +280,23 @@ ${trackingUrl ? `<p>Puoi controllare lo stato della richiesta in qualsiasi momen
   };
 }
 
+// ---- richiesta lavori grafici (pagina profilo Simone Aricò) ------------------
+function buildDesignEmail(body: any) {
+  const name = str(body?.name, 120);
+  const contact = str(body?.contact, 120);
+  const message = str(body?.message, 3000);
+  const services = (Array.isArray(body?.services) ? body.services : []).map((x: unknown) => str(x, 60)).filter(Boolean).slice(0, 12);
+  if (!name || !contact || message.length < 5) throw new Error('Messaggio vuoto');
+  const html = `<div style="font-family:Arial,sans-serif;max-width:600px">
+<h2 style="margin:0 0 12px">Nuova richiesta di lavoro</h2>
+<table style="border-collapse:collapse;font-size:14px">${row('Nome', name)}${row('Contatto', contact)}${row('Lavoro richiesto', services.join(', '))}</table>
+<p style="margin:16px 0 6px;color:#64748b;font-size:13px">Descrizione</p>
+<div style="white-space:pre-wrap;font-size:14px;color:#0f172a;background:#f1f5f9;border-radius:8px;padding:12px">${esc(message)}</div>
+<p style="margin-top:16px;color:#94a3b8;font-size:12px">Inviata dalla pagina profilo nell'app Aurora.</p></div>`;
+  const text = ['NUOVA RICHIESTA DI LAVORO', `Nome: ${name}`, `Contatto: ${contact}`, `Lavoro: ${services.join(', ')}`, '', message].join('\n');
+  return { subject: `🎨 Richiesta lavoro: ${services[0] || 'grafica'} - ${name}`, html, text, replyTo: isEmail(contact) ? contact : '' };
+}
+
 // ---- invio -----------------------------------------------------------------
 type Mail = { subject: string; html: string; text: string; replyTo: string };
 
@@ -398,6 +417,17 @@ export default async function handler(req: any, res: any) {
         }
       }
       res.status(200).json({ ok: true, customerSent });
+      return;
+    }
+
+    if (body.kind === 'design') {
+      const mail = buildDesignEmail(body);
+      if (!transportKind()) {
+        res.status(503).json({ ok: false, error: 'not_configured' });
+        return;
+      }
+      await deliver(mail, process.env.DESIGN_TO_EMAIL || to);
+      res.status(200).json({ ok: true });
       return;
     }
 
