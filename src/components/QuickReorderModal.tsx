@@ -376,7 +376,7 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
                           className="bg-[#0d1420] border border-[#1c2433] hover:border-sky-500/40 rounded-2xl p-2.5 flex items-center justify-between gap-3 transition-colors"
                         >
                           <div className="w-11 h-11 rounded-xl bg-white border border-slate-200 p-1 shrink-0 flex items-center justify-center">
-                            <img
+                            <img data-autozoom
                               src={product.image || PLACEHOLDER_IMAGE}
                               alt={product.name}
                               referrerPolicy="no-referrer"

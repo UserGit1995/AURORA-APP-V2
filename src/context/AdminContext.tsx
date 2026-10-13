@@ -19,7 +19,8 @@ import {
   syncSupabaseOrder,
   syncSupabaseSettings,
   fetchSupabasePublicSetting,
-  newDbId
+  newDbId,
+  getSupabase
 } from '../services/supabase';
 import { applyFlashOffers, flashLiveKey, stripFlashFields } from '../utils/flashOffers';
 
@@ -328,6 +329,21 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setProductsList((prev) => enrichProductsWithSubcategoryTree(prev, subcategoriesList));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [subcategoriesList]);
+
+  // L'etichetta "admin" salvata sul telefono/PC vale solo se c'è anche l'accesso vero a Supabase.
+  // Se l'accesso è scaduto (o era di una versione vecchia dell'app), si esce da admin e si rientra:
+  // altrimenti il pannello si apre ma il database risponde "Accesso negato" (chat, salvataggi...).
+  useEffect(() => {
+    const sb = getSupabase();
+    if (!sb) return;
+    const dropStaleAdmin = () =>
+      setCurrentUser((prev) => (prev && (prev.role === 'admin' || prev.role === 'superadmin') ? null : prev));
+    sb.auth.getSession().then(({ data }) => { if (!data.session) dropStaleAdmin(); }).catch(() => {});
+    const { data: sub } = sb.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_OUT' || (event === 'INITIAL_SESSION' && !session)) dropStaleAdmin();
+    });
+    return () => sub.subscription.unsubscribe();
+  }, []);
 
   const isAdmin = currentUser?.role === 'admin' || currentUser?.role === 'superadmin';
   const isSuperAdmin = currentUser?.role === 'superadmin';

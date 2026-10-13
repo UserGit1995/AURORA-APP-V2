@@ -67,6 +67,9 @@ function cleanError(e: unknown): Error {
   if (/function .* does not exist|Could not find the function/i.test(msg)) {
     return new Error('La chat non è ancora attiva: esegui lo script chat_clienti.sql su Supabase');
   }
+  if (/Accesso negato/i.test(msg)) {
+    return new Error("Accesso da amministratore non attivo su questo dispositivo: esci e rientra con la tua email e password. Se continua, il tuo account non ha il ruolo admin su Supabase (vedi controlla_admin.sql).");
+  }
   return new Error(msg);
 }
 

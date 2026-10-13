@@ -151,7 +151,7 @@ export const CompareView: React.FC<CompareViewProps> = ({
                   key={prod.id}
                   className="bg-gradient-to-t from-slate-950/90 via-slate-950/55 to-slate-950/20 border border-[#1c2433] rounded-2xl p-3 flex items-center justify-between gap-3 text-left"
                 >
-                  <img
+                  <img data-autozoom
                     src={prod.image || PLACEHOLDER_IMAGE}
                     alt={prod.name}
                     referrerPolicy="no-referrer"
@@ -254,7 +254,7 @@ export const CompareView: React.FC<CompareViewProps> = ({
                             onClick={() => onSelectProduct(product)}
                             className="cursor-pointer aspect-square w-full max-w-[140px] mx-auto rounded-2xl bg-white border border-slate-200 shadow-xs p-3 mb-3 flex items-center justify-center hover:border-sky-500/60 transition-colors"
                           >
-                            <img
+                            <img data-autozoom
                               src={product.image || PLACEHOLDER_IMAGE}
                               alt={product.name}
                               referrerPolicy="no-referrer"
@@ -661,7 +661,7 @@ export const CompareView: React.FC<CompareViewProps> = ({
                       className="bg-gradient-to-t from-slate-950/90 via-slate-950/55 to-slate-950/20 hover:from-slate-950/95 border border-[#1c2433] rounded-2xl p-3 flex items-center justify-between gap-3 transition-colors"
                     >
                       <div className="flex items-center gap-3 min-w-0">
-                        <img
+                        <img data-autozoom
                           src={product.image || PLACEHOLDER_IMAGE}
                           alt={product.name}
                           referrerPolicy="no-referrer"

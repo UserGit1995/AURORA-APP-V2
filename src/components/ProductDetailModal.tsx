@@ -106,7 +106,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                   Sconto -{product.discountPercent}%
                 </div>
               )}
-              <img
+              <img data-autozoom
                 src={product.image || PLACEHOLDER_IMAGE}
                 alt={product.name}
                 referrerPolicy="no-referrer"

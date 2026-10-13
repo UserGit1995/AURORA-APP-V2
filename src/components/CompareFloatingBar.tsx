@@ -62,7 +62,7 @@ export const CompareFloatingBar: React.FC<CompareFloatingBarProps> = ({
                   className="group relative w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-white border border-slate-200 p-1 shrink-0 flex items-center justify-center"
                   title={product.name}
                 >
-                  <img
+                  <img data-autozoom
                     src={product.image || PLACEHOLDER_IMAGE}
                     alt={product.name}
                     referrerPolicy="no-referrer"

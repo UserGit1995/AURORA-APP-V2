@@ -452,7 +452,7 @@ export const OrderTemplateModal: React.FC<OrderTemplateModalProps> = ({
                             >
                               <div className="flex items-center gap-2 min-w-0">
                                 <div className="w-8 h-8 rounded-lg bg-white border border-slate-200 p-0.5 shrink-0 flex items-center justify-center">
-                                  <img
+                                  <img data-autozoom
                                     src={product.image || PLACEHOLDER_IMAGE}
                                     alt={product.name}
                                     className="w-full h-full object-contain"

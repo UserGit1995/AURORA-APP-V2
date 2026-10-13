@@ -388,7 +388,7 @@ export const RestockAnalysisModal: React.FC<RestockAnalysisModalProps> = ({
                           <div className="flex items-start gap-3.5 flex-1">
                             {product && (
                               <div className="w-14 h-14 rounded-xl bg-white border border-slate-200 p-1.5 shrink-0 flex items-center justify-center overflow-hidden">
-                                <img
+                                <img data-autozoom
                                   src={product.image || PLACEHOLDER_IMAGE}
                                   alt={product.name}
                                   referrerPolicy="no-referrer"
