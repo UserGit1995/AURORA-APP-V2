@@ -186,16 +186,26 @@ export const DeveloperProfileView: React.FC<Props> = ({ onBack, onOpenPrivacy })
       </button>
 
       {/* Profilo */}
-      <section className="relative overflow-hidden rounded-3xl border border-[#1c2433] bg-gradient-to-br from-[#06224a] via-[#041a3a] to-[#030f24] p-6 sm:p-8">
-        <div className="absolute -right-20 -top-24 w-72 h-72 rounded-full bg-sky-500/10 blur-3xl pointer-events-none" />
+      <section className="relative overflow-hidden rounded-3xl border border-[#1c2433] bg-gradient-to-br from-[#0a111e] to-[#0e1b30] p-6 pb-40 sm:p-8">
+        {/* Sfondo come quello dell'app: luci blu sfumate + logo "SA Simone Aricò" in trasparenza */}
+        <div aria-hidden="true" className="absolute inset-0 pointer-events-none">
+          <div className="absolute -left-32 -top-40 w-[28rem] h-[28rem] rounded-full bg-[radial-gradient(closest-side,rgba(30,110,180,0.28),rgba(30,110,180,0.126)_45%,transparent)]" />
+          <div className="absolute -right-40 -bottom-48 w-[32rem] h-[32rem] rounded-full bg-[radial-gradient(closest-side,rgba(20,90,160,0.32),rgba(20,90,160,0.144)_45%,transparent)]" />
+          <img
+            src="/sfondi/logo-simone.svg"
+            alt=""
+            className="absolute right-4 bottom-4 w-32 opacity-[0.22] sm:w-auto sm:bottom-auto sm:top-1/2 sm:-translate-y-1/2 sm:right-6 sm:h-[90%] sm:opacity-[0.09] select-none"
+            draggable={false}
+          />
+        </div>
         <div className="relative flex flex-col sm:flex-row items-center sm:items-start gap-5">
           <div className="relative shrink-0">
-            <div className="w-28 h-28 rounded-full p-[3px] bg-gradient-to-br from-sky-400 via-sky-600 to-indigo-600 shadow-lg shadow-sky-950/50">
+            <div className="w-36 h-36 sm:w-40 sm:h-40 rounded-full p-[3px] bg-gradient-to-br from-sky-400 via-sky-600 to-indigo-600 shadow-lg shadow-sky-950/50">
               <div className="w-full h-full rounded-full overflow-hidden bg-[#0d1420] flex items-center justify-center">
                 {avatar ? (
                   <img src={avatar} alt={NAME} className="w-full h-full object-cover" onError={() => setAvatar(null)} />
                 ) : (
-                  <span className="text-3xl font-bold tracking-wide text-white font-heading">SA</span>
+                  <span className="text-4xl font-bold tracking-wide text-white font-heading">SA</span>
                 )}
               </div>
             </div>
