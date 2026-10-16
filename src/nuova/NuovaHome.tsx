@@ -341,14 +341,18 @@ export const BrandCard: React.FC<{
   useEffect(() => () => window.clearTimeout(t.current), []);
   const click = () => {
     const hover = typeof window !== 'undefined' && window.matchMedia?.('(hover: hover)').matches;
-    if ((!image && !vec) || hover || on) {
+    if ((!image && !vec) || hover) {
       onOpen();
       return;
     }
+    // un solo tocco: si vede il logo a colori e subito dopo si apre la marca
     setOn(true);
     vib(8);
     window.clearTimeout(t.current);
-    t.current = window.setTimeout(() => setOn(false), 2500);
+    t.current = window.setTimeout(() => {
+      onOpen();
+      window.setTimeout(() => setOn(false), 400);
+    }, 380);
   };
   return (
     <div style={{ position: 'relative', minWidth: 0 }}>
