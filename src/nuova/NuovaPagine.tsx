@@ -195,3 +195,51 @@ export const NuovaInstalla: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     </div>
   );
 };
+
+/* ---------- Privacy e cookie all'apertura (stesso riquadro del messaggio "Inizia" del prototipo) ---------- */
+const CONSENSO_KEY = 'aurora_consenso_privacy_v1';
+const CONSENSO_GIORNI = 180; // si richiede di nuovo dopo 6 mesi
+
+const consensoValido = () => {
+  try {
+    const c = JSON.parse(localStorage.getItem(CONSENSO_KEY) || 'null') as { date?: string } | null;
+    if (!c?.date) return false;
+    const giorni = (Date.now() - new Date(c.date).getTime()) / 86400000;
+    return giorni >= 0 && giorni <= CONSENSO_GIORNI;
+  } catch {
+    return false;
+  }
+};
+
+export const NuovaConsenso: React.FC<{ onOpenPrivacy: () => void; paused?: boolean }> = ({ onOpenPrivacy, paused }) => {
+  const [open, setOpen] = useState(() => !consensoValido());
+  if (!open || paused) return null;
+  const scegli = (scelta: 'tutti' | 'necessari') => {
+    try {
+      localStorage.setItem(CONSENSO_KEY, JSON.stringify({ scelta, date: new Date().toISOString() }));
+    } catch {
+      /* il browser non salva: il riquadro ricompare alla prossima apertura */
+    }
+    vib(6);
+    setOpen(false);
+  };
+  return (
+    <div className="n-consenso" role="dialog" aria-modal="true" aria-label="Privacy e cookie">
+      <div className="n-consenso-box">
+        <h2>Privacy e cookie</h2>
+        <p>
+          Per far funzionare l'app usiamo solo cookie <b>tecnici necessari</b>: accesso, carrello, preferiti e preferenze.
+        </p>
+        <p>
+          I dati che ci lasci (nome e cognome, numero di telefono, indirizzo) li usiamo solo per gestire ordini, consegne e
+          assistenza, come spiegato nell'
+          <button type="button" onClick={onOpenPrivacy}>Informativa privacy</button>.
+        </p>
+        <div className="n-consenso-btns">
+          <button type="button" className="go" onClick={() => scegli('tutti')}>Accetta</button>
+          <button type="button" className="gh" onClick={() => scegli('necessari')}>Solo necessari</button>
+        </div>
+      </div>
+    </div>
+  );
+};

@@ -32,7 +32,7 @@ import { NuovaHome, NuovaCatalogTop, NuovaCategoryHero, NuovaBrandsPage, NuovaOf
 import { NuovaProductSheet } from './nuova/NuovaProductSheet';
 import { Ic } from './nuova/Icona';
 import { NuovaChat } from './nuova/NuovaChat';
-import { NuovaConsegne, NuovaLegale, NuovaInstalla } from './nuova/NuovaPagine';
+import { NuovaConsegne, NuovaLegale, NuovaInstalla, NuovaConsenso } from './nuova/NuovaPagine';
 // Il pannello admin (e le sue schermate) pesa parecchio (grafici, editor
 // immagini, gestione ordini/sottocategorie): lo carichiamo solo quando serve
 // davvero, così i clienti normali non lo scaricano mai. Il sito resta uguale,
@@ -833,6 +833,7 @@ export default function App() {
       )}
 
       <CookieBanner onOpenPrivacy={() => setActiveTab('privacy')} />
+      <NuovaConsenso onOpenPrivacy={() => setActiveTab('privacy')} paused={activeTab === 'privacy'} />
 
       {/* SuperAdmin Master Control Panel Modal - STRICTLY FOR AUTHENTICATED ADMIN ONLY */}
       {isAdmin && (

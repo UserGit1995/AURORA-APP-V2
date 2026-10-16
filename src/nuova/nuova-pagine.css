@@ -341,3 +341,18 @@ html.ng-on .n-legal .x-legal a,html.ng-on .n-legal .x-legal button{color:#8fd3f7
 @keyframes xaflash{0%,100%{box-shadow:0 0 0 0 rgba(76,184,239,0)}35%{box-shadow:0 0 0 3px rgba(76,184,239,.55)}}html.ng-on .n-ck button[class*="bg-[#0d1420]"],html.ng-on .n-ck button[class*="bg-[#111826]"],html.ng-on .n-ck button[class*="bg-[#1a2230]"]{background:#fff !important;color:#5d7189 !important;border:1px solid rgba(11,26,46,.12) !important}
 html.ng-on .n-ck button[class*="bg-sky-500/"]{background:#0b1a2e !important;color:#fff !important;border-color:#0b1a2e !important}
 html.ng-on .n-ck button[class*="bg-sky-500/"] *{color:#fff !important}
+/* riquadro privacy e cookie all'apertura (come il messaggio "Inizia" del prototipo) */
+.n-consenso{position:fixed;inset:0;z-index:9000;background:rgba(3,7,15,.78);display:grid;place-items:center;padding:18px;font-family:'Plus Jakarta Sans',system-ui,sans-serif;animation:n-cons-in .35s ease both}
+.n-consenso-box{max-width:420px;width:100%;background:linear-gradient(180deg,#10284a,#0b1c34);border:1px solid rgba(143,180,214,.25);border-radius:26px;padding:22px;color:#fff;box-shadow:0 30px 80px rgba(0,0,0,.6);text-align:left;animation:n-cons-up .45s cubic-bezier(.22,1,.36,1) both}
+.n-consenso h2{margin:0;font:600 21px 'Sora',system-ui;letter-spacing:-.03em;color:#fff}
+.n-consenso p{margin:10px 0 0;font-size:13.5px;line-height:1.55;color:#c3d2e2}
+.n-consenso p b{color:#fff}
+.n-consenso p button{display:inline;padding:0;border:0;background:none;color:#4cb8ef;text-decoration:underline;font:inherit;cursor:pointer}
+.n-consenso .n-consenso-small{font-size:12px;line-height:1.5;color:#93a7bd}
+.n-consenso-btns{display:flex;gap:10px;margin-top:16px}
+.n-consenso-btns button{flex:1;height:46px;border-radius:23px;font:600 14px 'Sora',system-ui;cursor:pointer;transition:transform .2s cubic-bezier(.34,1.56,.64,1)}
+.n-consenso-btns button:active{transform:scale(.96)}
+.n-consenso-btns .go{border:0;background:linear-gradient(135deg,#5cc4f5,#2c96d8);color:#0b1a2e}
+.n-consenso-btns .gh{border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.06);color:#fff}
+@keyframes n-cons-in{from{opacity:0}}
+@keyframes n-cons-up{from{opacity:0;transform:translateY(14px) scale(.98)}}
