@@ -28,7 +28,12 @@ const NavButton: React.FC<{ onClick: () => void; label: string; children: React.
   </button>
 );
 
-export const FlyerSection: React.FC = () => {
+/**
+ * openSignal / hideInline servono solo alla grafica nuova: lì il volantino si apre
+ * da un riquadro della home direttamente a schermo intero. Senza queste opzioni
+ * (grafica classica) tutto funziona esattamente come prima.
+ */
+export const FlyerSection: React.FC<{ openSignal?: number; hideInline?: boolean }> = ({ openSignal = 0, hideInline = false }) => {
   const [flyer, setFlyer] = useState<Flyer | null>(null);
   const [page, setPage] = useState(0);
   const [fullscreen, setFullscreen] = useState(false);
@@ -58,6 +63,13 @@ export const FlyerSection: React.FC = () => {
     fetchActiveFlyer().then(setFlyer).catch(() => setFlyer(null));
   }, []);
 
+  useEffect(() => {
+    if (openSignal > 0) {
+      setZoom(1);
+      setFullscreen(true);
+    }
+  }, [openSignal]);
+
   // Blocca lo scorrimento della pagina sotto la finestra a schermo intero
   useEffect(() => {
     if (!fullscreen) return;
@@ -79,7 +91,8 @@ export const FlyerSection: React.FC = () => {
   };
 
   return (
-    <section className="w-full mt-6 sm:mt-7">
+    <section className={hideInline ? '' : 'w-full mt-6 sm:mt-7'}>
+      {!hideInline && (<>
       <div className="flex items-center justify-between gap-3 mb-3.5 sm:mb-4">
         <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
           <div className="p-1.5 rounded-lg bg-sky-500/20 text-sky-400 shrink-0">
@@ -120,6 +133,8 @@ export const FlyerSection: React.FC = () => {
           </NavButton>
         </div>
       </div>
+
+      </>)}
 
       {fullscreen && (
         <div className="fixed inset-0 z-[60] bg-[#050b16]/95 flex flex-col">

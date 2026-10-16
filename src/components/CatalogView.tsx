@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useDeferredValue } from 'react';
+import { useCardRenderer } from '../nuova/cardContext';
 import { imageFirst } from '../utils/imageFirst';
 import { AdminImageFinderButton } from './AdminImageFinderButton';
 import { AdminRemoveBgButton } from './AdminRemoveBgButton';
@@ -50,6 +51,8 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
   onOpenRestockAnalysis,
 }) => {
   const { isBusinessCustomer, vatFactor, vatPercent } = useAdmin();
+  // Grafica nuova: schede prodotto disegnate dalla grafica nuova (null = grafica classica)
+  const nuovaCard = useCardRenderer();
   const [activeFilterCategory, setActiveFilterCategory] = useState<string | null>(selectedCategoryId);
   const [quickFilter, setQuickFilter] = useState<'tutti' | 'offerta' | 'bestseller' | 'eco' | 'medico'>('tutti');
   const [sortBy, setSortBy] = useState<'popolarita' | 'prezzo-asc' | 'prezzo-desc' | 'nome'>('popolarita');
@@ -712,8 +715,9 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
           </div>
         </div>
       ) : (
-        <div ref={listTopRef} className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3.5 scroll-mt-24">
+        <div ref={listTopRef} className={nuovaCard && !isSelectionMode ? 'n-pgrid scroll-mt-24' : 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3.5 scroll-mt-24'}>
           {sortedProducts.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE).map((product) => {
+            if (nuovaCard && !isSelectionMode) return <React.Fragment key={product.id}>{nuovaCard(product)}</React.Fragment>;
             const isFav = favorites.includes(product.id);
             const isCompared = comparedProductIds.includes(product.id);
             const isLowStock = product.stock <= (product.lowStockThreshold ?? 100);

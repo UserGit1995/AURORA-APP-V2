@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { useCardRenderer } from '../nuova/cardContext';
 import { ArrowLeft } from 'lucide-react';
 import { Category, Product, Subcategory } from '../types';
 import { productsByBrandGroupedByType } from '../lib/brands';
@@ -96,13 +97,14 @@ const BrandGroup: React.FC<any> = ({ group, favorites, comparedProductIds, onTog
   const [page, setPage] = React.useState(0);
   const pages = Math.ceil(group.products.length / GROUP_PAGE);
   const shown = group.products.slice(page * GROUP_PAGE, page * GROUP_PAGE + GROUP_PAGE);
+  const nuovaCard = useCardRenderer();
   return (
         <section>
           <h2 className="text-white text-base font-bold mb-3 flex items-center gap-2">
             {group.typeName}
             <span className="text-slate-400 text-xs font-medium">({group.products.length})</span>
           </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+          <div className={nuovaCard ? 'n-pgrid' : 'grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3'}>
             {shown.map((product: any) => (
               <ProductGridCard
                 key={product.id}

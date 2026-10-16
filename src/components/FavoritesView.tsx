@@ -1,4 +1,5 @@
 import React from 'react';
+import { useCardRenderer } from '../nuova/cardContext';
 import { AdminImageFinderButton } from './AdminImageFinderButton';
 import { AdminRemoveBgButton } from './AdminRemoveBgButton';
 import { Heart, Plus, ArrowLeft, Star, PackageSearch, Bookmark, Scale } from 'lucide-react';
@@ -25,6 +26,7 @@ export const FavoritesView: React.FC<FavoritesViewProps> = ({
   onAddToCart,
   onBackToHome,
 }) => {
+  const nuovaCard = useCardRenderer();
   const { isBusinessCustomer, vatFactor } = useAdmin();
 
   return (
@@ -100,8 +102,9 @@ export const FavoritesView: React.FC<FavoritesViewProps> = ({
           </div>
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3.5">
+        <div className={nuovaCard ? 'n-pgrid' : 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3.5'}>
           {favoriteProducts.map((product) => {
+            if (nuovaCard) return <React.Fragment key={product.id}>{nuovaCard(product)}</React.Fragment>;
             const isLowStock = product.stock <= (product.lowStockThreshold ?? 100);
             const isCompared = comparedProductIds.includes(product.id);
 

@@ -1,3 +1,4 @@
+import { Ic, Bi, eur } from '../nuova/Icona';
 import React, { useState, useMemo, useEffect } from 'react';
 import { useCloseOnBack } from '../utils/useCloseOnBack';
 import { X, Plus, Minus, Trash2, ShoppingBag, ArrowRight, CheckCircle2, ShieldCheck, Building2, User, Truck, Store, Mail, Phone, MapPin, FileText, CreditCard, Send, AlertCircle, Clock, Bookmark, BookmarkPlus, BookmarkCheck, Star, Layers, RotateCw, Check, Package } from 'lucide-react';
@@ -22,6 +23,8 @@ interface CartDrawerProps {
   onCheckoutSuccess?: (order: Order) => void;
   // Cliente che ha dimenticato di essere online / rete assente: ci pensa il pulsante Riprova
   onApplyTemplate?: (template: OrderTemplate, mode: 'replace' | 'merge') => void;
+  /** grafica nuova: il carrello è la pagina chiara del prototipo */
+  nuova?: boolean;
 }
 
 export const CartDrawer: React.FC<CartDrawerProps> = ({
@@ -33,6 +36,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
   onClearCart,
   onCheckoutSuccess,
   onApplyTemplate,
+  nuova,
 }) => {
   const { language, t } = useLanguage();
   const isIt = language === 'it';
@@ -223,8 +227,102 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
     onClose();
   };
 
+  if (nuova && step === 'cart') {
+    const pct = minimumOrderEur > 0 ? Math.min(100, (subtotal / minimumOrderEur) * 100) : 100;
+    return (
+      <section className="n-cartpg" role="dialog" aria-label="Carrello">
+        <header className="vh">
+          <h1>Carrello</h1>
+          <p>Consegna gratuita a Roma e provincia</p>
+          <button type="button" className="x" onClick={onClose} aria-label="Chiudi il carrello">
+            <Ic n="x" s={18} />
+          </button>
+        </header>
+        <div className="sbody">
+          {minimumOrderEur > 0 && (
+            <div className="min" id="cart-minimum-order-banner">
+              <p>
+                {belowMinimum ? (
+                  <>
+                    Mancano <b>{eur(missingForMinimum)}</b> per l'ordine minimo di € {minimumOrderEur.toFixed(0)}
+                  </>
+                ) : (
+                  <>
+                    <b>Ordine minimo raggiunto.</b> Consegna gratuita a Roma e provincia.
+                  </>
+                )}
+              </p>
+              <div className={`meter${belowMinimum ? '' : ' full'}`}>
+                <i style={{ width: `${pct}%` }} />
+              </div>
+            </div>
+          )}
+          {items.length ? (
+            items.map((it) => (
+              <div className="ci" key={it.product.id}>
+                <img src={it.product.image} alt="" loading="lazy" />
+                <span className="info">
+                  <b>{it.product.name}</b>
+                  <small>
+                    {eur(it.product.price)}/{it.product.unit || 'pz'}
+                  </small>
+                </span>
+                <span className="st">
+                  <button
+                    type="button"
+                    aria-label="Togli"
+                    onClick={() => (it.quantity > 1 ? onUpdateQuantity(it.product.id, -1) : onRemoveItem(it.product.id))}
+                  >
+                    <Ic n={it.quantity > 1 ? 'minus' : 'x'} s={15} />
+                  </button>
+                  <b>{it.quantity}</b>
+                  <button type="button" aria-label="Aggiungi" onClick={() => onUpdateQuantity(it.product.id, 1)}>
+                    <Ic n="plus" s={15} />
+                  </button>
+                </span>
+                <span className="pc">{eur(it.product.price * it.quantity)}</span>
+              </div>
+            ))
+          ) : (
+            <div className="empty">
+              <Bi n="takeaway" s={44} />
+              Il carrello è vuoto.
+              <br />
+              Aggiungi un prodotto con il pulsante +
+            </div>
+          )}
+        </div>
+        <div className="sfoot">
+          <div className="tot">
+            <small>Totale IVA esclusa</small>
+            <b>{eur(subtotal)}</b>
+          </div>
+          <button
+            type="button"
+            id="cart-checkout-btn"
+            className="btn dark"
+            onClick={(e) => {
+              if (items.length === 0) return;
+              if (belowMinimum) {
+                // come nel prototipo il pulsante resta scuro: sotto il minimo si illumina il riquadro del minimo
+                const m = (e.currentTarget.closest('.n-cartpg') as HTMLElement | null)?.querySelector('.min');
+                m?.classList.remove('flash');
+                void (m as HTMLElement | null)?.offsetWidth;
+                m?.classList.add('flash');
+                return;
+              }
+              handleProceedToForm();
+            }}
+          >
+            Invia l'ordine
+          </button>
+        </div>
+      </section>
+    );
+  }
+
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden">
+    <div className={`fixed inset-0 z-50 overflow-hidden${nuova ? ' n-ck' : ''}`}>
       {/* Backdrop */}
       <div 
         className="absolute inset-0 bg-black/75 backdrop-blur-xs transition-opacity"

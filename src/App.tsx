@@ -1,16 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { RotateCcw, ArrowRight, Loader2, RefreshCw, ShoppingBag, MessageCircle } from 'lucide-react';
-import { Sidebar, NavTab } from './components/Sidebar';
-import { Header } from './components/Header';
-import { HeroBanner } from './components/HeroBanner';
+import { Loader2, RefreshCw, MessageCircle } from 'lucide-react';
+import type { NavTab } from './components/Sidebar';
 import { DeveloperProfileView } from './components/DeveloperProfileView';
-import { BackgroundRotator } from './components/BackgroundRotator';
-import { FlyerSection } from './components/FlyerSection';
-import { CategorySection } from './components/CategorySection';
-import { PromoBanner } from './components/PromoBanner';
-import { FeaturedProductsSection } from './components/FeaturedProductsSection';
-import { HORECA_CATEGORY_IDS, isHorecaCategory } from './lib/horeca';
-import { ProductDetailModal } from './components/ProductDetailModal';
 import { CartDrawer } from './components/CartDrawer';
 import { ContactModal } from './components/ContactModal';
 import { NotificationsModal } from './components/NotificationsModal';
@@ -23,9 +14,6 @@ import { CompareFloatingBar } from './components/CompareFloatingBar';
 import { RestockAnalysisModal } from './components/RestockAnalysisModal';
 import { QuickReorderModal } from './components/QuickReorderModal';
 import { LoginModal } from './components/LoginModal';
-import { BrandsSection } from './components/BrandsSection';
-import { HorecaSection } from './components/HorecaSection';
-import { AllBrandsView } from './components/AllBrandsView';
 import { BrandDetailView } from './components/BrandDetailView';
 import { ScrollToTopButton } from './components/ScrollToTopButton';
 import { PersonalizzaView } from './components/PersonalizzaView';
@@ -34,13 +22,17 @@ import { CookieBanner } from './components/CookieBanner';
 import { warmSearchIndex } from './utils/productSearch';
 import { OPEN_REMOVE_BG_EVENT } from './components/AdminRemoveBgButton';
 import { CustomizationTrackingView } from './components/CustomizationTrackingView';
-import { ChatView } from './components/chat/ChatView';
-import { InfoStrip } from './components/InfoStrip';
 import { loadChatSession, fetchClientUnread, adminUnreadCount } from './services/chat';
 import { parseInitialRoute, syncUrlWithTab, sharedProductIdFromUrl, clearSharedProductUrl } from './utils/deepLinks';
 
 import { Product, CartItem, Order, NotificationItem, OrderTemplate } from './types';
 import { useAdmin } from './context/AdminContext';
+import { NuovaShell } from './nuova/NuovaShell';
+import { NuovaHome, NuovaCatalogTop, NuovaCategoryHero, NuovaBrandsPage, NuovaOffersPage } from './nuova/NuovaHome';
+import { NuovaProductSheet } from './nuova/NuovaProductSheet';
+import { Ic } from './nuova/Icona';
+import { NuovaChat } from './nuova/NuovaChat';
+import { NuovaConsegne, NuovaLegale, NuovaInstalla } from './nuova/NuovaPagine';
 // Il pannello admin (e le sue schermate) pesa parecchio (grafici, editor
 // immagini, gestione ordini/sottocategorie): lo carichiamo solo quando serve
 // davvero, così i clienti normali non lo scaricano mai. Il sito resta uguale,
@@ -48,10 +40,12 @@ import { useAdmin } from './context/AdminContext';
 const AdminControlPanel = React.lazy(() =>
   import('./components/AdminControlPanel').then((m) => ({ default: m.AdminControlPanel }))
 );
+const QrScannerModal = React.lazy(() =>
+  import('./components/QrScannerModal').then((m) => ({ default: m.QrScannerModal }))
+);
 const ProductEditModal = React.lazy(() =>
   import('./components/ProductEditModal').then((m) => ({ default: m.ProductEditModal }))
 );
-
 export default function App() {
   const { 
     productsList, 
@@ -64,7 +58,12 @@ export default function App() {
     catalogLoading,
     refreshFromCloud,
     minimumOrderEur,
+    currentUser,
+    logout,
+    isBusinessCustomer,
+    vatFactor,
   } = useAdmin();
+
 
   // Indirizzi "profondi": /personalizza, /privacy, /termini-vendita e i link di
   // tracking /personalizzazione/<token> (quelli che arrivano nelle email ai clienti).
@@ -180,6 +179,7 @@ export default function App() {
   // Quick Reorder state
   const [isQuickReorderOpen, setIsQuickReorderOpen] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const [isQrOpen, setIsQrOpen] = useState(false);
 
   const handleOpenRestockAnalysis = (focusProductId?: string) => {
     setRestockFocusProductId(focusProductId || null);
@@ -437,78 +437,98 @@ export default function App() {
       .filter(Boolean) as Product[];
   }, [comparedProductIds, productsList]);
 
-  return (
-    <div className="min-h-screen text-white flex font-sans">
-      <BackgroundRotator />
-      {/* Fixed Left Sidebar */}
-      <Sidebar
-        activeTab={activeTab}
-        onSelectTab={(tab) => {
-          setActiveTab(tab);
-          if (tab === 'home') setSelectedCategoryId(null);
-          // Le pagine Personalizza / Privacy / Termini non devono restare
-          // coperte da una ricerca, un brand o una vista marchi ancora aperti.
-          if (tab === 'personalizza' || tab === 'privacy' || tab === 'termini' || tab === 'chat' || tab === 'creatore') {
-            setSearchQuery('');
-            setSelectedBrandName(null);
-            setShowAllBrands(false);
-          }
-        }}
-        onOpenContact={() => setIsContactOpen(true)}
-        onOpenQuickReorder={() => setIsQuickReorderOpen(true)}
-        onOpenLogin={() => setIsLoginOpen(true)}
-        onOpenAdminPanel={() => setIsAdminPanelOpen(true)}
-        favoritesCount={favorites.length}
-        comparedCount={comparedProductIds.length}
-        isOpenMobile={isMobileMenuOpen}
-        onCloseMobile={() => setIsMobileMenuOpen(false)}
-        chatUnread={chatUnread}
-      />
+  // Grafica nuova: quantità di ogni prodotto nel carrello (per il pulsante + / − sulle schede)
+  const cartQtyById = useMemo(() => {
+    const m: Record<string, number> = {};
+    for (const item of cart) m[item.product.id] = item.quantity;
+    return m;
+  }, [cart]);
 
-      {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0 lg:pl-60">
-        {/* Ordine minimo e consegna, sempre visibili */}
-        <InfoStrip />
-        {/* Sticky Header */}
-        <Header
-          searchQuery={searchQuery}
-          onSearchChange={(q) => {
-            setSearchQuery(q);
-          }}
-          cartCount={cartCount}
-          onOpenCart={() => setIsCartOpen(true)}
-          onOpenNotifications={() => setIsNotificationsOpen(true)}
-          onOpenProfile={() => setIsProfileOpen(true)}
-          onOpenLogin={() => setIsLoginOpen(true)}
-          onOpenAdminPanel={() => setIsAdminPanelOpen(true)}
-          onOpenQuickReorder={() => setIsQuickReorderOpen(true)}
-          onOpenContact={() => setIsContactOpen(true)}
-          onToggleMobileMenu={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          unreadNotificationsCount={unreadNotificationsCount}
-          unreadInquiriesCount={chatUnread}
-          isCartPulsing={isCartPulsing}
-          cartTotal={cartSubtotal}
-        />
+  // Grafica nuova: cambio pagina dal menu, dalla barra in basso e dai link in alto
+  const navNuova = (tab: NavTab) => {
+    setActiveTab(tab);
+    setSearchQuery('');
+    setSelectedBrandName(null);
+    setShowAllBrands(false);
+    if (tab === 'home' || tab === 'categorie') setSelectedCategoryId(null);
+    window.scrollTo({ top: 0 });
+  };
 
-        {/* Dynamic Page Views */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto pb-24">
+  // Contenuto della pagina attiva: è lo stesso per le due grafiche
+  const cartDrawer = (
+      <CartDrawer
+      isOpen={isCartOpen}
+      onClose={() => setIsCartOpen(false)}
+      items={cart}
+      onUpdateQuantity={handleUpdateCartQuantity}
+      onRemoveItem={handleRemoveFromCart}
+      onClearCart={handleClearCart}
+      onApplyTemplate={handleApplyTemplate}
+      nuova
+      onCheckoutSuccess={(newOrder) => {
+        setNotifications((prev) => [
+          {
+            id: `notif-${Date.now()}`,
+            title: `Nuovo Ordine ${newOrder.id}`,
+            message: `Il tuo ordine di ${newOrder.itemsCount} colli è stato registrato ed è in elaborazione. Consegna stimata: ${newOrder.estimatedDelivery}.`,
+            time: 'Adesso',
+            read: false,
+            type: 'order',
+          },
+          ...prev,
+        ]);
+      }}
+    />
+  );
+
+  const pageContent = (
+    <>
           {activeTab === 'tracking' && trackingToken ? (
             <CustomizationTrackingView token={trackingToken} onBackToHome={() => setActiveTab('home')} />
           ) : activeTab === 'personalizza' ? (
-            <PersonalizzaView
-              onBackToHome={() => setActiveTab('home')}
-              onOpenLegal={(page) => setActiveTab(page)}
-            />
+            <>
+              <section className="n-pers-hero">
+                <header className="bar">
+                  <button type="button" aria-label="Indietro" onClick={() => setActiveTab('home')}>
+                    <Ic n="chevl" s={22} />
+                  </button>
+                  <b>Personalizza packaging</b>
+                  <button
+                    type="button"
+                    aria-label="Cerca"
+                    onClick={() => window.dispatchEvent(new Event('n-open-search'))}
+                  >
+                    <Ic n="search" s={20} />
+                  </button>
+                </header>
+                <div className="img">
+                  <img src="/nuova/cat-asporto.webp" alt="" />
+                </div>
+                <div className="hd">
+                  <h1>Personalizza il tuo packaging</h1>
+                  <p>Il tuo logo su sacchetti, scatole, shopper e bicchieri. Ti mandiamo il preventivo prima di produrre.</p>
+                </div>
+              </section>
+              <PersonalizzaView
+                hideIntro
+                onBackToHome={() => setActiveTab('home')}
+                onOpenLegal={(page) => setActiveTab(page)}
+              />
+            </>
           ) : activeTab === 'creatore' ? (
             <DeveloperProfileView onBack={() => setActiveTab('home')} onOpenPrivacy={() => setActiveTab('privacy')} />
           ) : activeTab === 'chat' ? (
-            <ChatView onBack={() => setActiveTab('home')} onOpenPrivacy={() => setActiveTab('privacy')} />
+            <NuovaChat onOpenPrivacy={() => setActiveTab('privacy')} />
           ) : activeTab === 'privacy' || activeTab === 'termini' ? (
-            <LegalView
+            <NuovaLegale
               page={activeTab}
               onBack={() => setActiveTab('home')}
               onOpenLegal={(page) => setActiveTab(page)}
             />
+          ) : activeTab === 'consegne' ? (
+            <NuovaConsegne onBack={() => setActiveTab('home')} />
+          ) : activeTab === 'installa' ? (
+            <NuovaInstalla onBack={() => setActiveTab('home')} />
           ) : productsList.length === 0 ? (
             /* Catalogo non ancora arrivato dal cloud (o connessione assente) */
             <div className="py-24 flex flex-col items-center text-center text-slate-300 space-y-3">
@@ -574,141 +594,61 @@ export default function App() {
               onBack={() => setSelectedBrandName(null)}
             />
           ) : showAllBrands ? (
-            <AllBrandsView
+            <NuovaBrandsPage
               categories={categoriesList}
               subcategories={subcategoriesList}
               products={productsList}
               onSelectBrand={(name) => {
                 setSelectedBrandName(name);
+                window.scrollTo({ top: 0 });
               }}
               onBack={() => setShowAllBrands(false)}
             />
           ) : activeTab === 'home' ? (
-            /* EXACT SCREENSHOT REPLICA: Home View */
-            <div className="space-y-6">
-              {/* 1. Hero Banner */}
-              <HeroBanner
-                onExploreCatalog={() => {
-                  setActiveTab('categorie');
-                  setSelectedCategoryId(null);
-                }}
-                onPersonalizza={() => {
-                  setActiveTab('personalizza');
-                  setSearchQuery('');
-                  setSelectedBrandName(null);
-                  setShowAllBrands(false);
-                  window.scrollTo({ top: 0 });
-                }}
-                onChat={() => {
-                  setActiveTab('chat');
-                  window.scrollTo({ top: 0 });
-                }}
-              />
-
-              {/* 2. Categorie principali */}
-              <CategorySection
-                categories={categoriesList}
-                selectedCategoryId={selectedCategoryId}
-                onSelectCategory={handleSelectCategory}
-                onViewAll={() => {
-                  setActiveTab('categorie');
-                  setSelectedCategoryId(null);
-                }}
-              />
-
-              {/* Volantino offerte sfogliabile */}
-              <FlyerSection />
-
-              {/* 2.1 Marche */}
-              <BrandsSection
-                categories={categoriesList}
-                subcategories={subcategoriesList}
-                products={productsList}
-                onSelectBrand={(name) => setSelectedBrandName(name)}
-                onViewAllBrands={() => setShowAllBrands(true)}
-              />
-
-              {/* 2.2 Ho.Re.Ca - Monouso (categorie trasferite dall'app Ho.Re.Ca) */}
-              <HorecaSection
-                categories={categoriesList}
-                subcategories={subcategoriesList}
-                products={productsList}
-                onOpen={(categoryId, subcategoryId) => {
-                  setInitialSubcategoryId(subcategoryId);
-                  setSelectedCategoryId(categoryId);
-                  setActiveTab('categorie');
-                }}
-              />
-
-              {/* 2.5 Quick Reorder Highlight Banner Card (Mobile only, matches smartphone mockup) */}
-              <div
-                id="home-quick-reorder-banner"
-                onClick={() => setIsQuickReorderOpen(true)}
-                className="md:hidden w-full bg-gradient-to-r from-[#051d41] via-[#052a5a] to-[#051d41] border border-sky-500/30 hover:border-sky-500/60 rounded-2xl p-3.5 flex items-center justify-between cursor-pointer transition-all duration-200 shadow-sm group active:scale-[0.99]"
-              >
-                <div className="flex items-center gap-3.5">
-                  <div className="w-10 h-10 rounded-full bg-sky-500/20 border border-sky-500/40 text-sky-400 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform shadow-xs">
-                    <RotateCcw className="w-4.5 h-4.5 stroke-[2.5]" />
-                  </div>
-                  <div>
-                    <h3 className="text-white text-xs sm:text-sm font-bold leading-tight flex items-center gap-1.5">
-                      <span>Riordino Rapido</span>
-                      <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-sky-500/20 text-sky-300 border border-sky-500/40">
-                        1-Click
-                      </span>
-                    </h3>
-                    <p className="text-sky-400 text-[11px] font-semibold mt-0.5">
-                      Riordini veloci • Si paga alla consegna
-                    </p>
-                  </div>
-                </div>
-                <div className="w-7 h-7 rounded-full bg-[#0e1b30] border border-sky-500/30 text-slate-500 group-hover:text-sky-400 group-hover:border-sky-500/60 flex items-center justify-center transition-all">
-                  <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-                </div>
-              </div>
-
-              {/* 3. Offerte del mese Promo Banner */}
-              <PromoBanner
-                onDiscoverOffers={() => {
-                  setActiveTab('offerte');
-                }}
-              />
-
-              {/* 4. Prodotti in evidenza (marche, senza Ho.Re.Ca) */}
-              <FeaturedProductsSection
-                className="w-full mt-7"
-                products={productsList.filter((p) => !isHorecaCategory(p.categoryId))}
-                favorites={favorites}
-                onToggleFavorite={handleToggleFavorite}
-                comparedProductIds={comparedProductIds}
-                onToggleCompare={handleToggleCompare}
-                onSelectProduct={setSelectedProduct}
-                onAddToCart={handleAddToCart}
-                onViewAll={() => {
-                  setActiveTab('categorie');
-                }}
-                addedProductId={addedProductId}
-              />
-
-              {/* 5. Prodotti in evidenza Ho.Re.Ca - Monouso */}
-              <FeaturedProductsSection
-                sectionId="featured-horeca"
-                title="Prodotti in evidenza Ho.Re.Ca - Monouso"
-                products={productsList.filter((p) => isHorecaCategory(p.categoryId))}
-                favorites={favorites}
-                onToggleFavorite={handleToggleFavorite}
-                comparedProductIds={comparedProductIds}
-                onToggleCompare={handleToggleCompare}
-                onSelectProduct={setSelectedProduct}
-                onAddToCart={handleAddToCart}
-                onViewAll={() => {
-                  setInitialSubcategoryId(null);
-                  setSelectedCategoryId(HORECA_CATEGORY_IDS[1]);
-                  setActiveTab('categorie');
-                }}
-                addedProductId={addedProductId}
-              />
-            </div>
+            <NuovaHome
+              products={productsList}
+              categories={categoriesList}
+              subcategories={subcategoriesList}
+              favorites={favorites}
+              comparedIds={comparedProductIds}
+              cartQty={cartQtyById}
+              priceFactor={isBusinessCustomer ? vatFactor : 1}
+              onOpenCatalog={() => navNuova('categorie')}
+              onSelectCategory={(id) => {
+                setSelectedCategoryId(id);
+                setActiveTab('categorie');
+                window.scrollTo({ top: 0 });
+              }}
+              onOpenOffers={() => navNuova('offerte')}
+              onPersonalizza={() => navNuova('personalizza')}
+              onChat={() => navNuova('chat')}
+              onOpenOrders={() => navNuova('ordini')}
+              onHowItWorks={() => navNuova('consegne')}
+              onInstall={() => navNuova('installa')}
+              onQuickReorder={() => setIsQuickReorderOpen(true)}
+              onSelectBrand={(name) => {
+                setSelectedBrandName(name);
+                window.scrollTo({ top: 0 });
+              }}
+              onAllBrands={() => {
+                navNuova('categorie');
+                window.setTimeout(() => {
+                  const el = document.getElementById('n-marche');
+                  if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 90, behavior: 'smooth' });
+                }, 350);
+              }}
+              onOpenHoreca={(categoryId, subcategoryId) => {
+                setInitialSubcategoryId(subcategoryId);
+                setSelectedCategoryId(categoryId);
+                setActiveTab('categorie');
+                window.scrollTo({ top: 0 });
+              }}
+              onSelectProduct={setSelectedProduct}
+              onAdd={(p) => handleAddToCart(p, 1)}
+              onRemoveOne={(p) => handleUpdateCartQuantity(p.id, -1)}
+              onToggleFavorite={handleToggleFavorite}
+              onToggleCompare={handleToggleCompare}
+            />
           ) : activeTab === 'ordini' ? (
             <OrdersView 
               orders={ordersList} 
@@ -761,44 +701,15 @@ export default function App() {
               onOpenRestockAnalysis={handleOpenRestockAnalysis}
             />
           )}
-        </main>
-      </div>
+    </>
+  );
 
+  // Finestre, carrello, pannello admin e pulsanti flottanti: in comune alle due grafiche
+  const overlays = (
+    <>
       <ScrollToTopButton />
 
       {/* Barra carrello flottante: sempre in vista quando ci sono articoli */}
-      {cartColli > 0 && !isCartOpen && (
-        <button
-          id="floating-cart-bar"
-          type="button"
-          onClick={() => setIsCartOpen(true)}
-          className="fixed z-40 right-4 bottom-40 sm:right-6 sm:bottom-24 flex items-center gap-3 pl-3.5 pr-3 py-2.5 rounded-2xl bg-[#0284c7] hover:bg-[#0369a1] text-white shadow-xl shadow-sky-950/70 border border-sky-300/30 active:scale-95 transition-all cursor-pointer"
-          aria-label="Apri il carrello"
-        >
-          <span className="relative">
-            <ShoppingBag className="w-5 h-5" />
-            <span className="absolute -top-2 -right-2.5 min-w-[18px] h-[18px] px-1 bg-amber-400 text-slate-900 text-[10px] font-extrabold rounded-full flex items-center justify-center">
-              {cartColli}
-            </span>
-          </span>
-          <span className="text-left leading-tight">
-            <span className="block text-[11px] font-semibold text-sky-100">Vedi carrello</span>
-            <span className="block text-sm font-extrabold font-mono">€{cartSubtotal.toFixed(2)}</span>
-          </span>
-          <span
-            className={`text-[10px] font-bold px-2 py-1 rounded-full whitespace-nowrap ${
-              minimumOrderEur > 0 && Math.round(cartSubtotal * 100) < Math.round(minimumOrderEur * 100)
-                ? 'bg-amber-400 text-slate-900'
-                : 'bg-emerald-400 text-slate-900'
-            }`}
-          >
-            {minimumOrderEur > 0 && Math.round(cartSubtotal * 100) < Math.round(minimumOrderEur * 100)
-              ? `Mancano €${(minimumOrderEur - cartSubtotal).toFixed(2)}`
-              : 'Pronto da inviare'}
-          </span>
-        </button>
-      )}
-
       {/* Floating Compare Dock (shown when there are items to compare and not in compare view) */}
       {activeTab !== 'confronta' && (
         <CompareFloatingBar
@@ -810,7 +721,7 @@ export default function App() {
       )}
 
       {/* Modals & Drawers */}
-      <ProductDetailModal
+      <NuovaProductSheet
         product={selectedProduct}
         onClose={() => setSelectedProduct(null)}
         onAddToCart={handleAddToCart}
@@ -832,28 +743,6 @@ export default function App() {
         onOpenCart={() => setIsCartOpen(true)}
       />
 
-      <CartDrawer
-        isOpen={isCartOpen}
-        onClose={() => setIsCartOpen(false)}
-        items={cart}
-        onUpdateQuantity={handleUpdateCartQuantity}
-        onRemoveItem={handleRemoveFromCart}
-        onClearCart={handleClearCart}
-        onApplyTemplate={handleApplyTemplate}
-        onCheckoutSuccess={(newOrder) => {
-          setNotifications((prev) => [
-            {
-              id: `notif-${Date.now()}`,
-              title: `Nuovo Ordine ${newOrder.id}`,
-              message: `Il tuo ordine di ${newOrder.itemsCount} colli è stato registrato ed è in elaborazione. Consegna stimata: ${newOrder.estimatedDelivery}.`,
-              time: 'Adesso',
-              read: false,
-              type: 'order',
-            },
-            ...prev,
-          ]);
-        }}
-      />
 
       <ContactModal
         isOpen={isContactOpen}
@@ -931,6 +820,18 @@ export default function App() {
       />
 
       {/* Banner cookie: si attiva solo da src/config/cookies.ts (oggi spento, non serve) */}
+      {isQrOpen && (
+        <React.Suspense fallback={null}>
+          <QrScannerModal
+            isOpen={isQrOpen}
+            onClose={() => setIsQrOpen(false)}
+            products={productsList}
+            onAddToCart={handleAddToCart}
+            onOpenCart={() => setIsCartOpen(true)}
+          />
+        </React.Suspense>
+      )}
+
       <CookieBanner onOpenPrivacy={() => setActiveTab('privacy')} />
 
       {/* SuperAdmin Master Control Panel Modal - STRICTLY FOR AUTHENTICATED ADMIN ONLY */}
@@ -942,6 +843,7 @@ export default function App() {
             removeBgRequest={removeBgRequest}
             chatRequest={chatAdminRequest}
             onChatUnreadChange={setAdminChatUnread}
+            nuova
           />
         </React.Suspense>
       )}
@@ -957,6 +859,93 @@ export default function App() {
           />
         </React.Suspense>
       )}
-    </div>
+    </>
+  );
+
+  const showingHome =
+    activeTab === 'home' && productsList.length > 0 && !searchQuery.trim() && !selectedBrandName && !showAllBrands;
+  const showingCategoryHero =
+    activeTab === 'categorie' && selectedCategoryId && productsList.length > 0 && !searchQuery.trim() && !selectedBrandName && !showAllBrands
+      ? categoriesList.find((c) => c.id === selectedCategoryId) || null
+      : null;
+  const showingOffers =
+    activeTab === 'offerte' && productsList.length > 0 && !searchQuery.trim() && !selectedBrandName && !showAllBrands;
+  const showingCatalogTop =
+    activeTab === 'categorie' && !selectedCategoryId && productsList.length > 0 && !searchQuery.trim() && !selectedBrandName && !showAllBrands;
+  const layout = (
+        <NuovaShell
+          activeTab={activeTab}
+          isHome={showingHome}
+          onNavigate={navNuova}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          cartCount={cartCount}
+          cartTotal={cartSubtotal}
+          onOpenCart={() => setIsCartOpen(true)}
+          cartOpen={isCartOpen}
+          bareTop={showingCatalogTop || showingOffers}
+          overlay={cartDrawer}
+          onCloseCart={() => setIsCartOpen(false)}
+          onOpenNotifications={() => setIsNotificationsOpen(true)}
+          unreadNotificationsCount={unreadNotificationsCount}
+          onOpenLogin={() => setIsLoginOpen(true)}
+          onOpenProfile={() => setIsProfileOpen(true)}
+          onOpenAdminPanel={() => setIsAdminPanelOpen(true)}
+          onOpenContact={() => setIsContactOpen(true)}
+          onOpenQr={() => setIsQrOpen(true)}
+          favoritesCount={favorites.length}
+          comparedCount={comparedProductIds.length}
+          chatUnread={chatUnread}
+          isAdmin={isAdmin}
+          currentUser={currentUser}
+          onLogout={logout}
+          minimumOrderEur={minimumOrderEur}
+          cardEnv={{
+            cartQty: cartQtyById,
+            favorites,
+            comparedIds: comparedProductIds,
+            priceFactor: isBusinessCustomer ? vatFactor : 1,
+            onOpen: setSelectedProduct,
+            onAdd: (p) => handleAddToCart(p, 1),
+            onRemoveOne: (p) => handleUpdateCartQuantity(p.id, -1),
+            onToggleFavorite: handleToggleFavorite,
+            onToggleCompare: handleToggleCompare,
+          }}
+        >
+          {showingHome ? (
+            pageContent
+          ) : (
+            <div className="n-page">
+              {showingCategoryHero && <NuovaCategoryHero category={showingCategoryHero} />}
+              {showingCatalogTop ? (
+                <NuovaCatalogTop
+                  categories={categoriesList}
+                  subcategories={subcategoriesList}
+                  products={productsList}
+                  onPick={(id) => {
+                    setSelectedCategoryId(id);
+                    window.scrollTo({ top: 0 });
+                  }}
+                  onSelectBrand={(name) => {
+                    setSelectedBrandName(name);
+                    window.scrollTo({ top: 0 });
+                  }}
+                  onSearch={() => window.dispatchEvent(new Event('n-open-search'))}
+                />
+              ) : showingOffers ? (
+                <NuovaOffersPage products={productsList} />
+              ) : (
+                pageContent
+              )}
+            </div>
+          )}
+        </NuovaShell>
+  );
+
+  return (
+    <>
+      {layout}
+      <div className="text-white font-sans">{overlays}</div>
+    </>
   );
 }

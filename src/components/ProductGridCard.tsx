@@ -1,4 +1,5 @@
 import React from 'react';
+import { useCardRenderer } from '../nuova/cardContext';
 import { AdminImageFinderButton } from './AdminImageFinderButton';
 import { AdminRemoveBgButton } from './AdminRemoveBgButton';
 import { Heart, Plus, Check, Scale } from 'lucide-react';
@@ -38,6 +39,8 @@ export const ProductGridCard: React.FC<ProductGridCardProps> = ({
   const { isBusinessCustomer, vatFactor } = useAdmin();
   const isLowStock = product.stock <= (product.lowStockThreshold ?? 100);
   const translatedCat = t(`cat.${product.categoryId}`, product.category);
+  const nuovaCard = useCardRenderer();
+  if (nuovaCard) return <>{nuovaCard(product)}</>;
 
   return (
     <div

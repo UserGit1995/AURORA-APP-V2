@@ -4,7 +4,7 @@ import { AuroraLogo } from './AuroraLogo';
 import { useLanguage } from '../context/LanguageContext';
 import { useAdmin } from '../context/AdminContext';
 
-export type NavTab = 'home' | 'categorie' | 'offerte' | 'novita' | 'piu-venduti' | 'ordini' | 'preferiti' | 'confronta' | 'personalizza' | 'privacy' | 'termini' | 'tracking' | 'chat' | 'creatore';
+export type NavTab = 'home' | 'categorie' | 'offerte' | 'novita' | 'piu-venduti' | 'ordini' | 'preferiti' | 'confronta' | 'personalizza' | 'privacy' | 'termini' | 'tracking' | 'chat' | 'creatore' | 'consegne' | 'installa';
 
 interface SidebarProps {
   activeTab: NavTab;

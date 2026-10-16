@@ -8,6 +8,8 @@ interface LegalViewProps {
   page: LegalPage;
   onBack: () => void;
   onOpenLegal: (page: LegalPage) => void;
+  /** grafica nuova: solo i testi, la cornice la mette la pagina */
+  bare?: boolean;
 }
 
 const H2 = 'mb-2 mt-6 text-lg font-semibold text-white font-heading';
@@ -194,7 +196,12 @@ const TerminiContent: React.FC<{ onOpenLegal: (p: LegalPage) => void }> = ({ onO
   </>
 );
 
-export const LegalView: React.FC<LegalViewProps> = ({ page, onBack, onOpenLegal }) => (
+export const LegalView: React.FC<LegalViewProps> = ({ page, onBack, onOpenLegal, bare }) =>
+  bare ? (
+    <div className="x-legal">
+      {page === 'privacy' ? <PrivacyContent /> : <TerminiContent onOpenLegal={onOpenLegal} />}
+    </div>
+  ) : (
   <div className="max-w-3xl mx-auto pb-10">
     <button
       onClick={onBack}

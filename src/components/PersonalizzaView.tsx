@@ -20,6 +20,8 @@ import {
 interface PersonalizzaViewProps {
   onBackToHome: () => void;
   onOpenLegal: (page: 'privacy' | 'termini') => void;
+  /** grafica nuova: l'intestazione la mostra la pagina (come nel prototipo) */
+  hideIntro?: boolean;
 }
 
 type CategoryId = PackagingCategory['id'];
@@ -70,7 +72,7 @@ const Slider: React.FC<{
   </div>
 );
 
-export const PersonalizzaView: React.FC<PersonalizzaViewProps> = ({ onBackToHome, onOpenLegal }) => {
+export const PersonalizzaView: React.FC<PersonalizzaViewProps> = ({ onBackToHome, onOpenLegal, hideIntro }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Prezzi live impostati dall'admin (fallback: prezzi di default del catalogo)
@@ -255,6 +257,7 @@ export const PersonalizzaView: React.FC<PersonalizzaViewProps> = ({ onBackToHome
   return (
     <div className="space-y-6 pb-10">
       {/* Intestazione */}
+      {!hideIntro && (
       <div className={`${CARD} p-6 sm:p-8`}>
         <button
           onClick={onBackToHome}
@@ -281,6 +284,7 @@ export const PersonalizzaView: React.FC<PersonalizzaViewProps> = ({ onBackToHome
           </div>
         </div>
       </div>
+      )}
 
       {/* Step 1: categoria */}
       <div>

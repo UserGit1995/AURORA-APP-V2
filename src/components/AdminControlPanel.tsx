@@ -1,4 +1,6 @@
 import React, { useState, useMemo } from 'react';
+import { NuovaPanoramica } from '../nuova/NuovaPanoramica';
+import { NuovaAdmin } from '../nuova/admin/NuovaAdmin';
 import {
   X,
   Download,
@@ -24,6 +26,7 @@ import {
   XCircle,
   Scissors,
   MessageCircle,
+  LayoutDashboard,
 } from 'lucide-react';
 import { useAdmin } from '../context/AdminContext';
 import { ProductEditModal } from './ProductEditModal';
@@ -54,6 +57,8 @@ interface AdminControlPanelProps {
   /** Apertura diretta della chat clienti (dall'avviso "nuovi messaggi") */
   chatRequest?: number;
   onChatUnreadChange?: (n: number) => void;
+  /** Grafica nuova attiva: aggiunge la schermata "Panoramica" e il logo Aurora in alto */
+  nuova?: boolean;
 }
 
 // Stessa struttura/logica di sempre: qui cambia solo l'aspetto — via gradienti,
@@ -73,7 +78,7 @@ const BTN_SECONDARY = 'px-3 py-1.5 rounded-lg bg-[#0d1420] hover:bg-[#1a2230] te
 const ICON_BTN = 'p-1.5 rounded-lg bg-[#0d1420] text-slate-400 hover:text-white transition-colors';
 const ICON_BTN_DANGER = 'p-1.5 rounded-lg bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 transition-colors';
 
-export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({ isOpen, onClose, removeBgRequest, chatRequest, onChatUnreadChange }) => {
+export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({ isOpen, onClose, removeBgRequest, chatRequest, onChatUnreadChange, nuova = false }) => {
   const {
     currentUser,
     isSupabaseConnected,
@@ -90,7 +95,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({ isOpen, on
   } = useAdmin();
 
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [activeTab, setActiveTab] = useState<'products' | 'orders' | 'categories' | 'subcategories' | 'images' | 'removebg' | 'requests' | 'packaging' | 'flash' | 'flyer' | 'backup' | 'supplierphotos' | 'settings' | 'chat'>(chatRequest ? 'chat' : 'products');
+  const [activeTab, setActiveTab] = useState<'overview' | 'products' | 'orders' | 'categories' | 'subcategories' | 'images' | 'removebg' | 'requests' | 'packaging' | 'flash' | 'flyer' | 'backup' | 'supplierphotos' | 'settings' | 'chat' | 'clienti' | 'magazzino' | 'ddt' | 'fatture' | 'azienda'>(chatRequest ? 'chat' : nuova ? 'overview' : 'products');
   const [chatUnread, setChatUnreadLocal] = useState(0);
   const setChatUnread = React.useCallback((n: number) => { setChatUnreadLocal(n); onChatUnreadChange?.(n); }, [onChatUnreadChange]);
   React.useEffect(() => { if (chatRequest) setActiveTab('chat'); }, [chatRequest]);
@@ -161,6 +166,11 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({ isOpen, on
       document.body.style.overflow = prev;
     };
   }, [isOpen]);
+
+  // Tornando alla grafica classica la Panoramica non esiste: si riparte da Prodotti
+  React.useEffect(() => {
+    if (!nuova && activeTab === 'overview') setActiveTab('products');
+  }, [nuova, activeTab]);
 
   if (!isOpen) return null;
 
@@ -278,143 +288,27 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({ isOpen, on
       ],
     },
   ];
+  // Grafica nuova: in cima al menu la schermata "Panoramica"
+  if (nuova) {
+    NAV_GROUPS.unshift({
+      title: 'Generale',
+      items: [{ id: 'overview', label: 'Panoramica', icon: LayoutDashboard, desc: 'Ordini, incassi e cose da controllare a colpo d\'occhio.' }],
+    });
+  }
   const allNav = NAV_GROUPS.flatMap((g) => g.items);
   const current = allNav.find((i) => i.id === activeTab) || allNav[0];
   const goTo = (id: TabId) => (id === 'removebg' ? openRemoveBg(null) : setActiveTab(id));
   const CurrentIcon = current.icon;
 
-  return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-[#070f1d] text-left">
-      {/* Barra superiore */}
-      <header className="shrink-0 h-16 px-3 sm:px-6 flex items-center justify-between gap-3 border-b border-[#1c2433] bg-[#0b1526]">
-        <div className="flex items-center gap-3 min-w-0">
-          <div className="w-10 h-10 rounded-xl bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 flex items-center justify-center shrink-0">
-            <SlidersHorizontal className="w-5 h-5" />
-          </div>
-          <div className="min-w-0">
-            <h1 className="text-base sm:text-lg font-bold text-white leading-tight truncate">Pannello di gestione</h1>
-            <div className="flex items-center gap-2 text-xs text-slate-400">
-              <span className="truncate">{currentUser?.name} · {currentUser?.role}</span>
-              <span className="hidden sm:inline">•</span>
-              {isSupabaseConnected ? (
-                <span className="hidden sm:flex items-center gap-1 text-emerald-400">
-                  <Cloud className="w-3.5 h-3.5" /> Cloud connesso
-                </span>
-              ) : (
-                <span className="hidden sm:flex items-center gap-1 text-slate-500">
-                  <CloudOff className="w-3.5 h-3.5" /> Modalità locale
-                </span>
-              )}
-            </div>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2 shrink-0">
-          {isSupabaseConnected && (
-            <button
-              type="button"
-              onClick={async () => {
-                setIsRefreshing(true);
-                await refreshFromCloud();
-                setTimeout(() => setIsRefreshing(false), 500);
-              }}
-              disabled={isRefreshing}
-              className={BTN_SECONDARY}
-              title="Sincronizza e scarica dati da Supabase"
-            >
-              <RotateCcw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin' : ''}`} />
-              <span className="hidden md:inline">{isRefreshing ? 'Sincronizzo…' : 'Aggiorna dati'}</span>
-            </button>
-          )}
-          <button
-            type="button"
-            onClick={onClose}
-            title="Chiudi e torna alla home"
-            aria-label="Chiudi e torna alla home"
-            className="inline-flex items-center gap-2 pl-3 pr-2.5 py-2 rounded-xl bg-[#0d1420] border border-[#1c2433] text-slate-300 hover:text-white hover:border-rose-500/60 hover:bg-rose-500/10 transition-colors"
-          >
-            <span className="hidden sm:inline text-sm font-semibold">Torna alla home</span>
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-      </header>
-
-      {/* Menu sezioni su cellulare */}
-      <nav className="lg:hidden shrink-0 flex gap-1.5 overflow-x-auto no-scrollbar px-3 py-2 border-b border-[#1c2433] bg-[#0b1526]">
-        {allNav.map((item) => {
-          const Icon = item.icon;
-          const active = activeTab === item.id;
-          return (
-            <button
-              key={item.id}
-              type="button"
-              onClick={() => goTo(item.id)}
-              className={`shrink-0 inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold transition-colors ${
-                active ? 'bg-indigo-600 text-white' : 'bg-[#0d1420] text-slate-400 border border-[#1c2433]'
-              }`}
-            >
-              <Icon className="w-3.5 h-3.5" />
-              {item.label}
-            </button>
-          );
-        })}
-      </nav>
-
-      <div className="flex-1 min-h-0 flex">
-        {/* Menu laterale */}
-        <aside className="hidden lg:flex w-64 shrink-0 flex-col gap-5 overflow-y-auto border-r border-[#1c2433] bg-[#0b1526] px-3 py-5">
-          {NAV_GROUPS.map((group) => (
-            <div key={group.title}>
-              <p className="px-3 mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">{group.title}</p>
-              <div className="space-y-0.5">
-                {group.items.map((item) => {
-                  const Icon = item.icon;
-                  const active = activeTab === item.id;
-                  return (
-                    <button
-                      key={item.id}
-                      type="button"
-                      onClick={() => goTo(item.id)}
-                      className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                        active
-                          ? 'bg-indigo-500/15 text-white border border-indigo-500/30'
-                          : 'text-slate-400 hover:text-white hover:bg-[#121c2e] border border-transparent'
-                      }`}
-                    >
-                      <Icon className={`w-4 h-4 shrink-0 ${active ? 'text-indigo-300' : ''}`} />
-                      <span className="flex-1 text-left truncate">{item.label}</span>
-                      {item.badge && (
-                        <span
-                          className={`text-[10.5px] font-semibold px-1.5 py-0.5 rounded-md ${
-                            item.id === 'requests' || item.id === 'backup' ? 'bg-amber-500/20 text-amber-300' : 'bg-[#16213a] text-slate-400'
-                          }`}
-                        >
-                          {item.badge}
-                        </span>
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          ))}
-        </aside>
-
-        {/* Contenuto della sezione */}
-        <main className="flex-1 min-w-0 overflow-y-auto">
-          <div className={`mx-auto w-full ${activeTab === 'removebg' ? 'max-w-7xl' : 'max-w-6xl'} flex flex-col pb-10`}>
-            <div className="px-4 sm:px-6 pt-5 sm:pt-6 pb-1 flex items-start gap-3">
-              <div className="w-9 h-9 rounded-lg bg-indigo-500/15 text-indigo-300 flex items-center justify-center shrink-0">
-                <CurrentIcon className="w-4.5 h-4.5" />
-              </div>
-              <div className="min-w-0">
-                <h2 className="text-lg sm:text-xl font-bold text-white leading-tight">{current.label}</h2>
-                <p className="text-xs sm:text-sm text-slate-400 mt-0.5">{current.desc}</p>
-              </div>
-            </div>
+  const sections = (
+      <>
+        {/* Tab: Panoramica (solo grafica nuova) */}
+        {false && activeTab === 'overview' && (
+          <NuovaPanoramica onGo={goTo} chatUnread={chatUnread} newRequests={newCustomizations} />
+        )}
 
         {/* Tab: Prodotti */}
-        {activeTab === 'products' && (
+        {!nuova && activeTab === 'products' && (
           <div className="p-4 sm:p-6 overflow-y-auto flex-1 space-y-4 text-left">
             <div className={`flex flex-wrap items-center justify-between gap-3 ${PANEL_CARD} p-4`}>
               <div>
@@ -527,7 +421,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({ isOpen, on
         )}
 
         {/* Tab: Ordini */}
-        {activeTab === 'orders' && (
+        {!nuova && activeTab === 'orders' && (
           <div className="p-4 sm:p-6 overflow-y-auto flex-1 space-y-4 text-left">
             <div className={`${PANEL_CARD} p-4`}>
               <h3 className="text-sm font-semibold text-white">Ordini e tracciabilità</h3>
@@ -721,7 +615,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({ isOpen, on
 
         {/* Tab: Parametri */}
         {activeTab === 'requests' && <CustomizationRequestsPanel onNewCountChange={setNewCustomizations} />}
-        {activeTab === 'chat' && <ChatAdminPanel onUnreadChange={setChatUnread} />}
+        {!nuova && activeTab === 'chat' && <ChatAdminPanel onUnreadChange={setChatUnread} />}
         {activeTab === 'packaging' && <CustomizationPricingPanel />}
         {activeTab === 'flash' && <FlashOffersPanel />}
         {activeTab === 'flyer' && <FlyerAdminPanel />}
@@ -828,6 +722,10 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({ isOpen, on
           </form>
         )}
 
+      </>
+  );
+  const modals = (
+      <>
         {/* Sub-modals for Product & Order Editing */}
         {isProductModalOpen && (
           <ProductEditModal
@@ -852,6 +750,169 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({ isOpen, on
             }}
           />
         )}
+      </>
+  );
+  if (nuova) {
+    const supplierN = productsList.filter((p) => isSupplierImage(p.image)).length;
+    const bd = daysSinceLastBackup();
+    return (
+      <NuovaAdmin
+        activeTab={activeTab}
+        onGo={(id) => setActiveTab(id)}
+        onClose={onClose}
+        chatUnread={chatUnread}
+        onChatUnread={setChatUnread}
+        newRequests={newCustomizations}
+        onNewRequests={setNewCustomizations}
+        onNewProduct={handleOpenNewProduct}
+        onEditProductFull={handleOpenEditProduct}
+        onEditOrderFull={handleOpenEditOrder}
+        onRemoveBg={openRemoveBg}
+        supplierPhotos={supplierN}
+        backupDue={bd === null || bd > 7}
+        modals={modals}
+      >
+        {sections}
+      </NuovaAdmin>
+    );
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex flex-col bg-[#070f1d] text-left">
+      {/* Barra superiore */}
+      <header className="shrink-0 h-16 px-3 sm:px-6 flex items-center justify-between gap-3 border-b border-[#1c2433] bg-[#0b1526]">
+        <div className="flex items-center gap-3 min-w-0">
+          {nuova ? (
+            <img src="/nuova/emblem.svg" alt="Aurora" className="w-10 h-10 shrink-0" />
+          ) : (
+          <div className="w-10 h-10 rounded-xl bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 flex items-center justify-center shrink-0">
+            <SlidersHorizontal className="w-5 h-5" />
+          </div>
+          )}
+          <div className="min-w-0">
+            <h1 className="text-base sm:text-lg font-bold text-white leading-tight truncate">Pannello di gestione</h1>
+            <div className="flex items-center gap-2 text-xs text-slate-400">
+              <span className="truncate">{currentUser?.name} · {currentUser?.role}</span>
+              <span className="hidden sm:inline">•</span>
+              {isSupabaseConnected ? (
+                <span className="hidden sm:flex items-center gap-1 text-emerald-400">
+                  <Cloud className="w-3.5 h-3.5" /> Cloud connesso
+                </span>
+              ) : (
+                <span className="hidden sm:flex items-center gap-1 text-slate-500">
+                  <CloudOff className="w-3.5 h-3.5" /> Modalità locale
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 shrink-0">
+          {isSupabaseConnected && (
+            <button
+              type="button"
+              onClick={async () => {
+                setIsRefreshing(true);
+                await refreshFromCloud();
+                setTimeout(() => setIsRefreshing(false), 500);
+              }}
+              disabled={isRefreshing}
+              className={BTN_SECONDARY}
+              title="Sincronizza e scarica dati da Supabase"
+            >
+              <RotateCcw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin' : ''}`} />
+              <span className="hidden md:inline">{isRefreshing ? 'Sincronizzo…' : 'Aggiorna dati'}</span>
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={onClose}
+            title="Chiudi e torna alla home"
+            aria-label="Chiudi e torna alla home"
+            className="inline-flex items-center gap-2 pl-3 pr-2.5 py-2 rounded-xl bg-[#0d1420] border border-[#1c2433] text-slate-300 hover:text-white hover:border-rose-500/60 hover:bg-rose-500/10 transition-colors"
+          >
+            <span className="hidden sm:inline text-sm font-semibold">Torna alla home</span>
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+      </header>
+
+      {/* Menu sezioni su cellulare */}
+      <nav className="lg:hidden shrink-0 flex gap-1.5 overflow-x-auto no-scrollbar px-3 py-2 border-b border-[#1c2433] bg-[#0b1526]">
+        {allNav.map((item) => {
+          const Icon = item.icon;
+          const active = activeTab === item.id;
+          return (
+            <button
+              key={item.id}
+              type="button"
+              onClick={() => goTo(item.id)}
+              className={`shrink-0 inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold transition-colors ${
+                active ? 'bg-indigo-600 text-white' : 'bg-[#0d1420] text-slate-400 border border-[#1c2433]'
+              }`}
+            >
+              <Icon className="w-3.5 h-3.5" />
+              {item.label}
+            </button>
+          );
+        })}
+      </nav>
+
+      <div className="flex-1 min-h-0 flex">
+        {/* Menu laterale */}
+        <aside className="hidden lg:flex w-64 shrink-0 flex-col gap-5 overflow-y-auto border-r border-[#1c2433] bg-[#0b1526] px-3 py-5">
+          {NAV_GROUPS.map((group) => (
+            <div key={group.title}>
+              <p className="px-3 mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">{group.title}</p>
+              <div className="space-y-0.5">
+                {group.items.map((item) => {
+                  const Icon = item.icon;
+                  const active = activeTab === item.id;
+                  return (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => goTo(item.id)}
+                      className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                        active
+                          ? 'bg-indigo-500/15 text-white border border-indigo-500/30'
+                          : 'text-slate-400 hover:text-white hover:bg-[#121c2e] border border-transparent'
+                      }`}
+                    >
+                      <Icon className={`w-4 h-4 shrink-0 ${active ? 'text-indigo-300' : ''}`} />
+                      <span className="flex-1 text-left truncate">{item.label}</span>
+                      {item.badge && (
+                        <span
+                          className={`text-[10.5px] font-semibold px-1.5 py-0.5 rounded-md ${
+                            item.id === 'requests' || item.id === 'backup' ? 'bg-amber-500/20 text-amber-300' : 'bg-[#16213a] text-slate-400'
+                          }`}
+                        >
+                          {item.badge}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </aside>
+
+        {/* Contenuto della sezione */}
+        <main className="flex-1 min-w-0 overflow-y-auto">
+          <div className={`mx-auto w-full ${activeTab === 'removebg' ? 'max-w-7xl' : 'max-w-6xl'} flex flex-col pb-10`}>
+            <div className="px-4 sm:px-6 pt-5 sm:pt-6 pb-1 flex items-start gap-3">
+              <div className="w-9 h-9 rounded-lg bg-indigo-500/15 text-indigo-300 flex items-center justify-center shrink-0">
+                <CurrentIcon className="w-4.5 h-4.5" />
+              </div>
+              <div className="min-w-0">
+                <h2 className="text-lg sm:text-xl font-bold text-white leading-tight">{current.label}</h2>
+                <p className="text-xs sm:text-sm text-slate-400 mt-0.5">{current.desc}</p>
+              </div>
+            </div>
+
+        {sections}
+        {modals}
           </div>
         </main>
       </div>

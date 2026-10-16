@@ -1,0 +1,109 @@
+/* =====================================================================
+   GRAFICA NUOVA - "vestito" per le schermate che mantengono la loro
+   struttura (catalogo, carrello e ordine, ordini, chat, personalizza,
+   profilo, accesso, pagine legali, pannello admin).
+   Vale SOLO quando la grafica nuova è attiva (html.ng-on): stessi colori,
+   caratteri, angoli e pulsanti della grafica nuova, nessuna funzione cambiata.
+   Queste regole non sono in un "layer", quindi hanno la precedenza sulle
+   classi della grafica classica senza bisogno di !important.
+   ===================================================================== */
+
+html.ng-on{
+  --sk-card:linear-gradient(180deg,#10284a 0%,#0b1c34 100%);
+  --sk-card-flat:#0d2140;
+  --sk-deep:#07111f;
+  --sk-bar:#0a1a30;
+  --sk-ln:rgba(143,180,214,.16);
+  --sk-ln2:rgba(143,180,214,.28);
+  --sk-aur:#4cb8ef;
+  --sk-btn:linear-gradient(135deg,#3db2ec,#1d7fc6);
+  --sk-hover:rgba(255,255,255,.06);
+  --sk-in:rgba(255,255,255,.05);
+}
+html.ng-on body{font-family:'Plus Jakarta Sans',ui-sans-serif,system-ui,sans-serif}
+html.ng-on :is(h1,h2,h3,.font-heading){font-family:'Sora',ui-sans-serif,system-ui,sans-serif;letter-spacing:-.025em}
+html.ng-on h4{font-family:'Sora',ui-sans-serif,system-ui,sans-serif}
+
+/* ---------- superfici (riquadri, finestre, pannelli) ---------- */
+html.ng-on :is(
+  [class~="bg-[#0d1420]"],[class~="bg-[#0e1b30]"],[class~="bg-[#161f30]"],[class~="bg-[#111826]"],
+  [class~="bg-[#202434]"],[class~="bg-[#0b1526]"],[class~="bg-[#081326]"],[class~="bg-[#16213a]"],[class~="bg-[#2a3044]"]
+){background:var(--sk-card)}
+html.ng-on :is([class~="bg-[#0d1420]/50"],[class~="bg-[#0d1420]/60"],[class~="bg-[#111826]/80"],[class~="bg-[#1a2230]/50"],[class~="bg-[#0e1b30]/5"]){background:rgba(13,33,64,.6)}
+html.ng-on [class~="bg-[#070f1d]"]{background:radial-gradient(70% 40% at 15% 0%,rgba(76,184,239,.12),transparent 70%),var(--sk-deep)}
+html.ng-on [class~="bg-[#1a2230]"]{background:rgba(76,184,239,.1)}
+/* schede prodotto classiche rimaste (es. selezione multipla, confronto) */
+html.ng-on [class~="from-slate-950/90"]{background:var(--sk-card)}
+/* bordi */
+html.ng-on :is([class~="border-[#1c2433]"],[class~="border-slate-700"],[class~="border-slate-800"],[class~="border-[#2a3044]"]){border-color:var(--sk-ln)}
+html.ng-on :is([class~="hover:border-sky-500/50"],[class~="hover:border-sky-500/40"],[class~="hover:border-sky-500/60"]):hover{border-color:rgba(76,184,239,.55)}
+/* hover delle righe */
+html.ng-on :is([class~="hover:bg-[#1a2230]"],[class~="hover:bg-[#121c2e]"],[class~="hover:bg-[#111826]"]):hover{background:var(--sk-hover)}
+
+/* angoli più morbidi, come nella grafica nuova */
+html.ng-on :is(div,section,aside,form,article,li)[class~="rounded-2xl"]{border-radius:22px}
+html.ng-on :is(div,section,aside,form,article)[class~="rounded-3xl"]{border-radius:28px}
+html.ng-on :is(div,section,aside,form,article,li)[class~="rounded-xl"]{border-radius:16px}
+html.ng-on :is(button,a,label)[class~="rounded-xl"]{border-radius:14px}
+html.ng-on :is(button,a,label)[class~="rounded-lg"]{border-radius:12px}
+
+/* ---------- testi ---------- */
+html.ng-on [class~="text-slate-400"]{color:#93a7bd}
+html.ng-on [class~="text-slate-500"]{color:#7f93a9}
+html.ng-on [class~="text-slate-300"]{color:#c3d2e2}
+html.ng-on [class~="text-sky-400"]{color:#4cb8ef}
+html.ng-on [class~="text-sky-300"]{color:#8fd3f7}
+html.ng-on [class~="text-sky-200"]{color:#cdeeff}
+html.ng-on :is([class~="text-indigo-300"],[class~="text-indigo-400"]){color:#8fd3f7}
+
+/* ---------- pulsanti principali (azzurro aurora) ---------- */
+html.ng-on :is(button,a,label):is([class~="bg-[#0284c7]"],[class~="bg-sky-600"],[class~="bg-sky-500"],[class~="bg-indigo-600"],[class~="bg-indigo-500"]){
+  background:var(--sk-btn);color:#fff;box-shadow:0 10px 24px rgba(44,150,216,.28),inset 0 1px 0 rgba(255,255,255,.3);
+  font-family:'Sora',ui-sans-serif,system-ui,sans-serif;font-weight:600;letter-spacing:-.01em;transition:transform .25s cubic-bezier(.34,1.56,.64,1),filter .2s,box-shadow .2s
+}
+html.ng-on :is(button,a,label):is([class~="bg-[#0284c7]"],[class~="bg-sky-600"],[class~="bg-sky-500"],[class~="bg-indigo-600"],[class~="bg-indigo-500"]):hover{filter:brightness(1.08)}
+html.ng-on :is(button,a,label):is([class~="bg-[#0284c7]"],[class~="bg-sky-600"],[class~="bg-sky-500"],[class~="bg-indigo-600"],[class~="bg-indigo-500"]):active{transform:scale(.96)}
+html.ng-on :is(button,a):disabled:is([class~="bg-[#0284c7]"],[class~="bg-sky-600"],[class~="bg-indigo-600"]){filter:grayscale(.4) brightness(.8);box-shadow:none}
+html.ng-on :is(button,a)[class~="from-[#0284c7]"]{background:var(--sk-btn)}
+/* pallini, barre e badge azzurri */
+html.ng-on :not(button,a,label):is([class~="bg-sky-500"],[class~="bg-sky-400"]){background-color:var(--sk-aur)}
+html.ng-on :is([class~="bg-sky-500/20"],[class~="bg-sky-500/15"],[class~="bg-sky-500/10"],[class~="bg-indigo-500/15"],[class~="bg-indigo-500/20"],[class~="bg-indigo-500/10"]){background-color:rgba(76,184,239,.14)}
+html.ng-on :is([class~="border-sky-500/30"],[class~="border-indigo-500/30"],[class~="border-indigo-500/40"]){border-color:rgba(76,184,239,.35)}
+html.ng-on :is([class~="ring-sky-500/40"],[class~="ring-sky-500/60"],[class~="ring-sky-500/50"]){--tw-ring-color:rgba(76,184,239,.5)}
+
+/* ---------- campi da compilare ---------- */
+html.ng-on :is(input,select,textarea):is([class~="bg-[#0d1420]"],[class~="bg-[#161f30]"],[class~="bg-[#0e1b30]"],[class~="bg-[#111826]"],[class~="bg-[#081326]"],[class~="bg-[#0b1526]"],[class~="bg-[#0d1420]/50"]){
+  background:var(--sk-in);border-color:var(--sk-ln);border-radius:14px;color:#fff
+}
+html.ng-on :is(input,select,textarea):focus{border-color:rgba(76,184,239,.7);box-shadow:0 0 0 3px rgba(76,184,239,.18);outline:none}
+html.ng-on select option{background:#0b1c34;color:#fff}
+html.ng-on :is(input,textarea)::placeholder{color:#7f93a9}
+html.ng-on input[type="checkbox"]{accent-color:#2c96d8}
+
+/* ---------- finestre sopra la pagina ---------- */
+html.ng-on :is([class~="bg-black/75"],[class~="bg-black/80"],[class~="bg-black/85"],[class~="bg-black/60"],[class~="bg-black/70"],[class~="bg-slate-900/40"]){background-color:rgba(3,7,15,.66)}
+html.ng-on :is(div,section)[class~="shadow-2xl"]{box-shadow:0 30px 80px rgba(0,0,0,.55),0 0 0 1px rgba(143,180,214,.08)}
+
+/* pannello admin: menu laterale e voce attiva come la grafica nuova */
+html.ng-on aside[class~="bg-[#0b1526]"],html.ng-on header[class~="bg-[#0b1526]"],html.ng-on nav[class~="bg-[#0b1526]"]{background:linear-gradient(180deg,#0d2240,#0a1a30)}
+html.ng-on [class~="bg-indigo-500/15"][class~="border-indigo-500/30"]{background:rgba(76,184,239,.14);border-color:transparent;box-shadow:inset 3px 0 0 #4cb8ef}
+
+/* scrollbar discreta su computer */
+@media (hover:hover){
+  html.ng-on ::-webkit-scrollbar{width:10px;height:10px}
+  html.ng-on ::-webkit-scrollbar-thumb{background:rgba(143,180,214,.22);border-radius:10px;border:2px solid transparent;background-clip:padding-box}
+  html.ng-on ::-webkit-scrollbar-track{background:transparent}
+}
+
+/* le classi "al passaggio del mouse" della grafica classica restano attive */
+html.ng-on [class~="hover:text-white"]:hover{color:#fff}
+html.ng-on [class~="hover:text-sky-300"]:hover{color:#8fd3f7}
+html.ng-on [class~="hover:text-slate-300"]:hover{color:#c3d2e2}
+html.ng-on [class~="group"]:hover [class~="group-hover:text-sky-300"]{color:#8fd3f7}
+html.ng-on [class~="group"]:hover [class~="group-hover:text-white"]{color:#fff}
+html.ng-on [class~="hover:bg-sky-600"]:hover,html.ng-on [class~="hover:bg-[#0284c7]"]:hover{background:var(--sk-btn);color:#fff}
+html.ng-on [class~="hover:bg-rose-500/10"]:hover{background:rgba(244,63,94,.1)}
+html.ng-on [class~="hover:bg-rose-600"]:hover{background:#e11d48}
+
+/* riquadri chiari della grafica classica: nella grafica nuova diventano scuri (il testo bianco resta leggibile) */
+html.ng-on :is(div,section)[class~="from-white"]:is([class~="to-sky-50"],[class~="via-slate-50"]){background:var(--sk-card)}

@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { X, Lock, Mail, Building2, CheckCircle2, User, Eye, EyeOff, UserCheck, UserPlus, AlertTriangle, Star, ShoppingBag, Briefcase, Phone } from 'lucide-react';
 import { motion } from 'motion/react';
-import { AuroraLogo } from './AuroraLogo';
 import { useLanguage } from '../context/LanguageContext';
 import { UserProfile } from '../types';
 import {
@@ -125,7 +124,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
         initial={{ opacity: 0, scale: 0.95, y: 15 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 15 }}
-        className="relative w-full max-w-md bg-[#0d1420] border border-[#1c2433] rounded-3xl shadow-2xl z-10 overflow-hidden my-auto"
+        className="n-login relative w-full max-w-md bg-[#0d1420] border border-[#1c2433] rounded-3xl shadow-2xl z-10 overflow-hidden my-auto"
       >
         {/* Close Button */}
         <button
@@ -139,7 +138,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
         {/* Header with Official Aurora Logo */}
         <div className="pt-7 pb-3.5 px-6 text-center flex flex-col items-center border-b border-[#1c2433] bg-[#0d1420]/60">
           <div className="relative mb-2 p-1">
-            <AuroraLogo size="login" showSubtitle={true} />
+            <img src="/nuova/logo-blu.svg" alt="Aurora" className="n-login-logo" />
           </div>
 
           {/* Mode Switcher Tabs */}
