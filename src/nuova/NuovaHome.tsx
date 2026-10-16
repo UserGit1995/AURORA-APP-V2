@@ -331,8 +331,12 @@ export const BrandCard: React.FC<{
   isAdmin: boolean;
   onOpen: () => void;
   onManage: () => void;
-}> = ({ name, image, vec, count, isAdmin, onOpen, onManage }) => {
+}> = ({ name, image: img0, vec, count, isAdmin, onOpen, onManage }) => {
   const [on, setOn] = useState(false);
+  // se il logo a colori non si carica, al tocco si vede il logo vettoriale invece di un riquadro vuoto
+  const [bad, setBad] = useState(false);
+  const image = bad ? undefined : img0;
+  const fail = () => setBad(true);
   const t = useRef<number>(0);
   useEffect(() => () => window.clearTimeout(t.current), []);
   const click = () => {
@@ -362,19 +366,19 @@ export const BrandCard: React.FC<{
                   <img
                     src={image}
                     alt=""
-                    loading="lazy"
                     referrerPolicy="no-referrer"
+                    onError={fail}
                     style={{ width: `${100 / vec.c[2]}%`, left: `${(-vec.c[0] / vec.c[2]) * 100}%`, top: `${(-vec.c[1] / vec.c[3]) * 100}%` }}
                   />
                 </span>
               ) : image ? (
-                <img className="orig" src={image} alt="" loading="lazy" referrerPolicy="no-referrer" />
+                <img className="orig" src={image} alt="" referrerPolicy="no-referrer" onError={fail} />
               ) : null}
             </>
           ) : image ? (
             <>
-              <img className="fmono" src={image} alt="" loading="lazy" referrerPolicy="no-referrer" />
-              <img className="orig" src={image} alt="" loading="lazy" referrerPolicy="no-referrer" />
+              <img className="fmono" src={image} alt="" referrerPolicy="no-referrer" onError={fail} />
+              <img className="orig" src={image} alt="" referrerPolicy="no-referrer" onError={fail} />
             </>
           ) : (
             <span className="wm">{name}</span>
