@@ -331,32 +331,52 @@ export const BrandCard: React.FC<{
   isAdmin: boolean;
   onOpen: () => void;
   onManage: () => void;
-}> = ({ name, image: img0, vec, count, isAdmin, onOpen, onManage }) => {
+  /** pagina "Tutte le marche": primo tocco colori, secondo tocco apre (come nel prototipo) */
+  twoStep?: boolean;
+}> = ({ name, image: img0, vec, count, isAdmin, onOpen, onManage, twoStep }) => {
   const [on, setOn] = useState(false);
   // se il logo a colori non si carica, al tocco si vede il logo vettoriale invece di un riquadro vuoto
   const [bad, setBad] = useState(false);
   const image = bad ? undefined : img0;
   const fail = () => setBad(true);
   const t = useRef<number>(0);
-  useEffect(() => () => window.clearTimeout(t.current), []);
-  const click = () => {
-    const hover = typeof window !== 'undefined' && window.matchMedia?.('(hover: hover)').matches;
-    if ((!image && !vec) || hover) {
-      onOpen();
+  const openNext = useRef(false);
+  const me = useRef({});
+  useEffect(() => {
+    // una sola marca colorata alla volta
+    const off = (e: Event) => {
+      if ((e as CustomEvent).detail !== me.current) setOn(false);
+    };
+    window.addEventListener('n-br-on', off);
+    return () => {
+      window.removeEventListener('n-br-on', off);
+      window.clearTimeout(t.current);
+    };
+  }, []);
+  const hasLogo = !!(image || vec);
+  // come nel prototipo: al primo contatto del dito (anche mentre scorri) si vede il logo a colori
+  const down = (e: React.PointerEvent) => {
+    if (e.pointerType === 'mouse' || !hasLogo) return;
+    if (twoStep && on) {
+      openNext.current = true;
       return;
     }
-    // un solo tocco: si vede il logo a colori e subito dopo si apre la marca
+    window.dispatchEvent(new CustomEvent('n-br-on', { detail: me.current }));
     setOn(true);
     vib(8);
     window.clearTimeout(t.current);
-    t.current = window.setTimeout(() => {
+    t.current = window.setTimeout(() => setOn(false), 2500);
+  };
+  const click = () => {
+    const hover = typeof window !== 'undefined' && window.matchMedia?.('(hover: hover)').matches;
+    if (!twoStep || !hasLogo || hover || openNext.current) {
+      openNext.current = false;
       onOpen();
-      window.setTimeout(() => setOn(false), 400);
-    }, 380);
+    }
   };
   return (
     <div style={{ position: 'relative', minWidth: 0 }}>
-      <button type="button" className={`n-br${on ? ' on' : ''}${image || vec ? '' : ' nologo'}${vec && !image ? ' vonly' : ''}`} onClick={click} aria-label={name}>
+      <button type="button" className={`n-br${on ? ' on' : ''}${image || vec ? '' : ' nologo'}${vec && !image ? ' vonly' : ''}`} onPointerDown={down} onClick={click} aria-label={name}>
         <span className="lg">
           {vec ? (
             <>
@@ -783,6 +803,7 @@ export const NuovaBrandsPage: React.FC<{
         {list.map((b) => (
           <div key={b.name} data-l={b.name.charAt(0).toUpperCase()} style={{ minWidth: 0 }}>
             <BrandCard
+              twoStep
               name={b.name}
               image={b.image}
               vec={vecs[vecKey(b.name)]}
