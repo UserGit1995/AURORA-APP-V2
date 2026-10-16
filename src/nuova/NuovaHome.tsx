@@ -354,9 +354,11 @@ export const BrandCard: React.FC<{
     };
   }, []);
   const hasLogo = !!(image || vec);
-  // come nel prototipo: al primo contatto del dito (anche mentre scorri) si vede il logo a colori
-  const down = (e: React.PointerEvent) => {
-    if (e.pointerType === 'mouse' || !hasLogo) return;
+  const downAt = useRef(0);
+  // come nel prototipo: appena il dito tocca la marca (anche per scorrere) si vede il logo a colori
+  const start = () => {
+    if (!hasLogo) return;
+    downAt.current = Date.now();
     if (twoStep && on) {
       openNext.current = true;
       return;
@@ -367,16 +369,22 @@ export const BrandCard: React.FC<{
     window.clearTimeout(t.current);
     t.current = window.setTimeout(() => setOn(false), 2500);
   };
+  const down = (e: React.PointerEvent) => {
+    if (e.pointerType === 'mouse' || e.pointerType === 'touch') return; // il tocco lo gestisce onTouchStart
+    start();
+  };
   const click = () => {
     const hover = typeof window !== 'undefined' && window.matchMedia?.('(hover: hover)').matches;
-    if (!twoStep || !hasLogo || hover || openNext.current) {
-      openNext.current = false;
-      onOpen();
-    }
+    if (twoStep && hasLogo && !hover && !openNext.current) return;
+    openNext.current = false;
+    // tocco veloce: il logo a colori si vede per un attimo, poi si apre
+    const wait = hover || !hasLogo ? 0 : Math.max(0, 220 - (Date.now() - downAt.current));
+    if (wait) window.setTimeout(onOpen, wait);
+    else onOpen();
   };
   return (
     <div style={{ position: 'relative', minWidth: 0 }}>
-      <button type="button" className={`n-br${on ? ' on' : ''}${image || vec ? '' : ' nologo'}${vec && !image ? ' vonly' : ''}`} onPointerDown={down} onClick={click} aria-label={name}>
+      <button type="button" className={`n-br${on ? ' on' : ''}${image || vec ? '' : ' nologo'}${vec && !image ? ' vonly' : ''}`} onTouchStart={start} onPointerDown={down} onClick={click} aria-label={name}>
         <span className="lg">
           {vec ? (
             <>
