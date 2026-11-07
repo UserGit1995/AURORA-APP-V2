@@ -95,7 +95,9 @@ export function orderToPlainText(order: Order, maxItems = 1000): string {
     lines.push(`- ${i.productName}${i.code ? ` [${i.code}]` : ''} x${i.qty}  ${eur(i.price * i.qty)}`);
   });
   if (order.items.length > maxItems) lines.push(`... e altri ${order.items.length - maxItems} articoli`);
-  lines.push('', `TOTALE: ${eur(order.total)}`, 'Pagamento alla consegna');
+  const ship =
+    a.deliveryOption === 'ritiro_sede' ? 'Ritiro in sede' : order.shippingCost ? eur(order.shippingCost) : 'Gratuita';
+  lines.push('', `Consegna: ${ship}`, `TOTALE: ${eur(order.total)}`, 'Pagamento alla consegna');
   return lines.join('\n');
 }
 

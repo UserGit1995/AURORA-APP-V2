@@ -11,7 +11,7 @@ import { OrderSendFallback } from './OrderSendFallback';
 import { useLanguage } from '../context/LanguageContext';
 import { useAdmin } from '../context/AdminContext';
 import { PLACEHOLDER_IMAGE } from '../utils/imageRepair';
-import { shippingCostLabel, shippingTimeLabel, SHIPPING_ROMA_TEXT, SHIPPING_LAZIO_TEXT, SHIPPING_ITALIA_TEXT, SHIPPING_DAYS_TEXT } from '../config/shipping';
+import { shippingCost, shippingCostLabel, shippingTimeLabel, SHIPPING_ROMA_TEXT, SHIPPING_LAZIO_TEXT, SHIPPING_ITALIA_TEXT, SHIPPING_DAYS_TEXT } from '../config/shipping';
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -110,7 +110,10 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
   const subtotal = items.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
   // IVA: solo se impostata dall'admin (default 0); i privati non la pagano mai
   const vat = isAzienda ? subtotal * (vatPercent / 100) : 0;
-  const total = subtotal + vat;
+  const goodsTotal = subtotal + vat;
+  // Consegna: Roma gratis, resto del Lazio € 3,50, resto d'Italia € 6,90 (ritiro in sede: gratis)
+  const shipping = deliveryOption === 'ritiro_sede' ? 0 : shippingCost(province);
+  const total = goodsTotal + shipping;
 
   // Ordine minimo (sull'imponibile): sotto la soglia la richiesta non può partire
   const missingForMinimum = Math.max(0, Math.round((minimumOrderEur - subtotal) * 100) / 100);
@@ -170,7 +173,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
       total: total,
       subtotal: subtotal,
       vatAmount: vat,
-      shippingCost: 0.0,
+      shippingCost: pickup ? 0 : shippingCost(province),
       paymentMethod: 'Pagamento alla consegna',
       shippingAddress: {
         customerType: customerType,
@@ -683,7 +686,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                         </div>
                         <div className="flex justify-between text-sm font-bold text-white pt-2 border-t border-[#1c2433]">
                           <span>{vatPercent > 0 ? 'Totale Fornitura (IVA inclusa):' : 'Totale Ordine:'}</span>
-                          <span className="text-sky-400 font-mono">€{total.toFixed(2)}</span>
+                          <span className="text-sky-400 font-mono">€{goodsTotal.toFixed(2)}</span>
                         </div>
                       </>
                     ) : (
@@ -698,7 +701,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                         </div>
                         <div className="flex justify-between text-sm font-bold text-white pt-2 border-t border-[#1c2433]">
                           <span>Totale Ordine (Senza IVA):</span>
-                          <span className="text-emerald-400 font-mono">€{total.toFixed(2)}</span>
+                          <span className="text-emerald-400 font-mono">€{goodsTotal.toFixed(2)}</span>
                         </div>
                       </>
                     )}
@@ -1067,6 +1070,22 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                   </div>
                 )}
                 <div className="flex justify-between items-center text-xs">
+                  <span className="text-slate-400">Prodotti:</span>
+                  <span className="font-mono text-white">€{goodsTotal.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between items-center text-xs">
+                  <span className="text-slate-400">Consegna:</span>
+                  <span className="font-mono text-white">
+                    {deliveryOption === 'ritiro_sede'
+                      ? 'Ritiro in sede'
+                      : !province.trim()
+                        ? 'indica la provincia'
+                        : shipping > 0
+                          ? `€${shipping.toFixed(2)}`
+                          : 'Gratuita'}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center text-xs">
                   <span className="text-slate-400">
                     {isAzienda && vatPercent > 0 ? `Totale Fornitura (IVA ${vatPercent}% inc.):` : 'Totale Ordine:'}
                   </span>
@@ -1125,6 +1144,12 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                   <span className="text-slate-400">Modalità Consegna:</span>
                   <span className="text-slate-300">
                     {lastSubmittedOrder?.shippingAddress?.deliveryOption === 'ritiro_sede' ? 'Ritiro in Sede' : 'Spedizione Corriere'}
+                  </span>
+                </div>
+                <div className="flex justify-between border-b border-[#1c2433] pb-2">
+                  <span className="text-slate-400">Consegna:</span>
+                  <span className="text-slate-300">
+                    {lastSubmittedOrder?.shippingCost ? `€${lastSubmittedOrder.shippingCost.toFixed(2)}` : 'Gratuita'}
                   </span>
                 </div>
                 <div className="flex justify-between pt-1">

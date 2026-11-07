@@ -81,7 +81,9 @@ function buildOrderEmail(body: any) {
   const vat = num(o.vatAmount);
   const shipping = num(o.shippingCost);
   const email = str(a.email, 120);
-  const delivery = a.deliveryOption === 'ritiro_sede' ? 'Ritiro in sede' : 'Spedizione con corriere';
+  const pickup = a.deliveryOption === 'ritiro_sede';
+  const delivery = pickup ? 'Ritiro in sede' : 'Spedizione con corriere';
+  const shippingText = pickup ? 'Ritiro in sede' : shipping > 0 ? eur(shipping) : 'Gratuita';
   const address = [str(a.street, 200), [str(a.postalCode, 12), str(a.city, 80), a.province ? `(${str(a.province, 6)})` : ''].filter(Boolean).join(' ')]
     .filter(Boolean)
     .join(', ');
@@ -122,7 +124,7 @@ ${itemRows}
 <table style="border-collapse:collapse;font-size:14px;margin:12px 0 0 auto">
 <tr><td style="padding:3px 12px;color:#64748b">Imponibile</td><td style="padding:3px 0;text-align:right">${eur(subtotal)}</td></tr>
 ${vat ? `<tr><td style="padding:3px 12px;color:#64748b">IVA</td><td style="padding:3px 0;text-align:right">${eur(vat)}</td></tr>` : ''}
-${shipping ? `<tr><td style="padding:3px 12px;color:#64748b">Spedizione</td><td style="padding:3px 0;text-align:right">${eur(shipping)}</td></tr>` : ''}
+<tr><td style="padding:3px 12px;color:#64748b">Consegna</td><td style="padding:3px 0;text-align:right">${esc(shippingText)}</td></tr>
 <tr><td style="padding:6px 12px;font-weight:bold">TOTALE</td><td style="padding:6px 0;text-align:right;font-weight:bold;font-size:16px">${eur(total)}</td></tr>
 </table>
 <p style="margin-top:20px;color:#64748b;font-size:12px">Per rispondere al cliente premi "Rispondi": l'indirizzo di risposta è quello inserito dal cliente${email ? '' : ' (non indicato)'}.</p>
@@ -146,6 +148,7 @@ ${shipping ? `<tr><td style="padding:3px 12px;color:#64748b">Spedizione</td><td 
     '',
     `Imponibile: ${eur(subtotal)}`,
     vat ? `IVA: ${eur(vat)}` : '',
+    `Consegna: ${shippingText}`,
     `TOTALE: ${eur(total)}`,
   ]
     .filter((l) => l !== '')

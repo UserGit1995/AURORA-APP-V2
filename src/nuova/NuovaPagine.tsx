@@ -46,13 +46,13 @@ export const NuovaConsegne: React.FC<{ onBack: () => void }> = ({ onBack }) => {
             </div>
             <div className="x-zone">
               <Bi n="route" s={30} />
-              <span><b>Resto del Lazio</b><small>In 24/48 ore lavorative, in base alla zona</small></span>
-              <em>€ 3,50 · 4,50</em>
+              <span><b>Resto del Lazio</b><small>In 24/48 ore lavorative</small></span>
+              <em>€ 3,50</em>
             </div>
             <div className="x-zone">
               <Bi n="route" s={30} />
               <span><b>Resto d'Italia</b><small>Spedizione con corriere</small></span>
-              <em>€ 7,00</em>
+              <em>€ 6,90</em>
             </div>
           </div>
           <div className="x-note"><Ic n="bag" s={18} /><span>Ordine minimo <b>€ {String(min).replace('.', ',')}</b> di prodotti, spese di consegna escluse.</span></div>

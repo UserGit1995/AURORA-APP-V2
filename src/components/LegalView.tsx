@@ -124,8 +124,8 @@ const TerminiContent: React.FC<{ onOpenLegal: (p: LegalPage) => void }> = ({ onO
     <h2 className={H2}>Consegna</h2>
     <ul className="mb-4 list-disc space-y-1 pl-5">
       <li><strong className="text-white">Roma e provincia (RM):</strong> consegna gratuita entro 24/48 ore lavorative.</li>
-      <li><strong className="text-white">Resto del Lazio:</strong> consegna entro 24/48 ore lavorative, al costo di € 3,50 o € 4,50 in base alla zona di consegna.</li>
-      <li><strong className="text-white">Resto d'Italia:</strong> spedizione al costo di € 7,00.</li>
+      <li><strong className="text-white">Resto del Lazio:</strong> consegna entro 24/48 ore lavorative, al costo di € 3,50.</li>
+      <li><strong className="text-white">Resto d'Italia:</strong> spedizione al costo di € 6,90.</li>
       <li>Consegne e spedizioni avvengono nei giorni lavorativi, esclusi sabato e domenica.</li>
     </ul>
     <p className={P}>

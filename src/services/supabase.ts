@@ -439,6 +439,31 @@ export async function insertSupabaseOrder(order: Order): Promise<{ ok: boolean; 
 }
 
 /**
+ * Elimina definitivamente un ordine dal database (solo admin).
+ * Le righe articolo vengono eliminate da sole (ON DELETE CASCADE).
+ * Richiede la regola "Admin delete orders" (script SQL CORREZIONI_ORDINI.sql).
+ */
+export async function deleteSupabaseOrder(orderNumber: string): Promise<boolean> {
+  const sb = getSupabase();
+  if (!sb) return false;
+  try {
+    const { data, error } = await sb.from('orders').delete().eq('order_number', orderNumber).select('id');
+    if (error) {
+      console.error('Supabase delete order FAILED:', error.message);
+      return false;
+    }
+    if (!data || data.length === 0) {
+      console.warn('Supabase delete order: nessuna riga eliminata (permesso mancante o ordine non trovato)');
+      return false;
+    }
+    return true;
+  } catch (e) {
+    console.error('Supabase delete order error:', e);
+    return false;
+  }
+}
+
+/**
  * Aggiorna un ordine esistente (solo admin: stato, note, ecc.)
  */
 export async function syncSupabaseOrder(order: Order): Promise<boolean> {

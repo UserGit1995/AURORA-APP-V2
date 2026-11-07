@@ -99,9 +99,13 @@ export const OrderEditModal: React.FC<OrderEditModalProps> = ({
     onClose();
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (confirm(`Sei sicuro di voler eliminare l'ordine ${order.id}?`)) {
-      deleteOrder(order.id);
+      const ok = await deleteOrder(order.id);
+      if (!ok) {
+        alert("Non è stato possibile eliminare l'ordine dal database. Controlla di aver eseguito lo script CORREZIONI_ORDINI.sql su Supabase e di essere entrato come admin.");
+        return;
+      }
       onClose();
     }
   };

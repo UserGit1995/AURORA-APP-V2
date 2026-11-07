@@ -17,6 +17,7 @@ import {
   syncSupabaseSubcategory,
   deleteSupabaseSubcategory,
   syncSupabaseOrder,
+  deleteSupabaseOrder,
   syncSupabaseSettings,
   fetchSupabasePublicSetting,
   newDbId,
@@ -65,7 +66,7 @@ interface AdminContextType {
   
   // Order Management
   updateOrder: (updated: Order) => void;
-  deleteOrder: (orderId: string) => void;
+  deleteOrder: (orderId: string) => Promise<boolean>;
   // Registra l'ordine: email al negozio + salvataggio su database. Restituisce l'esito reale.
   createOrder: (newOrder: Order, source?: 'carrello' | 'riordino-rapido') => Promise<SubmitResult>;
   
@@ -498,8 +499,11 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     syncSupabaseOrder(updated);
   };
 
-  const deleteOrder = (orderId: string) => {
-    setOrdersList((prev) => prev.filter((o) => o.id !== orderId));
+  const deleteOrder = async (orderId: string): Promise<boolean> => {
+    // Prima dal database: se non riesce, l'ordine resta in lista (altrimenti ricomparirebbe al prossimo caricamento)
+    const ok = await deleteSupabaseOrder(orderId);
+    if (ok) setOrdersList((prev) => prev.filter((o) => o.id !== orderId));
+    return ok;
   };
 
   const createOrder = async (

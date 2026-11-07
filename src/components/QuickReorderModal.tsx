@@ -6,6 +6,7 @@ import { newOrderNumber } from '../services/supabase';
 import { OrderSendFallback } from './OrderSendFallback';
 import { useAdmin } from '../context/AdminContext';
 import { PLACEHOLDER_IMAGE } from '../utils/imageRepair';
+import { shippingCost } from '../config/shipping';
 
 interface QuickReorderModalProps {
   isOpen: boolean;
@@ -49,6 +50,7 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
   const [email, setEmail] = useState(currentUser?.email || '');
   const [phone, setPhone] = useState(currentUser?.phone || '');
   const [deliveryAddress, setDeliveryAddress] = useState([currentUser?.address, currentUser?.postalCode, currentUser?.city].filter(Boolean).join(', '));
+  const [province, setProvince] = useState((currentUser?.province || '').toUpperCase());
   const [notes, setNotes] = useState('');
 
   // SKU code input
@@ -74,7 +76,9 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
   // IVA solo se impostata dall'admin (default 0); i privati mai
   const subtotal = selectedItems.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
   const vat = isAzienda ? subtotal * (vatPercent / 100) : 0;
-  const total = subtotal + vat;
+  // Consegna: Roma gratis, resto del Lazio € 3,50, resto d'Italia € 6,90 (ritiro in sede: gratis)
+  const shipping = deliveryOption === 'ritiro_sede' ? 0 : shippingCost(province);
+  const total = subtotal + vat + shipping;
   const totalColli = selectedItems.reduce((acc, item) => acc + item.quantity, 0);
   // Ordine minimo (sull'imponibile): sotto la soglia il riordino non può partire
   const belowMinimum = minimumOrderEur > 0 && Math.round(subtotal * 100) < Math.round(minimumOrderEur * 100);
@@ -191,6 +195,10 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
       setSubmitError("Inserisci l'indirizzo di consegna completo (via, CAP, città).");
       return;
     }
+    if (deliveryOption === 'corriere' && province.trim().length !== 2) {
+      setSubmitError('Inserisci la sigla della provincia (es. RM).');
+      return;
+    }
 
     setSubmitError(null);
     setIsSubmitting(true);
@@ -208,7 +216,7 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
       total: total,
       subtotal: subtotal,
       vatAmount: vat,
-      shippingCost: 0.0,
+      shippingCost: shipping,
       paymentMethod: 'Pagamento alla consegna',
       shippingAddress: {
         customerType,
@@ -218,7 +226,7 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
         phone: phone.trim(),
         street: pickup ? 'Ritiro in sede' : deliveryAddress.trim(),
         city: '',
-        province: '',
+        province: pickup ? '' : province.trim(),
         postalCode: '',
         country: 'Italia',
         deliveryOption,
@@ -678,6 +686,22 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
                     placeholder="Nome Azienda o Referente"
                     className="w-full bg-[#0d1420] border border-[#1c2433] rounded-xl px-2.5 py-1.5 text-white text-xs placeholder-slate-500 focus:outline-none"
                   />
+                  <div className="grid grid-cols-2 gap-1.5">
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="E-mail *"
+                      className="w-full bg-[#0d1420] border border-[#1c2433] rounded-xl px-2.5 py-1.5 text-white text-xs placeholder-slate-500 focus:outline-none"
+                    />
+                    <input
+                      type="tel"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      placeholder="Telefono *"
+                      className="w-full bg-[#0d1420] border border-[#1c2433] rounded-xl px-2.5 py-1.5 text-white text-xs placeholder-slate-500 focus:outline-none"
+                    />
+                  </div>
 
                   <div className="grid grid-cols-2 gap-1.5 pt-1">
                     <button
@@ -705,6 +729,26 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
                       <span>Ritiro in Sede</span>
                     </button>
                   </div>
+                  {deliveryOption === 'corriere' && (
+                    <div className="grid grid-cols-[1fr_4rem] gap-1.5">
+                      <input
+                        type="text"
+                        value={deliveryAddress}
+                        onChange={(e) => setDeliveryAddress(e.target.value)}
+                        placeholder="Indirizzo, CAP, città *"
+                        className="w-full bg-[#0d1420] border border-[#1c2433] rounded-xl px-2.5 py-1.5 text-white text-xs placeholder-slate-500 focus:outline-none"
+                      />
+                      <input
+                        type="text"
+                        value={province}
+                        onChange={(e) => setProvince(e.target.value.toUpperCase())}
+                        placeholder="RM"
+                        maxLength={2}
+                        aria-label="Provincia"
+                        className="w-full bg-[#0d1420] border border-[#1c2433] rounded-xl px-2.5 py-1.5 text-white text-xs uppercase text-center placeholder-slate-500 focus:outline-none"
+                      />
+                    </div>
+                  )}
                 </div>
 
                 {/* Subtotal & Summary */}
@@ -717,6 +761,18 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
                     <span>{isAzienda ? (vatPercent > 0 ? `IVA ${vatPercent}% (Attività/Aziende):` : 'IVA (non applicata):') : 'IVA (0% - Listino Privati):'}</span>
                     <span className={`font-mono ${isAzienda ? 'text-white' : 'text-emerald-400'}`}>
                       {isAzienda ? `€${vat.toFixed(2)}` : '€0.00 (non applicata)'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-slate-400 text-[11px]">
+                    <span>Consegna:</span>
+                    <span className="font-mono text-white">
+                      {deliveryOption === 'ritiro_sede'
+                        ? 'Ritiro in sede'
+                        : !province.trim()
+                          ? 'indica la provincia'
+                          : shipping > 0
+                            ? `€${shipping.toFixed(2)}`
+                            : 'Gratuita'}
                     </span>
                   </div>
                   <div className="flex justify-between text-sm font-bold text-white pt-1">
