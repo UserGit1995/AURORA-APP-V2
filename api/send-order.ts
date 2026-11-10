@@ -9,6 +9,7 @@
  *   A) Gmail (consigliato, gratis):  GMAIL_USER  +  GMAIL_APP_PASSWORD
  *   B) Resend:                       RESEND_API_KEY
  * Facoltativa: ORDERS_TO_EMAIL (default: gruppo.aurora.ordini@gmail.com)
+ * Notifiche sul telefono per ogni ordine: VAPID_PRIVATE_KEY + SUPABASE_SERVICE_ROLE_KEY
  * Richieste di lavori grafici (kind: 'design', pagina "Simone Aricò"): vanno all'indirizzo
  * scritto in DESIGN_TO_EMAIL (solo su Vercel, mai nel codice); se manca, a ORDERS_TO_EMAIL.
  *
@@ -300,6 +301,168 @@ function buildDesignEmail(body: any) {
   return { subject: `🎨 Richiesta lavoro: ${services[0] || 'grafica'} - ${name}`, html, text, replyTo: isEmail(contact) ? contact : '' };
 }
 
+// ---- notifiche push sul telefono (iPhone/Android) per ogni nuovo ordine --------
+// Standard Web Push (VAPID + crittografia aes128gcm), senza librerie esterne.
+// Su Vercel servono: VAPID_PRIVATE_KEY e SUPABASE_SERVICE_ROLE_KEY.
+// La chiave pubblica qui sotto è la stessa scritta nell'app (src/services/push.ts).
+const VAPID_PUBLIC_KEY = 'BI6U5HZj2mN0LJt9SKqyOdonqSUcUUlzKpLGJoeWzT6W-qRT78k9eHny3BiBpv0l9f-t6tS6tbioao13hzwCJ9Q';
+const VAPID_SUBJECT = 'mailto:gruppo.aurora.ordini@gmail.com';
+const SUPABASE_FALLBACK_URL = 'https://hkpqvggvqzvpkzeqmtga.supabase.co';
+
+function pushConfigured(): boolean {
+  return !!(process.env.VAPID_PRIVATE_KEY && process.env.SUPABASE_SERVICE_ROLE_KEY);
+}
+
+function serviceHeaders(): Record<string, string> {
+  const key = String(process.env.SUPABASE_SERVICE_ROLE_KEY || '').trim();
+  // le chiavi nuove "sb_secret_..." vanno solo in apikey; quelle classiche (JWT) anche in Authorization
+  return key.startsWith('eyJ') ? { apikey: key, Authorization: `Bearer ${key}` } : { apikey: key };
+}
+
+function supaUrl(): string {
+  return (process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || SUPABASE_FALLBACK_URL).replace(/\/+$/, '');
+}
+
+interface PushSub { endpoint: string; p256dh: string; auth: string }
+
+async function loadPushSubs(): Promise<PushSub[]> {
+  const r = await fetch(`${supaUrl()}/rest/v1/push_subscriptions?select=endpoint,p256dh,auth`, { headers: serviceHeaders() });
+  if (!r.ok) throw new Error(`push_subscriptions ${r.status}: ${(await r.text()).slice(0, 200)}`);
+  return (await r.json()) as PushSub[];
+}
+
+async function deletePushSub(endpoint: string): Promise<void> {
+  await fetch(`${supaUrl()}/rest/v1/push_subscriptions?endpoint=eq.${encodeURIComponent(endpoint)}`, {
+    method: 'DELETE',
+    headers: serviceHeaders(),
+  }).catch(() => {});
+}
+
+async function webPushRequest(sub: PushSub, payload: string): Promise<Response> {
+  const crypto: any = await import('node:crypto');
+  const b64u = (b: Buffer) => b.toString('base64url');
+  const fromB64u = (s: string) => Buffer.from(s, 'base64url');
+  const hmac = (key: Buffer, data: Buffer) => crypto.createHmac('sha256', key).update(data).digest() as Buffer;
+
+  // VAPID: firma JWT ES256 con la chiave privata del server
+  const pub = fromB64u(VAPID_PUBLIC_KEY);
+  const jwk = {
+    kty: 'EC',
+    crv: 'P-256',
+    d: String(process.env.VAPID_PRIVATE_KEY).trim(),
+    x: b64u(pub.subarray(1, 33)),
+    y: b64u(pub.subarray(33, 65)),
+  };
+  const privateKey = crypto.createPrivateKey({ key: jwk, format: 'jwk' });
+  const aud = new URL(sub.endpoint).origin;
+  const header = b64u(Buffer.from(JSON.stringify({ typ: 'JWT', alg: 'ES256' })));
+  const claims = b64u(Buffer.from(JSON.stringify({ aud, exp: Math.floor(Date.now() / 1000) + 12 * 3600, sub: VAPID_SUBJECT })));
+  const sig = crypto.sign('sha256', Buffer.from(`${header}.${claims}`), { key: privateKey, dsaEncoding: 'ieee-p1363' });
+  const jwt = `${header}.${claims}.${b64u(sig)}`;
+
+  // Crittografia del contenuto (RFC 8291, aes128gcm)
+  const uaPublic = fromB64u(sub.p256dh);
+  const authSecret = fromB64u(sub.auth);
+  const ecdh = crypto.createECDH('prime256v1');
+  ecdh.generateKeys();
+  const asPublic: Buffer = ecdh.getPublicKey();
+  const shared: Buffer = ecdh.computeSecret(uaPublic);
+  const prkKey = hmac(authSecret, shared);
+  const keyInfo = Buffer.concat([Buffer.from('WebPush: info\0'), uaPublic, asPublic, Buffer.from([1])]);
+  const ikm = hmac(prkKey, keyInfo).subarray(0, 32);
+  const salt: Buffer = crypto.randomBytes(16);
+  const prk = hmac(salt, ikm);
+  const cek = hmac(prk, Buffer.from('Content-Encoding: aes128gcm\0\x01', 'binary')).subarray(0, 16);
+  const nonce = hmac(prk, Buffer.from('Content-Encoding: nonce\0\x01', 'binary')).subarray(0, 12);
+  const cipher = crypto.createCipheriv('aes-128-gcm', cek, nonce);
+  const enc = Buffer.concat([cipher.update(Buffer.concat([Buffer.from(payload, 'utf8'), Buffer.from([2])])), cipher.final(), cipher.getAuthTag()]);
+  const rs = Buffer.alloc(4);
+  rs.writeUInt32BE(4096, 0);
+  const body = Buffer.concat([salt, rs, Buffer.from([asPublic.length]), asPublic, enc]);
+
+  return fetch(sub.endpoint, {
+    method: 'POST',
+    headers: {
+      TTL: '86400',
+      Urgency: 'high',
+      'Content-Encoding': 'aes128gcm',
+      'Content-Type': 'application/octet-stream',
+      Authorization: `vapid t=${jwt}, k=${VAPID_PUBLIC_KEY}`,
+    },
+    body,
+  });
+}
+
+/** Manda la notifica a tutti i telefoni dell'admin. Non blocca mai l'ordine: errori solo nei log. */
+async function notifyPhones(note: { title: string; body: string; url?: string; tag?: string }): Promise<{ sent: number; failed: number }> {
+  if (!pushConfigured()) return { sent: 0, failed: 0 };
+  let sent = 0;
+  let failed = 0;
+  try {
+    const subs = await loadPushSubs();
+    const payload = JSON.stringify({ title: note.title, body: note.body, url: note.url || '/home', tag: note.tag });
+    await Promise.all(
+      subs.map(async (sub) => {
+        try {
+          const r = await webPushRequest(sub, payload);
+          if (r.status === 404 || r.status === 410) {
+            await deletePushSub(sub.endpoint); // telefono disattivato o app rimossa
+            failed++;
+          } else if (!r.ok) {
+            console.error('push: invio fallito', r.status, (await r.text()).slice(0, 200));
+            failed++;
+          } else sent++;
+        } catch (e: any) {
+          console.error('push: errore', e?.message || e);
+          failed++;
+        }
+      })
+    );
+  } catch (e: any) {
+    console.error('push: impossibile leggere i telefoni registrati:', e?.message || e);
+  }
+  return { sent, failed };
+}
+
+function orderNotification(body: any) {
+  const o = body?.order || {};
+  const a = o.shippingAddress || {};
+  const items = cleanItems(o.items);
+  const customer = str(a.companyName, 80) || str(a.recipient, 80) || 'Cliente';
+  const subtotal = items.reduce((s, i) => s + i.price * i.qty, 0);
+  const total = num(o.total) || subtotal;
+  const pieces = items.reduce((s, i) => s + i.qty, 0);
+  const place = [str(a.city, 40), str(a.province, 4) ? `(${str(a.province, 4)})` : ''].filter(Boolean).join(' ');
+  const pickup = a.deliveryOption === 'ritiro_sede';
+  const names = items.slice(0, 3).map((i) => i.name.slice(0, 40)).join(', ') + (items.length > 3 ? ` e altri ${items.length - 3}` : '');
+  // Come le notifiche delle app: titolo in grassetto + testo su più righe (icona Aurora a sinistra)
+  return {
+    title: `🛒 Nuovo ordine da ${customer} · ${eur(total)}`,
+    body: [
+      pickup ? 'Ritiro in sede' : place ? `Consegna a ${place}` : '',
+      `${pieces} ${pieces === 1 ? 'pezzo' : 'pezzi'}: ${names}`,
+      'Tocca per aprire Aurora e confermare l\'ordine.',
+    ]
+      .filter(Boolean)
+      .join('\n'),
+    url: '/home',
+    tag: `ordine-${str(o.id, 60)}`,
+  };
+}
+
+/** Verifica che il token appartenga a un admin (per la notifica di prova). */
+async function isAdminToken(token: string): Promise<boolean> {
+  if (!token) return false;
+  const u = await fetch(`${supaUrl()}/auth/v1/user`, { headers: { ...serviceHeaders(), Authorization: `Bearer ${token}` } });
+  if (!u.ok) return false;
+  const user = (await u.json()) as { id?: string };
+  if (!user?.id || !UUID_RE.test(user.id)) return false;
+  const r = await fetch(`${supaUrl()}/rest/v1/user_roles?select=role&user_id=eq.${user.id}&role=eq.admin`, { headers: serviceHeaders() });
+  if (!r.ok) return false;
+  const rows = (await r.json()) as unknown[];
+  return Array.isArray(rows) && rows.length > 0;
+}
+
 // ---- invio -----------------------------------------------------------------
 type Mail = { subject: string; html: string; text: string; replyTo: string };
 
@@ -359,6 +522,7 @@ export default async function handler(req: any, res: any) {
       ok: true,
       emailConfigured: !!kind,
       transport: kind,
+      pushConfigured: pushConfigured(),
       recipient: process.env.ORDERS_TO_EMAIL || DEFAULT_TO,
     });
     return;
@@ -388,6 +552,21 @@ export default async function handler(req: any, res: any) {
     }
 
     const to = process.env.ORDERS_TO_EMAIL || DEFAULT_TO;
+
+    // Notifica di prova dal pannello admin ("Invia notifica di prova")
+    if (body.kind === 'push-test') {
+      if (!pushConfigured()) {
+        res.status(503).json({ ok: false, error: 'push_not_configured' });
+        return;
+      }
+      if (!(await isAdminToken(str(body.accessToken, 4000)))) {
+        res.status(403).json({ ok: false, error: 'forbidden' });
+        return;
+      }
+      const result = await notifyPhones({ title: '🔔 Notifiche attive', body: 'Da ora ricevi qui un avviso per ogni nuovo ordine Aurora.', tag: 'aurora-test' });
+      res.status(200).json({ ok: true, ...result });
+      return;
+    }
 
     // Richiesta di personalizzazione: avviso al negozio + conferma al cliente.
     if (body.kind === 'customization') {
@@ -434,15 +613,24 @@ export default async function handler(req: any, res: any) {
       return;
     }
 
-    const mail = body.kind === 'contact' || body.kind === 'inquiry' ? buildMessageEmail(body) : buildOrderEmail(body);
+    const isMessage = body.kind === 'contact' || body.kind === 'inquiry';
+    const mail = isMessage ? buildMessageEmail(body) : buildOrderEmail(body);
+
+    // Nuovo ordine: notifica sul telefono, anche se l'email non è configurata o non parte
+    const phoneNote = isMessage ? Promise.resolve(null) : notifyPhones(orderNotification(body));
 
     if (!transportKind()) {
       console.error('send-order: nessun servizio email configurato (GMAIL_USER/GMAIL_APP_PASSWORD o RESEND_API_KEY)');
+      await phoneNote;
       res.status(503).json({ ok: false, error: 'not_configured' });
       return;
     }
 
-    await deliver(mail, to);
+    try {
+      await deliver(mail, to);
+    } finally {
+      await phoneNote; // la funzione resta attiva finché la notifica non è partita
+    }
     res.status(200).json({ ok: true });
   } catch (err: any) {
     console.error('send-order errore:', err?.message || err);

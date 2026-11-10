@@ -316,7 +316,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
                     Spedizione
                   </span>
                   <div className="text-xl font-bold text-sky-300 mt-1">Gratis su Roma</div>
-                  <span className="text-[11px] text-slate-400 block mt-0.5">Roma (RM) gratis 24/48h · resto del Lazio € 3,50 · Italia € 6,90 · esclusi sabato e domenica</span>
+                  <span className="text-[11px] text-slate-400 block mt-0.5">Roma città gratis 24/48h · provincia di Roma e resto del Lazio € 3,50 · Italia € 6,90 · esclusi sabato e domenica</span>
                 </div>
 
                 <div className="bg-[#0d1420] border border-purple-500/30 p-4 rounded-2xl">

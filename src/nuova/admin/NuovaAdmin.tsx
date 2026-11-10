@@ -12,6 +12,7 @@ import { ClientiView } from './gestione/Clienti';
 import { MagazzinoView } from './gestione/Magazzino';
 import { AziendaView, DdtView, FattureView } from './gestione/Documenti';
 import { CLIENTE_VUOTO, Ddt, clientiCaricati, save as gSave, load as gLoad, soloCifre } from './gestione/store';
+import { PushOrdiniCard } from './PushOrdiniCard';
 import './nuova-admin.css';
 
 /*
@@ -761,6 +762,7 @@ const OrdersView: React.FC<{ go: Go; onFull: (o: Order) => void; toast: (t: stri
 
   return (
     <>
+      <PushOrdiniCard toast={toast} />
       <div className="a-tool">
         <label className="a-fin">
           <Ic n="search" s={18} />

@@ -2,7 +2,7 @@ import React from 'react';
 import { ShoppingBag, Truck } from 'lucide-react';
 import { useAdmin } from '../context/AdminContext';
 
-/** Fascia sempre visibile in cima all'app: ordine minimo e consegna gratuita su Roma. */
+/** Fascia sempre visibile in cima all'app: ordine minimo e consegna gratuita a Roma città. */
 export const InfoStrip: React.FC = () => {
   const { minimumOrderEur } = useAdmin();
   const min = minimumOrderEur > 0 ? `€ ${minimumOrderEur.toFixed(0)}` : null;
@@ -18,7 +18,7 @@ export const InfoStrip: React.FC = () => {
         <span className="hidden sm:inline opacity-60">•</span>
         <span className="inline-flex items-center gap-1.5">
           <Truck className="w-3.5 h-3.5 shrink-0" />
-          Consegna gratuita su Roma (RM)
+          Consegna gratuita a Roma città
         </span>
       </div>
     </div>

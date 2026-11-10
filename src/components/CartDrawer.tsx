@@ -111,8 +111,8 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
   // IVA: solo se impostata dall'admin (default 0); i privati non la pagano mai
   const vat = isAzienda ? subtotal * (vatPercent / 100) : 0;
   const goodsTotal = subtotal + vat;
-  // Consegna: Roma gratis, resto del Lazio € 3,50, resto d'Italia € 6,90 (ritiro in sede: gratis)
-  const shipping = deliveryOption === 'ritiro_sede' ? 0 : shippingCost(province);
+  // Consegna: Roma città gratis, provincia di Roma e resto del Lazio € 3,50, resto d'Italia € 6,90 (ritiro in sede: gratis)
+  const shipping = deliveryOption === 'ritiro_sede' ? 0 : shippingCost(province, city, postalCode);
   const total = goodsTotal + shipping;
 
   // Ordine minimo (sull'imponibile): sotto la soglia la richiesta non può partire
@@ -167,13 +167,13 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
       status: 'In elaborazione',
       estimatedDelivery: pickup
         ? 'Ritiro in sede: ti avviseremo quando è pronto'
-        : `${shippingTimeLabel(province)} · Costo: ${shippingCostLabel(province)}`,
+        : `${shippingTimeLabel(province, city, postalCode)} · Costo: ${shippingCostLabel(province, city, postalCode)}`,
       courier: pickup ? 'Ritiro in sede' : 'Corriere da confermare',
       trackingNumber: pickup ? 'RITIRO-SEDE' : undefined,
       total: total,
       subtotal: subtotal,
       vatAmount: vat,
-      shippingCost: pickup ? 0 : shippingCost(province),
+      shippingCost: pickup ? 0 : shippingCost(province, city, postalCode),
       paymentMethod: 'Pagamento alla consegna',
       shippingAddress: {
         customerType: customerType,
@@ -236,7 +236,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
       <section className="n-cartpg" role="dialog" aria-label="Carrello">
         <header className="vh">
           <h1>Carrello</h1>
-          <p>Consegna gratuita a Roma e provincia</p>
+          <p>Consegna gratuita a Roma città</p>
           <button type="button" className="x" onClick={onClose} aria-label="Chiudi il carrello">
             <Ic n="x" s={18} />
           </button>
@@ -251,7 +251,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                   </>
                 ) : (
                   <>
-                    <b>Ordine minimo raggiunto.</b> Consegna gratuita a Roma e provincia.
+                    <b>Ordine minimo raggiunto.</b> Consegna gratuita a Roma città.
                   </>
                 )}
               </p>
@@ -1001,10 +1001,10 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                       {/* Costi e tempi di consegna in base alla provincia */}
                       <div className="p-3 rounded-xl bg-[#0d1420] border border-sky-500/30 text-[11px] text-slate-300 space-y-1">
                         <p className="font-bold text-sky-300">
-                          Consegna: {shippingCostLabel(province)}
+                          Consegna: {shippingCostLabel(province, city, postalCode)}
                         </p>
                         {province.trim() ? (
-                          <p className="text-slate-400">{shippingTimeLabel(province)}</p>
+                          <p className="text-slate-400">{shippingTimeLabel(province, city, postalCode)}</p>
                         ) : (
                           <>
                             <p className="text-slate-400">{SHIPPING_ROMA_TEXT}</p>

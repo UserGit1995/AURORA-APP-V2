@@ -1005,7 +1005,7 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
                               <span className="text-slate-400">Spese di Spedizione / Logistica:</span>
                               <span className="font-mono text-slate-300 font-medium">
                                 {shippingCost === 0
-                                  ? (selectedDetailOrder.shippingAddress?.deliveryOption === 'ritiro_sede' ? 'Ritiro in sede' : shippingCostLabel(selectedDetailOrder.shippingAddress?.province))
+                                  ? (selectedDetailOrder.shippingAddress?.deliveryOption === 'ritiro_sede' ? 'Ritiro in sede' : shippingCostLabel(selectedDetailOrder.shippingAddress?.province, selectedDetailOrder.shippingAddress?.city, selectedDetailOrder.shippingAddress?.postalCode))
                                   : `€${shippingCost.toFixed(2)}`}
                               </span>
                             </div>

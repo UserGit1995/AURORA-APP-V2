@@ -76,8 +76,11 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
   // IVA solo se impostata dall'admin (default 0); i privati mai
   const subtotal = selectedItems.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
   const vat = isAzienda ? subtotal * (vatPercent / 100) : 0;
-  // Consegna: Roma gratis, resto del Lazio € 3,50, resto d'Italia € 6,90 (ritiro in sede: gratis)
-  const shipping = deliveryOption === 'ritiro_sede' ? 0 : shippingCost(province);
+  // Consegna: Roma città gratis, provincia di Roma e resto del Lazio € 3,50, resto d'Italia € 6,90 (ritiro in sede: gratis)
+  // Città e CAP si ricavano dall'indirizzo scritto ("Via ..., 00132, Roma")
+  const addrCap = (deliveryAddress.match(/\b(\d{5})\b/) || [])[1] || '';
+  const addrCity = (deliveryAddress.split(',').map((x) => x.trim()).filter((x) => x && !/^\d{5}$/.test(x)).pop() || '').replace(/\b\d{5}\b/, '').trim();
+  const shipping = deliveryOption === 'ritiro_sede' ? 0 : shippingCost(province, addrCity, addrCap);
   const total = subtotal + vat + shipping;
   const totalColli = selectedItems.reduce((acc, item) => acc + item.quantity, 0);
   // Ordine minimo (sull'imponibile): sotto la soglia il riordino non può partire
@@ -199,6 +202,10 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
       setSubmitError('Inserisci la sigla della provincia (es. RM).');
       return;
     }
+    if (deliveryOption === 'corriere' && province.trim().toUpperCase() === 'RM' && !addrCap) {
+      setSubmitError("Per la provincia di Roma scrivi anche il CAP nell'indirizzo (es. Via ..., 00132, Roma).");
+      return;
+    }
 
     setSubmitError(null);
     setIsSubmitting(true);
@@ -227,7 +234,7 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
         street: pickup ? 'Ritiro in sede' : deliveryAddress.trim(),
         city: '',
         province: pickup ? '' : province.trim(),
-        postalCode: '',
+        postalCode: pickup ? '' : addrCap,
         country: 'Italia',
         deliveryOption,
         deliveryNotes: notes.trim() || undefined,

@@ -41,12 +41,12 @@ export const NuovaConsegne: React.FC<{ onBack: () => void }> = ({ onBack }) => {
           <div className="x-box">
             <div className="x-zone">
               <Bi n="rome" s={30} />
-              <span><b>Roma e provincia</b><small>Con i nostri furgoni, in 24/48 ore lavorative</small></span>
+              <span><b>Roma città</b><small>Con i nostri furgoni, in 24/48 ore lavorative</small></span>
               <em>Gratis</em>
             </div>
             <div className="x-zone">
               <Bi n="route" s={30} />
-              <span><b>Resto del Lazio</b><small>In 24/48 ore lavorative</small></span>
+              <span><b>Provincia di Roma e resto del Lazio</b><small>In 24/48 ore lavorative</small></span>
               <em>€ 3,50</em>
             </div>
             <div className="x-zone">

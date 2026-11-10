@@ -666,7 +666,7 @@ export const NuovaHome: React.FC<NuovaHomeProps> = (p) => {
 
       <section className="n-sec" style={{ marginTop: 26 }}>
         <div className="n-serv">
-          <div className="n-sv"><Bi n="rome" s={32} /><b>Roma e provincia</b><small>Consegna gratuita con i nostri furgoni</small></div>
+          <div className="n-sv"><Bi n="rome" s={32} /><b>Roma città</b><small>Consegna gratuita con i nostri furgoni</small></div>
           <div className="n-sv"><Bi n="route" s={32} /><b>Tutta Italia</b><small>Spedizione con corriere e tracciamento</small></div>
           <div className="n-sv"><Bi n="invoice" s={32} /><b>Per le attività</b><small>Fattura elettronica e DDT</small></div>
           <div className="n-sv"><Bi n="seal" s={32} /><b>Qualità certificata</b><small>ISO 9001, HACCP, Ecolabel</small></div>

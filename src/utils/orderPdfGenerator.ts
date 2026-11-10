@@ -229,7 +229,7 @@ export const generateOrderReceiptPdf = (order: Order): void => {
   doc.setFont('helvetica', 'normal');
   doc.text('Spese di Spedizione:', summaryX + 4, finalY + 12);
   doc.setFont('courier', 'normal');
-  doc.text(shippingCost === 0 ? (order.shippingAddress?.deliveryOption === 'ritiro_sede' ? 'Ritiro in sede' : shippingCostLabel(order.shippingAddress?.province)) : `€ ${shippingCost.toFixed(2)}`, summaryX + summaryWidth - 4, finalY + 12, { align: 'right' });
+  doc.text(shippingCost === 0 ? (order.shippingAddress?.deliveryOption === 'ritiro_sede' ? 'Ritiro in sede' : shippingCostLabel(order.shippingAddress?.province, order.shippingAddress?.city, order.shippingAddress?.postalCode)) : `€ ${shippingCost.toFixed(2)}`, summaryX + summaryWidth - 4, finalY + 12, { align: 'right' });
 
   doc.setFont('helvetica', 'normal');
   if (isBusinessOrder) {
