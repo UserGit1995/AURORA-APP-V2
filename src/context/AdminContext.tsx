@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { UserProfile, SystemSettings, Product, Order, Category, Subcategory } from '../types';
 import { PRODUCTS as DEMO_PRODUCTS, INITIAL_ORDERS as DEMO_ORDERS, CATEGORIES as DEMO_CATEGORIES } from '../data/catalog';
 import { submitOrder, SubmitResult } from '../services/orderSubmit';
@@ -254,6 +254,37 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   // Al caricamento scarica il catalogo dal cloud. Se il primo tentativo non
   // riesce (rete lenta, telefono in campagna...) riprova da solo fino a 3 volte.
+  // Ordini: per l'ADMIN il database è l'unica fonte valida. Gli ordini eliminati non devono
+  // ricomparire dalla memoria del telefono/PC (prima venivano rimessi in lista a ogni apertura).
+  // Per i clienti invece teniamo anche lo storico salvato solo su questo dispositivo
+  // (es. ordini inviati da ospite, che il database non restituisce a chi non è entrato).
+  const isAdminRef = useRef(false);
+  const adminSessionActive = useCallback(async (): Promise<boolean> => {
+    if (!isAdminRef.current) return false;
+    const sb = getSupabase();
+    if (!sb) return false;
+    try {
+      // getSession aspetta che l'accesso salvato sia ripristinato: così la lettura è fatta da admin
+      const { data } = await sb.auth.getSession();
+      return !!data.session;
+    } catch {
+      return false;
+    }
+  }, []);
+  const applyCloudOrders = useCallback((cloudOrders: Order[], authoritative: boolean) => {
+    setOrdersList((prev) => {
+      if (authoritative) return cloudOrders;
+      const cloudIds = new Set(cloudOrders.map((o) => o.id));
+      return [...cloudOrders, ...prev.filter((o) => !cloudIds.has(o.id))];
+    });
+  }, []);
+  const refreshOrders = useCallback(async () => {
+    const admin = await adminSessionActive();
+    if (!admin) return;
+    const cloudOrders = await fetchSupabaseOrders();
+    if (cloudOrders) applyCloudOrders(cloudOrders, true);
+  }, [adminSessionActive, applyCloudOrders]);
+
   const refreshFromCloud = useCallback(async () => {
     if (!isSupabaseConfigured()) {
       setCatalogLoading(false);
@@ -301,20 +332,13 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       if (cloudSubcategories) {
         setSubcategoriesList(cloudSubcategories);
       }
-      if (cloudOrders && cloudOrders.length > 0) {
-        // Uniamo gli ordini del database con quelli rimasti solo su questo dispositivo
-        // (es. inviati via email quando il salvataggio online non era riuscito).
-        setOrdersList((prev) => {
-          const cloudIds = new Set(cloudOrders.map((o) => o.id));
-          return [...cloudOrders, ...prev.filter((o) => !cloudIds.has(o.id))];
-        });
-      }
+      if (cloudOrders) applyCloudOrders(cloudOrders, await adminSessionActive());
     } catch (err) {
       console.warn('Cloud data fetch notice:', err);
     } finally {
       setCatalogLoading(false);
     }
-  }, []);
+  }, [adminSessionActive, applyCloudOrders]);
 
   useEffect(() => {
     refreshFromCloud();
@@ -348,6 +372,19 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const isAdmin = currentUser?.role === 'admin' || currentUser?.role === 'superadmin';
   const isSuperAdmin = currentUser?.role === 'superadmin';
+  isAdminRef.current = isAdmin;
+
+  // Admin: ordini ricaricati dal database appena entra e ogni volta che riapre l'app
+  // (es. toccando la notifica di un nuovo ordine), così la lista è sempre aggiornata.
+  useEffect(() => {
+    if (!isAdmin) return;
+    refreshOrders();
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') refreshOrders();
+    };
+    document.addEventListener('visibilitychange', onVisible);
+    return () => document.removeEventListener('visibilitychange', onVisible);
+  }, [isAdmin, refreshOrders]);
   // Stessa regola del carrello: attività e admin vedono l'IVA solo se impostata, i privati mai.
   const isBusinessCustomer = currentUser?.customerType === 'attivita' || isAdmin;
   // Nessuna IVA automatica: si applica solo se l'admin la imposta in Impostazioni.

@@ -362,8 +362,9 @@ export async function fetchSupabaseOrders(): Promise<Order[] | null> {
       .order('created_at', { ascending: false })
       .limit(1000);
     if (error) return null;
-    const mapped = (data ?? []).map(rowToOrder).filter(Boolean) as Order[];
-    return mapped.length > 0 ? mapped : null;
+    // Lista vuota = nel database non ci sono ordini (NON un errore): serve per togliere
+    // dallo schermo anche l'ultimo ordine eliminato.
+    return (data ?? []).map(rowToOrder).filter(Boolean) as Order[];
   } catch {
     return null;
   }
