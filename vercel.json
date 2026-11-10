@@ -5,6 +5,26 @@
       "destination": "/installa/index.html"
     },
     {
+      "source": "/sitemap.xml",
+      "destination": "/api/seo?type=sitemap"
+    },
+    {
+      "source": "/prodotto/:id",
+      "destination": "/api/seo?type=product&id=:id"
+    },
+    {
+      "source": "/forniture",
+      "destination": "/api/seo?type=hub"
+    },
+    {
+      "source": "/forniture/:slug",
+      "destination": "/api/seo?type=landing&slug=:slug"
+    },
+    {
+      "source": "/recensione",
+      "destination": "/api/seo?type=review"
+    },
+    {
       "source": "/((?!api/).*)",
       "destination": "/index.html"
     }

@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /personalizzazione/
+Disallow: /chat
+
+Sitemap: https://www.aurora-srls.it/sitemap.xml
