@@ -172,7 +172,21 @@ export async function registerNewUser(data: {
     return { success: false, error: 'Connessione al database non disponibile. Riprova tra poco.' };
   }
 
-  const { data: signUpData, error } = await sb.auth.signUp({ email: cleanEmail, password: cleanPass });
+  // I dati del cliente vanno anche nel database (tabella profiles), così l'admin vede chi si è registrato
+  const { data: signUpData, error } = await sb.auth.signUp({
+    email: cleanEmail,
+    password: cleanPass,
+    options: {
+      data: {
+        full_name: cleanName,
+        phone: data.phone?.trim() || '',
+        company: customerType === 'attivita' ? cleanCompany : '',
+        customer_type: customerType,
+        piva: cleanPiva,
+        city: data.city?.trim() || '',
+      },
+    },
+  });
   if (error) {
     if (error.message.toLowerCase().includes('already') || error.message.toLowerCase().includes('registered')) {
       return { success: false, error: 'Questa email è già registrata. Clicca su "Accedi" per entrare.' };

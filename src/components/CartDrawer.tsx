@@ -10,6 +10,7 @@ import { newOrderNumber } from '../services/supabase';
 import { OrderSendFallback } from './OrderSendFallback';
 import { useLanguage } from '../context/LanguageContext';
 import { useAdmin } from '../context/AdminContext';
+import { applyBenefits, useMyBenefits } from '../services/users';
 import { PLACEHOLDER_IMAGE } from '../utils/imageRepair';
 import { shippingCost, shippingCostLabel, shippingTimeLabel, SHIPPING_ROMA_TEXT, SHIPPING_LAZIO_TEXT, SHIPPING_ITALIA_TEXT, SHIPPING_DAYS_TEXT } from '../config/shipping';
 
@@ -41,6 +42,8 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
   const { language, t } = useLanguage();
   const isIt = language === 'it';
   const { currentUser, createOrder, productsList, vatFactor, vatPercent, minimumOrderEur } = useAdmin();
+  // Bonus acquisto e sconti personali assegnati dall'admin a questo cliente
+  const myBenefits = useMyBenefits(currentUser);
 
   // Step in checkout: 'cart' -> 'form' -> 'success'
   const [step, setStep] = useState<'cart' | 'form' | 'success'>('cart');
@@ -109,8 +112,10 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
   const isAzienda = customerType === 'azienda';
   const subtotal = items.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
   // IVA: solo se impostata dall'admin (default 0); i privati non la pagano mai
-  const vat = isAzienda ? subtotal * (vatPercent / 100) : 0;
-  const goodsTotal = subtotal + vat;
+  const discount = applyBenefits(subtotal, myBenefits);
+  const netGoods = Math.max(0, subtotal - discount.total);
+  const vat = isAzienda ? netGoods * (vatPercent / 100) : 0;
+  const goodsTotal = netGoods + vat;
   // Consegna: Roma città gratis, provincia di Roma e resto del Lazio € 3,50, resto d'Italia € 6,90 (ritiro in sede: gratis)
   const shipping = deliveryOption === 'ritiro_sede' ? 0 : shippingCost(province, city, postalCode);
   const total = goodsTotal + shipping;
@@ -174,6 +179,9 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
       subtotal: subtotal,
       vatAmount: vat,
       shippingCost: pickup ? 0 : shippingCost(province, city, postalCode),
+      ...(discount.total > 0
+        ? { discountAmount: discount.total, discountLabel: discount.label, benefitIds: discount.consumeIds }
+        : {}),
       paymentMethod: 'Pagamento alla consegna',
       shippingAddress: {
         customerType: customerType,
@@ -297,8 +305,8 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
         </div>
         <div className="sfoot">
           <div className="tot">
-            <small>Totale IVA esclusa</small>
-            <b>{eur(subtotal)}</b>
+            <small>{discount.total > 0 ? `Totale IVA esclusa · ${discount.label}` : 'Totale IVA esclusa'}</small>
+            <b>{eur(netGoods)}</b>
           </div>
           <button
             type="button"
@@ -680,6 +688,12 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                           <span>Imponibile Netto:</span>
                           <span className="font-mono text-white font-medium">€{subtotal.toFixed(2)}</span>
                         </div>
+                        {discount.total > 0 && (
+                          <div className="flex justify-between">
+                            <span className="text-amber-300">{discount.label}:</span>
+                            <span className="font-mono text-amber-300 font-medium">-€{discount.total.toFixed(2)}</span>
+                          </div>
+                        )}
                         <div className="flex justify-between">
                           <span>{vatPercent > 0 ? `IVA (${vatPercent}% per Attività/Aziende):` : 'IVA (non applicata):'}</span>
                           <span className="font-mono text-white font-medium">€{vat.toFixed(2)}</span>
@@ -695,6 +709,12 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                           <span>Imponibile:</span>
                           <span className="font-mono text-white font-medium">€{subtotal.toFixed(2)}</span>
                         </div>
+                        {discount.total > 0 && (
+                          <div className="flex justify-between">
+                            <span className="text-amber-300">{discount.label}:</span>
+                            <span className="font-mono text-amber-300 font-medium">-€{discount.total.toFixed(2)}</span>
+                          </div>
+                        )}
                         <div className="flex justify-between">
                           <span className="text-emerald-400">IVA (0% - Listino Utenti Privati):</span>
                           <span className="font-mono text-emerald-400 font-medium">€0.00 (non applicata)</span>
@@ -1069,8 +1089,14 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                     {failedOrder && <OrderSendFallback order={failedOrder} />}
                   </div>
                 )}
+                {discount.total > 0 && (
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="text-amber-300">{discount.label}:</span>
+                    <span className="font-mono text-amber-300">-€{discount.total.toFixed(2)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between items-center text-xs">
-                  <span className="text-slate-400">Prodotti:</span>
+                  <span className="text-slate-400">{discount.total > 0 ? 'Prodotti scontati:' : 'Prodotti:'}</span>
                   <span className="font-mono text-white">€{goodsTotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between items-center text-xs">
@@ -1152,6 +1178,12 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                     {lastSubmittedOrder?.shippingCost ? `€${lastSubmittedOrder.shippingCost.toFixed(2)}` : 'Gratuita'}
                   </span>
                 </div>
+                {lastSubmittedOrder?.discountAmount ? (
+                  <div className="flex justify-between border-b border-[#1c2433] pb-2">
+                    <span className="text-amber-300">{lastSubmittedOrder.discountLabel || 'Sconto riservato'}:</span>
+                    <span className="text-amber-300">-€{lastSubmittedOrder.discountAmount.toFixed(2)}</span>
+                  </div>
+                ) : null}
                 <div className="flex justify-between pt-1">
                   <span className="text-slate-400">Totale Documento:</span>
                   <span className="text-sky-400 font-bold font-mono">€{lastSubmittedOrder?.total.toFixed(2)}</span>

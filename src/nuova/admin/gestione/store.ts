@@ -27,7 +27,7 @@ export interface Cliente {
   telefono: string;
   email: string;
   note: string;
-  fonte: 'manuale' | 'chat' | 'whatsapp' | 'rubrica';
+  fonte: 'manuale' | 'chat' | 'whatsapp' | 'rubrica' | 'app';
   createdAt: string;
 }
 

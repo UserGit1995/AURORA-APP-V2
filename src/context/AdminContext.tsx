@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback, use
 import { UserProfile, SystemSettings, Product, Order, Category, Subcategory } from '../types';
 import { PRODUCTS as DEMO_PRODUCTS, INITIAL_ORDERS as DEMO_ORDERS, CATEGORIES as DEMO_CATEGORIES } from '../data/catalog';
 import { submitOrder, SubmitResult } from '../services/orderSubmit';
+import { consumeBenefits, mergeDbProfile, syncMyProfile } from '../services/users';
 import { 
   isSupabaseConfigured, 
   fetchSupabaseProducts, 
@@ -374,6 +375,24 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const isSuperAdmin = currentUser?.role === 'superadmin';
   isAdminRef.current = isAdmin;
 
+  // Cliente loggato: i suoi dati finiscono nel profilo del database (così l'admin lo vede
+  // in "Utenti registrati") e, su un telefono nuovo, il profilo si completa dal database.
+  useEffect(() => {
+    if (!currentUser || isAdmin) return;
+    let alive = true;
+    syncMyProfile(currentUser).then((db) => {
+      if (!alive || !db) return;
+      setCurrentUser((prev) => {
+        if (!prev || prev.id !== currentUser.id) return prev;
+        const merged = mergeDbProfile(prev, db);
+        return JSON.stringify(merged) === JSON.stringify(prev) ? prev : merged;
+      });
+    });
+    return () => {
+      alive = false;
+    };
+  }, [currentUser?.id, isAdmin]);
+
   // Admin: ordini ricaricati dal database appena entra e ogni volta che riapre l'app
   // (es. toccando la notifica di un nuovo ordine), così la lista è sempre aggiornata.
   useEffect(() => {
@@ -562,6 +581,22 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     // ...e solo se l'ordine è davvero partito lo mostriamo nello storico.
     if (result.ok) {
       setOrdersList((prev) => [newOrder, ...prev.filter((o) => o.id !== newOrder.id)]);
+      if (currentUser && !isAdmin) {
+        // bonus / sconti "una volta sola" usati in questo ordine
+        if (newOrder.benefitIds?.length) consumeBenefits(newOrder.benefitIds, newOrder.id);
+        // l'indirizzo dell'ordine completa il profilo cliente (solo i campi ancora vuoti)
+        const a = newOrder.shippingAddress;
+        if (a && a.deliveryOption !== 'ritiro_sede') {
+          syncMyProfile({
+            ...currentUser,
+            phone: currentUser.phone || a.phone,
+            address: currentUser.address || a.street,
+            city: currentUser.city || a.city,
+            postalCode: currentUser.postalCode || a.postalCode,
+            province: currentUser.province || a.province,
+          });
+        }
+      }
     }
     return result;
   };

@@ -95,7 +95,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({ isOpen, on
   } = useAdmin();
 
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [activeTab, setActiveTab] = useState<'overview' | 'products' | 'orders' | 'categories' | 'subcategories' | 'images' | 'removebg' | 'requests' | 'packaging' | 'flash' | 'flyer' | 'backup' | 'supplierphotos' | 'settings' | 'chat' | 'clienti' | 'magazzino' | 'ddt' | 'fatture' | 'azienda'>(chatRequest ? 'chat' : nuova ? 'overview' : 'products');
+  const [activeTab, setActiveTab] = useState<'overview' | 'products' | 'orders' | 'categories' | 'subcategories' | 'images' | 'removebg' | 'requests' | 'packaging' | 'flash' | 'flyer' | 'backup' | 'supplierphotos' | 'settings' | 'chat' | 'clienti' | 'utenti' | 'magazzino' | 'ddt' | 'fatture' | 'azienda'>(chatRequest ? 'chat' : nuova ? 'overview' : 'products');
   const [chatUnread, setChatUnreadLocal] = useState(0);
   const setChatUnread = React.useCallback((n: number) => { setChatUnreadLocal(n); onChatUnreadChange?.(n); }, [onChatUnreadChange]);
   React.useEffect(() => { if (chatRequest) setActiveTab('chat'); }, [chatRequest]);

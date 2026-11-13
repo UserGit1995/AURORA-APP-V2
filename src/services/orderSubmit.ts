@@ -97,6 +97,7 @@ export function orderToPlainText(order: Order, maxItems = 1000): string {
   if (order.items.length > maxItems) lines.push(`... e altri ${order.items.length - maxItems} articoli`);
   const ship =
     a.deliveryOption === 'ritiro_sede' ? 'Ritiro in sede' : order.shippingCost ? eur(order.shippingCost) : 'Gratuita';
+  if (order.discountAmount) lines.push('', `${order.discountLabel || 'Sconto riservato'}: - ${eur(order.discountAmount)}`);
   lines.push('', `Consegna: ${ship}`, `TOTALE: ${eur(order.total)}`, 'Pagamento alla consegna');
   return lines.join('\n');
 }

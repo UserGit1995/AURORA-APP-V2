@@ -183,7 +183,7 @@ export const ClientiView: React.FC<{ toast: (t: string) => void; nuovoDaChat?: {
               <b>{nomeCliente(c)}</b>
               <small>{[c.comune, c.telefono, c.piva && `P.IVA ${c.piva}`].filter(Boolean).join(' · ') || 'Dati da completare'}</small>
             </span>
-            {c.fonte !== 'manuale' && <span className="a-src">{c.fonte === 'chat' ? 'Chat' : c.fonte === 'whatsapp' ? 'WhatsApp' : 'Rubrica'}</span>}
+            {c.fonte !== 'manuale' && <span className="a-src">{c.fonte === 'chat' ? 'Chat' : c.fonte === 'whatsapp' ? 'WhatsApp' : c.fonte === 'app' ? 'App' : 'Rubrica'}</span>}
             {c.telefono && (
               <a className="a-ib a-sib a-wa" href={`https://wa.me/${numeroWa(c.telefono)}`} target="_blank" rel="noreferrer" title="Scrivi su WhatsApp" aria-label="Scrivi su WhatsApp" onClick={(e) => e.stopPropagation()}>
                 <Ic n="whats" s={17} />

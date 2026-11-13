@@ -7,6 +7,7 @@ import { OrderSendFallback } from './OrderSendFallback';
 import { useAdmin } from '../context/AdminContext';
 import { PLACEHOLDER_IMAGE } from '../utils/imageRepair';
 import { shippingCost } from '../config/shipping';
+import { applyBenefits, useMyBenefits } from '../services/users';
 
 interface QuickReorderModalProps {
   isOpen: boolean;
@@ -30,6 +31,8 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
   onSelectProduct
 }) => {
   const { currentUser, isBusinessCustomer, productsList, createOrder, vatFactor, vatPercent, minimumOrderEur } = useAdmin();
+  // Bonus acquisto e sconti personali assegnati dall'admin a questo cliente
+  const myBenefits = useMyBenefits(currentUser);
 
   // Tabs: 'frequent' (Frequenti & Consumabili) | 'history' (Da Ordini Passati) | 'sku' (Inserimento Rapido Codice)
   const [activeTab, setActiveTab] = useState<'frequent' | 'history' | 'sku'>('frequent');
@@ -75,13 +78,15 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
   const isAzienda = customerType === 'azienda';
   // IVA solo se impostata dall'admin (default 0); i privati mai
   const subtotal = selectedItems.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
-  const vat = isAzienda ? subtotal * (vatPercent / 100) : 0;
+  const discount = applyBenefits(subtotal, myBenefits);
+  const netGoods = Math.max(0, subtotal - discount.total);
+  const vat = isAzienda ? netGoods * (vatPercent / 100) : 0;
   // Consegna: Roma città gratis, provincia di Roma e resto del Lazio € 3,50, resto d'Italia € 6,90 (ritiro in sede: gratis)
   // Città e CAP si ricavano dall'indirizzo scritto ("Via ..., 00132, Roma")
   const addrCap = (deliveryAddress.match(/\b(\d{5})\b/) || [])[1] || '';
   const addrCity = (deliveryAddress.split(',').map((x) => x.trim()).filter((x) => x && !/^\d{5}$/.test(x)).pop() || '').replace(/\b\d{5}\b/, '').trim();
   const shipping = deliveryOption === 'ritiro_sede' ? 0 : shippingCost(province, addrCity, addrCap);
-  const total = subtotal + vat + shipping;
+  const total = netGoods + vat + shipping;
   const totalColli = selectedItems.reduce((acc, item) => acc + item.quantity, 0);
   // Ordine minimo (sull'imponibile): sotto la soglia il riordino non può partire
   const belowMinimum = minimumOrderEur > 0 && Math.round(subtotal * 100) < Math.round(minimumOrderEur * 100);
@@ -224,6 +229,9 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
       subtotal: subtotal,
       vatAmount: vat,
       shippingCost: shipping,
+      ...(discount.total > 0
+        ? { discountAmount: discount.total, discountLabel: discount.label, benefitIds: discount.consumeIds }
+        : {}),
       paymentMethod: 'Pagamento alla consegna',
       shippingAddress: {
         customerType,
@@ -764,6 +772,12 @@ export const QuickReorderModal: React.FC<QuickReorderModalProps> = ({
                     <span>Imponibile ({totalColli} colli):</span>
                     <span className="font-mono text-white">€{subtotal.toFixed(2)}</span>
                   </div>
+                  {discount.total > 0 && (
+                    <div className="flex justify-between text-amber-300 text-[11px]">
+                      <span>{discount.label}:</span>
+                      <span className="font-mono">-€{discount.total.toFixed(2)}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between text-slate-400 text-[11px]">
                     <span>{isAzienda ? (vatPercent > 0 ? `IVA ${vatPercent}% (Attività/Aziende):` : 'IVA (non applicata):') : 'IVA (0% - Listino Privati):'}</span>
                     <span className={`font-mono ${isAzienda ? 'text-white' : 'text-emerald-400'}`}>

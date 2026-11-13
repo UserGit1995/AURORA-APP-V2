@@ -119,6 +119,11 @@ export interface Order {
   subtotal?: number;
   vatAmount?: number;
   shippingCost?: number;
+  /** sconto personale + bonus acquisto applicati (euro, già tolti dal totale) */
+  discountAmount?: number;
+  discountLabel?: string;
+  /** bonus/sconti "una volta sola" da segnare come usati dopo l'invio */
+  benefitIds?: string[];
   paymentMethod?: string;
   shippingAddress?: ShippingAddress;
   itemsCount: number;

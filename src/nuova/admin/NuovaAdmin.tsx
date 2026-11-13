@@ -9,6 +9,7 @@ import {
 import { listCustomizationRequests } from '../../services/customization';
 import { Ic, Bi, eur, vib } from '../Icona';
 import { ClientiView } from './gestione/Clienti';
+import { UtentiView } from './UtentiView';
 import { MagazzinoView } from './gestione/Magazzino';
 import { AziendaView, DdtView, FattureView } from './gestione/Documenti';
 import { CLIENTE_VUOTO, Ddt, clientiCaricati, save as gSave, load as gLoad, soloCifre } from './gestione/store';
@@ -24,7 +25,7 @@ import './nuova-admin.css';
 export type AdmTab =
   | 'overview' | 'products' | 'orders' | 'categories' | 'subcategories' | 'images' | 'removebg' | 'requests'
   | 'packaging' | 'flash' | 'flyer' | 'backup' | 'supplierphotos' | 'settings' | 'chat'
-  | 'clienti' | 'magazzino' | 'ddt' | 'fatture' | 'azienda';
+  | 'clienti' | 'utenti' | 'magazzino' | 'ddt' | 'fatture' | 'azienda';
 
 type Go = (id: AdmTab | 'more') => void;
 
@@ -131,6 +132,7 @@ export const NuovaAdmin: React.FC<NuovaAdminProps> = (p) => {
     ]],
     ['Clienti', [
       { id: 'chat', icon: 'chat', label: 'Chat clienti', badge: p.chatUnread ? String(p.chatUnread) : undefined, hot: true, desc: 'Leggi e rispondi ai messaggi dei clienti.', big: 'chat', em: p.chatUnread ? `${p.chatUnread} da leggere` : undefined },
+      { id: 'utenti', icon: 'user', label: 'Utenti registrati', desc: "Chi si è registrato nell'app e quando: portafoglio, bonus e sconti personali.", big: 'seal' },
       { id: 'clienti', icon: 'user', label: 'Portafoglio clienti', desc: 'Rubrica dei clienti: salvali dalla chat, da WhatsApp o dal telefono.', big: 'whats' },
     ]],
     ['Gestionale', [
@@ -221,6 +223,8 @@ export const NuovaAdmin: React.FC<NuovaAdminProps> = (p) => {
     <ChatView onUnread={p.onChatUnread} toast={toast} />
   ) : p.activeTab === 'clienti' ? (
     <ClientiView toast={toast} />
+  ) : p.activeTab === 'utenti' ? (
+    <UtentiView toast={toast} />
   ) : p.activeTab === 'magazzino' ? (
     <MagazzinoView toast={toast} />
   ) : p.activeTab === 'ddt' ? (
@@ -232,7 +236,7 @@ export const NuovaAdmin: React.FC<NuovaAdminProps> = (p) => {
   ) : cur ? (
     <SectionHead item={cur} />
   ) : null;
-  const custom = more || ['overview', 'products', 'orders', 'chat', 'clienti', 'magazzino', 'ddt', 'fatture', 'azienda'].includes(p.activeTab);
+  const custom = more || ['overview', 'products', 'orders', 'chat', 'clienti', 'utenti', 'magazzino', 'ddt', 'fatture', 'azienda'].includes(p.activeTab);
 
   return (
     <div className="na">

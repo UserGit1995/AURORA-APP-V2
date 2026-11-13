@@ -80,6 +80,8 @@ function buildOrderEmail(body: any) {
   const subtotal = items.reduce((s, i) => s + i.price * i.qty, 0);
   const total = num(o.total) || subtotal;
   const vat = num(o.vatAmount);
+  const discount = num(o.discountAmount);
+  const discountLabel = str(o.discountLabel, 120) || 'Sconto riservato al cliente';
   const shipping = num(o.shippingCost);
   const email = str(a.email, 120);
   const pickup = a.deliveryOption === 'ritiro_sede';
@@ -124,6 +126,7 @@ ${itemRows}
 </table>
 <table style="border-collapse:collapse;font-size:14px;margin:12px 0 0 auto">
 <tr><td style="padding:3px 12px;color:#64748b">Imponibile</td><td style="padding:3px 0;text-align:right">${eur(subtotal)}</td></tr>
+${discount ? `<tr><td style="padding:3px 12px;color:#b45309">${esc(discountLabel)}</td><td style="padding:3px 0;text-align:right;color:#b45309">- ${eur(discount)}</td></tr>` : ''}
 ${vat ? `<tr><td style="padding:3px 12px;color:#64748b">IVA</td><td style="padding:3px 0;text-align:right">${eur(vat)}</td></tr>` : ''}
 <tr><td style="padding:3px 12px;color:#64748b">Consegna</td><td style="padding:3px 0;text-align:right">${esc(shippingText)}</td></tr>
 <tr><td style="padding:6px 12px;font-weight:bold">TOTALE</td><td style="padding:6px 0;text-align:right;font-weight:bold;font-size:16px">${eur(total)}</td></tr>
@@ -148,6 +151,7 @@ ${vat ? `<tr><td style="padding:3px 12px;color:#64748b">IVA</td><td style="paddi
     ...items.map((i) => `- ${i.name}${i.code ? ` [${i.code}]` : ''}  x${i.qty}  ${eur(i.price)}  = ${eur(i.price * i.qty)}`),
     '',
     `Imponibile: ${eur(subtotal)}`,
+    discount ? `${discountLabel}: - ${eur(discount)}` : '',
     vat ? `IVA: ${eur(vat)}` : '',
     `Consegna: ${shippingText}`,
     `TOTALE: ${eur(total)}`,
