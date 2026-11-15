@@ -71,7 +71,9 @@ function processAndResizeImage(file: File): Promise<string> {
           ctx.imageSmoothingEnabled = true;
           ctx.imageSmoothingQuality = 'high';
           ctx.drawImage(img, 0, 0, width, height);
-          resolve(canvas.toDataURL('image/jpeg', 0.82));
+          // PNG/WebP con sfondo trasparente: restano trasparenti (WebP), le altre JPG
+          const keepAlpha = /\.(png|webp)$/i.test(file.name);
+          resolve(keepAlpha ? canvas.toDataURL('image/webp', 0.92) : canvas.toDataURL('image/jpeg', 0.82));
         } catch {
           resolve(dataUrl);
         }
@@ -98,6 +100,14 @@ export const ImageImportTool: React.FC = () => {
 
   const matchRows = (parsed: { name: string; imageUrl: string }[]) => {
     const withMatches: ParsedRow[] = parsed.map((p) => {
+      // nome file con "#codice" alla fine: va esattamente all'articolo con quel codice (o id)
+      const code = (p.name.match(/#\s*([A-Za-z0-9-]+)\s*$/) || [])[1];
+      if (code) {
+        const exact = productsList.find((prod) => String(prod.id) === code || String((prod as any).sku || '') === code);
+        if (exact) {
+          return { sourceName: p.name, imageUrl: p.imageUrl, matchedProductId: exact.id, confidence: 100, confirmed: true };
+        }
+      }
       let best: Product | null = null;
       let bestScore = 0;
       for (const prod of productsList) {
@@ -136,7 +146,11 @@ export const ImageImportTool: React.FC = () => {
       const file = imageFiles[i];
       try {
         const dataUri = await processAndResizeImage(file);
-        const name = file.name.replace(IMAGE_EXT, '').replace(/[_-]+/g, ' ').trim();
+        const base = file.name.replace(IMAGE_EXT, '');
+        const hash = base.indexOf('#');
+        const name = hash >= 0
+          ? base.slice(0, hash).replace(/[_-]+/g, ' ').trim() + ' #' + base.slice(hash + 1).trim()
+          : base.replace(/[_-]+/g, ' ').trim();
         parsed.push({ name, imageUrl: dataUri });
       } catch {
         // immagine illeggibile: la saltiamo
