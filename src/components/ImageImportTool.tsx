@@ -14,6 +14,10 @@ interface ParsedRow {
 
 // Similarità semplice tra due stringhe (normalizzate), sufficiente per
 // suggerire abbinamenti senza applicarli mai automaticamente da sola.
+function normName(s: string): string {
+  return (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
 function similarity(a: string, b: string): number {
   const norm = (s: string) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim();
   const na = norm(a);
@@ -97,8 +101,14 @@ export const ImageImportTool: React.FC = () => {
   const [applied, setApplied] = useState(0);
   const [isReadingFolder, setIsReadingFolder] = useState(false);
   const [folderProgress, setFolderProgress] = useState({ done: 0, total: 0 });
+  const [editingIdx, setEditingIdx] = useState<number | null>(null);
 
   const matchRows = (parsed: { name: string; imageUrl: string }[]) => {
+    const exactIndex = new Map<string, Product>();
+    for (const prod of productsList) {
+      const k = normName(prod.name);
+      if (k && !exactIndex.has(k)) exactIndex.set(k, prod);
+    }
     const withMatches: ParsedRow[] = parsed.map((p) => {
       // nome file con "#codice" alla fine: va esattamente all'articolo con quel codice (o id)
       const code = (p.name.match(/#\s*([A-Za-z0-9-]+)\s*$/) || [])[1];
@@ -107,6 +117,10 @@ export const ImageImportTool: React.FC = () => {
         if (exact) {
           return { sourceName: p.name, imageUrl: p.imageUrl, matchedProductId: exact.id, confidence: 100, confirmed: true };
         }
+      }
+      const exactProd = exactIndex.get(normName(p.name));
+      if (exactProd) {
+        return { sourceName: p.name, imageUrl: p.imageUrl, matchedProductId: exactProd.id, confidence: 100, confirmed: true };
       }
       let best: Product | null = null;
       let bestScore = 0;
@@ -214,6 +228,7 @@ export const ImageImportTool: React.FC = () => {
       // del prodotto restano esattamente come sono, non vengono toccati.
       updateProduct({ ...product, image: finalImageUrl });
       count++;
+      if (count % 10 === 0) setApplied(count);
     }
     setApplied(count);
     setApplying(false);
@@ -333,9 +348,17 @@ export const ImageImportTool: React.FC = () => {
                         {matched ? matched.name : 'Nessuna corrispondenza trovata'} ({row.confidence}%)
                       </span>
                     </div>
+                    {editingIdx !== idx ? (
+                      <button
+                        onClick={() => setEditingIdx(idx)}
+                        className="mt-1.5 text-[11px] text-sky-400 hover:underline"
+                      >
+                        Correggi manualmente
+                      </button>
+                    ) : (
                     <select
                       value={row.matchedProductId || ''}
-                      onChange={(e) => overrideMatch(idx, e.target.value)}
+                      onChange={(e) => { overrideMatch(idx, e.target.value); setEditingIdx(null); }}
                       className="mt-1.5 w-full bg-[#0e1b30] border border-[#1c2433] rounded-lg px-2 py-1 text-[11px] text-white outline-none"
                     >
                       <option value="">— Correggi manualmente, scegli il prodotto giusto —</option>
@@ -343,6 +366,7 @@ export const ImageImportTool: React.FC = () => {
                         <option key={p.id} value={p.id}>{p.name}</option>
                       ))}
                     </select>
+                    )}
                   </div>
                   <button
                     onClick={() => toggleConfirm(idx)}
