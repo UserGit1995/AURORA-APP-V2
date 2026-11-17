@@ -70,7 +70,7 @@ export const ProductPicker: React.FC<ProductPickerProps> = ({
 
   return createPortal(
     <div
-      className="fixed inset-0 z-[90] flex items-center justify-center p-3 sm:p-6 bg-black/80 backdrop-blur-sm"
+      className="na-lt fixed inset-0 z-[90] flex items-center justify-center p-3 sm:p-6 bg-black/80 backdrop-blur-sm"
       onClick={onClose}
     >
       <div

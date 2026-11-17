@@ -16,6 +16,7 @@ import { AziendaView, DdtView, FattureView } from './gestione/Documenti';
 import { CLIENTE_VUOTO, Ddt, clientiCaricati, save as gSave, load as gLoad, soloCifre } from './gestione/store';
 import { PushOrdiniCard } from './PushOrdiniCard';
 import './nuova-admin.css';
+import './admin-chiaro.css';
 
 /*
  * Pannello di gestione con la grafica del prototipo "Aurora Pannello Admin".
@@ -165,6 +166,8 @@ export const NuovaAdmin: React.FC<NuovaAdminProps> = (p) => {
   const go: Go = (id) => {
     vib(6);
     setSide(false);
+    setMenu(null);
+    setAcct(false);
     if (id === 'more') {
       setMore(true);
       return;
@@ -174,30 +177,56 @@ export const NuovaAdmin: React.FC<NuovaAdminProps> = (p) => {
     else p.onGo(id);
   };
 
-  // barra in basso
-  const TABS: { id: AdmTab | 'more'; icon: string; label: string; b?: number }[] = [
-    { id: 'overview', icon: 'dash', label: 'Panoramica' },
-    { id: 'products', icon: 'package', label: 'Prodotti' },
-    { id: 'orders', icon: 'orders', label: 'Ordini', b: toDo },
-    { id: 'chat', icon: 'whats', label: 'Chat', b: p.chatUnread },
-    { id: 'more', icon: 'more', label: 'Altro' },
+  // barra in alto (PC): voci dirette e gruppi con menu a tendina
+  type TopItem = { key: string; label: string; id?: AdmTab; group?: string };
+  const TOP: TopItem[] = [
+    { key: 'home', label: 'Panoramica', id: 'overview' },
+    { key: 'cat', label: 'Catalogo', group: 'Catalogo' },
+    { key: 'ven', label: 'Ordini e vendite', group: 'Vendite e promozioni' },
+    { key: 'cli', label: 'Clienti', group: 'Clienti' },
+    { key: 'ges', label: 'Gestionale', group: 'Gestionale' },
+    { key: 'img', label: 'Immagini', group: 'Immagini' },
+    { key: 'per', label: 'Personalizzazioni', group: 'Personalizzazioni' },
+    { key: 'vis', label: 'Visite al sito', id: 'visite' },
+    { key: 'imp', label: 'Impostazioni', group: 'Impostazioni' },
   ];
-  const tabIdx = more ? 4 : Math.max(0, TABS.findIndex((t) => t.id === p.activeTab)) === 0 && p.activeTab !== 'overview' ? 4 : TABS.findIndex((t) => t.id === p.activeTab);
-  const tabRef = useRef<HTMLElement>(null);
-  const [indLeft, setIndLeft] = useState(0);
-  useLayoutEffect(() => {
-    const place = () => {
-      const b = tabRef.current?.querySelectorAll('button')[tabIdx < 0 ? 4 : tabIdx] as HTMLElement | undefined;
-      if (b) setIndLeft(b.offsetLeft + b.offsetWidth / 2 - 28);
+  const groupItems = (g?: string) => (g ? (NAV.find(([n]) => n === g)?.[1] || []) : []);
+  const [menu, setMenu] = useState<string | null>(null);
+  const [acct, setAcct] = useState(false);
+  const navRef = useRef<HTMLElement>(null);
+  const acctRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!menu && !acct) return;
+    const close = (e: MouseEvent | TouchEvent) => {
+      const t = e.target as Node;
+      if (menu && navRef.current && !navRef.current.contains(t)) setMenu(null);
+      if (acct && acctRef.current && !acctRef.current.contains(t)) setAcct(false);
     };
-    place();
-    window.addEventListener('resize', place);
-    return () => window.removeEventListener('resize', place);
-  }, [tabIdx]);
+    document.addEventListener('mousedown', close);
+    document.addEventListener('touchstart', close);
+    return () => { document.removeEventListener('mousedown', close); document.removeEventListener('touchstart', close); };
+  }, [menu, acct]);
+  // telefono: scorciatoie sotto la ricerca (la pagina aperta compare sempre)
+  const CHIPS: { id: AdmTab; label: string }[] = [
+    { id: 'overview', label: 'Panoramica' },
+    { id: 'orders', label: 'Ordini' },
+    { id: 'products', label: 'Prodotti' },
+    { id: 'chat', label: 'Chat' },
+    { id: 'visite', label: 'Visite' },
+  ];
+  const chips = !more && cur && !CHIPS.some((c) => c.id === cur.id) ? [CHIPS[0], { id: cur.id, label: cur.label }, ...CHIPS.slice(1)] : CHIPS;
+  const notif = toDo + p.chatUnread + p.newRequests;
+  // telefono: la scorciatoia della pagina aperta resta sempre in vista
+  const chipsRef = useRef<HTMLElement>(null);
+  useLayoutEffect(() => {
+    const box = chipsRef.current;
+    const b = box?.querySelector('button.a-on') as HTMLElement | null;
+    if (box && b) box.scrollLeft = Math.max(0, b.offsetLeft - (box.clientWidth - b.offsetWidth) / 2);
+  }, [p.activeTab, more]);
 
   // Esc chiude il cassetto
   useEffect(() => {
-    const k = (e: KeyboardEvent) => e.key === 'Escape' && setSide(false);
+    const k = (e: KeyboardEvent) => { if (e.key === 'Escape') { setSide(false); setMenu(null); setAcct(false); } };
     window.addEventListener('keydown', k);
     return () => window.removeEventListener('keydown', k);
   }, []);
@@ -244,23 +273,42 @@ export const NuovaAdmin: React.FC<NuovaAdminProps> = (p) => {
   ) : null;
   const custom = more || ['overview', 'products', 'orders', 'chat', 'clienti', 'utenti', 'magazzino', 'ddt', 'fatture', 'azienda', 'visite'].includes(p.activeTab);
 
+  const firstName = (currentUser?.name || '').trim().split(/\s+/)[0] || '';
+  const crumb = more ? 'Pannello' : cur?.group === 'Generale' ? '' : cur?.group || '';
+  const title = more ? 'Tutte le sezioni' : p.activeTab === 'overview' ? (firstName ? `Ciao ${firstName}, ecco com'è andata oggi` : "Ecco com'è andata oggi") : cur?.label;
+  const searchBox = (cls: string) => (
+    <form className={cls} role="search" onSubmit={(e) => { e.preventDefault(); searchAll(); }}>
+      <span className="z-in">Cerca in <b>Prodotti</b></span>
+      <input
+        type="search"
+        value={prodQ}
+        onChange={(e) => { setProdQ(e.target.value); if (more || p.activeTab !== 'products') go('products'); }}
+        placeholder="Nome prodotto, codice o marca…"
+        aria-label="Cerca prodotti"
+      />
+      <button type="submit" aria-label="Cerca"><Ic n="search" s={19} /></button>
+    </form>
+  );
+
   return (
     <div className="na">
       <div className="a-aur" aria-hidden="true"><i className="a-r1" /><i className="a-r2" /></div>
-      <div className={`a-scrim${side ? ' a-on' : ''}`} onClick={() => setSide(false)} />
-      <aside className={`a-side${side ? ' a-on' : ''}`}>
-        <img className="a-emb" src="/nuova/emblem.svg" alt="" />
-        <div className="a-brand">
-          <img src="/nuova/logo.svg" alt="Aurora" />
-          <button type="button" className="a-ib a-mb a-closeside" aria-label="Chiudi" onClick={() => setSide(false)}><Ic n="x" s={18} /></button>
+      <img className="a-bgemb" src="/nuova/emblem.svg" alt="" aria-hidden="true" />
+      <img className="a-bgemb2" src="/nuova/emblem.svg" alt="" aria-hidden="true" />
+
+      {/* cassetto (telefono) */}
+      <div className={`a-scrim z-dscrim${side ? ' a-on' : ''}`} onClick={() => setSide(false)} />
+      <aside className={`z-drawer${side ? ' a-on' : ''}`} aria-label="Tutte le sezioni" aria-hidden={!side}>
+        <div className="z-dhead">
+          <img src="/nuova/logo-scuro.svg" alt="Aurora" />
+          <button type="button" className="z-x" aria-label="Chiudi" onClick={() => setSide(false)}><Ic n="x" s={20} /></button>
         </div>
-        <span className="a-role"><i />Pannello di gestione</span>
-        <nav className="a-nav">
+        <nav className="z-dnav">
           {NAV.map(([g, items]) => (
-            <div className="a-ng" key={g}>
+            <div key={g}>
               <p>{g}</p>
               {items.map((it) => (
-                <button key={it.id} type="button" className={`a-ni${!more && p.activeTab === it.id ? ' a-on' : ''}`} onClick={() => go(it.id)}>
+                <button key={it.id} type="button" className={!more && p.activeTab === it.id ? 'a-on' : ''} onClick={() => go(it.id)}>
                   <Ic n={it.icon} s={19} />
                   <span>{it.label}</span>
                   {it.badge ? <em className={it.hot ? 'a-hot' : ''}>{it.badge}</em> : null}
@@ -268,48 +316,109 @@ export const NuovaAdmin: React.FC<NuovaAdminProps> = (p) => {
               ))}
             </div>
           ))}
-        </nav>
-        <div className="a-me">
-          <span className="a-av">{initials(userName)}</span>
-          <span><b>{userName}</b><small>Amministratore</small></span>
-          <button type="button" aria-label="Esci" title="Esci" onClick={() => { logout(); p.onClose(); }}><Ic n="logout" s={18} /></button>
-        </div>
-      </aside>
-      <main className="a-main">
-        <img className="a-bgemb" src="/nuova/emblem.svg" alt="" aria-hidden="true" />
-        <header className="a-top">
-          <button type="button" className="a-ib a-mb" aria-label="Menu" onClick={() => { setSide(true); vib(6); }}><Ic n="menu" s={20} /></button>
-          <img className="a-tlogo" src="/nuova/logo.svg" alt="Aurora" />
-          <div className="a-crumb">
-            <small>{more ? 'Pannello' : cur?.group}</small>
-            <h1>{more ? 'Tutte le sezioni' : cur?.label}</h1>
+          <div>
+            <p>Account</p>
+            <button type="button" onClick={() => { setSide(false); p.onClose(); }}><Ic n="storefront" s={19} /><span>Torna al negozio</span></button>
+            <button type="button" onClick={() => { logout(); p.onClose(); }}><Ic n="logout" s={19} /><span>Esci ({userName})</span></button>
           </div>
-          <button type="button" className="a-tsearch" onClick={searchAll}><Ic n="search" s={18} /><span>Cerca prodotti, ordini, clienti</span></button>
-          <button type="button" className="a-ib" aria-label="Vai al negozio" title="Vai al negozio" onClick={p.onClose}><Ic n="storefront" s={19} /></button>
-          <button type="button" className="a-ib" aria-label="Notifiche" onClick={() => go('overview')}>
-            <Ic n="bell" s={19} />
-            {toDo + p.chatUnread + p.newRequests > 0 && <b>{toDo + p.chatUnread + p.newRequests}</b>}
+        </nav>
+      </aside>
+
+      <header className="z-top">
+        <div className="z-bar">
+          <button type="button" className="z-mb" aria-label="Menu" onClick={() => { setSide(true); vib(6); }}><Ic n="menu" s={22} /></button>
+          <button type="button" className="z-logo" onClick={() => go('overview')} aria-label="Panoramica">
+            <img src="/nuova/logo-scuro.svg" alt="Aurora" />
+            <span>Pannello<br />di gestione</span>
           </button>
-          <button type="button" className="a-btn a-prim a-newbtn" onClick={p.onNewProduct}><Ic n="plus" s={16} /> Nuovo prodotto</button>
-        </header>
+          {searchBox('z-search z-search-d')}
+          <button type="button" className="z-link" onClick={() => go('overview')} aria-label="Notifiche">
+            <span className="z-bell"><Ic n="bell" s={22} />{notif > 0 && <b>{notif}</b>}</span>
+            <span className="z-lt"><small>{notif > 0 ? (notif === 1 ? '1 nuova' : `${notif} nuove`) : 'Nessuna nuova'}</small><b>Notifiche</b></span>
+          </button>
+          <button type="button" className="z-link z-hide-m" onClick={p.onClose}>
+            <Ic n="storefront" s={22} />
+            <span className="z-lt"><small>Torna al</small><b>Negozio</b></span>
+          </button>
+          <div className="z-acc" ref={acctRef}>
+            <button type="button" className="z-link" onClick={() => setAcct((x) => !x)} aria-expanded={acct}>
+              <span className="z-av">{initials(userName)}</span>
+              <span className="z-lt z-hide-m"><small>Ciao, {firstName || userName}</small><b>Account ▾</b></span>
+            </button>
+            {acct && (
+              <div className="z-dd z-dd-r">
+                <p className="z-ddh">{userName}<small>Amministratore</small></p>
+                <button type="button" onClick={() => { setAcct(false); p.onClose(); }}>Torna al negozio<small>Chiude il pannello</small></button>
+                <button type="button" onClick={() => go('more')}>Tutte le sezioni<small>Tutto il pannello in un colpo d'occhio</small></button>
+                <button type="button" onClick={() => { logout(); p.onClose(); }}>Esci<small>Chiudi la sessione da amministratore</small></button>
+              </div>
+            )}
+          </div>
+        </div>
+        {searchBox('z-search z-search-m')}
+        <nav className="z-nav" ref={navRef} aria-label="Sezioni">
+          <div className="z-navin">
+            {TOP.map((t) => {
+              const items = groupItems(t.group);
+              const on = !more && (t.id ? p.activeTab === t.id : items.some((i) => i.id === p.activeTab));
+              const hot = items.filter((i) => i.hot && i.badge);
+              const hotN = hot.reduce((n, i) => n + (parseInt(i.badge || '', 10) || 0), 0);
+              return (
+                <span className="z-ni" key={t.key}>
+                  <button
+                    type="button"
+                    className={`${on ? 'a-on' : ''}${menu === t.key ? ' z-open' : ''}`}
+                    aria-expanded={t.group ? menu === t.key : undefined}
+                    onClick={() => (t.id ? go(t.id) : setMenu((m) => (m === t.key ? null : t.key)))}
+                  >
+                    {t.label}
+                    {hotN > 0 ? <em>{hotN}</em> : hot.length ? <i className="z-dot" /> : null}
+                    {t.group ? <span className="z-car">▾</span> : null}
+                  </button>
+                  {t.group && menu === t.key && (
+                    <div className="z-dd">
+                      <p className="z-ddh">{t.label}</p>
+                      {items.map((it) => (
+                        <button key={it.id} type="button" className={!more && p.activeTab === it.id ? 'a-on' : ''} onClick={() => go(it.id)}>
+                          <span className="z-ddl">{it.label}{it.badge ? <em className={it.hot ? 'a-hot' : ''}>{it.badge}</em> : null}</span>
+                          <small>{it.desc}</small>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </span>
+              );
+            })}
+            <button type="button" className="z-new" onClick={p.onNewProduct}><Ic n="plus" s={15} /> Nuovo prodotto</button>
+          </div>
+        </nav>
+        <nav className="z-chips" aria-label="Scorciatoie" ref={chipsRef}>
+          {chips.map((c) => (
+            <button key={c.id} type="button" className={!more && p.activeTab === c.id ? 'a-on' : ''} onClick={() => go(c.id)}>
+              {c.label}
+              {c.id === 'orders' && toDo > 0 ? <em>{toDo}</em> : c.id === 'chat' && p.chatUnread > 0 ? <em>{p.chatUnread}</em> : null}
+            </button>
+          ))}
+        </nav>
+      </header>
+
+      <main className="a-main">
         <div className="a-views">
           <section className="a-view a-on" ref={viewRef}>
-            <div className="a-vin" key={more ? 'more' : p.activeTab}>{view}</div>
-            {/* le altre sezioni restano montate (es. Rimuovi sfondo non perde il lavoro) */}
-            <div className="a-legacy" style={custom ? { display: 'none' } : undefined}>{p.children}</div>
+            <div className="z-page">
+              <div className="z-ph">
+                <p className="z-crumb">
+                  {p.activeTab === 'overview' && !more ? <>Pannello di gestione</> : <><button type="button" onClick={() => go('overview')}>Panoramica</button>{crumb ? <> › {crumb}</> : null}</>}
+                </p>
+                <h1>{title}</h1>
+              </div>
+              <div className="a-vin" key={more ? 'more' : p.activeTab}>{view}</div>
+              {/* le altre sezioni restano montate (es. Rimuovi sfondo non perde il lavoro) */}
+              <div className="a-legacy" style={custom ? { display: 'none' } : undefined}>{p.children}</div>
+            </div>
           </section>
         </div>
       </main>
-      <nav className="a-tab" ref={tabRef} style={side ? { visibility: 'hidden' } : undefined}>
-        <span className="a-ind" style={{ left: indLeft }} />
-        {TABS.map((t, i) => (
-          <button key={t.id} type="button" className={i === (tabIdx < 0 ? 4 : tabIdx) ? 'a-on' : ''} onClick={() => go(t.id)}>
-            <Ic n={t.icon} s={22} />
-            {t.label}
-            {t.b ? <b>{t.b}</b> : null}
-          </button>
-        ))}
-      </nav>
       <div className={`a-toast${toastMsg ? ' a-on' : ''}`}><i><Ic n="check" s={15} /></i><span>{toastMsg}</span></div>
       {p.modals}
     </div>
@@ -381,8 +490,8 @@ const Chart: React.FC<{ v: number[] }> = ({ v }) => {
         const y = H - pad - (g / top) * (H - pad * 2);
         return (
           <React.Fragment key={g}>
-            <line x1={pad} x2={W - pad} y1={y} y2={y} stroke="rgba(143,180,214,.12)" />
-            <text x="0" y={y + 4} fill="#7f94ab" fontSize="10" fontFamily="Sora">{Math.round(g)}</text>
+            <line x1={pad} x2={W - pad} y1={y} y2={y} stroke="#d3dfea" />
+            <text x="0" y={y + 4} fill="#565959" fontSize="10" fontFamily="Sora">{Math.round(g)}</text>
           </React.Fragment>
         );
       })}

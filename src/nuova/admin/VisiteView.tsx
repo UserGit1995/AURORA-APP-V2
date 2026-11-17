@@ -84,12 +84,12 @@ const Barre: React.FC<{ giorni: { g: string; n: number }[] }> = ({ giorni }) => 
               <title>{`${x.g}: ${x.n} visite`}</title>
             </rect>
             {(i % 5 === 0 || i === giorni.length - 1) && (
-              <text x={pad + i * bw + bw / 2} y={H - 6} fill="#7f94ab" fontSize="10" textAnchor="middle" fontFamily="Sora">{x.g}</text>
+              <text x={pad + i * bw + bw / 2} y={H - 6} fill="#565959" fontSize="10" textAnchor="middle" fontFamily="Sora">{x.g}</text>
             )}
           </g>
         );
       })}
-      <text x="0" y={pad} fill="#7f94ab" fontSize="10" fontFamily="Sora">{max}</text>
+      <text x="0" y={pad} fill="#565959" fontSize="10" fontFamily="Sora">{max}</text>
     </svg>
   );
 };
