@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Search, X, XCircle, Check, ImageOff } from 'lucide-react';
+import { Search, X, XCircle, Check, ImageOff } from './icone';
 import { useAdmin } from '../../context/AdminContext';
 import { searchProducts } from '../../utils/productSearch';
 import { hasRealImage } from '../../utils/bgRemoval/productImage';
@@ -74,10 +74,10 @@ export const ProductPicker: React.FC<ProductPickerProps> = ({
       onClick={onClose}
     >
       <div
-        className="w-full max-w-2xl max-h-[88vh] flex flex-col rounded-2xl bg-[#0d1420] border border-[#1c2433] shadow-2xl overflow-hidden"
+        className="w-full max-w-2xl max-h-[88vh] flex flex-col rounded-2xl bg-[#0e1b30] border border-[#1f3a5c] shadow-2xl overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="p-4 border-b border-[#1c2433] flex items-center justify-between gap-3 shrink-0">
+        <div className="p-4 border-b border-[#1f3a5c] flex items-center justify-between gap-3 shrink-0">
           <div>
             <h3 className="text-sm font-bold text-white">
               {multiple ? 'Scegli i prodotti da scontornare' : 'Scegli il prodotto da ritoccare'}
@@ -91,7 +91,7 @@ export const ProductPicker: React.FC<ProductPickerProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="p-2 rounded-full text-slate-400 hover:text-white hover:bg-[#1a2230] transition-colors"
+            className="p-2 rounded-full text-slate-400 hover:text-white hover:bg-[#132a4a] transition-colors"
             aria-label="Chiudi"
           >
             <X className="w-5 h-5" />
@@ -107,7 +107,7 @@ export const ProductPicker: React.FC<ProductPickerProps> = ({
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Cerca per nome, codice/SKU, categoria o marca..."
-              className="w-full pl-10 pr-9 py-2.5 bg-[#0d1420] border border-[#1c2433] rounded-lg text-white text-sm outline-none focus:border-emerald-400/60 transition-colors"
+              className="w-full pl-10 pr-9 py-2.5 bg-[#0e1b30] border border-[#1f3a5c] rounded-xl text-white text-sm outline-none focus:border-sky-400/60 transition-colors"
             />
             {query && (
               <button
@@ -129,7 +129,7 @@ export const ProductPicker: React.FC<ProductPickerProps> = ({
               <button
                 type="button"
                 onClick={selectAllResults}
-                className="font-semibold text-emerald-400 hover:text-emerald-300"
+                className="font-semibold text-sky-400 hover:text-sky-300"
               >
                 Seleziona tutti i risultati ({selectableResults.length})
               </button>
@@ -150,20 +150,20 @@ export const ProductPicker: React.FC<ProductPickerProps> = ({
                 onClick={() => toggle(p)}
                 className={`w-full flex items-center gap-3 p-2.5 rounded-xl border text-left transition-colors ${
                   checked
-                    ? 'border-emerald-400 bg-emerald-500/10'
+                    ? 'border-sky-400 bg-sky-500/10'
                     : ok
-                    ? 'border-[#1c2433] bg-[#0d1420] hover:border-emerald-500/40'
-                    : 'border-[#1c2433] bg-[#0d1420] opacity-45 cursor-not-allowed'
+                    ? 'border-[#1f3a5c] bg-[#0e1b30] hover:border-sky-500/40'
+                    : 'border-[#1f3a5c] bg-[#0e1b30] opacity-45 cursor-not-allowed'
                 }`}
               >
                 {hasRealImage(p.image) ? (
                   <img
                     src={p.image}
                     alt=""
-                    className="w-11 h-11 rounded-lg object-contain bg-[#0e1b30]/40 border border-[#1c2433] shrink-0"
+                    className="w-11 h-11 rounded-xl object-contain bg-[#0e1b30]/40 border border-[#1f3a5c] shrink-0"
                   />
                 ) : (
-                  <div className="w-11 h-11 rounded-lg bg-[#0e1b30]/40 border border-[#1c2433] flex items-center justify-center shrink-0">
+                  <div className="w-11 h-11 rounded-xl bg-[#0e1b30]/40 border border-[#1f3a5c] flex items-center justify-center shrink-0">
                     <ImageOff className="w-5 h-5 text-slate-600" />
                   </div>
                 )}
@@ -181,10 +181,10 @@ export const ProductPicker: React.FC<ProductPickerProps> = ({
                 {multiple && (
                   <div
                     className={`w-5 h-5 rounded border flex items-center justify-center shrink-0 ${
-                      checked ? 'bg-emerald-500 border-emerald-500' : 'border-slate-600'
+                      checked ? 'bg-sky-500 border-sky-500' : 'border-[#1f3a5c]'
                     }`}
                   >
-                    {checked && <Check className="w-3.5 h-3.5 text-slate-950" />}
+                    {checked && <Check className="w-3.5 h-3.5 text-[#0b1a2e]" />}
                   </div>
                 )}
               </button>
@@ -198,7 +198,7 @@ export const ProductPicker: React.FC<ProductPickerProps> = ({
               <button
                 type="button"
                 onClick={() => setVisible((v) => v + PAGE_SIZE)}
-                className="px-3 py-1.5 rounded-lg bg-[#0d1420] hover:bg-[#1a2230] text-slate-300 text-sm font-medium border border-[#1c2433] transition-colors"
+                className="px-3 py-1.5 rounded-xl bg-[#0e1b30] hover:bg-[#132a4a] text-slate-300 text-sm font-medium border border-[#1f3a5c] transition-colors"
               >
                 Carica altri ({results.length - visible} rimanenti)
               </button>
@@ -207,7 +207,7 @@ export const ProductPicker: React.FC<ProductPickerProps> = ({
         </div>
 
         {multiple && (
-          <div className="p-4 border-t border-[#1c2433] flex items-center justify-between gap-3 shrink-0">
+          <div className="p-4 border-t border-[#1f3a5c] flex items-center justify-between gap-3 shrink-0">
             <button
               type="button"
               onClick={() => setSelected(new Map())}
@@ -220,7 +220,7 @@ export const ProductPicker: React.FC<ProductPickerProps> = ({
               type="button"
               disabled={selected.size === 0}
               onClick={() => onConfirm(Array.from(selected.values()))}
-              className="px-4 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm transition-colors disabled:opacity-40"
+              className="px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-[#0b1a2e] font-bold text-sm transition-colors disabled:opacity-40"
             >
               Aggiungi alla coda ({selected.size})
             </button>

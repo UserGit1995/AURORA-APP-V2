@@ -606,8 +606,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({ isOpen, on
         {/* Tab: Rimuovi sfondo (AI) */}
         {removeBgMounted && (
           <div
-            className={activeTab === 'removebg' ? 'flex flex-col shrink-0 overflow-hidden' : 'hidden'}
-            style={{ height: 'calc(100vh - 11rem)' }}
+            className={activeTab === 'removebg' ? 'flex flex-col shrink-0 md:overflow-hidden md:h-[calc(100vh-11rem)]' : 'hidden'}
           >
             <RemoveBgStudio initialProductId={removeBgProductId} openToken={removeBgToken} />
           </div>

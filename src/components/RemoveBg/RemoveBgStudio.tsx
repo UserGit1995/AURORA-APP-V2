@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { CheckCircle2, AlertTriangle, X } from 'lucide-react';
+import { CheckCircle2, AlertTriangle, X } from './icone';
 import { useAdmin } from '../../context/AdminContext';
 import { hasRealImage } from '../../utils/bgRemoval/productImage';
 import { SingleEditor, type LoadRequest, type StudioProduct } from './SingleEditor';
@@ -144,14 +144,14 @@ export const RemoveBgStudio: React.FC<RemoveBgStudioProps> = ({
   };
 
   const modeSwitcher = allowBatch ? (
-    <div className="flex items-center rounded-lg bg-[#202434] p-0.5 border border-[#2e3448]">
+    <div className="flex items-center rounded-xl bg-[#132a4a] p-0.5 border border-[#1f3a5c]">
       {(['single', 'batch'] as Mode[]).map((m) => (
         <button
           key={m}
           type="button"
           onClick={() => switchMode(m)}
-          className={`px-3 py-1 rounded-md text-xs font-bold transition cursor-pointer ${
-            mode === m ? 'bg-emerald-500 text-slate-950 shadow' : 'text-slate-400 hover:text-white'
+          className={`px-3 py-1 rounded-xl text-xs font-bold whitespace-nowrap transition cursor-pointer ${
+            mode === m ? 'bg-sky-500 text-[#0b1a2e] shadow' : 'text-slate-400 hover:text-white'
           }`}
         >
           {m === 'single' ? 'Foto Singola' : 'Batch Multi-Foto'}
@@ -169,9 +169,9 @@ export const RemoveBgStudio: React.FC<RemoveBgStudioProps> = ({
   const alreadyQueued = new Set<string>();
 
   return (
-    <div className={`relative flex flex-col bg-[#101218] text-slate-100 ${className}`}>
+    <div className={`relative flex flex-col bg-transparent text-slate-100 ${className}`}>
       {product && mode === 'single' && (
-        <div className="px-4 py-1.5 bg-[#12151f] border-b border-[#242838] text-xs text-slate-400 flex items-center gap-2">
+        <div className="px-4 py-1.5 bg-[#0e1b30] border-b border-[#1f3a5c] text-xs text-slate-400 flex items-center gap-2">
           <span>Stai modificando la foto di</span>
           {product.code && <span className="font-mono text-slate-300">{product.code}</span>}
           <span className="font-semibold text-white truncate">{product.name}</span>

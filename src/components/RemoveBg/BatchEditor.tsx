@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Scissors, Download, Star, RefreshCw, Upload, FileArchive, FolderOpen, Trash2, Save, Square, CheckCircle2, AlertTriangle } from 'lucide-react';
+import { Scissors, Download, Star, RefreshCw, Upload, FileArchive, FolderOpen, Trash2, Save, Square, CheckCircle2, AlertTriangle } from './icone';
 import {
   createCanvas,
   loadImage,
@@ -296,7 +296,7 @@ export const BatchEditor: React.FC<BatchEditorProps> = ({ notify, onPickFromCata
   const doneTotal = items.filter((i) => i.status === 'done' || i.status === 'error').length;
 
   return (
-    <div className="flex-1 min-h-0 flex flex-col bg-[#101218] overflow-hidden select-none">
+    <div className="flex-1 min-h-0 flex flex-col bg-[#0b1a2e] md:overflow-hidden select-none rounded-[22px] border border-[#1f3a5c]">
       <input
         ref={fileInputRef}
         type="file"
@@ -310,9 +310,9 @@ export const BatchEditor: React.FC<BatchEditorProps> = ({ notify, onPickFromCata
       />
 
       {/* Barra strumenti */}
-      <div className="min-h-11 border-b border-[#242838] bg-[#161822] px-3 sm:px-4 py-1.5 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-300">
+      <div className="min-h-11 border-b border-[#1f3a5c] bg-[#0e1b30] px-3 sm:px-4 py-1.5 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-300">
         <div className="flex items-center gap-3">
-          <span className="font-extrabold text-emerald-400 flex items-center gap-1.5">
+          <span className="font-extrabold text-sky-400 flex items-center gap-1.5">
             <Scissors className="w-4 h-4" />
             AURORA REMOVE BG
           </span>
@@ -323,18 +323,18 @@ export const BatchEditor: React.FC<BatchEditorProps> = ({ notify, onPickFromCata
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="px-3 py-1 rounded bg-[#202434] hover:bg-[#2a3044] text-white font-bold flex items-center gap-1 cursor-pointer transition"
+            className="px-3 py-1 rounded bg-[#132a4a] hover:bg-[#1a3a63] text-white font-bold flex items-center gap-1 cursor-pointer transition"
           >
-            <Upload className="w-3.5 h-3.5 text-emerald-400" />
+            <Upload className="w-3.5 h-3.5 text-sky-400" />
             <span>Aggiungi File</span>
           </button>
 
           <button
             type="button"
             onClick={onPickFromCatalog}
-            className="px-3 py-1 rounded bg-[#202434] hover:bg-[#2a3044] text-white font-bold flex items-center gap-1 cursor-pointer transition"
+            className="px-3 py-1 rounded bg-[#132a4a] hover:bg-[#1a3a63] text-white font-bold flex items-center gap-1 cursor-pointer transition"
           >
-            <FolderOpen className="w-3.5 h-3.5 text-cyan-300" />
+            <FolderOpen className="w-3.5 h-3.5 text-sky-300" />
             <span>Dal catalogo</span>
           </button>
 
@@ -352,7 +352,7 @@ export const BatchEditor: React.FC<BatchEditorProps> = ({ notify, onPickFromCata
               type="button"
               onClick={handleRunBatch}
               disabled={pending === 0}
-              className="px-3 py-1 rounded bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold flex items-center gap-1 cursor-pointer transition shadow-sm disabled:opacity-50"
+              className="px-3 py-1 rounded bg-sky-500 hover:bg-sky-400 text-[#0b1a2e] font-bold flex items-center gap-1 cursor-pointer transition shadow-sm disabled:opacity-50"
             >
               <Star className="w-3.5 h-3.5" />
               <span>Scontorna Tutto ({pending})</span>
@@ -364,7 +364,7 @@ export const BatchEditor: React.FC<BatchEditorProps> = ({ notify, onPickFromCata
               type="button"
               onClick={handleDownloadZip}
               disabled={zipping}
-              className="px-3 py-1 rounded bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold flex items-center gap-1 cursor-pointer transition shadow-sm disabled:opacity-60"
+              className="px-3 py-1 rounded bg-amber-500 hover:bg-amber-400 text-[#0b1a2e] font-bold flex items-center gap-1 cursor-pointer transition shadow-sm disabled:opacity-60"
             >
               {zipping ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <FileArchive className="w-3.5 h-3.5" />}
               <span>Scarica ZIP</span>
@@ -376,7 +376,7 @@ export const BatchEditor: React.FC<BatchEditorProps> = ({ notify, onPickFromCata
               type="button"
               onClick={handleApplyAll}
               disabled={applying || running}
-              className="px-3 py-1 rounded bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold flex items-center gap-1 cursor-pointer transition shadow-sm disabled:opacity-60"
+              className="px-3 py-1 rounded bg-sky-500 hover:bg-sky-400 text-[#0b1a2e] font-bold flex items-center gap-1 cursor-pointer transition shadow-sm disabled:opacity-60"
             >
               {applying ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
               <span>Applica ai prodotti ({applicable.length})</span>
@@ -387,7 +387,7 @@ export const BatchEditor: React.FC<BatchEditorProps> = ({ notify, onPickFromCata
 
       {/* Contenuto */}
       <div
-        className="flex-1 min-h-0 bg-[#0b0c10] flex flex-col p-4 sm:p-6 overflow-hidden"
+        className="flex-1 min-h-[60vh] md:min-h-0 bg-[#07111f] flex flex-col p-4 sm:p-6 md:overflow-hidden"
         onDragOver={(e) => e.preventDefault()}
         onDrop={(e) => {
           e.preventDefault();
@@ -398,7 +398,7 @@ export const BatchEditor: React.FC<BatchEditorProps> = ({ notify, onPickFromCata
           <div>
             <h3 className="text-lg font-bold text-white flex flex-wrap items-center gap-2">
               <span>Scontorno Multiplo — Elaborazione in blocco</span>
-              <span className="text-xs px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-mono font-bold">
+              <span className="text-xs px-2 py-0.5 rounded bg-sky-500/20 text-sky-300 font-mono font-bold">
                 {items.length} foto in coda
               </span>
             </h3>
@@ -415,7 +415,7 @@ export const BatchEditor: React.FC<BatchEditorProps> = ({ notify, onPickFromCata
                 checked={autoCrop}
                 onChange={(e) => setAutoCrop(e.target.checked)}
                 disabled={running}
-                className="rounded accent-emerald-400"
+                className="rounded accent-sky-400"
               />
               <span>Auto-Crop</span>
             </label>
@@ -424,7 +424,7 @@ export const BatchEditor: React.FC<BatchEditorProps> = ({ notify, onPickFromCata
                 type="checkbox"
                 checked={whiteBackdrop}
                 onChange={(e) => setWhiteBackdrop(e.target.checked)}
-                className="rounded accent-emerald-400"
+                className="rounded accent-sky-400"
               />
               <span>Sfondo bianco (JPG)</span>
             </label>
@@ -443,7 +443,7 @@ export const BatchEditor: React.FC<BatchEditorProps> = ({ notify, onPickFromCata
 
         {running && (
           <div className="mb-3 flex items-center gap-2 text-xs text-slate-300">
-            <RefreshCw className="w-3.5 h-3.5 animate-spin text-emerald-400" />
+            <RefreshCw className="w-3.5 h-3.5 animate-spin text-sky-400" />
             <span>
               Scontorno in corso… {doneTotal}/{items.length}. Non chiudere questa finestra.
             </span>
@@ -453,8 +453,8 @@ export const BatchEditor: React.FC<BatchEditorProps> = ({ notify, onPickFromCata
         {items.length === 0 ? (
           <div className="flex-1 flex items-center justify-center">
             <div className="flex flex-col items-center gap-4 text-center max-w-sm">
-              <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center">
-                <Upload className="w-8 h-8 text-emerald-400" />
+              <div className="w-16 h-16 rounded-2xl bg-sky-500/10 border border-sky-500/30 flex items-center justify-center">
+                <Upload className="w-8 h-8 text-sky-400" />
               </div>
               <div className="space-y-1">
                 <h4 className="text-base font-bold text-white">La coda è vuota</h4>
@@ -466,7 +466,7 @@ export const BatchEditor: React.FC<BatchEditorProps> = ({ notify, onPickFromCata
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-md"
+                  className="px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-[#0b1a2e] font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-md"
                 >
                   <Upload className="w-4 h-4" />
                   <span>Carica Foto per Batch</span>
@@ -474,9 +474,9 @@ export const BatchEditor: React.FC<BatchEditorProps> = ({ notify, onPickFromCata
                 <button
                   type="button"
                   onClick={onPickFromCatalog}
-                  className="px-4 py-2 rounded-xl bg-[#202434] hover:bg-[#2a3044] text-slate-200 font-bold text-xs flex items-center gap-1.5 cursor-pointer"
+                  className="px-4 py-2 rounded-xl bg-[#132a4a] hover:bg-[#1a3a63] text-slate-200 font-bold text-xs flex items-center gap-1.5 cursor-pointer"
                 >
-                  <FolderOpen className="w-4 h-4 text-cyan-300" />
+                  <FolderOpen className="w-4 h-4 text-sky-300" />
                   <span>Scegli dal catalogo</span>
                 </button>
               </div>
@@ -487,7 +487,7 @@ export const BatchEditor: React.FC<BatchEditorProps> = ({ notify, onPickFromCata
             {items.map((item) => (
               <div
                 key={item.id}
-                className="rounded-xl border border-[#272b3b] bg-[#141620] overflow-hidden flex flex-col justify-between"
+                className="rounded-xl border border-[#1f3a5c] bg-[#0e1b30] overflow-hidden flex flex-col justify-between"
               >
                 <div className="aspect-[4/3] bg-transparency-grid relative overflow-hidden flex items-center justify-center">
                   <img
@@ -498,17 +498,17 @@ export const BatchEditor: React.FC<BatchEditorProps> = ({ notify, onPickFromCata
                   />
                   {item.status === 'processing' && (
                     <div className="absolute inset-0 bg-black/60 flex items-center justify-center gap-2 text-white text-xs font-bold">
-                      <RefreshCw className="w-4 h-4 animate-spin text-emerald-400" />
+                      <RefreshCw className="w-4 h-4 animate-spin text-sky-400" />
                       <span>Scontorno in corso...</span>
                     </div>
                   )}
                   {item.status === 'done' && (
-                    <span className="absolute top-2 left-2 px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500 text-slate-950">
+                    <span className="absolute top-2 left-2 px-2 py-0.5 rounded text-[10px] font-bold bg-sky-500 text-[#0b1a2e]">
                       SCONTORNATO
                     </span>
                   )}
                   {item.applied && (
-                    <span className="absolute top-2 right-2 px-2 py-0.5 rounded text-[10px] font-bold bg-cyan-400 text-slate-950 flex items-center gap-1">
+                    <span className="absolute top-2 right-2 px-2 py-0.5 rounded text-[10px] font-bold bg-sky-400 text-[#0b1a2e] flex items-center gap-1">
                       <CheckCircle2 className="w-3 h-3" />
                       APPLICATA
                     </span>
@@ -530,7 +530,7 @@ export const BatchEditor: React.FC<BatchEditorProps> = ({ notify, onPickFromCata
                     </button>
                   )}
                 </div>
-                <div className="p-3 border-t border-[#222533] flex items-center justify-between gap-2 text-xs">
+                <div className="p-3 border-t border-[#1f3a5c] flex items-center justify-between gap-2 text-xs">
                   <div className="min-w-0">
                     {item.code && <div className="font-mono text-[10px] text-slate-500">{item.code}</div>}
                     <span className="font-bold text-slate-200 truncate block">{item.name}</span>
@@ -543,7 +543,7 @@ export const BatchEditor: React.FC<BatchEditorProps> = ({ notify, onPickFromCata
                           onClick={() => handleApplyOne(item)}
                           disabled={applying}
                           title="Sostituisci la foto del prodotto"
-                          className="p-1 rounded bg-cyan-500/20 text-cyan-300 hover:bg-cyan-500 hover:text-slate-950 transition cursor-pointer disabled:opacity-50"
+                          className="p-1 rounded bg-sky-500/20 text-sky-300 hover:bg-sky-500 hover:text-[#0b1a2e] transition cursor-pointer disabled:opacity-50"
                         >
                           <Save className="w-3.5 h-3.5" />
                         </button>
@@ -552,7 +552,7 @@ export const BatchEditor: React.FC<BatchEditorProps> = ({ notify, onPickFromCata
                         type="button"
                         onClick={() => handleDownloadOne(item)}
                         title="Scarica"
-                        className="p-1 rounded bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500 hover:text-slate-950 transition cursor-pointer"
+                        className="p-1 rounded bg-sky-500/20 text-sky-300 hover:bg-sky-500 hover:text-[#0b1a2e] transition cursor-pointer"
                       >
                         <Download className="w-3.5 h-3.5" />
                       </button>

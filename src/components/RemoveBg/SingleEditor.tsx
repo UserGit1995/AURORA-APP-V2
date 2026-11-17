@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Scissors, Download, Star, RefreshCw, Eraser, Paintbrush, Check, Crop, Undo2, Redo2, Wand2, Upload, ZoomIn, ZoomOut, Save, FolderOpen, AlertTriangle, Loader2 } from 'lucide-react';
+import { Scissors, Download, Star, RefreshCw, Eraser, Paintbrush, Check, Crop, Undo2, Redo2, Wand2, Upload, ZoomIn, ZoomOut, Save, FolderOpen, AlertTriangle, Loader2 } from './icone';
 import {
   createCanvas,
   pixelCtx,
@@ -605,10 +605,10 @@ export const SingleEditor: React.FC<SingleEditorProps> = ({
       type="button"
       onClick={() => setActiveFineTune(activeFineTune === tool ? 'none' : tool)}
       disabled={!ready}
-      className={`py-2 px-1 rounded-lg border text-center transition cursor-pointer flex flex-col items-center gap-1 disabled:opacity-40 disabled:cursor-not-allowed ${
+      className={`py-2 px-1 rounded-xl border text-center transition cursor-pointer flex flex-col items-center gap-1 disabled:opacity-40 disabled:cursor-not-allowed ${
         activeFineTune === tool
           ? 'border-amber-400 bg-amber-500/10 text-amber-300 font-bold'
-          : 'border-[#292e40] bg-[#1b1e2c] text-slate-400 hover:text-white'
+          : 'border-[#1f3a5c] bg-[#132a4a] text-slate-400 hover:text-white'
       }`}
     >
       {icon}
@@ -622,8 +622,8 @@ export const SingleEditor: React.FC<SingleEditorProps> = ({
       onClick={() => updateScene({ backdropType: type })}
       className={`p-2.5 rounded-xl border font-semibold flex items-center gap-2 transition cursor-pointer ${
         scene.backdropType === type
-          ? 'border-emerald-400 bg-emerald-500/10 text-emerald-300'
-          : 'border-[#262939] bg-[#181a24] text-slate-400 hover:bg-[#202330]'
+          ? 'border-sky-400 bg-sky-500/10 text-sky-300'
+          : 'border-[#1f3a5c] bg-[#132a4a] text-slate-400 hover:bg-[#132a4a]'
       }`}
     >
       {swatch}
@@ -632,26 +632,26 @@ export const SingleEditor: React.FC<SingleEditorProps> = ({
   );
 
   return (
-    <div className="flex-1 min-h-0 flex flex-col bg-[#101218] overflow-hidden select-none">
+    <div className="flex-1 min-h-0 flex flex-col bg-[#0b1a2e] md:overflow-hidden select-none rounded-[22px] border border-[#1f3a5c]">
       <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleFileInput} />
 
       {/* Barra strumenti */}
-      <div className="min-h-11 border-b border-[#242838] bg-[#161822] px-3 sm:px-4 py-1.5 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-300">
+      <div className="min-h-11 border-b border-[#1f3a5c] bg-[#0e1b30] px-3 sm:px-4 py-1.5 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-300">
         <div className="flex items-center gap-3">
-          <span className="font-extrabold text-emerald-400 flex items-center gap-1.5">
+          <span className="font-extrabold text-sky-400 flex items-center gap-1.5">
             <Scissors className="w-4 h-4" />
             AURORA REMOVE BG
           </span>
 
           {modeSwitcher}
 
-          <div className="flex items-center gap-1 pl-2 border-l border-[#282d3e]">
+          <div className="flex items-center gap-1 pl-2 border-l border-[#1f3a5c]">
             <button
               type="button"
               onClick={handleUndo}
               disabled={!canUndo}
               title="Annulla modifica (Ctrl+Z)"
-              className="p-1 rounded hover:bg-[#252a3a] disabled:opacity-30 disabled:hover:bg-transparent text-slate-300 transition"
+              className="p-1 rounded hover:bg-[#132a4a] disabled:opacity-30 disabled:hover:bg-transparent text-slate-300 transition"
             >
               <Undo2 className="w-3.5 h-3.5" />
             </button>
@@ -660,7 +660,7 @@ export const SingleEditor: React.FC<SingleEditorProps> = ({
               onClick={handleRedo}
               disabled={!canRedo}
               title="Ripeti modifica (Ctrl+Y)"
-              className="p-1 rounded hover:bg-[#252a3a] disabled:opacity-30 disabled:hover:bg-transparent text-slate-300 transition"
+              className="p-1 rounded hover:bg-[#132a4a] disabled:opacity-30 disabled:hover:bg-transparent text-slate-300 transition"
             >
               <Redo2 className="w-3.5 h-3.5" />
             </button>
@@ -672,7 +672,7 @@ export const SingleEditor: React.FC<SingleEditorProps> = ({
             type="button"
             onClick={handleAutoCrop}
             disabled={!ready}
-            className="px-2.5 py-1 rounded bg-[#202434] hover:bg-[#2a3044] text-slate-200 font-semibold flex items-center gap-1.5 transition cursor-pointer disabled:opacity-50"
+            className="px-2.5 py-1 rounded bg-[#132a4a] hover:bg-[#1a3a63] text-slate-200 font-semibold flex items-center gap-1.5 transition cursor-pointer disabled:opacity-50"
             title="Ritaglia automaticamente i bordi vuoti"
           >
             <Crop className="w-3.5 h-3.5 text-amber-400" />
@@ -682,9 +682,9 @@ export const SingleEditor: React.FC<SingleEditorProps> = ({
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="px-2.5 py-1 rounded bg-[#202434] hover:bg-[#2a3044] text-slate-200 font-semibold flex items-center gap-1.5 transition cursor-pointer"
+            className="px-2.5 py-1 rounded bg-[#132a4a] hover:bg-[#1a3a63] text-slate-200 font-semibold flex items-center gap-1.5 transition cursor-pointer"
           >
-            <Upload className="w-3.5 h-3.5 text-emerald-400" />
+            <Upload className="w-3.5 h-3.5 text-sky-400" />
             <span className="hidden sm:inline">Carica Foto</span>
           </button>
 
@@ -692,10 +692,10 @@ export const SingleEditor: React.FC<SingleEditorProps> = ({
             <button
               type="button"
               onClick={onPickFromCatalog}
-              className="px-2.5 py-1 rounded bg-[#202434] hover:bg-[#2a3044] text-slate-200 font-semibold flex items-center gap-1.5 transition cursor-pointer"
+              className="px-2.5 py-1 rounded bg-[#132a4a] hover:bg-[#1a3a63] text-slate-200 font-semibold flex items-center gap-1.5 transition cursor-pointer"
               title="Scegli un prodotto del catalogo"
             >
-              <FolderOpen className="w-3.5 h-3.5 text-cyan-300" />
+              <FolderOpen className="w-3.5 h-3.5 text-sky-300" />
               <span className="hidden lg:inline">Dal catalogo</span>
             </button>
           )}
@@ -705,7 +705,7 @@ export const SingleEditor: React.FC<SingleEditorProps> = ({
               type="button"
               onClick={handleSave}
               disabled={!ready || saving}
-              className="px-2.5 py-1 rounded bg-[#1f2538] hover:bg-[#2b334c] text-cyan-300 font-semibold flex items-center gap-1 transition cursor-pointer disabled:opacity-50"
+              className="px-2.5 py-1 rounded bg-[#132a4a] hover:bg-[#1a3a63] text-sky-300 font-semibold flex items-center gap-1 transition cursor-pointer disabled:opacity-50"
               title={saveLabel}
             >
               {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
@@ -717,7 +717,7 @@ export const SingleEditor: React.FC<SingleEditorProps> = ({
             type="button"
             onClick={handleDownload}
             disabled={!ready}
-            className="px-3.5 py-1 rounded bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black flex items-center gap-1.5 transition cursor-pointer shadow-sm disabled:opacity-50"
+            className="px-3.5 py-1 rounded bg-sky-500 hover:bg-sky-400 text-[#0b1a2e] font-black flex items-center gap-1.5 transition cursor-pointer shadow-sm disabled:opacity-50"
           >
             <Download className="w-3.5 h-3.5" />
             <span>{downloadLabel}</span>
@@ -725,11 +725,11 @@ export const SingleEditor: React.FC<SingleEditorProps> = ({
         </div>
       </div>
 
-      <div className="flex-1 min-h-0 flex flex-col md:flex-row overflow-hidden">
+      <div className="flex-1 min-h-0 flex flex-col md:flex-row md:overflow-hidden">
         {/* Pannello sinistro */}
-        <aside className="w-full md:w-84 max-h-[42vh] md:max-h-none border-b md:border-b-0 md:border-r border-[#242838] bg-[#141620] flex flex-col shrink-0 overflow-y-auto p-4 space-y-4">
+        <aside className="w-full md:w-84 md:max-h-none border-b md:border-b-0 md:border-r border-[#1f3a5c] bg-[#0e1b30] flex flex-col shrink-0 overflow-y-auto p-4 space-y-4">
           {/* Rifinitura di precisione */}
-          <div className="p-3.5 rounded-xl bg-[#191c28] border border-[#272b3b] space-y-3">
+          <div className="p-3.5 rounded-xl bg-[#132a4a] border border-[#1f3a5c] space-y-3">
             <div className="flex items-center justify-between">
               <span className="font-extrabold text-xs text-white uppercase tracking-wider flex items-center gap-1.5">
                 <Wand2 className="w-3.5 h-3.5 text-amber-400" />
@@ -753,15 +753,15 @@ export const SingleEditor: React.FC<SingleEditorProps> = ({
             </div>
 
             {activeFineTune !== 'none' && (
-              <div className="pt-2 border-t border-[#262a3a] space-y-2.5">
+              <div className="pt-2 border-t border-[#1f3a5c] space-y-2.5">
                 <div className="grid grid-cols-2 gap-1.5 text-xs font-bold">
                   <button
                     type="button"
                     onClick={() => setBrushMode('erase')}
-                    className={`py-1.5 rounded-lg border flex items-center justify-center gap-1 transition cursor-pointer ${
+                    className={`py-1.5 rounded-xl border flex items-center justify-center gap-1 transition cursor-pointer ${
                       brushMode === 'erase'
                         ? 'border-rose-500 bg-rose-500/20 text-rose-300'
-                        : 'border-[#292e40] bg-[#1b1e2c] text-slate-400'
+                        : 'border-[#1f3a5c] bg-[#132a4a] text-slate-400'
                     }`}
                   >
                     <Eraser className="w-3.5 h-3.5" />
@@ -770,10 +770,10 @@ export const SingleEditor: React.FC<SingleEditorProps> = ({
                   <button
                     type="button"
                     onClick={() => setBrushMode('restore')}
-                    className={`py-1.5 rounded-lg border flex items-center justify-center gap-1 transition cursor-pointer ${
+                    className={`py-1.5 rounded-xl border flex items-center justify-center gap-1 transition cursor-pointer ${
                       brushMode === 'restore'
-                        ? 'border-emerald-500 bg-emerald-500/20 text-emerald-300'
-                        : 'border-[#292e40] bg-[#1b1e2c] text-slate-400'
+                        ? 'border-sky-500 bg-sky-500/20 text-sky-300'
+                        : 'border-[#1f3a5c] bg-[#132a4a] text-slate-400'
                     }`}
                   >
                     <Check className="w-3.5 h-3.5" />
@@ -847,29 +847,29 @@ export const SingleEditor: React.FC<SingleEditorProps> = ({
               {backdropBtn(
                 'transparent',
                 'Trasparente',
-                <div className="w-4 h-4 rounded bg-transparency-grid shrink-0 border border-slate-700" />
+                <div className="w-4 h-4 rounded bg-transparency-grid shrink-0 border border-[#1f3a5c]" />
               )}
               {backdropBtn(
                 'color',
                 'Tinta Unita',
                 <div
-                  className="w-4 h-4 rounded shrink-0 border border-slate-700"
-                  style={{ backgroundColor: scene.color === 'transparent' ? '#181a24' : scene.color }}
+                  className="w-4 h-4 rounded shrink-0 border border-[#1f3a5c]"
+                  style={{ backgroundColor: scene.color === 'transparent' ? '#0e1b30' : scene.color }}
                 />
               )}
               {backdropBtn(
                 'gradient',
                 'Sfumatura',
                 <div
-                  className="w-4 h-4 rounded shrink-0 border border-slate-700"
+                  className="w-4 h-4 rounded shrink-0 border border-[#1f3a5c]"
                   style={{ background: gradientCss(GRADIENTS.find((g) => g.id === scene.gradientId) ?? GRADIENTS[0]) }}
                 />
               )}
-              {backdropBtn('blur', 'Sfocatura Bokeh', <Star className="w-4 h-4 text-emerald-400 shrink-0" />)}
+              {backdropBtn('blur', 'Sfocatura Bokeh', <Star className="w-4 h-4 text-sky-400 shrink-0" />)}
             </div>
 
             {scene.backdropType === 'color' && (
-              <div className="space-y-2 pt-2 border-t border-[#222533]">
+              <div className="space-y-2 pt-2 border-t border-[#1f3a5c]">
                 <span className="text-xs text-slate-400">Palette Studio:</span>
                 <div className="grid grid-cols-4 gap-2">
                   {STUDIO_COLORS.map((c) => (
@@ -878,10 +878,10 @@ export const SingleEditor: React.FC<SingleEditorProps> = ({
                       key={c.hex}
                       title={c.name}
                       onClick={() => updateScene({ color: c.hex })}
-                      className={`h-9 rounded-lg border transition cursor-pointer flex items-center justify-center ${
+                      className={`h-9 rounded-xl border transition cursor-pointer flex items-center justify-center ${
                         scene.color === c.hex ? 'border-amber-400 scale-105' : 'border-transparent'
                       }`}
-                      style={{ backgroundColor: c.hex === 'transparent' ? '#181a24' : c.hex }}
+                      style={{ backgroundColor: c.hex === 'transparent' ? '#0e1b30' : c.hex }}
                     >
                       {scene.color === c.hex && (
                         <Check
@@ -899,7 +899,7 @@ export const SingleEditor: React.FC<SingleEditorProps> = ({
             )}
 
             {scene.backdropType === 'gradient' && (
-              <div className="space-y-1.5 pt-2 border-t border-[#222533]">
+              <div className="space-y-1.5 pt-2 border-t border-[#1f3a5c]">
                 {GRADIENTS.map((g) => (
                   <button
                     type="button"
@@ -918,10 +918,10 @@ export const SingleEditor: React.FC<SingleEditorProps> = ({
             )}
 
             {scene.backdropType === 'blur' && (
-              <div className="space-y-1 pt-2 border-t border-[#222533]">
+              <div className="space-y-1 pt-2 border-t border-[#1f3a5c]">
                 <div className="flex justify-between text-xs text-slate-400">
                   <span>Intensità Sfocatura</span>
-                  <span className="font-mono text-emerald-400">{scene.blurAmount}px</span>
+                  <span className="font-mono text-sky-400">{scene.blurAmount}px</span>
                 </div>
                 <input
                   type="range"
@@ -929,14 +929,14 @@ export const SingleEditor: React.FC<SingleEditorProps> = ({
                   max="45"
                   value={scene.blurAmount}
                   onChange={(e) => updateScene({ blurAmount: Number(e.target.value) })}
-                  className="w-full accent-emerald-400"
+                  className="w-full accent-sky-400"
                 />
               </div>
             )}
           </div>
 
           {/* Effetti soggetto */}
-          <div className="space-y-3 pt-3 border-t border-[#222533]">
+          <div className="space-y-3 pt-3 border-t border-[#1f3a5c]">
             <span className="font-bold text-xs uppercase tracking-wider text-slate-300 block">Effetti Soggetto</span>
 
             <label className="flex items-center justify-between text-xs text-slate-300 cursor-pointer">
@@ -945,7 +945,7 @@ export const SingleEditor: React.FC<SingleEditorProps> = ({
                 type="checkbox"
                 checked={scene.shadow}
                 onChange={(e) => updateScene({ shadow: e.target.checked })}
-                className="rounded accent-emerald-400"
+                className="rounded accent-sky-400"
               />
             </label>
 
@@ -955,7 +955,7 @@ export const SingleEditor: React.FC<SingleEditorProps> = ({
                 type="checkbox"
                 checked={scene.stroke}
                 onChange={(e) => updateScene({ stroke: e.target.checked })}
-                className="rounded accent-emerald-400"
+                className="rounded accent-sky-400"
               />
             </label>
 
@@ -965,7 +965,7 @@ export const SingleEditor: React.FC<SingleEditorProps> = ({
                   type="color"
                   value={scene.strokeColor}
                   onChange={(e) => updateScene({ strokeColor: e.target.value })}
-                  className="w-7 h-7 rounded border border-slate-600 bg-transparent cursor-pointer"
+                  className="w-7 h-7 rounded border border-[#1f3a5c] bg-transparent cursor-pointer"
                 />
                 <input
                   type="range"
@@ -973,7 +973,7 @@ export const SingleEditor: React.FC<SingleEditorProps> = ({
                   max="18"
                   value={scene.strokeWidth}
                   onChange={(e) => updateScene({ strokeWidth: Number(e.target.value) })}
-                  className="flex-1 accent-emerald-400"
+                  className="flex-1 accent-sky-400"
                 />
                 <span className="text-xs font-mono">{scene.strokeWidth}px</span>
               </div>
@@ -983,8 +983,8 @@ export const SingleEditor: React.FC<SingleEditorProps> = ({
 
         {/* Area di lavoro */}
         <main
-          className={`flex-1 min-w-0 min-h-[50vh] md:min-h-0 bg-[#0b0c10] relative ${
-            dragOver ? 'ring-2 ring-inset ring-emerald-400' : ''
+          className={`flex-1 min-w-0 h-[65vh] md:h-auto min-h-[320px] md:min-h-0 bg-[#07111f] relative ${
+            dragOver ? 'ring-2 ring-inset ring-sky-400' : ''
           }`}
           onDragOver={(e) => {
             e.preventDefault();
@@ -1013,14 +1013,14 @@ export const SingleEditor: React.FC<SingleEditorProps> = ({
 
             {status === 'processing' && (
               <div className="m-auto flex flex-col items-center gap-4 text-slate-200 p-6">
-                <div className="w-14 h-14 border-4 border-emerald-400 border-t-transparent rounded-full animate-spin shadow-lg" />
+                <div className="w-14 h-14 border-4 border-sky-400 border-t-transparent rounded-full animate-spin shadow-lg" />
                 <div className="text-center space-y-1">
                   <h4 className="text-base font-bold text-white">{progress.stage}</h4>
                   <p className="text-xs text-slate-400">Rilevamento profondo del soggetto e isolamento trasparente PNG</p>
                 </div>
-                <div className="w-64 h-2 bg-[#1e2332] rounded-full overflow-hidden">
+                <div className="w-64 h-2 bg-[#132a4a] rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-emerald-500 transition-all duration-300"
+                    className="h-full bg-sky-500 transition-all duration-300"
                     style={{ width: `${progress.percent}%` }}
                   />
                 </div>
@@ -1029,8 +1029,8 @@ export const SingleEditor: React.FC<SingleEditorProps> = ({
 
             {status === 'empty' && (
               <div className="m-auto flex flex-col items-center gap-4 text-center p-6 max-w-sm">
-                <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center">
-                  <Scissors className="w-8 h-8 text-emerald-400" />
+                <div className="w-16 h-16 rounded-2xl bg-sky-500/10 border border-sky-500/30 flex items-center justify-center">
+                  <Scissors className="w-8 h-8 text-sky-400" />
                 </div>
                 <div className="space-y-1">
                   <h4 className="text-base font-bold text-white">
@@ -1044,7 +1044,7 @@ export const SingleEditor: React.FC<SingleEditorProps> = ({
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
-                    className="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-md"
+                    className="px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-[#0b1a2e] font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-md"
                   >
                     <Upload className="w-4 h-4" />
                     <span>Carica Foto</span>
@@ -1053,9 +1053,9 @@ export const SingleEditor: React.FC<SingleEditorProps> = ({
                     <button
                       type="button"
                       onClick={onPickFromCatalog}
-                      className="px-4 py-2 rounded-xl bg-[#202434] hover:bg-[#2a3044] text-slate-200 font-bold text-xs flex items-center gap-1.5 cursor-pointer"
+                      className="px-4 py-2 rounded-xl bg-[#132a4a] hover:bg-[#1a3a63] text-slate-200 font-bold text-xs flex items-center gap-1.5 cursor-pointer"
                     >
-                      <FolderOpen className="w-4 h-4 text-cyan-300" />
+                      <FolderOpen className="w-4 h-4 text-sky-300" />
                       <span>Scegli dal catalogo</span>
                     </button>
                   )}
@@ -1074,7 +1074,7 @@ export const SingleEditor: React.FC<SingleEditorProps> = ({
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
-                    className="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs flex items-center gap-1.5 cursor-pointer"
+                    className="px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-[#0b1a2e] font-bold text-xs flex items-center gap-1.5 cursor-pointer"
                   >
                     <Upload className="w-4 h-4" />
                     <span>Carica un'altra foto</span>
@@ -1083,7 +1083,7 @@ export const SingleEditor: React.FC<SingleEditorProps> = ({
                     <button
                       type="button"
                       onClick={() => runCutout(lastSourceRef.current!.url, lastSourceRef.current!.name)}
-                      className="px-4 py-2 rounded-xl bg-[#202434] hover:bg-[#2a3044] text-slate-200 font-bold text-xs flex items-center gap-1.5 cursor-pointer"
+                      className="px-4 py-2 rounded-xl bg-[#132a4a] hover:bg-[#1a3a63] text-slate-200 font-bold text-xs flex items-center gap-1.5 cursor-pointer"
                     >
                       <RefreshCw className="w-4 h-4" />
                       <span>Riprova</span>
@@ -1096,7 +1096,7 @@ export const SingleEditor: React.FC<SingleEditorProps> = ({
             {ready && size && (
               <div className="m-auto p-6">
                 <div
-                  className={`relative shadow-2xl rounded-xl overflow-hidden border border-[#272b3b] ${
+                  className={`relative shadow-2xl rounded-xl overflow-hidden border border-[#1f3a5c] ${
                     showGrid ? 'bg-transparency-grid' : ''
                   }`}
                   style={{ width: dispW, height: dispH }}
@@ -1127,20 +1127,20 @@ export const SingleEditor: React.FC<SingleEditorProps> = ({
 
           {/* Barra zoom */}
           {ready && (
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-[#171923]/90 backdrop-blur-md border border-[#272b3b] rounded-xl px-3 py-1.5 flex items-center gap-3 text-xs text-slate-300 shadow-xl z-20">
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-[#0e1b30]/90 backdrop-blur-md border border-[#1f3a5c] rounded-xl px-3 py-1.5 flex items-center gap-3 text-xs text-slate-300 shadow-xl z-20">
               <button
                 type="button"
                 onClick={() => setZoom((z) => Math.max(0.3, Math.round((z - 0.1) * 100) / 100))}
-                className="p-1 rounded hover:bg-[#232738] transition cursor-pointer"
+                className="p-1 rounded hover:bg-[#132a4a] transition cursor-pointer"
                 aria-label="Riduci zoom"
               >
                 <ZoomOut className="w-3.5 h-3.5" />
               </button>
-              <span className="w-12 text-center font-mono font-bold text-emerald-400">{Math.round(zoom * 100)}%</span>
+              <span className="w-12 text-center font-mono font-bold text-sky-400">{Math.round(zoom * 100)}%</span>
               <button
                 type="button"
                 onClick={() => setZoom((z) => Math.min(4, Math.round((z + 0.1) * 100) / 100))}
-                className="p-1 rounded hover:bg-[#232738] transition cursor-pointer"
+                className="p-1 rounded hover:bg-[#132a4a] transition cursor-pointer"
                 aria-label="Aumenta zoom"
               >
                 <ZoomIn className="w-3.5 h-3.5" />
@@ -1148,7 +1148,7 @@ export const SingleEditor: React.FC<SingleEditorProps> = ({
               <button
                 type="button"
                 onClick={() => setZoom(1)}
-                className="px-2 py-0.5 rounded hover:bg-[#232738] text-[11px] font-semibold text-slate-300 transition cursor-pointer"
+                className="px-2 py-0.5 rounded hover:bg-[#132a4a] text-[11px] font-semibold text-slate-300 transition cursor-pointer"
               >
                 100%
               </button>
