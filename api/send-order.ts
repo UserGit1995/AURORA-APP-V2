@@ -525,6 +525,14 @@ async function lastClientMessage(id: string): Promise<string> {
 // WhatsApp all'amministratore tramite CallMeBot (gratis, uso personale).
 // Su Vercel: CALLMEBOT_APIKEY (la chiave che CallMeBot manda su WhatsApp).
 // Facoltativa: WHATSAPP_ADMIN_PHONE (default 393456000865).
+/** Numero del cliente nel formato di WhatsApp (39 + numero), per il link "Rispondi su WhatsApp". */
+function waNumber(phone: string | null | undefined): string {
+  let n = String(phone || '').replace(/[^0-9]/g, '');
+  if (n.startsWith('00')) n = n.slice(2);
+  if (n.length >= 9 && n.length <= 10 && /^[03]/.test(n)) n = '39' + n;
+  return n.length >= 8 && n.length <= 15 ? n : '';
+}
+
 function whatsappConfigured(): boolean {
   return !!process.env.CALLMEBOT_APIKEY;
 }
@@ -621,7 +629,15 @@ async function handleChatNotify(body: any, req: any, res: any): Promise<boolean>
         tag: `chat-${id}`,
       }),
       notifyWhatsApp(
-        [`💬 *Nuovo messaggio in chat da ${name}*`, `Tel. ${str(conv.phone, 20)}`, '', full || 'Nuovo messaggio', '', base ? `Rispondi dal pannello: ${base}/admin-chat` : '']
+        [
+          `💬 *Nuovo messaggio in chat da ${name}*`,
+          `Tel. ${str(conv.phone, 20)}`,
+          '',
+          full || 'Nuovo messaggio',
+          '',
+          waNumber(conv.phone) ? `👉 Rispondi su WhatsApp: https://wa.me/${waNumber(conv.phone)}` : '',
+          base ? `👉 Rispondi dal sito: ${base}/admin-chat` : '',
+        ]
           .filter((x, i, a) => x !== '' || (i > 0 && a[i - 1] !== ''))
           .join('\n')
           .trim()
