@@ -12,6 +12,8 @@
  * Notifiche sul telefono per ogni ordine: VAPID_PRIVATE_KEY + SUPABASE_SERVICE_ROLE_KEY
  * Notifiche della chat (cliente -> admin e admin -> cliente, + email al cliente): stesse chiavi,
  * più lo script supabase/chat_notifiche.sql.
+ * Messaggi della chat anche su WhatsApp dell'admin (gratis, CallMeBot): CALLMEBOT_APIKEY
+ * (facoltativa WHATSAPP_ADMIN_PHONE, default 393456000865).
  * Richieste di lavori grafici (kind: 'design', pagina "Simone Aricò"): vanno all'indirizzo
  * scritto in DESIGN_TO_EMAIL (solo su Vercel, mai nel codice); se manca, a ORDERS_TO_EMAIL.
  *
@@ -510,6 +512,44 @@ async function lastAdminMessage(id: string): Promise<string> {
   return str(rows[0]?.body, 2000);
 }
 
+async function lastClientMessage(id: string): Promise<string> {
+  const r = await fetch(
+    `${supaUrl()}/rest/v1/chat_messages?conversation_id=eq.${id}&sender=eq.cliente&select=body&order=created_at.desc&limit=1`,
+    { headers: serviceHeaders() }
+  );
+  if (!r.ok) return '';
+  const rows = (await r.json()) as { body: string }[];
+  return str(rows[0]?.body, 2000);
+}
+
+// WhatsApp all'amministratore tramite CallMeBot (gratis, uso personale).
+// Su Vercel: CALLMEBOT_APIKEY (la chiave che CallMeBot manda su WhatsApp).
+// Facoltativa: WHATSAPP_ADMIN_PHONE (default 393456000865).
+function whatsappConfigured(): boolean {
+  return !!process.env.CALLMEBOT_APIKEY;
+}
+
+async function notifyWhatsApp(text: string): Promise<boolean> {
+  if (!whatsappConfigured()) return false;
+  const phone = String(process.env.WHATSAPP_ADMIN_PHONE || '393456000865').replace(/[^0-9]/g, '');
+  const url = `https://api.callmebot.com/whatsapp.php?phone=${phone}&text=${encodeURIComponent(text.slice(0, 1500))}&apikey=${encodeURIComponent(String(process.env.CALLMEBOT_APIKEY).trim())}`;
+  try {
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 8000);
+    const r = await fetch(url, { signal: ctrl.signal });
+    clearTimeout(t);
+    const body = (await r.text()).slice(0, 300);
+    if (!r.ok || /error|invalid|not (been )?activated/i.test(body)) {
+      console.error('whatsapp: invio non riuscito', r.status, body);
+      return false;
+    }
+    return true;
+  } catch (e: any) {
+    console.error('whatsapp: errore', e?.message || e);
+    return false;
+  }
+}
+
 async function loadChatSubs(id: string): Promise<PushSub[]> {
   const r = await fetch(`${supaUrl()}/rest/v1/chat_push_subs?conversation_id=eq.${id}&select=endpoint,p256dh,auth`, { headers: serviceHeaders() });
   if (!r.ok) return []; // tabella non ancora creata
@@ -571,13 +611,23 @@ async function handleChatNotify(body: any, req: any, res: any): Promise<boolean>
       return true;
     }
     const name = str(conv.name, 80) || 'Cliente';
-    const result = await notifyPhones({
-      title: `💬 ${name} ti ha scritto`,
-      body: short(str(conv.last_message, 140) || 'Nuovo messaggio in chat', 140) + '\nTocca per rispondere.',
-      url: '/admin-chat',
-      tag: `chat-${id}`,
-    });
-    res.status(200).json({ ok: true, ...result });
+    const full = whatsappConfigured() ? (await lastClientMessage(id)) || str(conv.last_message, 2000) : '';
+    const base = baseUrl(req);
+    const [result, whatsapp] = await Promise.all([
+      notifyPhones({
+        title: `💬 ${name} ti ha scritto`,
+        body: short(str(conv.last_message, 140) || 'Nuovo messaggio in chat', 140) + '\nTocca per rispondere.',
+        url: '/admin-chat',
+        tag: `chat-${id}`,
+      }),
+      notifyWhatsApp(
+        [`💬 *Nuovo messaggio in chat da ${name}*`, `Tel. ${str(conv.phone, 20)}`, '', full || 'Nuovo messaggio', '', base ? `Rispondi dal pannello: ${base}/admin-chat` : '']
+          .filter((x, i, a) => x !== '' || (i > 0 && a[i - 1] !== ''))
+          .join('\n')
+          .trim()
+      ),
+    ]);
+    res.status(200).json({ ok: true, ...result, whatsapp });
     return true;
   }
 
@@ -685,6 +735,7 @@ export default async function handler(req: any, res: any) {
       emailConfigured: !!kind,
       transport: kind,
       pushConfigured: pushConfigured(),
+      whatsappConfigured: whatsappConfigured(),
       recipient: process.env.ORDERS_TO_EMAIL || DEFAULT_TO,
     });
     return;
