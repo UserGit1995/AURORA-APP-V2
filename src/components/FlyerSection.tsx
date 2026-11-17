@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { BookOpen, ChevronLeft, ChevronRight, Maximize2, X, ZoomIn, ZoomOut, Volume2, VolumeX } from 'lucide-react';
 import { isFlipSoundOn, setFlipSoundOn, unlockFlipSound } from '../utils/pageFlipSound';
 import { FlipBook, FlipBookHandle } from './FlipBook';
@@ -71,12 +72,16 @@ export const FlyerSection: React.FC<{ openSignal?: number; hideInline?: boolean 
   }, [openSignal]);
 
   // Blocca lo scorrimento della pagina sotto la finestra a schermo intero
+  // (e lo sblocca sempre alla chiusura). Esc chiude il volantino.
   useEffect(() => {
     if (!fullscreen) return;
     const prev = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setFullscreen(false);
+    window.addEventListener('keydown', onKey);
     return () => {
-      document.body.style.overflow = prev;
+      window.removeEventListener('keydown', onKey);
+      document.body.style.overflow = prev === 'hidden' ? '' : prev;
     };
   }, [fullscreen]);
 
@@ -136,8 +141,8 @@ export const FlyerSection: React.FC<{ openSignal?: number; hideInline?: boolean 
 
       </>)}
 
-      {fullscreen && (
-        <div className="fixed inset-0 z-[60] bg-[#050b16]/95 flex flex-col">
+      {fullscreen && createPortal(
+        <div className="fixed inset-0 z-[200] bg-[#050b16]/95 flex flex-col" style={{ height: '100dvh' }}>
           <div className="flex items-center justify-between gap-2 px-3 sm:px-5 py-3 border-b border-[#1c2433]">
             <div className="min-w-0">
               <p className="text-white text-sm font-bold truncate">{flyer.title}</p>
@@ -164,7 +169,7 @@ export const FlyerSection: React.FC<{ openSignal?: number; hideInline?: boolean 
             </div>
           </div>
 
-          <div className="flex-1 min-h-0 overflow-auto p-3 sm:p-6">
+          <div className="flex-1 min-h-0 overflow-auto p-3 sm:p-6" style={{ overscrollBehavior: 'contain', WebkitOverflowScrolling: 'touch' }}>
             {zoom === 1 ? (
               <div className="max-w-[1200px] mx-auto">
                 <FlipBook
@@ -227,7 +232,8 @@ export const FlyerSection: React.FC<{ openSignal?: number; hideInline?: boolean 
               </>
             )}
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </section>
   );
