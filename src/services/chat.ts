@@ -104,6 +104,34 @@ export async function fetchClientUnread(s: ChatSession): Promise<number> {
   return Number(data) || 0;
 }
 
+// --- avvisi al cliente per email -------------------------------------------
+
+const EMAIL_KEY = 'aurora_chat_email_v1';
+
+/** Email lasciata dal cliente per questa chat (salvata anche sul telefono, per mostrarla). */
+export function loadChatEmail(s: ChatSession): string {
+  try {
+    const raw = localStorage.getItem(EMAIL_KEY);
+    const o = raw ? JSON.parse(raw) : null;
+    return o && o.id === s.id ? String(o.email || '') : '';
+  } catch {
+    return '';
+  }
+}
+
+export async function setChatEmail(s: ChatSession, email: string): Promise<void> {
+  const e = email.trim();
+  const { error } = await sb().rpc('chat_set_email', { p_id: s.id, p_token: s.token, p_email: e });
+  if (error) {
+    if (/Email non valida/i.test(error.message)) throw new Error('Email non valida');
+    if (/function .* does not exist|Could not find the function/i.test(error.message)) {
+      throw new Error('Avvisi per email non ancora attivi (manca lo script chat_notifiche.sql su Supabase)');
+    }
+    throw cleanError(error);
+  }
+  try { localStorage.setItem(EMAIL_KEY, JSON.stringify({ id: s.id, email: e })); } catch { /* niente */ }
+}
+
 // --- amministratore ---------------------------------------------------------
 
 export async function adminListChats(): Promise<ChatConversation[]> {

@@ -115,3 +115,89 @@ export async function sendTestPush(): Promise<{ sent: number; failed: number }> 
   if (!r.ok) throw new Error('Invio non riuscito.');
   return { sent: Number(j.sent) || 0, failed: Number(j.failed) || 0 };
 }
+
+// ---------------------------------------------------------------------------
+// CHAT: avvisi al CLIENTE quando Aurora risponde (anche senza app installata,
+// tranne su iPhone dove Apple le permette solo dall'icona sulla schermata Home).
+// Il dispositivo viene salvato per la sua chat (tabella chat_push_subs).
+// ---------------------------------------------------------------------------
+
+/** Chiede il permesso: va chiamata subito dal tocco su un pulsante (prima di altre attese). */
+export function askNotificationPermission(): Promise<NotificationPermission> | null {
+  if (!('Notification' in window) || !('serviceWorker' in navigator) || !('PushManager' in window)) return null;
+  if (isIos() && !isStandalone()) return null;
+  if (Notification.permission !== 'default') return Promise.resolve(Notification.permission);
+  try {
+    return Notification.requestPermission();
+  } catch {
+    return null;
+  }
+}
+
+/** Registra questo dispositivo per gli avvisi della chat del cliente. */
+export async function enableChatPush(chat: { id: string; token: string }): Promise<void> {
+  const perm = Notification.permission === 'default' ? await Notification.requestPermission() : Notification.permission;
+  if (perm !== 'granted') throw new Error('Notifiche non consentite su questo dispositivo.');
+  const reg = await registration();
+  let sub = await reg.pushManager.getSubscription();
+  if (!sub) {
+    try {
+      sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: keyToBytes(VAPID_PUBLIC_KEY) as BufferSource });
+    } catch {
+      throw new Error('Il dispositivo non ha accettato la registrazione, riprova.');
+    }
+  }
+  const json = sub.toJSON() as { endpoint?: string; keys?: { p256dh?: string; auth?: string } };
+  if (!json.endpoint || !json.keys?.p256dh || !json.keys?.auth) throw new Error('Registrazione non riuscita.');
+  const sb = getSupabase();
+  if (!sb) throw new Error('Servizio non disponibile, riprova tra poco.');
+  const { error } = await sb.rpc('chat_push_save', {
+    p_id: chat.id, p_token: chat.token, p_endpoint: json.endpoint, p_p256dh: json.keys.p256dh, p_auth: json.keys.auth,
+  });
+  if (error) {
+    throw new Error(/function .* does not exist|Could not find the function/i.test(error.message)
+      ? 'Avvisi non ancora attivi (manca lo script chat_notifiche.sql su Supabase).'
+      : 'Salvataggio non riuscito, riprova.');
+  }
+  try { localStorage.setItem('aurora_chat_push_' + chat.id, '1'); } catch { /* niente */ }
+}
+
+/** Stato degli avvisi della chat su questo dispositivo. */
+export async function getChatPushState(chat: { id: string }): Promise<PushState> {
+  const st = await getPushState();
+  if (st !== 'on') return st;
+  try {
+    return localStorage.getItem('aurora_chat_push_' + chat.id) === '1' ? 'on' : 'off';
+  } catch {
+    return 'off';
+  }
+}
+
+/** Avvisa il server: il cliente ha scritto (notifica all'admin). Non blocca mai la chat. */
+export function notifyChatNew(chat: { id: string; token: string }): void {
+  fetch('/api/send-order', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ kind: 'chat-new', id: chat.id, token: chat.token }),
+    keepalive: true,
+  }).catch(() => { /* senza rete: l'admin vede comunque il messaggio nel pannello */ });
+}
+
+/** Avvisa il cliente che hai risposto (notifica sul suo dispositivo + email se l'ha lasciata). */
+export async function notifyChatReply(id: string): Promise<{ sent: number; emailed: boolean; hasEmail: boolean } | null> {
+  try {
+    const sb = getSupabase();
+    const token = sb ? (await sb.auth.getSession()).data.session?.access_token : undefined;
+    const r = await fetch('/api/send-order', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ kind: 'chat-reply', id, accessToken: token || '' }),
+      keepalive: true,
+    });
+    if (!r.ok) return null;
+    const j = await r.json().catch(() => ({}));
+    return { sent: Number(j.sent) || 0, emailed: !!j.emailed, hasEmail: !!j.hasEmail };
+  } catch {
+    return null;
+  }
+}

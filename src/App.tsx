@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { Loader2, RefreshCw, MessageCircle } from 'lucide-react';
 import type { NavTab } from './components/Sidebar';
 import { DeveloperProfileView } from './components/DeveloperProfileView';
@@ -125,6 +125,37 @@ export default function App() {
   }, [selectedProduct, sharedProductId]);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [isAdminPanelOpen, setIsAdminPanelOpen] = useState(false);
+
+  // Tocco su una notifica della chat: "/chat" apre la chat del cliente,
+  // "/admin-chat" apre la chat nel pannello di gestione (solo admin).
+  const pendingAdminChat = useRef(typeof window !== 'undefined' && /^\/admin-chat\/?$/.test(window.location.pathname));
+  useEffect(() => {
+    if (pendingAdminChat.current) {
+      window.history.replaceState(null, '', '/home');
+      if (isAdmin) {
+        pendingAdminChat.current = false;
+        setChatAdminRequest(Date.now());
+        setIsAdminPanelOpen(true);
+      }
+    }
+  }, [isAdmin]);
+  useEffect(() => {
+    if (!('serviceWorker' in navigator)) return;
+    const onMsg = (e: MessageEvent) => {
+      const d = e.data as { type?: string; url?: string } | null;
+      if (!d || d.type !== 'aurora-open') return;
+      if (d.url === '/chat') {
+        setIsAdminPanelOpen(false);
+        setActiveTab('chat');
+      } else if (d.url === '/admin-chat' && isAdmin) {
+        setChatAdminRequest(Date.now());
+        setIsAdminPanelOpen(true);
+      }
+    };
+    navigator.serviceWorker.addEventListener('message', onMsg);
+    return () => navigator.serviceWorker.removeEventListener('message', onMsg);
+  }, [isAdmin]);
+
   // Forbici sulle schede prodotto: apre il pannello admin su "Rimuovi sfondo" con quel prodotto
   const [removeBgRequest, setRemoveBgRequest] = useState<{ productId: string; token: number } | null>(null);
   useEffect(() => {

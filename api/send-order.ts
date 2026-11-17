@@ -10,6 +10,8 @@
  *   B) Resend:                       RESEND_API_KEY
  * Facoltativa: ORDERS_TO_EMAIL (default: gruppo.aurora.ordini@gmail.com)
  * Notifiche sul telefono per ogni ordine: VAPID_PRIVATE_KEY + SUPABASE_SERVICE_ROLE_KEY
+ * Notifiche della chat (cliente -> admin e admin -> cliente, + email al cliente): stesse chiavi,
+ * più lo script supabase/chat_notifiche.sql.
  * Richieste di lavori grafici (kind: 'design', pagina "Simone Aricò"): vanno all'indirizzo
  * scritto in DESIGN_TO_EMAIL (solo su Vercel, mai nel codice); se manca, a ORDERS_TO_EMAIL.
  *
@@ -335,8 +337,8 @@ async function loadPushSubs(): Promise<PushSub[]> {
   return (await r.json()) as PushSub[];
 }
 
-async function deletePushSub(endpoint: string): Promise<void> {
-  await fetch(`${supaUrl()}/rest/v1/push_subscriptions?endpoint=eq.${encodeURIComponent(endpoint)}`, {
+async function deletePushSub(endpoint: string, table = 'push_subscriptions'): Promise<void> {
+  await fetch(`${supaUrl()}/rest/v1/${table}?endpoint=eq.${encodeURIComponent(endpoint)}`, {
     method: 'DELETE',
     headers: serviceHeaders(),
   }).catch(() => {});
@@ -397,35 +399,42 @@ async function webPushRequest(sub: PushSub, payload: string): Promise<Response> 
   });
 }
 
-/** Manda la notifica a tutti i telefoni dell'admin. Non blocca mai l'ordine: errori solo nei log. */
-async function notifyPhones(note: { title: string; body: string; url?: string; tag?: string }): Promise<{ sent: number; failed: number }> {
-  if (!pushConfigured()) return { sent: 0, failed: 0 };
+type PushNote = { title: string; body: string; url?: string; tag?: string };
+
+/** Manda la notifica a una lista di telefoni; quelli disattivati vengono tolti dalla tabella. */
+async function pushToSubs(subs: PushSub[], note: PushNote, table: string): Promise<{ sent: number; failed: number }> {
   let sent = 0;
   let failed = 0;
-  try {
-    const subs = await loadPushSubs();
-    const payload = JSON.stringify({ title: note.title, body: note.body, url: note.url || '/home', tag: note.tag });
-    await Promise.all(
-      subs.map(async (sub) => {
-        try {
-          const r = await webPushRequest(sub, payload);
-          if (r.status === 404 || r.status === 410) {
-            await deletePushSub(sub.endpoint); // telefono disattivato o app rimossa
-            failed++;
-          } else if (!r.ok) {
-            console.error('push: invio fallito', r.status, (await r.text()).slice(0, 200));
-            failed++;
-          } else sent++;
-        } catch (e: any) {
-          console.error('push: errore', e?.message || e);
+  const payload = JSON.stringify({ title: note.title, body: note.body, url: note.url || '/home', tag: note.tag });
+  await Promise.all(
+    subs.map(async (sub) => {
+      try {
+        const r = await webPushRequest(sub, payload);
+        if (r.status === 404 || r.status === 410) {
+          await deletePushSub(sub.endpoint, table); // telefono disattivato o app rimossa
           failed++;
-        }
-      })
-    );
+        } else if (!r.ok) {
+          console.error('push: invio fallito', r.status, (await r.text()).slice(0, 200));
+          failed++;
+        } else sent++;
+      } catch (e: any) {
+        console.error('push: errore', e?.message || e);
+        failed++;
+      }
+    })
+  );
+  return { sent, failed };
+}
+
+/** Manda la notifica a tutti i telefoni dell'admin. Non blocca mai l'ordine: errori solo nei log. */
+async function notifyPhones(note: PushNote): Promise<{ sent: number; failed: number }> {
+  if (!pushConfigured()) return { sent: 0, failed: 0 };
+  try {
+    return await pushToSubs(await loadPushSubs(), note, 'push_subscriptions');
   } catch (e: any) {
     console.error('push: impossibile leggere i telefoni registrati:', e?.message || e);
+    return { sent: 0, failed: 0 };
   }
-  return { sent, failed };
 }
 
 function orderNotification(body: any) {
@@ -465,6 +474,155 @@ async function isAdminToken(token: string): Promise<boolean> {
   if (!r.ok) return false;
   const rows = (await r.json()) as unknown[];
   return Array.isArray(rows) && rows.length > 0;
+}
+
+
+// ---- notifiche della chat clienti ---------------------------------------------
+// chat-new:   il cliente ha scritto  -> notifica sui telefoni dell'admin
+// chat-reply: l'admin ha risposto     -> notifica sui dispositivi del cliente + email (se l'ha lasciata)
+// Tabelle: chat_conversations, chat_messages, chat_push_subs (script supabase/chat_notifiche.sql)
+
+interface ChatConv { id: string; token: string; name: string; phone: string; email: string | null; last_email_at: string | null; last_message: string | null }
+
+async function loadChatConv(id: string): Promise<ChatConv | null> {
+  const r = await fetch(
+    `${supaUrl()}/rest/v1/chat_conversations?id=eq.${id}&select=id,token,name,phone,email,last_email_at,last_message`,
+    { headers: serviceHeaders() }
+  );
+  if (!r.ok) {
+    // colonne email/last_email_at assenti: script chat_notifiche.sql non ancora eseguito
+    const r2 = await fetch(`${supaUrl()}/rest/v1/chat_conversations?id=eq.${id}&select=id,token,name,phone,last_message`, { headers: serviceHeaders() });
+    if (!r2.ok) throw new Error(`chat_conversations ${r2.status}`);
+    const rows2 = (await r2.json()) as any[];
+    return rows2[0] ? { ...rows2[0], email: null, last_email_at: null } : null;
+  }
+  const rows = (await r.json()) as ChatConv[];
+  return rows[0] || null;
+}
+
+async function lastAdminMessage(id: string): Promise<string> {
+  const r = await fetch(
+    `${supaUrl()}/rest/v1/chat_messages?conversation_id=eq.${id}&sender=eq.admin&select=body&order=created_at.desc&limit=1`,
+    { headers: serviceHeaders() }
+  );
+  if (!r.ok) return '';
+  const rows = (await r.json()) as { body: string }[];
+  return str(rows[0]?.body, 2000);
+}
+
+async function loadChatSubs(id: string): Promise<PushSub[]> {
+  const r = await fetch(`${supaUrl()}/rest/v1/chat_push_subs?conversation_id=eq.${id}&select=endpoint,p256dh,auth`, { headers: serviceHeaders() });
+  if (!r.ok) return []; // tabella non ancora creata
+  return (await r.json()) as PushSub[];
+}
+
+const short = (t: string, n: number) => (t.length > n ? t.slice(0, n - 1).trimEnd() + '…' : t);
+
+// limite per conversazione (oltre al limite del database sui messaggi)
+const chatHits = new Map<string, number[]>();
+function chatLimited(key: string, max: number): boolean {
+  const now = Date.now();
+  const arr = (chatHits.get(key) || []).filter((t) => now - t < 10 * 60 * 1000);
+  arr.push(now);
+  chatHits.set(key, arr);
+  if (chatHits.size > 1000) chatHits.clear();
+  return arr.length > max;
+}
+
+function buildChatReplyEmail(c: ChatConv, reply: string, chatUrl: string): Mail {
+  const name = str(c.name, 80) || 'Cliente';
+  const html = `<div style="font-family:Arial,Helvetica,sans-serif;max-width:560px;margin:auto;color:#0f172a">
+<h2 style="margin:0 0 4px;color:#0b1a2e">Aurora ti ha risposto in chat</h2>
+<p style="margin:0 0 16px;color:#64748b;font-size:14px">Ciao ${esc(name)}, abbiamo risposto al tuo messaggio:</p>
+<div style="white-space:pre-wrap;font-size:15px;line-height:1.5;color:#0f172a;background:#eef6fc;border-left:4px solid #2c96d8;border-radius:8px;padding:14px 16px">${esc(reply)}</div>
+${chatUrl ? `<p style="margin:22px 0"><a href="${esc(chatUrl)}" style="background:#2c96d8;color:#fff;text-decoration:none;font-weight:bold;padding:12px 22px;border-radius:24px;display:inline-block">Apri la chat</a></p>
+<p style="margin:0;color:#64748b;font-size:12px">Apri il link dal telefono o dal computer con cui ci hai scritto per continuare la conversazione.</p>` : ''}
+<p style="margin-top:22px;color:#94a3b8;font-size:12px">Aurora S.r.l.s · Ricevi questa email perché l'hai lasciata nella chat del sito. Per non riceverne più, cancellala dalla chat oppure scrivicelo.</p></div>`;
+  const text = [`Ciao ${name}, Aurora ti ha risposto in chat:`, '', reply, '', chatUrl ? `Apri la chat: ${chatUrl}` : ''].join('\n');
+  return { subject: 'Aurora ti ha risposto in chat', html, text, replyTo: '' };
+}
+
+/** Gestisce le notifiche della chat. Restituisce true se la richiesta era della chat. */
+async function handleChatNotify(body: any, req: any, res: any): Promise<boolean> {
+  if (body?.kind !== 'chat-new' && body?.kind !== 'chat-reply') return false;
+  const id = str(body.id, 60);
+  if (!UUID_RE.test(id)) {
+    res.status(400).json({ ok: false, error: 'Chat non valida' });
+    return true;
+  }
+  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    res.status(503).json({ ok: false, error: 'push_not_configured' });
+    return true;
+  }
+  const conv = await loadChatConv(id);
+  if (!conv) {
+    res.status(404).json({ ok: false, error: 'not_found' });
+    return true;
+  }
+
+  if (body.kind === 'chat-new') {
+    // solo chi ha il codice segreto della chat può far partire l'avviso
+    if (str(body.token, 60) !== conv.token) {
+      res.status(403).json({ ok: false, error: 'forbidden' });
+      return true;
+    }
+    if (chatLimited('new:' + id, 30)) {
+      res.status(200).json({ ok: true, sent: 0, limited: true });
+      return true;
+    }
+    const name = str(conv.name, 80) || 'Cliente';
+    const result = await notifyPhones({
+      title: `💬 ${name} ti ha scritto`,
+      body: short(str(conv.last_message, 140) || 'Nuovo messaggio in chat', 140) + '\nTocca per rispondere.',
+      url: '/admin-chat',
+      tag: `chat-${id}`,
+    });
+    res.status(200).json({ ok: true, ...result });
+    return true;
+  }
+
+  // chat-reply: solo l'amministratore
+  if (!(await isAdminToken(str(body.accessToken, 4000)))) {
+    res.status(403).json({ ok: false, error: 'forbidden' });
+    return true;
+  }
+  if (chatLimited('reply:' + id, 60)) {
+    res.status(200).json({ ok: true, sent: 0, emailed: false, limited: true });
+    return true;
+  }
+  const reply = (await lastAdminMessage(id)) || str(conv.last_message, 2000);
+  let sent = 0;
+  let failed = 0;
+  if (pushConfigured()) {
+    const r = await pushToSubs(await loadChatSubs(id), {
+      title: 'Aurora ti ha risposto',
+      body: short(reply || 'Hai una nuova risposta in chat', 160) + '\nTocca per leggere.',
+      url: '/chat',
+      tag: 'aurora-chat',
+    }, 'chat_push_subs');
+    sent = r.sent;
+    failed = r.failed;
+  }
+  // email: al massimo una ogni 10 minuti per chat (se scrivi più messaggi di fila arriva una sola email)
+  let emailed = false;
+  const email = str(conv.email, 120);
+  const recent = conv.last_email_at && Date.now() - new Date(conv.last_email_at).getTime() < 10 * 60 * 1000;
+  if (isEmail(email) && !recent && transportKind()) {
+    try {
+      const base = baseUrl(req);
+      await deliver(buildChatReplyEmail(conv, reply, base ? `${base}/chat` : ''), email);
+      emailed = true;
+      await fetch(`${supaUrl()}/rest/v1/chat_conversations?id=eq.${id}`, {
+        method: 'PATCH',
+        headers: { ...serviceHeaders(), 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+        body: JSON.stringify({ last_email_at: new Date().toISOString() }),
+      }).catch(() => {});
+    } catch (e: any) {
+      console.error('chat: email al cliente non inviata:', e?.message || e);
+    }
+  }
+  res.status(200).json({ ok: true, sent, failed, emailed, hasEmail: isEmail(email), devices: sent + failed });
+  return true;
 }
 
 // ---- invio -----------------------------------------------------------------
@@ -537,6 +695,18 @@ export default async function handler(req: any, res: any) {
   }
 
   try {
+    // Notifiche della chat: limite proprio per conversazione, non tolgono "posti" agli ordini
+    {
+      let early = req.body;
+      if (typeof early === 'string') {
+        try { early = JSON.parse(early); } catch { early = null; }
+      }
+      if (early && (early.kind === 'chat-new' || early.kind === 'chat-reply')) {
+        await handleChatNotify(early, req, res);
+        return;
+      }
+    }
+
     const ip = String(req.headers?.['x-forwarded-for'] || req.socket?.remoteAddress || 'x').split(',')[0].trim();
     if (rateLimited(ip)) {
       res.status(429).json({ ok: false, error: 'Troppe richieste, riprova tra qualche minuto.' });
@@ -567,7 +737,7 @@ export default async function handler(req: any, res: any) {
         res.status(403).json({ ok: false, error: 'forbidden' });
         return;
       }
-      const result = await notifyPhones({ title: '🔔 Notifiche attive', body: 'Da ora ricevi qui un avviso per ogni nuovo ordine Aurora.', tag: 'aurora-test' });
+      const result = await notifyPhones({ title: '🔔 Notifiche attive', body: 'Da ora ricevi qui un avviso per ogni nuovo ordine e per ogni messaggio in chat.', tag: 'aurora-test' });
       res.status(200).json({ ok: true, ...result });
       return;
     }

@@ -1,8 +1,10 @@
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useAdmin } from '../context/AdminContext';
 import {
-  ChatMessage, ChatSession, fetchChat, formatChatDay, formatChatTime, loadChatSession, mergeMessages, sendChat, startChat,
+  ChatMessage, ChatSession, fetchChat, formatChatDay, formatChatTime, loadChatEmail, loadChatSession, mergeMessages, sendChat,
+  setChatEmail, startChat,
 } from '../services/chat';
+import { PushState, askNotificationPermission, enableChatPush, getChatPushState, notifyChatNew } from '../services/push';
 import { Ic } from './Icona';
 import { EMBLEM } from './NuovaShell';
 
@@ -22,6 +24,7 @@ export const NuovaChat: React.FC<{ onOpenPrivacy?: () => void }> = ({ onOpenPriv
 
   const [name, setName] = useState(currentUser?.name || '');
   const [phone, setPhone] = useState(currentUser?.phone || '');
+  const [email, setEmail] = useState(currentUser?.email || '');
   const [consent, setConsent] = useState(false);
   const [starting, setStarting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
@@ -31,6 +34,52 @@ export const NuovaChat: React.FC<{ onOpenPrivacy?: () => void }> = ({ onOpenPriv
   const [sendError, setSendError] = useState<string | null>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const lastCount = useRef(0);
+
+  // avvisi quando Aurora risponde: notifica su questo dispositivo e/o email
+  const [pushState, setPushState] = useState<PushState | null>(null);
+  const [savedEmail, setSavedEmail] = useState('');
+  const [emailOpen, setEmailOpen] = useState(false);
+  const [emailDraft, setEmailDraft] = useState('');
+  const [notifBusy, setNotifBusy] = useState(false);
+  const [notifMsg, setNotifMsg] = useState<string | null>(null);
+  useEffect(() => {
+    if (!session) return;
+    setSavedEmail(loadChatEmail(session));
+    getChatPushState(session).then(setPushState).catch(() => setPushState('unsupported'));
+  }, [session]);
+
+  const turnOnPush = async () => {
+    if (!session || notifBusy) return;
+    setNotifBusy(true);
+    setNotifMsg(null);
+    try {
+      await enableChatPush(session);
+      setPushState('on');
+    } catch (e) {
+      setNotifMsg((e as Error).message);
+      setPushState(await getChatPushState(session).catch(() => 'off' as PushState));
+    } finally {
+      setNotifBusy(false);
+    }
+  };
+
+  const saveEmail = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!session || notifBusy) return;
+    const v = emailDraft.trim();
+    if (v && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)) return setNotifMsg('Scrivi un\'email valida');
+    setNotifBusy(true);
+    setNotifMsg(null);
+    try {
+      await setChatEmail(session, v);
+      setSavedEmail(v);
+      setEmailOpen(false);
+    } catch (err) {
+      setNotifMsg((err as Error).message);
+    } finally {
+      setNotifBusy(false);
+    }
+  };
 
   const lastAt = useRef<string | null>(null);
   lastAt.current = messages.length ? messages[messages.length - 1].created_at : null;
@@ -78,9 +127,18 @@ export const NuovaChat: React.FC<{ onOpenPrivacy?: () => void }> = ({ onOpenPriv
     if (name.trim().length < 2) return setFormError('Scrivi il tuo nome o quello della tua attività');
     if (phone.replace(/\D/g, '').length < 6) return setFormError('Scrivi un numero di telefono valido');
     if (!consent) return setFormError("Per scriverci devi accettare l'informativa privacy");
+    const mail = email.trim();
+    if (mail && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(mail)) return setFormError("Controlla l'email (oppure lasciala vuota)");
+    // il permesso per le notifiche va chiesto subito, mentre il tocco è "fresco"
+    const perm = askNotificationPermission();
     setStarting(true);
     try {
-      setSession(await startChat(name, phone));
+      const s = await startChat(name, phone);
+      if (mail) await setChatEmail(s, mail).catch(() => { /* la chat parte lo stesso */ });
+      if (perm && (await perm.catch(() => 'denied')) === 'granted') {
+        await enableChatPush(s).catch(() => { /* resta il pulsante "Avvisami" */ });
+      }
+      setSession(s);
     } catch (err) {
       setFormError((err as Error).message);
     } finally {
@@ -97,6 +155,7 @@ export const NuovaChat: React.FC<{ onOpenPrivacy?: () => void }> = ({ onOpenPriv
       const m = await sendChat(session, b);
       setMessages((prev) => mergeMessages(prev, [m]));
       setText('');
+      notifyChatNew(session); // avviso sul telefono di Aurora
     } catch (e) {
       setSendError((e as Error).message || 'Messaggio non inviato, riprova');
     } finally {
@@ -118,6 +177,43 @@ export const NuovaChat: React.FC<{ onOpenPrivacy?: () => void }> = ({ onOpenPriv
 
       {session ? (
         <>
+          <div className="ch-notif">
+            {pushState === 'on' ? (
+              <span className="ok"><Ic n="bell" s={15} /> Ti avvisiamo qui quando rispondiamo</span>
+            ) : pushState === 'off' ? (
+              <button type="button" className="on" onClick={turnOnPush} disabled={notifBusy}>
+                <Ic n="bell" s={15} /> {notifBusy ? 'Un momento…' : 'Avvisami quando rispondete'}
+              </button>
+            ) : pushState === 'denied' ? (
+              <span><Ic n="bell" s={15} /> Notifiche bloccate: puoi riattivarle nelle impostazioni del browser</span>
+            ) : pushState === 'ios-not-installed' ? (
+              <span><Ic n="bell" s={15} /> Su iPhone le notifiche arrivano solo se aggiungi Aurora alla schermata Home</span>
+            ) : pushState === 'unsupported' ? (
+              <span><Ic n="bell" s={15} /> Questo browser non riceve notifiche</span>
+            ) : null}
+            {!emailOpen && (
+              <button type="button" className="lnk" onClick={() => { setEmailDraft(savedEmail); setEmailOpen(true); setNotifMsg(null); }}>
+                {savedEmail ? `Avviso anche via email a ${savedEmail} · Cambia` : 'Avvisami anche per email'}
+              </button>
+            )}
+            {emailOpen && (
+              <form className="mail" onSubmit={saveEmail}>
+                <input
+                  type="email"
+                  inputMode="email"
+                  autoComplete="email"
+                  value={emailDraft}
+                  onChange={(e) => setEmailDraft(e.target.value)}
+                  placeholder="La tua email"
+                  maxLength={120}
+                  aria-label="Email per gli avvisi"
+                />
+                <button type="submit" disabled={notifBusy}>{notifBusy ? '…' : 'Salva'}</button>
+                <button type="button" className="x" onClick={() => setEmailOpen(false)} aria-label="Annulla">✕</button>
+              </form>
+            )}
+            {notifMsg && <p className="ch-err">{notifMsg}</p>}
+          </div>
           <div className="chat-body" ref={listRef}>
             <div className="msg">
               Ciao {session.name}! Siamo l'ufficio ordini di Aurora. Come possiamo aiutarti?
@@ -196,10 +292,23 @@ export const NuovaChat: React.FC<{ onOpenPrivacy?: () => void }> = ({ onOpenPriv
                 placeholder="es. 345 123 4567"
               />
             </label>
+            <label>
+              Email <em>(facoltativa: ti avvisiamo quando rispondiamo)</em>
+              <input
+                id="chat-email-input"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                type="email"
+                inputMode="email"
+                autoComplete="email"
+                maxLength={120}
+                placeholder="es. mario@email.it"
+              />
+            </label>
             <label className="ck">
               <input id="chat-consent" type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} />
               <span>
-                Accetto che nome, numero e messaggi vengano usati solo per rispondermi, come indicato nell'
+                Accetto che nome, numero, email (se la scrivo) e messaggi vengano usati solo per rispondermi e avvisarmi delle risposte, come indicato nell'
                 {onOpenPrivacy ? (
                   <button type="button" onClick={onOpenPrivacy}>informativa privacy</button>
                 ) : (

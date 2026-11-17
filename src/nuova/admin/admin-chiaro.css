@@ -356,3 +356,12 @@
 .na .a-legacy{margin-top:6px}
 /* testo bianco sopra le velature scure delle foto resta bianco */
 :is(.na,.na-lt) :is(.bg-black\/60,.bg-black\/70,.bg-black\/80):is(.text-white){color:#fff!important}
+
+/* chat: esito dell'avviso al cliente e pulsante WhatsApp */
+.na .a-thh .a-wa{color:#1fae78}
+.na .a-avv{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;margin:0 16px 8px;padding:8px 12px;border-radius:8px;font-size:12.5px;line-height:1.4}
+.na .a-avv>span{flex:1 1 200px}
+.na .a-avv-invio{background:#eef4f9;color:#3d4f63}
+.na .a-avv-ok{background:#dcf3ea;color:#067d62}
+.na .a-avv-no{background:#fff8ec;color:#8a4a07;border:1px solid #f0c48a}
+.na .a-avv a{display:inline-flex;align-items:center;gap:5px;height:28px;padding:0 12px;border-radius:14px;background:linear-gradient(180deg,#34c98e,#1fae78);color:#fff;font:600 12px var(--display);text-decoration:none}

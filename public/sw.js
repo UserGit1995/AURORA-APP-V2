@@ -1,4 +1,4 @@
-// Service worker di Aurora: rende l'app installabile e mostra le notifiche dei nuovi ordini.
+// Service worker di Aurora: rende l'app installabile e mostra le notifiche (nuovi ordini e chat).
 // NON salva nulla in cache: il sito si carica sempre dalla rete, quindi
 // ogni aggiornamento pubblicato su GitHub/Vercel è subito visibile.
 self.addEventListener('install', function () { self.skipWaiting(); });
@@ -15,6 +15,7 @@ self.addEventListener('push', function (e) {
       icon: '/icon-192.png',
       badge: '/icon-192.png',
       tag: d.tag || undefined,
+      renotify: !!d.tag,
       data: { url: d.url || '/home' },
     })
   );
@@ -27,7 +28,11 @@ self.addEventListener('notificationclick', function (e) {
   e.waitUntil(
     self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function (list) {
       for (var i = 0; i < list.length; i++) {
-        if ('focus' in list[i]) return list[i].focus();
+        if ('focus' in list[i]) {
+          // l'app è già aperta: le dice quale pagina mostrare (chat del cliente o chat del pannello)
+          try { list[i].postMessage({ type: 'aurora-open', url: url }); } catch (err) { /* niente */ }
+          return list[i].focus();
+        }
       }
       return self.clients.openWindow(url);
     })

@@ -235,6 +235,19 @@ html.ng-on .n-ck button[type="submit"] *,html.ng-on .n-ck button[class*="bg-sky-
 .n-chatpg .ch-top b{display:block;font:600 16px 'Sora',ui-sans-serif,system-ui,sans-serif}
 .n-chatpg .ch-top small{display:flex;align-items:center;gap:6px;font-size:12px;color:#5d7189}
 .n-chatpg .ch-top small i{width:7px;height:7px;border-radius:4px;background:#16a36d}
+.n-chatpg .ch-notif{display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px;padding:8px 14px;background:#f4f9fd;border-bottom:1px solid rgba(11,26,46,.08);font-size:12px;color:#5d7189}
+.n-chatpg .ch-notif>span{display:inline-flex;align-items:center;gap:6px}
+.n-chatpg .ch-notif>span.ok{color:#067d62;font-weight:600}
+.n-chatpg .ch-notif .on{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 13px;border-radius:15px;background:linear-gradient(135deg,#5cc4f5,#2c96d8);color:#fff;font:600 12px 'Sora',ui-sans-serif,system-ui,sans-serif;box-shadow:0 2px 6px rgba(44,150,216,.3)}
+.n-chatpg .ch-notif .on:disabled{opacity:.7}
+.n-chatpg .ch-notif .lnk{font:600 12px 'Sora',ui-sans-serif,system-ui,sans-serif;color:#1a73b0;text-align:left}
+.n-chatpg .ch-notif .mail{display:flex;gap:6px;flex:1 1 100%}
+.n-chatpg .ch-notif .mail input{flex:1;min-width:0;height:34px;border-radius:17px;border:1px solid rgba(11,26,46,.14);background:#fff;padding:0 12px;font:500 13.5px 'Plus Jakarta Sans',ui-sans-serif,system-ui,sans-serif;color:#0b1a2e;outline:0}
+.n-chatpg .ch-notif .mail input:focus{border-color:#4cb8ef}
+.n-chatpg .ch-notif .mail button{height:34px;padding:0 14px;border-radius:17px;background:#0b1a2e;color:#fff;font:600 12px 'Sora',ui-sans-serif,system-ui,sans-serif}
+.n-chatpg .ch-notif .mail .x{background:transparent;color:#5d7189;padding:0 8px}
+.n-chatpg .ch-notif .ch-err{flex-basis:100%;margin:0}
+.n-chatpg .ch-start label em{font-style:normal;font-weight:400;color:#8296ab}
 .n-chatpg .chat-body{flex:1;overflow-y:auto;padding:14px 14px 10px;display:flex;flex-direction:column;gap:8px;overscroll-behavior:contain}
 .n-chatpg .msg{max-width:82%;padding:10px 13px 7px;border-radius:18px 18px 18px 6px;background:#fff;border:1px solid rgba(11,26,46,.09);font-size:13.5px;line-height:1.45;white-space:pre-wrap;overflow-wrap:anywhere;align-self:flex-start}
 .n-chatpg .msg.me{align-self:flex-end;background:#0b1a2e;color:#fff;border-color:transparent;border-radius:18px 18px 6px 18px}

@@ -15,6 +15,7 @@ import { MagazzinoView } from './gestione/Magazzino';
 import { AziendaView, DdtView, FattureView } from './gestione/Documenti';
 import { CLIENTE_VUOTO, Ddt, clientiCaricati, save as gSave, load as gLoad, soloCifre } from './gestione/store';
 import { PushOrdiniCard } from './PushOrdiniCard';
+import { notifyChatReply } from '../../services/push';
 import './nuova-admin.css';
 import './admin-chiaro.css';
 
@@ -966,6 +967,8 @@ const ChatView: React.FC<{ onUnread: (n: number) => void; toast: (t: string) => 
   const [msgs, setMsgs] = useState<ChatMessage[]>([]);
   const [text, setText] = useState('');
   const [err, setErr] = useState<string | null>(null);
+  // esito dell'avviso al cliente dopo la tua risposta (per chat)
+  const [avviso, setAvviso] = useState<Record<string, { stato: 'invio' | 'ok' | 'no'; testo: string }>>({});
   const boxRef = useRef<HTMLDivElement>(null);
 
   const loadList = useCallback(async () => {
@@ -1022,9 +1025,40 @@ const ChatView: React.FC<{ onUnread: (n: number) => void; toast: (t: string) => 
       setList((prev) => prev.map((c) => (c.id === openId ? { ...c, last_message: body, last_message_at: m.created_at } : c)));
       setText('');
       vib(8);
+      // avvisa il cliente: notifica sul suo telefono/computer e, se l'ha lasciata, email
+      const id = openId;
+      setAvviso((a) => ({ ...a, [id]: { stato: 'invio', testo: 'Avviso il cliente…' } }));
+      notifyChatReply(id).then((r) => {
+        const parti: string[] = [];
+        if (r && r.sent > 0) parti.push(r.sent === 1 ? 'notifica sul suo telefono' : `notifica su ${r.sent} dispositivi`);
+        if (r && r.emailed) parti.push('email');
+        setAvviso((a) => ({
+          ...a,
+          [id]: parti.length
+            ? { stato: 'ok', testo: `Cliente avvisato: ${parti.join(' + ')}.` }
+            : {
+                stato: 'no',
+                testo: r && r.hasEmail
+                  ? "Email già inviata pochi minuti fa e nessuna notifica attiva: se serve, avvisalo su WhatsApp."
+                  : 'Il cliente non ha attivato gli avvisi: vedrà la risposta quando riapre il sito. Puoi avvisarlo su WhatsApp.',
+              },
+        }));
+      });
     } catch (e) {
       toast((e as Error).message || 'Messaggio non inviato');
     }
+  };
+  // WhatsApp con il messaggio già pronto (lo invii tu con un tocco, gratis)
+  const waLink = (c: ChatConversation) => {
+    let n = soloCifre(c.phone);
+    if (n.startsWith('00')) n = n.slice(2);
+    if (n.length === 10 && n.startsWith('3')) n = '39' + n;
+    const ultima = [...msgs].reverse().find((m) => m.sender === 'admin')?.body || '';
+    const sito = typeof window !== 'undefined' ? window.location.origin : '';
+    const testo = ultima
+      ? `Ciao ${c.name}, ti abbiamo risposto nella chat di Aurora:\n"${ultima.length > 300 ? ultima.slice(0, 299) + '…' : ultima}"\n\nPer continuare apri: ${sito}/chat`
+      : `Ciao ${c.name}, ti abbiamo risposto nella chat di Aurora. Per leggere apri: ${sito}/chat`;
+    return `https://wa.me/${n}?text=${encodeURIComponent(testo)}`;
   };
   const salvaRubrica = async () => {
     if (!open) return;
@@ -1055,6 +1089,8 @@ const ChatView: React.FC<{ onUnread: (n: number) => void; toast: (t: string) => 
   };
 
   return (
+    <>
+    <PushOrdiniCard toast={toast} />
     <div className={`a-card a-chatw${mobileOpen ? ' a-open' : ''}`}>
       <div className="a-clist">
         {loading && <div className="a-empty">Caricamento…</div>}
@@ -1075,6 +1111,7 @@ const ChatView: React.FC<{ onUnread: (n: number) => void; toast: (t: string) => 
               <span className="a-oav">{initials(open.name)}</span>
               <span className="a-tx"><b style={{ font: '600 14.5px var(--display)' }}>{open.name}</b><small style={{ display: 'block', color: 'var(--mu)', fontSize: 12 }}>{open.phone}</small></span>
               <button type="button" className="a-ib a-sib" title="Salva in rubrica" aria-label="Salva in rubrica" onClick={salvaRubrica}><Ic n="user" s={17} /></button>
+              <a className="a-ib a-sib a-wa" href={waLink(open)} target="_blank" rel="noopener noreferrer" title="Avvisa su WhatsApp" aria-label="Avvisa su WhatsApp"><Ic n="whats" s={17} /></a>
               <a className="a-ib a-sib" href={`tel:${open.phone}`} title="Chiama" aria-label="Chiama"><Ic n="phone" s={17} /></a>
               <button type="button" className="a-ib a-sib" title="Elimina la chat" aria-label="Elimina la chat" onClick={del}><Ic n="x" s={17} /></button>
             </div>
@@ -1086,6 +1123,15 @@ const ChatView: React.FC<{ onUnread: (n: number) => void; toast: (t: string) => 
                 </div>
               ))}
             </div>
+            {avviso[open.id] && (
+              <div className={`a-avv a-avv-${avviso[open.id].stato}`}>
+                <Ic n={avviso[open.id].stato === 'ok' ? 'check' : 'bell'} s={15} />
+                <span>{avviso[open.id].testo}</span>
+                {avviso[open.id].stato === 'no' && (
+                  <a href={waLink(open)} target="_blank" rel="noopener noreferrer"><Ic n="whats" s={15} /> Avvisa su WhatsApp</a>
+                )}
+              </div>
+            )}
             <div className="a-tpl">{TPL.map((t) => <button key={t} type="button" onClick={() => send(t)}>{t}</button>)}</div>
             <form className="a-cin" onSubmit={(e) => { e.preventDefault(); send(text); }}>
               <input value={text} onChange={(e) => setText(e.target.value)} placeholder="Scrivi una risposta" autoComplete="off" />
@@ -1097,5 +1143,6 @@ const ChatView: React.FC<{ onUnread: (n: number) => void; toast: (t: string) => 
         )}
       </div>
     </div>
+    </>
   );
 };

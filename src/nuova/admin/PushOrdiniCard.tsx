@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Ic, vib } from '../Icona';
 import { PushState, disablePush, enablePush, getPushState, sendTestPush } from '../../services/push';
 
-/** Riquadro in Ordini: attiva sul telefono la notifica per ogni nuovo ordine. */
+/** Riquadro in Ordini e in Chat: attiva sul telefono la notifica per ogni nuovo ordine e messaggio in chat. */
 export const PushOrdiniCard: React.FC<{ toast: (t: string) => void }> = ({ toast }) => {
   const [state, setState] = useState<PushState | null>(null);
   const [busy, setBusy] = useState(false);
@@ -37,15 +37,15 @@ export const PushOrdiniCard: React.FC<{ toast: (t: string) => void }> = ({ toast
       : state === 'denied'
         ? 'Le notifiche sono bloccate: sul telefono vai in Impostazioni → Notifiche → Aurora e attivale.'
         : on
-          ? 'Attive su questo telefono: ricevi un avviso per ogni nuovo ordine, anche ad app chiusa.'
-          : 'Ricevi su questo telefono un avviso per ogni nuovo ordine, anche ad app chiusa.';
+          ? 'Attive su questo telefono: ricevi un avviso per ogni nuovo ordine e per ogni messaggio in chat, anche ad app chiusa.'
+          : 'Ricevi su questo telefono un avviso per ogni nuovo ordine e per ogni messaggio in chat, anche ad app chiusa.';
 
   return (
     <div className="a-card" style={{ marginBottom: 14 }}>
       <div className="a-row" style={{ borderTop: 0, alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
         <span className="a-oav" aria-hidden="true"><Ic n="bell" s={18} /></span>
         <span className="a-tx" style={{ flex: '1 1 220px' }}>
-          <b>Notifiche ordini sul telefono</b>
+          <b>Notifiche ordini e chat sul telefono</b>
           <small style={{ whiteSpace: 'normal', overflow: 'visible', lineHeight: 1.45, marginTop: 2 }}>{text}</small>
         </span>
         {(state === 'off' || on) && (
