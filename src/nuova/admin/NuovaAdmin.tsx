@@ -10,6 +10,7 @@ import { listCustomizationRequests } from '../../services/customization';
 import { Ic, Bi, eur, vib } from '../Icona';
 import { ClientiView } from './gestione/Clienti';
 import { UtentiView } from './UtentiView';
+import { VisiteView, useVisiteSettimana } from './VisiteView';
 import { MagazzinoView } from './gestione/Magazzino';
 import { AziendaView, DdtView, FattureView } from './gestione/Documenti';
 import { CLIENTE_VUOTO, Ddt, clientiCaricati, save as gSave, load as gLoad, soloCifre } from './gestione/store';
@@ -25,7 +26,7 @@ import './nuova-admin.css';
 export type AdmTab =
   | 'overview' | 'products' | 'orders' | 'categories' | 'subcategories' | 'images' | 'removebg' | 'requests'
   | 'packaging' | 'flash' | 'flyer' | 'backup' | 'supplierphotos' | 'settings' | 'chat'
-  | 'clienti' | 'utenti' | 'magazzino' | 'ddt' | 'fatture' | 'azienda';
+  | 'clienti' | 'utenti' | 'magazzino' | 'ddt' | 'fatture' | 'azienda' | 'visite';
 
 type Go = (id: AdmTab | 'more') => void;
 
@@ -119,7 +120,10 @@ export const NuovaAdmin: React.FC<NuovaAdminProps> = (p) => {
   const noPhoto = useMemo(() => productsList.filter((x) => !hasProductImage(x)).length, [productsList]);
 
   const NAV: [string, NavItem[]][] = [
-    ['Generale', [{ id: 'overview', icon: 'dash', label: 'Panoramica', desc: 'Riepilogo di vendite, ordini e avvisi.' }]],
+    ['Generale', [
+      { id: 'overview', icon: 'dash', label: 'Panoramica', desc: 'Riepilogo di vendite, ordini e avvisi.' },
+      { id: 'visite', icon: 'eye', label: 'Visite al sito', desc: 'Quante persone entrano nel sito e da dove: paese, regione, città e IP.', big: 'route' },
+    ]],
     ['Catalogo', [
       { id: 'products', icon: 'package', label: 'Prodotti', badge: fmtN(productsList.length), desc: 'Modifica prezzi, giacenze, schede tecniche e foto.', big: 'boxes', em: `${fmtN(productsList.length)} prodotti` },
       { id: 'categories', icon: 'folder', label: 'Categorie', badge: fmtN(categoriesList.length), desc: 'Crea, rinomina e ordina le categorie principali del catalogo.', big: 'catalog', em: `${fmtN(categoriesList.length)} categorie` },
@@ -225,6 +229,8 @@ export const NuovaAdmin: React.FC<NuovaAdminProps> = (p) => {
     <ClientiView toast={toast} />
   ) : p.activeTab === 'utenti' ? (
     <UtentiView toast={toast} />
+  ) : p.activeTab === 'visite' ? (
+    <VisiteView toast={toast} />
   ) : p.activeTab === 'magazzino' ? (
     <MagazzinoView toast={toast} />
   ) : p.activeTab === 'ddt' ? (
@@ -236,7 +242,7 @@ export const NuovaAdmin: React.FC<NuovaAdminProps> = (p) => {
   ) : cur ? (
     <SectionHead item={cur} />
   ) : null;
-  const custom = more || ['overview', 'products', 'orders', 'chat', 'clienti', 'utenti', 'magazzino', 'ddt', 'fatture', 'azienda'].includes(p.activeTab);
+  const custom = more || ['overview', 'products', 'orders', 'chat', 'clienti', 'utenti', 'magazzino', 'ddt', 'fatture', 'azienda', 'visite'].includes(p.activeTab);
 
   return (
     <div className="na">
@@ -431,11 +437,13 @@ const DashView: React.FC<{ go: Go; onNewProduct: () => void; chatUnread: number;
     const recent = [...ordersList].sort((a, b) => (parseDate(b.date)?.getTime() || 0) - (parseDate(a.date)?.getTime() || 0)).slice(0, 4);
     return { days, week, weekTotal, weekCount, pct, toDo, out, low, offers, recent };
   }, [ordersList, productsList]);
+  const vis = useVisiteSettimana();
   const names = (l: Product[]) => l.slice(0, 3).map((p) => p.name.split(/\s+/).slice(0, 2).join(' ')).join(', ');
 
   return (
     <>
-      <div className="a-kpis">
+      <style>{`.na .a-kpis.a-kpis5{grid-template-columns:repeat(5,1fr)}@media (max-width:1100px){.na .a-kpis.a-kpis5{grid-template-columns:repeat(3,1fr)}}@media (max-width:860px){.na .a-kpis.a-kpis5{grid-template-columns:1fr 1fr}.na .a-kpis.a-kpis5>.a-kvis{grid-column:1/-1}}.na .a-kvis{cursor:pointer;text-align:left}`}</style>
+      <div className="a-kpis a-kpis5">
         <div className="a-card a-kpi">
           <Bi n="invoice" s={30} />
           {d.pct !== null && <span className={`a-d ${d.pct >= 0 ? 'a-up' : 'a-at'}`}>{d.pct >= 0 ? '+' : ''}{d.pct}%</span>}
@@ -459,6 +467,13 @@ const DashView: React.FC<{ go: Go; onNewProduct: () => void; chatUnread: number;
           <Bi n="palette" s={30} />
           <p className="a-v">{newRequests}</p>
           <p>Richieste di packaging nuove</p>
+        </div>
+        <div className="a-card a-kpi a-kvis" role="button" tabIndex={0} onClick={() => go('visite')} onKeyDown={(e) => e.key === 'Enter' && go('visite')} title="Apri Visite al sito">
+          <Bi n="route" s={30} />
+          {vis && vis.pct !== null && <span className={`a-d ${vis.pct >= 0 ? 'a-up' : 'a-at'}`}>{vis.pct >= 0 ? '+' : ''}{vis.pct}%</span>}
+          <p className="a-v">{vis ? vis.oggi.toLocaleString('it-IT') : '—'}</p>
+          <p>Visite al sito oggi</p>
+          {vis && <Spark v={vis.giorni} />}
         </div>
       </div>
       <div className="a-dgrid">
