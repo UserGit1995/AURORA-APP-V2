@@ -369,3 +369,7 @@ html.ng-on .n-ck button[class*="bg-sky-500/"] *{color:#fff !important}
 .n-consenso-btns .gh{border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.06);color:#fff}
 @keyframes n-cons-in{from{opacity:0}}
 @keyframes n-cons-up{from{opacity:0;transform:translateY(14px) scale(.98)}}
+
+/* Prodotto tolto dal fornitore (Mondo Sapone) */
+.n-pd-stock.n-pd-na{color:#64748b}.n-pd-stock.n-pd-na i{background:#94a3b8;animation:none}
+.n-pd-add:disabled{background:#e2e8f0!important;color:#64748b!important;box-shadow:none;cursor:not-allowed}

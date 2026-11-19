@@ -53,6 +53,8 @@ export interface Product {
   flashOffer?: FlashOffer;
   stock: number;
   lowStockThreshold?: number;
+  /** Mondo Sapone l'ha tolto: sul sito compare "Non disponibile" (colonna fornitore_assente, la gestisce l'aggiornamento automatico) */
+  supplierMissing?: boolean;
   description: string;
   specs: {
     format: string;

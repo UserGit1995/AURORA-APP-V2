@@ -402,3 +402,7 @@ html.ng-on,.ng,.n-ov{
 @media (prefers-reduced-motion:reduce){
   .ng *,.ng *::before,.ng *::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 }
+
+/* Prodotto tolto dal fornitore (Mondo Sapone): "Non disponibile" */
+.n-tag.n-tag-na{background:#64748b;padding:0 8px;font-size:10.5px;max-width:calc(100% - 56px)}
+.n-card.n-na .n-stage img{filter:grayscale(.85);opacity:.6}

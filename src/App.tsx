@@ -277,6 +277,8 @@ export default function App() {
 
   // Add to cart handler
   const handleAddToCart = (product: Product, quantityOrEvent?: number | React.MouseEvent) => {
+    // tolto dal fornitore (Mondo Sapone): "Non disponibile", non si aggiunge al carrello
+    if (product.supplierMissing) return;
     const qty = typeof quantityOrEvent === 'number' ? quantityOrEvent : 1;
     setCart((prev) => {
       const existing = prev.find((item) => item.product.id === product.id);

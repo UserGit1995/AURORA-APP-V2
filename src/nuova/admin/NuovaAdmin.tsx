@@ -11,6 +11,7 @@ import { Ic, Bi, eur, vib } from '../Icona';
 import { ClientiView } from './gestione/Clienti';
 import { UtentiView } from './UtentiView';
 import { VisiteView, useVisiteSettimana } from './VisiteView';
+import { FornitoreView } from './FornitoreView';
 import { MagazzinoView } from './gestione/Magazzino';
 import { AziendaView, DdtView, FattureView } from './gestione/Documenti';
 import { CLIENTE_VUOTO, Ddt, clientiCaricati, save as gSave, load as gLoad, soloCifre } from './gestione/store';
@@ -28,7 +29,7 @@ import './admin-chiaro.css';
 export type AdmTab =
   | 'overview' | 'products' | 'orders' | 'categories' | 'subcategories' | 'images' | 'removebg' | 'requests'
   | 'packaging' | 'flash' | 'flyer' | 'backup' | 'supplierphotos' | 'settings' | 'chat'
-  | 'clienti' | 'utenti' | 'magazzino' | 'ddt' | 'fatture' | 'azienda' | 'visite';
+  | 'clienti' | 'utenti' | 'magazzino' | 'ddt' | 'fatture' | 'azienda' | 'visite' | 'fornitore';
 
 type Go = (id: AdmTab | 'more') => void;
 
@@ -130,6 +131,7 @@ export const NuovaAdmin: React.FC<NuovaAdminProps> = (p) => {
       { id: 'products', icon: 'package', label: 'Prodotti', badge: fmtN(productsList.length), desc: 'Modifica prezzi, giacenze, schede tecniche e foto.', big: 'boxes', em: `${fmtN(productsList.length)} prodotti` },
       { id: 'categories', icon: 'folder', label: 'Categorie', badge: fmtN(categoriesList.length), desc: 'Crea, rinomina e ordina le categorie principali del catalogo.', big: 'catalog', em: `${fmtN(categoriesList.length)} categorie` },
       { id: 'subcategories', icon: 'tree', label: 'Sottocategorie', badge: fmtN(subcategoriesList.length), desc: 'Gestisci marche, tipologie e sottosezioni di ogni categoria.', em: `${fmtN(subcategoriesList.length)} sottocategorie` },
+      { id: 'fornitore', icon: 'repeat', label: 'Mondo Sapone', desc: 'Prezzi +30%, prodotti tolti e nuovi dal fornitore: si aggiorna da solo ogni giorno.', big: 'boxes' },
     ]],
     ['Vendite e promozioni', [
       { id: 'orders', icon: 'orders', label: 'Ordini', badge: toDo ? String(toDo) : undefined, hot: true, desc: 'Controlla e aggiorna lo stato degli ordini.', big: 'invoice', em: toDo ? `${toDo} da evadere` : undefined },
@@ -261,6 +263,8 @@ export const NuovaAdmin: React.FC<NuovaAdminProps> = (p) => {
     <UtentiView toast={toast} />
   ) : p.activeTab === 'visite' ? (
     <VisiteView toast={toast} />
+  ) : p.activeTab === 'fornitore' ? (
+    <FornitoreView toast={toast} />
   ) : p.activeTab === 'magazzino' ? (
     <MagazzinoView toast={toast} />
   ) : p.activeTab === 'ddt' ? (
@@ -272,7 +276,7 @@ export const NuovaAdmin: React.FC<NuovaAdminProps> = (p) => {
   ) : cur ? (
     <SectionHead item={cur} />
   ) : null;
-  const custom = more || ['overview', 'products', 'orders', 'chat', 'clienti', 'utenti', 'magazzino', 'ddt', 'fatture', 'azienda', 'visite'].includes(p.activeTab);
+  const custom = more || ['overview', 'products', 'orders', 'chat', 'clienti', 'utenti', 'magazzino', 'ddt', 'fatture', 'azienda', 'visite', 'fornitore'].includes(p.activeTab);
 
   const firstName = (currentUser?.name || '').trim().split(/\s+/)[0] || '';
   const crumb = more ? 'Pannello' : cur?.group === 'Generale' ? '' : cur?.group || '';

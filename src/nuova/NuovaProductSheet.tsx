@@ -80,6 +80,7 @@ export const NuovaProductSheet: React.FC<NuovaProductSheetProps> = ({
   const tag = p.isOffer || p.discountPercent || old ? 'Offerta' : p.isEco ? 'Eco e bio' : '';
 
   const add = () => {
+    if (p.supplierMissing) return;
     vib(12);
     flyToCart(imgRef.current);
     onAddToCart(p, qty);
@@ -133,10 +134,17 @@ export const NuovaProductSheet: React.FC<NuovaProductSheetProps> = ({
                 <p className="big">
                   {eur(unit)}<span>/{p.unit || 'pz'}</span>
                 </p>
-                <p className="n-pd-stock">
-                  <i />
-                  Disponibile
-                </p>
+                {p.supplierMissing ? (
+                  <p className="n-pd-stock n-pd-na">
+                    <i />
+                    Non disponibile
+                  </p>
+                ) : (
+                  <p className="n-pd-stock">
+                    <i />
+                    Disponibile
+                  </p>
+                )}
               </div>
 
               {onEditProduct && (
@@ -149,7 +157,7 @@ export const NuovaProductSheet: React.FC<NuovaProductSheetProps> = ({
                 <div><small>Formato</small><b>{p.specs?.format || '—'}</b></div>
                 <div><small>Confezione</small><b>{p.packageQty || '1'} {p.unit || 'pz'}</b></div>
                 <div><small>Prezzo</small><b>{isBusinessCustomer && vatPercent > 0 ? 'IVA inclusa' : 'IVA esclusa'}</b></div>
-                <div><small>Disponibilità</small><b>In magazzino</b></div>
+                <div><small>Disponibilità</small><b>{p.supplierMissing ? 'Non disponibile' : 'In magazzino'}</b></div>
               </div>
 
               <div className="n-dlv">
@@ -164,17 +172,21 @@ export const NuovaProductSheet: React.FC<NuovaProductSheetProps> = ({
         </div>
 
         <div className="n-pd-foot">
-          <div className="n-qty">
-            <button type="button" onClick={() => { setQty((q) => Math.max(1, q - 1)); vib(5); }} aria-label="Meno">
-              <Ic n="minus" s={18} />
-            </button>
-            <b>{qty}</b>
-            <button type="button" onClick={() => { setQty((q) => q + 1); vib(5); }} aria-label="Più">
-              <Ic n="plus" s={18} />
-            </button>
-          </div>
-          <button type="button" className={`n-btn ${added ? 'ok' : 'dark'} n-pd-add`} onClick={add}>
-            {added ? (
+          {!p.supplierMissing && (
+            <div className="n-qty">
+              <button type="button" onClick={() => { setQty((q) => Math.max(1, q - 1)); vib(5); }} aria-label="Meno">
+                <Ic n="minus" s={18} />
+              </button>
+              <b>{qty}</b>
+              <button type="button" onClick={() => { setQty((q) => q + 1); vib(5); }} aria-label="Più">
+                <Ic n="plus" s={18} />
+              </button>
+            </div>
+          )}
+          <button type="button" className={`n-btn ${added ? 'ok' : 'dark'} n-pd-add`} onClick={add} disabled={!!p.supplierMissing}>
+            {p.supplierMissing ? (
+              <>Non disponibile al momento</>
+            ) : added ? (
               <>
                 <Ic n="check" s={18} /> Aggiunto
               </>

@@ -365,3 +365,50 @@
 .na .a-avv-ok{background:#dcf3ea;color:#067d62}
 .na .a-avv-no{background:#fff8ec;color:#8a4a07;border:1px solid #f0c48a}
 .na .a-avv a{display:inline-flex;align-items:center;gap:5px;height:28px;padding:0 12px;border-radius:14px;background:linear-gradient(180deg,#34c98e,#1fae78);color:#fff;font:600 12px var(--display);text-decoration:none}
+
+/* ---------------- Mondo Sapone (aggiornamento dal fornitore) ---------------- */
+.na .a-ms-link{padding:16px 18px;margin-top:14px}
+.na .a-ms-on,.na .a-ms-intro{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.na .a-ms-on .a-tx,.na .a-ms-intro .a-tx{flex:1 1 260px;min-width:0}
+.na .a-ms-on .a-tx b,.na .a-ms-intro .a-tx b{display:block;font:700 15px var(--display);color:var(--tx)}
+.na .a-ms-on .a-tx small,.na .a-ms-intro .a-tx small{display:block;margin-top:2px;font-size:12.5px;color:var(--mu)}
+.na .a-ms-dot{width:12px;height:12px;border-radius:6px;flex:none;background:#94a3b8;box-shadow:0 0 0 4px rgba(148,163,184,.2)}
+.na .a-ms-dot.a-ok{background:#16a36d;box-shadow:0 0 0 4px rgba(22,163,109,.18)}
+.na .a-ms-dot.a-bad{background:#d14b2f;box-shadow:0 0 0 4px rgba(209,75,47,.18)}
+.na .a-ms-fields{display:grid;grid-template-columns:150px 1fr 1fr auto;gap:12px;align-items:end;margin-top:14px}
+.na .a-ms-fields .a-btn{height:42px;padding:0 22px}
+.na .a-ms-tabs{width:100%}
+.na .a-ms-tabs em{font-style:normal;margin-left:7px;min-width:20px;height:19px;padding:0 6px;border-radius:10px;background:#2c96d8;color:#fff;font:700 10.5px var(--body);display:inline-grid;place-items:center;vertical-align:1px}
+.na .a-ms-row{gap:12px;align-items:center}
+.na .a-ms-row .a-tx{flex:1;min-width:0}
+.na .a-ms-row .a-tx b{white-space:normal}
+.na .a-ms-cat{margin-top:6px;max-width:100%;width:340px;height:32px;border-radius:6px;border:1px solid #b7c7d6;background-color:#fff;color:var(--tx);font:500 12.5px var(--body);padding:0 8px}
+.na .a-ms-cat:focus{outline:0;border-color:#4cb8ef;box-shadow:0 0 0 3px rgba(76,184,239,.18)}
+.na .a-ms-pz{flex:none;text-align:right;line-height:1.15}
+.na .a-ms-pz b{display:block;font:700 15px var(--display);color:var(--tx)}
+.na .a-ms-pz small{font-size:11px;color:var(--mu)}
+.na .a-ms-bt{flex:none;display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.na .a-ms-ch{flex:none;font:600 13px var(--display);color:var(--tx)}
+.na .a-ms-ch s{color:var(--mu);font-weight:500;margin-right:6px}
+.na .a-ms-sum{display:grid;grid-template-columns:repeat(6,1fr);gap:0;border-bottom:1px solid var(--ln)}
+.na .a-ms-sum span{padding:14px 12px;font-size:12px;color:var(--mu);border-right:1px solid var(--ln)}
+.na .a-ms-sum span:last-child{border-right:0}
+.na .a-ms-sum b{display:block;font:700 22px var(--display);color:var(--tx);margin-bottom:2px}
+.na .a-ms-grp{border-top:1px solid var(--ln)}
+.na .a-ms-gt{margin:0;padding:12px 16px 4px;font:700 13px var(--display);color:var(--mu2)}
+@media (max-width:760px){
+  .na .a-ms-link{padding:14px}
+  .na .a-ms-fields{grid-template-columns:1fr;gap:10px}
+  .na .a-ms-on .a-btn{flex:1 1 auto}
+  .na .a-ms-row{flex-wrap:wrap}
+  .na .a-ms-row .a-tx{flex:1 1 calc(100% - 70px)}
+  .na .a-ms-cat{width:100%}
+  .na .a-ms-row .a-tx small{display:block;white-space:normal}
+  .na .a-ms-row .a-ms-pz{order:3;text-align:left;margin-left:70px}
+  .na .a-ms-row .a-ms-bt{order:4}
+  .na .a-ms-bt{width:100%;justify-content:stretch}
+  .na .a-ms-bt .a-btn{flex:1}
+  .na .a-ms-sum{grid-template-columns:repeat(3,1fr)}
+  .na .a-ms-sum span:nth-child(3n){border-right:0}
+  .na .a-ms-sum span:nth-child(-n+3){border-bottom:1px solid var(--ln)}
+}

@@ -65,5 +65,16 @@
         }
       ]
     }
+  ],
+  "functions": {
+    "api/mondo-sapone.ts": {
+      "maxDuration": 60
+    }
+  },
+  "crons": [
+    {
+      "path": "/api/mondo-sapone",
+      "schedule": "30 4 * * *"
+    }
   ]
 }

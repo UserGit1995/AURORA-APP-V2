@@ -100,6 +100,7 @@ function rowToProduct(row: any, categoryName?: string): Product {
     flashOffer: extra.flashOffer || undefined,
     stock: extra.stock ?? (row.in_stock ? 999 : 0),
     lowStockThreshold: extra.lowStockThreshold ?? undefined,
+    supplierMissing: !!row.fornitore_assente,
     description: row.description || '',
     specs: extra.specs || { format: '' },
   };

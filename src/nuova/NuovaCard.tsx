@@ -60,7 +60,7 @@ export const NuovaCard: React.FC<NuovaCardProps> = ({
 
   return (
     <article
-      className={`n-card${qty > 0 ? ' incart' : ''}${isCompared ? ' cmp' : ''}`}
+      className={`n-card${qty > 0 ? ' incart' : ''}${isCompared ? ' cmp' : ''}${p.supplierMissing ? ' n-na' : ''}`}
       onClick={() => onOpen(p)}
       onKeyDown={(e) => {
         if (e.key === 'Enter' && e.target === e.currentTarget) onOpen(p);
@@ -70,7 +70,7 @@ export const NuovaCard: React.FC<NuovaCardProps> = ({
     >
       <div className="n-stage">
         <img ref={imgRef} className="pi" data-autozoom loading="lazy" decoding="async" src={img} alt="" referrerPolicy="no-referrer" />
-        {tag && <span className={`n-tag ${tag.cls}`}>{tag.text}</span>}
+        {p.supplierMissing ? <span className="n-tag n-tag-na">Non disponibile</span> : tag && <span className={`n-tag ${tag.cls}`}>{tag.text}</span>}
         <div className="n-cardbtns">
           <button
             ref={heartRef}
@@ -113,6 +113,7 @@ export const NuovaCard: React.FC<NuovaCardProps> = ({
             <span>/{p.unit || 'pz'}</span>
             {old ? <s>{eur(old)}</s> : null}
           </p>
+          {p.supplierMissing ? null : (
           <span className={`n-add${qty > 0 ? ' has' : ''}`} role="group" aria-label="Quantità nel carrello" onClick={(e) => e.stopPropagation()}>
             <button
               type="button"
@@ -141,6 +142,7 @@ export const NuovaCard: React.FC<NuovaCardProps> = ({
               <Ic n="plus" s={17} />
             </button>
           </span>
+          )}
         </div>
       </div>
     </article>
